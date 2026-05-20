@@ -1,0 +1,23 @@
+# Dependencies
+frontend/node_modules
+backend/node_modules
+node_modules
+
+# Next.js build output
+frontend/.next/
+frontend/out/
+
+# Environment secrets (CRITICAL - Never push these)
+.env
+.env.local
+frontend/.env
+frontend/.env.local
+backend/.env
+
+# Prisma
+frontend/prisma/*.db
+frontend/prisma/*.db-journal
+
+# OS files
+.DS_Store
+Thumbs.db
