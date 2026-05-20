@@ -1,25 +1,23 @@
-import { prisma } from "@/lib/prisma";
-import { notFound } from "next/navigation";
+"use client";
 
-export default async function TenantPage({
-  params,
-}: {
-  params: { tenant: string };
-}) {
-  const tenant = await prisma.tenant.findUnique({
-    where: { slug: params.tenant },
-    select: { name: true },
-  });
+import { signIn } from "next-auth/react";
 
-  if (!tenant) {
-    notFound();
-  }
-
+export default function LoginPage() {
   return (
-    <div className="flex h-screen w-full items-center justify-center bg-gray-50">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold">Welcome to {tenant.name}</h1>
-        <p className="mt-2 text-lg text-gray-600">This is the main page for the tenant: {params.tenant}</p>
+    <div className="flex min-h-screen items-center justify-center bg-slate-50 p-4">
+      <div className="w-full max-w-md space-y-8 rounded-xl bg-white p-8 shadow-lg border border-slate-100">
+        <div className="text-center">
+          <h2 className="mt-6 text-3xl font-extrabold text-slate-900">Sign in to your Gym</h2>
+          <p className="mt-2 text-sm text-slate-600">Access your personalized dashboard</p>
+        </div>
+        <div className="mt-8 space-y-6">
+          <button
+            onClick={() => signIn("google", { callbackUrl: "/dashboard" })}
+            className="group relative flex w-full justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-3 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors"
+          >
+            Sign in with Google
+          </button>
+        </div>
       </div>
     </div>
   );
