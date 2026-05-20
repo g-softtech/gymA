@@ -1,0 +1,117 @@
+datasource db {
+  provider = "postgresql"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  SUPERADMIN
+  ADMIN       // Gym Owner
+  TRAINER     // Gym Employee
+  MEMBER      // Customer
+}
+
+model Tenant {
+  id              String           @id @default(cuid())
+  name            String
+  slug            String           @unique
+  users           User[]
+  membershipPlans MembershipPlan[]
+}
+
+model User {
+  id             String          @id @default(cuid())
+  name           String?
+  email          String?         @unique
+  emailVerified  DateTime?
+  image          String?
+  role           Role            @default(MEMBER)
+  
+  // Multi-tenancy
+  tenantId       String?
+  tenant         Tenant?         @relation(fields: [tenantId], references: [id])
+  
+  // NextAuth Relations
+  accounts       Account[]
+  sessions       Session[]
+  
+  // Gym specific profiles
+  memberProfile  MemberProfile?
+  trainerProfile TrainerProfile?
+}
+
+// --- NextAuth Required Models ---
+
+model Account {
+  id                 String  @id @default(cuid())
+  userId             String
+  type               String
+  provider           String
+  providerAccountId  String
+  refresh_token      String?  @db.Text
+  access_token       String?  @db.Text
+  expires_at         Int?
+  token_type         String?
+  scope              String?
+  id_token           String?  @db.Text
+  session_state      String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// --- SaaS Domain Models ---
+
+model MemberProfile {
+  id             String         @id @default(cuid())
+  userId         String         @unique
+  user           User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  weightKg       Float?
+  heightCm       Float?
+  fitnessGoals   String[]
+  workouts       WorkoutPlan[]
+}
+
+model TrainerProfile {
+  id             String         @id @default(cuid())
+  userId         String         @unique
+  user           User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  specialties    String[]
+  availability   Json           // Weekly slots stored as JSON for flexibility
+}
+
+model MembershipPlan {
+  id            String         @id @default(cuid())
+  tenantId      String
+  tenant        Tenant         @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  name          String
+  price         Float
+  durationDays  Int
+}
+
+model WorkoutPlan {
+  id             String         @id @default(cuid())
+  memberId       String
+  member         MemberProfile  @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  routines       Json           
+  isAiGenerated  Boolean        @default(false)
+}
