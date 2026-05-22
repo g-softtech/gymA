@@ -13,6 +13,12 @@ enum Role {
   MEMBER      // Customer
 }
 
+enum SubscriptionStatus {
+  ACTIVE
+  INACTIVE
+  CANCELLED
+}
+
 model Tenant {
   id              String           @id @default(cuid())
   name            String
@@ -88,6 +94,7 @@ model MemberProfile {
   weightKg       Float?
   heightCm       Float?
   fitnessGoals   String[]
+  subscriptions  Subscription[]
   workouts       WorkoutPlan[]
 }
 
@@ -106,6 +113,19 @@ model MembershipPlan {
   name          String
   price         Float
   durationDays  Int
+  subscriptions Subscription[]
+}
+
+model Subscription {
+  id               String             @id @default(cuid())
+  memberId         String
+  member           MemberProfile      @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  planId           String
+  plan             MembershipPlan     @relation(fields: [planId], references: [id], onDelete: Cascade)
+  startDate        DateTime           @default(now())
+  endDate          DateTime
+  status           SubscriptionStatus @default(ACTIVE)
+  paymentGatewayId String?
 }
 
 model WorkoutPlan {

@@ -1,6 +1,10 @@
 import { PrismaClient } from "@prisma/client";
+import { Pool } from "pg";
+import { PrismaPg } from "@prisma/adapter-pg";
 
-const prisma = new PrismaClient();
+const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+const adapter = new PrismaPg(pool);
+const prisma = new PrismaClient({ adapter });
 
 async function main() {
   // 1. Create a Test Tenant (Gym)
@@ -25,6 +29,32 @@ async function main() {
     },
   });
   console.log("✅ Seeded Admin:", admin.email);
+
+  // 3. Create Membership Plans for the Tenant
+  await prisma.membershipPlan.createMany({
+    data: [
+      {
+        name: "Basic Monthly",
+        price: 29.99,
+        durationDays: 30,
+        tenantId: tenant.id,
+      },
+      {
+        name: "Premium Monthly",
+        price: 49.99,
+        durationDays: 30,
+        tenantId: tenant.id,
+      },
+      {
+        name: "Annual Pass",
+        price: 499.99,
+        durationDays: 365,
+        tenantId: tenant.id,
+      },
+    ],
+    skipDuplicates: true,
+  });
+  console.log("✅ Seeded Membership Plans for", tenant.name);
 }
 
 main()
