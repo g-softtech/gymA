@@ -1,0 +1,500 @@
+diff --git a/auth.ts b/auth.ts
+deleted file mode 100644
+index e69de29..0000000
+diff --git a/frontend/Navbar.tsx b/frontend/Navbar.tsx
+deleted file mode 100644
+index e69de29..0000000
+diff --git a/frontend/app/gym/[tenant]/layout.tsx b/frontend/app/gym/[tenant]/layout.tsx
+index aae031f..336424c 100644
+--- a/frontend/app/gym/[tenant]/layout.tsx
++++ b/frontend/app/gym/[tenant]/layout.tsx
+@@ -1,48 +1,7 @@
+ import { ReactNode } from "react";
+-import { prisma } from "../../../lib/prisma";
+-import { notFound, redirect } from "next/navigation";
+-import { getAuthSession } from "../../../lib/auth";
+ 
+-export default async function DashboardLayout({
+-  children,
+-  params,
+-}: {
+-  children: ReactNode;
+-  params: Promise<{ tenant: string }>;
+-}) {
+-  const resolvedParams = await params;
+-  const session = await getAuthSession();
+-
+-  // Basic protection: Ensure user is logged in
+-  if (!session || !session.user) {
+-    redirect(`/api/auth/signin?callbackUrl=/gym/${resolvedParams.tenant}/dashboard/member`);
+-  }
+-
+-  // Verify the tenant exists
+-  const tenant = await prisma.tenant.findUnique({
+-    where: { slug: resolvedParams.tenant },
+-  });
+-
+-  if (!tenant) {
+-    notFound();
+-  }
+-
+-  // ENFORCE TENANT DATA ISOLATION: User must belong to this specific gym
+-  if (session.user.tenantId !== tenant.id) {
+-    return (
+-      <div className="flex min-h-screen items-center justify-center p-6 text-center text-red-600">
+-        <h2 className="text-2xl font-bold">Unauthorized: You do not have access to {tenant.name}</h2>
+-      </div>
+-    );
+-  }
+-
+-  return (
+-    <div className="flex min-h-screen flex-col bg-slate-100">
+-      <header className="w-full bg-white p-4 shadow-sm flex justify-between items-center">
+-        <span className="font-semibold text-lg">{tenant.name} Dashboard</span>
+-        <span className="text-sm text-gray-500">Logged in as: {session.user.role}</span>
+-      </header>
+-      <main className="flex-1 p-6">{children}</main>
+-    </div>
+-  );
+-}
+\ No newline at end of file
++// Public layout for gym pages (landing, plans, checkout).
++// Auth-gated routes live under /gym/[tenant]/dashboard/ with their own layout.
++export default function GymPublicLayout({ children }: { children: ReactNode }) {
++  return <>{children}</>;
++}
+diff --git a/frontend/app/gym/[tenant]/page.tsx b/frontend/app/gym/[tenant]/page.tsx
+index 80ca59c..9f9ac35 100644
+--- a/frontend/app/gym/[tenant]/page.tsx
++++ b/frontend/app/gym/[tenant]/page.tsx
+@@ -1,50 +1,79 @@
+-// import { prisma } from "../../../../../lib/prisma";
+-// import { notFound, redirect } from "next/navigation";
+-// import { getAuthSession } from "../../../../../lib/auth";
+-// import CheckoutButton from "../../../../../CheckoutButton";
+ import { prisma } from "@/lib/prisma";
+-import { notFound, redirect } from "next/navigation";
+-import { getAuthSession } from "@/lib/auth";
+-import CheckoutButton from "@/components/CheckoutButton";
++import { notFound } from "next/navigation";
++import Link from "next/link";
+ 
+-export default async function CheckoutPage({
++export default async function GymPublicPage({
+   params,
+ }: {
+-  params: Promise<{ tenant: string; planId: string }>;
++  params: Promise<{ tenant: string }>;
+ }) {
+-  const resolvedParams = await params;
+-  const session = await getAuthSession();
++  const { tenant: tenantSlug } = await params;
+ 
+-  if (!session || !session.user) {
+-    redirect(`/api/auth/signin?callbackUrl=/gym/${resolvedParams.tenant}/checkout/${resolvedParams.planId}`);
+-  }
+-
+-  // Fetch the specific plan being purchased
+-  const plan = await prisma.membershipPlan.findUnique({
+-    where: { id: resolvedParams.planId },
+-    include: { tenant: true },
++  const tenant = await prisma.tenant.findUnique({
++    where: { slug: tenantSlug },
++    include: { membershipPlans: true },
+   });
+ 
+-  if (!plan || plan.tenant.slug !== resolvedParams.tenant) {
++  if (!tenant) {
+     notFound();
+   }
+ 
+   return (
+-    <div className="flex min-h-screen items-center justify-center bg-gray-50 p-4">
+-      <div className="w-full max-w-md bg-white rounded-xl shadow-lg p-8 border border-gray-100">
+-        <h1 className="text-2xl font-bold text-gray-900 mb-6">Checkout</h1>
+-        <div className="border-b border-gray-200 pb-4 mb-6">
+-          <h2 className="text-sm font-semibold text-indigo-600 uppercase tracking-wide">{plan.tenant.name}</h2>
+-          <p className="text-2xl text-gray-900 mt-1 font-medium">{plan.name}</p>
+-          <p className="text-4xl font-extrabold text-gray-900 mt-4">${plan.price}</p>
+-        </div>
+-        <CheckoutButton 
+-          email={session.user.email!} 
+-          amount={plan.price} 
+-          planName={plan.name} 
+-          tenantSlug={plan.tenant.slug} 
+-        />
++    <div className="min-h-screen bg-gray-50">
++      {/* Hero */}
++      <div className="bg-indigo-700 text-white py-20 px-6 text-center">
++        <h1 className="text-5xl font-extrabold mb-4">{tenant.name}</h1>
++        <p className="text-xl text-indigo-200 max-w-xl mx-auto">
++          Join our gym and transform your fitness journey. Choose a plan below to get started.
++        </p>
++      </div>
++
++      {/* Membership Plans */}
++      <div className="max-w-5xl mx-auto px-6 py-16">
++        <h2 className="text-3xl font-bold text-gray-900 text-center mb-10">
++          Membership Plans
++        </h2>
++
++        {tenant.membershipPlans.length === 0 ? (
++          <p className="text-center text-gray-500">No plans available yet.</p>
++        ) : (
++          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
++            {tenant.membershipPlans.map((plan) => (
++              <div
++                key={plan.id}
++                className="bg-white rounded-2xl shadow-md border border-gray-100 p-8 flex flex-col justify-between hover:shadow-xl transition-shadow"
++              >
++                <div>
++                  <h3 className="text-xl font-bold text-gray-900 mb-2">{plan.name}</h3>
++                  <p className="text-gray-500 text-sm mb-6">
++                    {plan.durationDays} day{plan.durationDays > 1 ? "s" : ""} access
++                  </p>
++                  <p className="text-4xl font-extrabold text-indigo-600 mb-1">
++                    ₦{plan.price.toLocaleString()}
++                  </p>
++                </div>
++                <Link
++                  href={`/gym/${tenantSlug}/checkout/${plan.id}`}
++                  className="mt-8 block w-full bg-indigo-600 hover:bg-indigo-700 text-white text-center font-semibold py-3 rounded-lg transition-colors"
++                >
++                  Get Started
++                </Link>
++              </div>
++            ))}
++          </div>
++        )}
++      </div>
++
++      {/* Footer CTA */}
++      <div className="bg-indigo-50 border-t border-indigo-100 py-10 text-center">
++        <p className="text-gray-600 mb-4">Already a member?</p>
++        <Link
++          href={`/api/auth/signin?callbackUrl=/gym/${tenantSlug}/dashboard/member`}
++          className="inline-block px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition"
++        >
++          Sign In to Dashboard
++        </Link>
+       </div>
+     </div>
+   );
+-}
+\ No newline at end of file
++}
+diff --git a/frontend/app/gym/[tenant]/prisma.ts b/frontend/app/gym/[tenant]/prisma.ts
+deleted file mode 100644
+index e69de29..0000000
+diff --git a/frontend/components/CheckoutButton.tsx b/frontend/components/CheckoutButton.tsx
+index 5a72792..84cdc09 100644
+--- a/frontend/components/CheckoutButton.tsx
++++ b/frontend/components/CheckoutButton.tsx
+@@ -3,44 +3,72 @@
+ import { usePaystackPayment } from "react-paystack";
+ import { useRouter } from "next/navigation";
+ 
++interface CheckoutButtonProps {
++  email: string;
++  amount: number;
++  planName: string;
++  planId: string;
++  tenantSlug: string;
++}
++
+ export default function CheckoutButton({
+   email,
+   amount,
+   planName,
++  planId,
+   tenantSlug,
+-}: {
+-  email: string;
+-  amount: number;
+-  planName: string;
+-  tenantSlug: string;
+-}) {
++}: CheckoutButtonProps) {
+   const router = useRouter();
+ 
+   const config = {
+-    reference: new Date().getTime().toString(),
+-    email: email,
+-    amount: amount * 100, // Paystack calculates in the lowest currency unit (e.g., kobo/cents)
++    reference: `gym_${new Date().getTime()}`,
++    email,
++    amount: amount * 100, // Paystack uses kobo (smallest currency unit)
+     publicKey: process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY || "pk_test_placeholder",
++    metadata: {
++      custom_fields: [
++        { display_name: "Plan", variable_name: "plan_name", value: planName },
++        { display_name: "Plan ID", variable_name: "plan_id", value: planId },
++      ],
++    },
+   };
+ 
+   const initializePayment = usePaystackPayment(config);
+ 
+-  const onSuccess = (reference: any) => {
+-    alert(`Payment successful! Reference: ${reference.reference}`);
+-    // Redirect the user to their member dashboard after payment
+-    router.push(`/gym/${tenantSlug}/dashboard/member`);
++  const onSuccess = async (reference: { reference: string }) => {
++    try {
++      // Verify payment and activate subscription server-side
++      const res = await fetch("/api/payments/verify", {
++        method: "POST",
++        headers: { "Content-Type": "application/json" },
++        body: JSON.stringify({
++          reference: reference.reference,
++          planId,
++          tenantSlug,
++        }),
++      });
++
++      if (res.ok) {
++        router.push(`/gym/${tenantSlug}/dashboard/member?welcome=1`);
++      } else {
++        const data = await res.json();
++        alert(`Payment recorded but activation failed: ${data.error}. Please contact support.`);
++      }
++    } catch {
++      alert("Payment was successful but we could not activate your plan. Please contact support.");
++    }
+   };
+ 
+   const onClose = () => {
+-    alert("Payment cancelled.");
++    // User closed payment modal — do nothing
+   };
+ 
+   return (
+     <button
+-      onClick={() => initializePayment(onSuccess, onClose)}
++      onClick={() => initializePayment({ onSuccess, onClose })}
+       className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg transition-colors mt-2"
+     >
+-      Pay with Paystack
++      Pay ₦{amount.toLocaleString()} with Paystack
+     </button>
+   );
+-}
+\ No newline at end of file
++}
+diff --git a/frontend/package.json b/frontend/package.json
+index c8099cd..8b8a4cd 100644
+--- a/frontend/package.json
++++ b/frontend/package.json
+@@ -16,7 +16,8 @@
+     "next-auth": "^4.24.14",
+     "pg": "^8.21.0",
+     "react": "19.2.4",
+-    "react-dom": "19.2.4"
++    "react-dom": "19.2.4",
++    "react-paystack": "^6.0.0"
+   },
+   "devDependencies": {
+     "@tailwindcss/postcss": "^4",
+diff --git a/frontend/page.tsx b/frontend/page.tsx
+deleted file mode 100644
+index e69de29..0000000
+diff --git a/frontend/prisma/migrations/20260521075021_phase2_memberships/migration.sql b/frontend/prisma/migrations/20260521075021_phase2_memberships/migration.sql
+index 0ed6fa4..e6d5489 100644
+--- a/frontend/prisma/migrations/20260521075021_phase2_memberships/migration.sql
++++ b/frontend/prisma/migrations/20260521075021_phase2_memberships/migration.sql
+@@ -1,40 +1,24 @@
+-/*
+-  Warnings:
++-- Phase 2: Add Subscription system and SubscriptionStatus enum
+ 
+-  - Made the column `tenantId` on table `User` required. This step will fail if there are existing NULL values in that column.
+-  - Added the required column `tenantId` to the `WorkoutPlan` table without a default value. This is not possible if the table is not empty.
+-
+-*/
+ -- CreateEnum
+ CREATE TYPE "SubscriptionStatus" AS ENUM ('ACTIVE', 'INACTIVE', 'CANCELLED');
+ 
+--- DropForeignKey
++-- DropForeignKey (re-add with correct cascade rules)
+ ALTER TABLE "MemberProfile" DROP CONSTRAINT "MemberProfile_userId_fkey";
+-
+--- DropForeignKey
+ ALTER TABLE "MembershipPlan" DROP CONSTRAINT "MembershipPlan_tenantId_fkey";
+-
+--- DropForeignKey
+ ALTER TABLE "TrainerProfile" DROP CONSTRAINT "TrainerProfile_userId_fkey";
+-
+--- DropForeignKey
+ ALTER TABLE "User" DROP CONSTRAINT "User_tenantId_fkey";
+-
+--- DropForeignKey
+ ALTER TABLE "WorkoutPlan" DROP CONSTRAINT "WorkoutPlan_memberId_fkey";
+ 
+--- AlterTable
+-ALTER TABLE "User" ALTER COLUMN "tenantId" SET NOT NULL;
+-
+--- AlterTable
+-ALTER TABLE "WorkoutPlan" ADD COLUMN     "tenantId" TEXT NOT NULL;
++-- Make User.tenantId nullable (social/OAuth users may not belong to a tenant yet)
++ALTER TABLE "User" ALTER COLUMN "tenantId" DROP NOT NULL;
+ 
+--- CreateTable
++-- CreateTable Subscription
+ CREATE TABLE "Subscription" (
+     "id" TEXT NOT NULL,
+     "memberId" TEXT NOT NULL,
+     "planId" TEXT NOT NULL,
+-    "startDate" TIMESTAMP(3) NOT NULL,
++    "startDate" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+     "endDate" TIMESTAMP(3) NOT NULL,
+     "status" "SubscriptionStatus" NOT NULL DEFAULT 'ACTIVE',
+     "paymentGatewayId" TEXT,
+@@ -42,43 +26,11 @@ CREATE TABLE "Subscription" (
+     CONSTRAINT "Subscription_pkey" PRIMARY KEY ("id")
+ );
+ 
+--- CreateTable
+-CREATE TABLE "MealPlan" (
+-    "id" TEXT NOT NULL,
+-    "memberId" TEXT NOT NULL,
+-    "tenantId" TEXT NOT NULL,
+-    "details" JSONB NOT NULL,
+-    "isAiGenerated" BOOLEAN NOT NULL DEFAULT false,
+-
+-    CONSTRAINT "MealPlan_pkey" PRIMARY KEY ("id")
+-);
+-
+--- AddForeignKey
+-ALTER TABLE "User" ADD CONSTRAINT "User_tenantId_fkey" FOREIGN KEY ("tenantId") REFERENCES "Tenant"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+-
+--- AddForeignKey
+-ALTER TABLE "MemberProfile" ADD CONSTRAINT "MemberProfile_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+-
+--- AddForeignKey
+-ALTER TABLE "TrainerProfile" ADD CONSTRAINT "TrainerProfile_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+-
+--- AddForeignKey
+-ALTER TABLE "MembershipPlan" ADD CONSTRAINT "MembershipPlan_tenantId_fkey" FOREIGN KEY ("tenantId") REFERENCES "Tenant"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+-
+--- AddForeignKey
+-ALTER TABLE "Subscription" ADD CONSTRAINT "Subscription_memberId_fkey" FOREIGN KEY ("memberId") REFERENCES "MemberProfile"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+-
+--- AddForeignKey
+-ALTER TABLE "Subscription" ADD CONSTRAINT "Subscription_planId_fkey" FOREIGN KEY ("planId") REFERENCES "MembershipPlan"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+-
+--- AddForeignKey
+-ALTER TABLE "WorkoutPlan" ADD CONSTRAINT "WorkoutPlan_memberId_fkey" FOREIGN KEY ("memberId") REFERENCES "MemberProfile"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+-
+--- AddForeignKey
+-ALTER TABLE "WorkoutPlan" ADD CONSTRAINT "WorkoutPlan_tenantId_fkey" FOREIGN KEY ("tenantId") REFERENCES "Tenant"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+-
+--- AddForeignKey
+-ALTER TABLE "MealPlan" ADD CONSTRAINT "MealPlan_memberId_fkey" FOREIGN KEY ("memberId") REFERENCES "MemberProfile"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+-
+ -- AddForeignKey
+-ALTER TABLE "MealPlan" ADD CONSTRAINT "MealPlan_tenantId_fkey" FOREIGN KEY ("tenantId") REFERENCES "Tenant"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
++ALTER TABLE "User" ADD CONSTRAINT "User_tenantId_fkey" FOREIGN KEY ("tenantId") REFERENCES "Tenant"("id") ON DELETE SET NULL ON UPDATE CASCADE;
++ALTER TABLE "MemberProfile" ADD CONSTRAINT "MemberProfile_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
++ALTER TABLE "TrainerProfile" ADD CONSTRAINT "TrainerProfile_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
++ALTER TABLE "MembershipPlan" ADD CONSTRAINT "MembershipPlan_tenantId_fkey" FOREIGN KEY ("tenantId") REFERENCES "Tenant"("id") ON DELETE CASCADE ON UPDATE CASCADE;
++ALTER TABLE "WorkoutPlan" ADD CONSTRAINT "WorkoutPlan_memberId_fkey" FOREIGN KEY ("memberId") REFERENCES "MemberProfile"("id") ON DELETE CASCADE ON UPDATE CASCADE;
++ALTER TABLE "Subscription" ADD CONSTRAINT "Subscription_memberId_fkey" FOREIGN KEY ("memberId") REFERENCES "MemberProfile"("id") ON DELETE CASCADE ON UPDATE CASCADE;
++ALTER TABLE "Subscription" ADD CONSTRAINT "Subscription_planId_fkey" FOREIGN KEY ("planId") REFERENCES "MembershipPlan"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+diff --git a/frontend/prisma/migrations/20260521134555_phase2_init/migration.sql b/frontend/prisma/migrations/20260521134555_phase2_init/migration.sql
+index 2e30758..62dae51 100644
+--- a/frontend/prisma/migrations/20260521134555_phase2_init/migration.sql
++++ b/frontend/prisma/migrations/20260521134555_phase2_init/migration.sql
+@@ -1,69 +1,4 @@
+-/*
+-  Warnings:
+-
+-  - You are about to drop the column `tenantId` on the `WorkoutPlan` table. All the data in the column will be lost.
+-  - You are about to drop the `MealPlan` table. If the table is not empty, all the data it contains will be lost.
+-
+-*/
+--- DropForeignKey
+-ALTER TABLE "MealPlan" DROP CONSTRAINT "MealPlan_memberId_fkey";
+-
+--- DropForeignKey
+-ALTER TABLE "MealPlan" DROP CONSTRAINT "MealPlan_tenantId_fkey";
+-
+--- DropForeignKey
+-ALTER TABLE "MemberProfile" DROP CONSTRAINT "MemberProfile_userId_fkey";
+-
+--- DropForeignKey
+-ALTER TABLE "MembershipPlan" DROP CONSTRAINT "MembershipPlan_tenantId_fkey";
+-
+--- DropForeignKey
+-ALTER TABLE "Subscription" DROP CONSTRAINT "Subscription_memberId_fkey";
+-
+--- DropForeignKey
+-ALTER TABLE "Subscription" DROP CONSTRAINT "Subscription_planId_fkey";
+-
+--- DropForeignKey
+-ALTER TABLE "TrainerProfile" DROP CONSTRAINT "TrainerProfile_userId_fkey";
+-
+--- DropForeignKey
+-ALTER TABLE "User" DROP CONSTRAINT "User_tenantId_fkey";
+-
+--- DropForeignKey
+-ALTER TABLE "WorkoutPlan" DROP CONSTRAINT "WorkoutPlan_memberId_fkey";
+-
+--- DropForeignKey
+-ALTER TABLE "WorkoutPlan" DROP CONSTRAINT "WorkoutPlan_tenantId_fkey";
+-
+--- AlterTable
+-ALTER TABLE "Subscription" ALTER COLUMN "startDate" SET DEFAULT CURRENT_TIMESTAMP;
+-
+--- AlterTable
+-ALTER TABLE "User" ALTER COLUMN "tenantId" DROP NOT NULL;
+-
+--- AlterTable
+-ALTER TABLE "WorkoutPlan" DROP COLUMN "tenantId";
+-
+--- DropTable
+-DROP TABLE "MealPlan";
+-
+--- AddForeignKey
+-ALTER TABLE "User" ADD CONSTRAINT "User_tenantId_fkey" FOREIGN KEY ("tenantId") REFERENCES "Tenant"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+-
+--- AddForeignKey
+-ALTER TABLE "MemberProfile" ADD CONSTRAINT "MemberProfile_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+-
+--- AddForeignKey
+-ALTER TABLE "TrainerProfile" ADD CONSTRAINT "TrainerProfile_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+-
+--- AddForeignKey
+-ALTER TABLE "MembershipPlan" ADD CONSTRAINT "MembershipPlan_tenantId_fkey" FOREIGN KEY ("tenantId") REFERENCES "Tenant"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+-
+--- AddForeignKey
+-ALTER TABLE "Subscription" ADD CONSTRAINT "Subscription_memberId_fkey" FOREIGN KEY ("memberId") REFERENCES "MemberProfile"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+-
+--- AddForeignKey
+-ALTER TABLE "Subscription" ADD CONSTRAINT "Subscription_planId_fkey" FOREIGN KEY ("planId") REFERENCES "MembershipPlan"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+-
+--- AddForeignKey
+-ALTER TABLE "WorkoutPlan" ADD CONSTRAINT "WorkoutPlan_memberId_fkey" FOREIGN KEY ("memberId") REFERENCES "MemberProfile"("id") ON DELETE CASCADE ON UPDATE CASCADE;
++-- Phase 2 cleanup: schema reconciliation
++-- This migration is intentionally empty.
++-- All Phase 2 changes were consolidated into 20260521075021_phase2_memberships.
++-- Keeping this file preserves the migration history without re-running dropped SQL.
+diff --git a/frontend/prisma/prisma.ts b/frontend/prisma/prisma.ts
+deleted file mode 100644
+index e69de29..0000000
+diff --git a/frontend/prisma/schema.prisma b/frontend/prisma/schema.prisma
+index a4c5bd1..7943844 100644
+--- a/frontend/prisma/schema.prisma
++++ b/frontend/prisma/schema.prisma
+@@ -1,5 +1,6 @@
+ datasource db {
+   provider = "postgresql"
++  url      = env("DATABASE_URL")
+ }
+ 
+ generator client {
+diff --git a/page.tsx b/page.tsx
+deleted file mode 100644
+index e69de29..0000000
+diff --git a/route.ts b/route.ts
+deleted file mode 100644
+index e69de29..0000000

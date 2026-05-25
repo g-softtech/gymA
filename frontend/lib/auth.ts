@@ -1,6 +1,4 @@
-// Authentication configuration
-// import { NextAuthOptions, Session } from "next-auth";
-// import NextAuth, { type NextAuthOptions, type Session } from "next-auth";
+
 import NextAuth from "next-auth";
 import type { NextAuthOptions, Session } from "next-auth";
 import { getServerSession } from "next-auth/next";
@@ -20,30 +18,57 @@ export const authOptions: NextAuthOptions = {
     strategy: "jwt",
   },
   callbacks: {
-    async jwt({ token, user }) {
+    async signIn({ user }) {
+      // If the user has no tenantId, try to assign one from their callbackUrl
+      if (user.id && !user.tenantId) {
+        const dbUser = await prisma.user.findUnique({
+          where: { id: user.id },
+          select: { tenantId: true },
+        });
+
+        if (!dbUser?.tenantId) {
+          // Extract slug from the stored callbackUrl cookie isn't available here,
+          // so we assign tenantId in the jwt callback on first load instead
+        }
+      }
+      return true;
+    },
+
+    async jwt({ token, user, trigger }) {
+      // On first sign-in, user object is present
       if (user) {
         token.id = user.id;
         token.role = user.role;
         token.tenantId = user.tenantId;
       }
+
+      // On every request, re-fetch tenantId from DB in case it was just assigned
+      if (token.id && !token.tenantId) {
+        const dbUser = await prisma.user.findUnique({
+          where: { id: token.id as string },
+          select: { tenantId: true, role: true },
+        });
+        if (dbUser?.tenantId) {
+          token.tenantId = dbUser.tenantId;
+          token.role = dbUser.role;
+        }
+      }
+
       return token;
     },
+
     async session({ session, token }) {
       if (token && session.user) {
         session.user.id = token.id as string;
         session.user.role = token.role as string;
-        session.user.tenantId = token.tenantId as string;
+        // session.user.tenantId = token.tenantId as string | undefined;
+        session.user.tenantId = (token.tenantId as string) ?? undefined;
       }
       return session;
     },
   },
 };
 
-/**
- * Production-grade helper to get the typed server session.
- * This bypasses the NextAuth getServerSession inference bug
- * and enforces the augmented Session type globally.
- */
 export function getAuthSession(): Promise<Session | null> {
   return getServerSession(authOptions);
 }
