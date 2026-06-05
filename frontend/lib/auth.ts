@@ -10,47 +10,39 @@ export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma) as any,
   providers: [
     GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID || "placeholder",
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET || "placeholder",
+      clientId: process.env.GOOGLE_CLIENT_ID || "",
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
+      authorization: {
+        params: {
+          prompt: "select_account",
+          access_type: "online",
+        },
+      },
     }),
   ],
   session: {
     strategy: "jwt",
+    maxAge: 24 * 60 * 60,
   },
   callbacks: {
-    async signIn({ user }) {
-      // If the user has no tenantId, try to assign one from their callbackUrl
-      if (user.id && !user.tenantId) {
-        const dbUser = await prisma.user.findUnique({
-          where: { id: user.id },
-          select: { tenantId: true },
-        });
-
-        if (!dbUser?.tenantId) {
-          // Extract slug from the stored callbackUrl cookie isn't available here,
-          // so we assign tenantId in the jwt callback on first load instead
-        }
-      }
-      return true;
-    },
-
-    async jwt({ token, user, trigger }) {
-      // On first sign-in, user object is present
-      if (user) {
+    async jwt({ token, user, account }) {
+      // On first sign in
+      if (user && account) {
         token.id = user.id;
-        token.role = user.role;
-        token.tenantId = user.tenantId;
+        token.role = user.role ?? "MEMBER";
+        token.tenantId = user.tenantId ?? undefined;
       }
 
-      // On every request, re-fetch tenantId from DB in case it was just assigned
-      if (token.id && !token.tenantId) {
+      // ALWAYS re-fetch role and tenantId from DB on every request
+      // This ensures role changes (e.g. MEMBER -> TRAINER) take effect immediately
+      if (token.id) {
         const dbUser = await prisma.user.findUnique({
           where: { id: token.id as string },
-          select: { tenantId: true, role: true },
+          select: { role: true, tenantId: true },
         });
-        if (dbUser?.tenantId) {
-          token.tenantId = dbUser.tenantId;
+        if (dbUser) {
           token.role = dbUser.role;
+          token.tenantId = dbUser.tenantId ?? undefined;
         }
       }
 
@@ -61,8 +53,7 @@ export const authOptions: NextAuthOptions = {
       if (token && session.user) {
         session.user.id = token.id as string;
         session.user.role = token.role as string;
-        // session.user.tenantId = token.tenantId as string | undefined;
-        session.user.tenantId = (token.tenantId as string) ?? undefined;
+        session.user.tenantId = token.tenantId as string | undefined;
       }
       return session;
     },

@@ -1,17 +1,17 @@
 datasource db {
   provider = "postgresql"
- 
 }
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
 }
 
 enum Role {
   SUPERADMIN
-  ADMIN       // Gym Owner
-  TRAINER     // Gym Employee
-  MEMBER      // Customer
+  ADMIN
+  TRAINER
+  MEMBER
 }
 
 enum SubscriptionStatus {
@@ -20,12 +20,36 @@ enum SubscriptionStatus {
   CANCELLED
 }
 
+enum NotificationType {
+  PAYMENT
+  SUBSCRIPTION_EXPIRY
+  ATTENDANCE
+  BOOKING
+  MESSAGE
+  GENERAL
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+  RESCHEDULED
+}
+
+enum SessionType {
+  PHYSICAL
+  ONLINE
+}
+
 model Tenant {
   id              String           @id @default(cuid())
   name            String
   slug            String           @unique
   users           User[]
   membershipPlans MembershipPlan[]
+  notifications   Notification[]
+  messages        Message[]
 }
 
 model User {
@@ -35,37 +59,30 @@ model User {
   emailVerified  DateTime?
   image          String?
   role           Role            @default(MEMBER)
-  
-  // Multi-tenancy
   tenantId       String?
   tenant         Tenant?         @relation(fields: [tenantId], references: [id])
-  
-  // NextAuth Relations
   accounts       Account[]
   sessions       Session[]
-  
-  // Gym specific profiles
   memberProfile  MemberProfile?
   trainerProfile TrainerProfile?
+  notifications  Notification[]
+  sentMessages   Message[]       @relation("SentMessages")
 }
 
-// --- NextAuth Required Models ---
-
 model Account {
-  id                 String  @id @default(cuid())
-  userId             String
-  type               String
-  provider           String
-  providerAccountId  String
-  refresh_token      String?  @db.Text
-  access_token       String?  @db.Text
-  expires_at         Int?
-  token_type         String?
-  scope              String?
-  id_token           String?  @db.Text
-  session_state      String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
@@ -86,25 +103,30 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
-// --- SaaS Domain Models ---
-
 model MemberProfile {
-  id             String         @id @default(cuid())
-  userId         String         @unique
-  user           User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  weightKg       Float?
-  heightCm       Float?
-  fitnessGoals   String[]
-  subscriptions  Subscription[]
-  workouts       WorkoutPlan[]
+  id              String            @id @default(cuid())
+  userId          String            @unique
+  user            User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  weightKg        Float?
+  heightCm        Float?
+  fitnessGoals    String[]
+  subscriptions   Subscription[]
+  workouts        WorkoutPlan[]
+  attendance      Attendance[]
+  bookings        Booking[]
+  progressRecords ProgressRecord[]
 }
 
 model TrainerProfile {
-  id             String         @id @default(cuid())
-  userId         String         @unique
-  user           User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  specialties    String[]
-  availability   Json           // Weekly slots stored as JSON for flexibility
+  id           String           @id @default(cuid())
+  userId       String           @unique
+  user         User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  specialties  String[]
+  availability Json
+  bio          String?
+  hourlyRate   Float?
+  bookings     Booking[]
+  workoutPlans WorkoutPlan[]
 }
 
 model MembershipPlan {
@@ -130,9 +152,96 @@ model Subscription {
 }
 
 model WorkoutPlan {
-  id             String         @id @default(cuid())
-  memberId       String
-  member         MemberProfile  @relation(fields: [memberId], references: [id], onDelete: Cascade)
-  routines       Json           
-  isAiGenerated  Boolean        @default(false)
+  id            String          @id @default(cuid())
+  memberId      String
+  member        MemberProfile   @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  trainerId     String?
+  trainer       TrainerProfile? @relation(fields: [trainerId], references: [id])
+  title         String          @default("My Workout Plan")
+  routines      Json
+  isAiGenerated Boolean         @default(false)
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+}
+
+model Booking {
+  id           String         @id @default(cuid())
+  trainerId    String
+  trainer      TrainerProfile @relation(fields: [trainerId], references: [id], onDelete: Cascade)
+  memberId     String
+  member       MemberProfile  @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  tenantId     String
+  date         DateTime
+  durationMins Int            @default(60)
+  sessionType  SessionType    @default(PHYSICAL)
+  status       BookingStatus  @default(PENDING)
+  notes        String?
+  meetingLink  String?
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+
+  @@index([trainerId, date])
+  @@index([memberId])
+  @@index([tenantId, status])
+}
+
+model Attendance {
+  id          String        @id @default(cuid())
+  memberId    String
+  member      MemberProfile @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  tenantId    String
+  checkedInAt DateTime      @default(now())
+  note        String?
+
+  @@index([tenantId, checkedInAt])
+  @@index([memberId])
+}
+
+model ProgressRecord {
+  id          String        @id @default(cuid())
+  memberId    String
+  member      MemberProfile @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  recordedBy  String
+  weightKg    Float?
+  bodyFatPct  Float?
+  muscleMass  Float?
+  chestCm     Float?
+  waistCm     Float?
+  hipsCm      Float?
+  notes       String?
+  recordedAt  DateTime      @default(now())
+
+  @@index([memberId, recordedAt])
+}
+
+model Message {
+  id         String   @id @default(cuid())
+  tenantId   String
+  tenant     Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  senderId   String
+  sender     User     @relation("SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
+  receiverId String
+  content    String
+  read       Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  @@index([tenantId])
+  @@index([senderId, receiverId])
+  @@index([receiverId, read])
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  tenantId  String
+  tenant    Tenant           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  userId    String?
+  user      User?            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      NotificationType @default(GENERAL)
+  title     String
+  message   String
+  read      Boolean          @default(false)
+  createdAt DateTime         @default(now())
+
+  @@index([tenantId, read])
+  @@index([userId])
 }
