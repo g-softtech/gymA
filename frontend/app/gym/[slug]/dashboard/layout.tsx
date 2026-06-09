@@ -19,7 +19,11 @@ export default async function DashboardLayout({
     redirect(`/api/auth/signin?callbackUrl=/gym/${slug}/dashboard/member`);
   }
 
-  const tenant = await prisma.tenant.findUnique({ where: { slug } });
+  // ✅ Phase 5: Fetch TenantSettings alongside the tenant for branding
+  const tenant = await prisma.tenant.findUnique({
+    where: { slug },
+    include: { settings: true },
+  });
   if (!tenant) notFound();
 
   // ✅ Phase 3: No silent auto-assign. New users must explicitly confirm joining a gym.
@@ -50,6 +54,20 @@ export default async function DashboardLayout({
     });
   }
 
+  // ✅ Phase 5: Brand CSS variables derived from TenantSettings
+  const settings = tenant.settings;
+  const primaryColor = settings?.primaryColor ?? "#6366F1";
+  const secondaryColor = settings?.secondaryColor ?? "#8B5CF6";
+  const fontFamily = settings?.fontFamily ?? "Inter";
+  const logoUrl = settings?.logoUrl;
+  const darkMode = settings?.darkMode ?? false;
+
+  // Sidebar theme
+  const sidebarBg = darkMode ? "#0f0f1a" : "#ffffff";
+  const sidebarBorder = darkMode ? "rgba(255,255,255,0.06)" : "#f0f0f0";
+  const textPrimary = darkMode ? "#f9fafb" : "#111827";
+  const textMuted = darkMode ? "#9ca3af" : "#6b7280";
+
   const navLinks = isAdmin
     ? [
         { href: `/gym/${slug}/dashboard/admin`, label: "Overview", icon: "📊" },
@@ -59,6 +77,7 @@ export default async function DashboardLayout({
         { href: `/gym/${slug}/dashboard/admin/attendance`, label: "Attendance", icon: "✅" },
         { href: `/gym/${slug}/dashboard/admin/revenue`, label: "Revenue", icon: "💰" },
         { href: `/gym/${slug}/dashboard/admin/notifications`, label: `Notifications${unreadCount > 0 ? ` (${unreadCount})` : ""}`, icon: "🔔" },
+        { href: `/gym/${slug}/dashboard/admin/website`, label: "Website", icon: "🌐" },
       ]
     : isTrainer
     ? [
@@ -84,50 +103,123 @@ export default async function DashboardLayout({
         { href: `/gym/${slug}/dashboard/member/messages`, label: "Messages", icon: "💬" },
       ];
 
-
   return (
-    <div className="flex min-h-screen bg-slate-100">
-      <aside className="w-56 bg-white border-r border-gray-100 shadow-sm flex flex-col">
-        <div className="px-5 py-5 border-b border-gray-100">
-          <p className="font-bold text-gray-900 text-base truncate">{tenant.name}</p>
-          <p className="text-xs text-indigo-600 font-medium mt-0.5">{role}</p>
-        </div>
+    <>
+      {/* ✅ Phase 5: Google Fonts injection based on TenantSettings.fontFamily */}
+      {fontFamily !== "Inter" && (
+        <link
+          rel="stylesheet"
+          href={`https://fonts.googleapis.com/css2?family=${fontFamily.replace(/ /g, "+")}:wght@400;500;600;700&display=swap`}
+        />
+      )}
 
-        <nav className="flex-1 px-3 py-4 space-y-1">
-          {navLinks.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-700 transition-colors font-medium"
-            >
-              <span>{link.icon}</span>
-              {link.label}
-            </Link>
-          ))}
-        </nav>
-
-        <div className="px-4 py-4 border-t border-gray-100 space-y-2">
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-xs font-bold uppercase">
-              {session.user.name?.[0] ?? session.user.email?.[0] ?? "?"}
-            </div>
-            <div className="min-w-0">
-              <p className="text-xs font-medium text-gray-700 truncate">
-                {session.user.name ?? "User"}
-              </p>
-              <p className="text-xs text-gray-400 truncate">{session.user.email}</p>
-            </div>
-          </div>
-          <a
-            href={`/api/auth/logout?callbackUrl=/gym/${slug}`}
-            className="block text-xs text-red-500 hover:text-red-700 hover:underline pt-1"
+      <div
+        className="flex min-h-screen"
+        style={{
+          background: darkMode ? "#080811" : "#f1f5f9",
+          fontFamily: `'${fontFamily}', system-ui, sans-serif`,
+          // ✅ Phase 5: CSS custom properties for brand colors — used by child components
+          ["--brand-primary" as string]: primaryColor,
+          ["--brand-secondary" as string]: secondaryColor,
+          ["--brand-accent" as string]: settings?.accentColor ?? "#A78BFA",
+        } as React.CSSProperties}
+      >
+        {/* Sidebar */}
+        <aside
+          className="w-56 flex flex-col shrink-0"
+          style={{
+            background: sidebarBg,
+            borderRight: `1px solid ${sidebarBorder}`,
+          }}
+        >
+          {/* ✅ Phase 5: Logo or text fallback */}
+          <div
+            className="px-5 py-5"
+            style={{ borderBottom: `1px solid ${sidebarBorder}` }}
           >
-            Sign out
-          </a>
-        </div>
-      </aside>
+            {logoUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={logoUrl}
+                alt={tenant.name}
+                className="h-8 w-auto object-contain mb-1"
+              />
+            ) : (
+              <div className="flex items-center gap-2.5 mb-1">
+                <div
+                  className="w-7 h-7 rounded-lg flex items-center justify-center text-white text-xs font-black uppercase shrink-0"
+                  style={{
+                    background: `linear-gradient(135deg, ${primaryColor}, ${secondaryColor})`,
+                  }}
+                >
+                  {tenant.name[0]}
+                </div>
+                <p
+                  className="font-bold text-sm truncate"
+                  style={{ color: textPrimary }}
+                >
+                  {tenant.name}
+                </p>
+              </div>
+            )}
+            <p className="text-xs font-semibold mt-0.5" style={{ color: primaryColor }}>
+              {role}
+            </p>
+          </div>
 
-      <main className="flex-1 p-6 overflow-y-auto">{children}</main>
-    </div>
+          {/* Navigation */}
+          <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
+            {navLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors"
+                style={{ color: textMuted }}
+              >
+                <span className="text-base">{link.icon}</span>
+                {link.label}
+              </Link>
+            ))}
+          </nav>
+
+          {/* User footer */}
+          <div
+            className="px-4 py-4"
+            style={{ borderTop: `1px solid ${sidebarBorder}` }}
+          >
+            <div className="flex items-center gap-2">
+              <div
+                className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold uppercase text-white shrink-0"
+                style={{
+                  background: `linear-gradient(135deg, ${primaryColor}, ${secondaryColor})`,
+                }}
+              >
+                {session.user.name?.[0] ?? session.user.email?.[0] ?? "?"}
+              </div>
+              <div className="min-w-0">
+                <p
+                  className="text-xs font-medium truncate"
+                  style={{ color: textPrimary }}
+                >
+                  {session.user.name ?? "User"}
+                </p>
+                <p className="text-xs truncate" style={{ color: textMuted }}>
+                  {session.user.email}
+                </p>
+              </div>
+            </div>
+            <a
+              href={`/api/auth/signout?callbackUrl=/gym/${slug}`}
+              className="block mt-3 text-xs hover:underline"
+              style={{ color: darkMode ? "#6b7280" : "#ef4444" }}
+            >
+              Sign out
+            </a>
+          </div>
+        </aside>
+
+        <main className="flex-1 p-6 overflow-y-auto">{children}</main>
+      </div>
+    </>
   );
 }
