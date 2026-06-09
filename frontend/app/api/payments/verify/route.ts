@@ -58,6 +58,7 @@ export async function POST(req: NextRequest) {
       data: {
         memberId: memberProfile.id,
         planId: plan.id,
+        tenantId: plan.tenantId, // ✅ from verified plan record, not from client
         startDate,
         endDate,
         status: "ACTIVE",

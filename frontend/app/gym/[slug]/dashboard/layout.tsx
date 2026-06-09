@@ -22,12 +22,9 @@ export default async function DashboardLayout({
   const tenant = await prisma.tenant.findUnique({ where: { slug } });
   if (!tenant) notFound();
 
+  // ✅ Phase 3: No silent auto-assign. New users must explicitly confirm joining a gym.
   if (!session.user.tenantId) {
-    await prisma.user.update({
-      where: { id: session.user.id },
-      data: { tenantId: tenant.id },
-    });
-    redirect(`/api/auth/signin?callbackUrl=/gym/${slug}/dashboard/member`);
+    redirect(`/gym/${slug}/join`);
   }
 
   if (session.user.tenantId !== tenant.id) {

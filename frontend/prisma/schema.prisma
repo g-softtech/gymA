@@ -70,14 +70,28 @@ enum ChallengeType {
   CUSTOM
 }
 
+enum TenantPlan {
+  FREE
+  STARTER
+  PROFESSIONAL
+  ENTERPRISE
+}
+
 model Tenant {
   id              String           @id @default(cuid())
   name            String
   slug            String           @unique
+  // ── SaaS billing ──────────────────────────────────────────────────────────
+  plan            TenantPlan       @default(FREE)
+  trialEndsAt     DateTime?
+  isActive        Boolean          @default(true)
+  // ── Relations ────────────────────────────────────────────────────────────
   users           User[]
   membershipPlans MembershipPlan[]
   notifications   Notification[]
   messages        Message[]
+  settings        TenantSettings?
+  blogPosts       BlogPost[]
 }
 
 model User {
@@ -180,10 +194,14 @@ model Subscription {
   member           MemberProfile      @relation(fields: [memberId], references: [id], onDelete: Cascade)
   planId           String
   plan             MembershipPlan     @relation(fields: [planId], references: [id], onDelete: Cascade)
+  // ✅ Phase 2: tenant isolation — non-nullable after Migration B backfill
+  tenantId         String
   startDate        DateTime           @default(now())
   endDate          DateTime
   status           SubscriptionStatus @default(ACTIVE)
   paymentGatewayId String?
+
+  @@index([tenantId, status])
 }
 
 model WorkoutPlan {
@@ -192,11 +210,15 @@ model WorkoutPlan {
   member        MemberProfile   @relation(fields: [memberId], references: [id], onDelete: Cascade)
   trainerId     String?
   trainer       TrainerProfile? @relation(fields: [trainerId], references: [id])
+  // ✅ Phase 2: tenant isolation — non-nullable after Migration B backfill
+  tenantId      String
   title         String          @default("My Workout Plan")
   routines      Json
   isAiGenerated Boolean         @default(false)
   createdAt     DateTime        @default(now())
   updatedAt     DateTime        @updatedAt
+
+  @@index([tenantId, createdAt])
 }
 
 model Booking {
@@ -236,6 +258,8 @@ model ProgressRecord {
   id         String        @id @default(cuid())
   memberId   String
   member     MemberProfile @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  // ✅ Phase 2: tenant isolation — non-nullable after Migration B backfill
+  tenantId   String
   recordedBy String
   weightKg   Float?
   bodyFatPct Float?
@@ -247,12 +271,15 @@ model ProgressRecord {
   recordedAt DateTime      @default(now())
 
   @@index([memberId, recordedAt])
+  @@index([tenantId, recordedAt])
 }
 
 model MealPlan {
   id            String        @id @default(cuid())
   memberId      String
   member        MemberProfile @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  // ✅ Phase 2: tenant isolation — non-nullable after Migration B backfill
+  tenantId      String
   title         String
   goal          DietGoal      @default(GENERAL_HEALTH)
   totalCalories Int
@@ -265,12 +292,15 @@ model MealPlan {
   updatedAt     DateTime      @updatedAt
 
   @@index([memberId])
+  @@index([tenantId, createdAt])
 }
 
 model FoodLog {
   id        String        @id @default(cuid())
   memberId  String
   member    MemberProfile @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  // ✅ Phase 2: tenant isolation — non-nullable after Migration B backfill
+  tenantId  String
   date      DateTime      @default(now())
   mealType  String
   foodName  String
@@ -283,6 +313,7 @@ model FoodLog {
   createdAt DateTime      @default(now())
 
   @@index([memberId, date])
+  @@index([tenantId, date])
 }
 
 model Post {
@@ -394,4 +425,86 @@ model Notification {
 
   @@index([tenantId, read])
   @@index([userId])
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// PHASE 2: New Models
+// ─────────────────────────────────────────────────────────────────────────────
+
+model TenantSettings {
+  id              String  @id @default(cuid())
+  tenantId        String  @unique
+  tenant          Tenant  @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  // ── Branding ──────────────────────────────────────────────────────────────
+  logoUrl         String?
+  faviconUrl      String?
+  primaryColor    String? // e.g. "#6366F1"
+  secondaryColor  String?
+  accentColor     String?
+  fontFamily      String? // e.g. "Inter"
+  darkMode        Boolean @default(false)
+
+  // ── Domain ────────────────────────────────────────────────────────────────
+  customDomain    String? @unique
+  subdomain       String? @unique
+  domainVerified  Boolean @default(false)
+
+  // ── Business Info ─────────────────────────────────────────────────────────
+  tagline         String?
+  description     String? @db.Text
+  phone           String?
+  email           String?
+  address         String?
+  city            String?
+  state           String?
+  country         String? @default("Nigeria")
+  mapEmbedUrl     String?
+
+  // ── Social Links ──────────────────────────────────────────────────────────
+  instagramUrl    String?
+  facebookUrl     String?
+  twitterUrl      String?
+  tiktokUrl       String?
+  whatsappNumber  String?
+  youtubeUrl      String?
+
+  // ── Marketing CMS (JSON blobs, one per section) ───────────────────────────
+  heroData        Json?  // { headline, subheadline, ctaText, ctaUrl, bgImageUrl, overlayOpacity }
+  aboutData       Json?  // { story, mission, vision, teamImageUrl, foundedYear, highlights[] }
+  servicesData    Json?  // [{ icon, title, description, imageUrl }]
+  galleryData     Json?  // [{ imageUrl, caption, category }]
+  testimonialData Json?  // [{ name, role, quote, avatarUrl, rating }]
+  contactData     Json?  // { formEnabled, successMessage }
+  featuresData    Json?  // [{ icon, title, description }]
+  statsData       Json?  // [{ value, label }]
+  openingHours    Json?  // { monday: { open, close }, tuesday: ... }
+
+  // ── SEO ───────────────────────────────────────────────────────────────────
+  metaTitle         String?
+  metaDescription   String?
+  ogImageUrl        String?
+  googleAnalyticsId String?
+
+  updatedAt       DateTime @updatedAt
+}
+
+model BlogPost {
+  id          String   @id @default(cuid())
+  tenantId    String
+  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  authorId    String
+  title       String
+  slug        String
+  excerpt     String?
+  content     String   @db.Text
+  coverImage  String?
+  tags        String[]
+  published   Boolean  @default(false)
+  publishedAt DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([tenantId, slug])
+  @@index([tenantId, published, publishedAt])
 }

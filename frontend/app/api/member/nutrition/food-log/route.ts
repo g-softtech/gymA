@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthSession } from "@/lib/auth";
+import { getTenantContextFromSession, noTenantContext } from "@/lib/tenant";
 
 export async function POST(req: NextRequest) {
   try {
@@ -8,6 +9,10 @@ export async function POST(req: NextRequest) {
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+
+    // ✅ tenantId from session
+    const ctx = getTenantContextFromSession(session);
+    if (!ctx?.tenantId) return noTenantContext();
 
     const { memberId, mealType, foodName, calories, protein, carbs, fats, quantity, unit, date } =
       await req.json();
@@ -19,6 +24,7 @@ export async function POST(req: NextRequest) {
     const log = await prisma.foodLog.create({
       data: {
         memberId,
+        tenantId: ctx.tenantId, // ✅
         mealType,
         foodName,
         calories: parseInt(calories) || 0,
@@ -45,6 +51,9 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    const ctx = getTenantContextFromSession(session);
+    if (!ctx?.tenantId) return noTenantContext();
+
     const logId = req.nextUrl.searchParams.get("logId");
     if (!logId) return NextResponse.json({ error: "logId required" }, { status: 400 });
 
@@ -53,7 +62,8 @@ export async function DELETE(req: NextRequest) {
     });
 
     const log = await prisma.foodLog.findUnique({ where: { id: logId } });
-    if (!log || log.memberId !== memberProfile?.id) {
+    // ✅ Also verify tenant ownership
+    if (!log || log.memberId !== memberProfile?.id || log.tenantId !== ctx.tenantId) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 

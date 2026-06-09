@@ -1,0 +1,52 @@
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+import { getAuthSession } from "@/lib/auth";
+
+/**
+ * POST /api/gym/[slug]/join
+ * Assigns the authenticated user to the specified tenant.
+ * This is the explicit confirmation endpoint for the /gym/[slug]/join page.
+ * Only allows assignment if the user has no tenantId yet.
+ */
+export async function POST(
+  _req: NextRequest,
+  { params }: { params: Promise<{ slug: string }> }
+) {
+  try {
+    const { slug } = await params;
+    const session = await getAuthSession();
+
+    if (!session?.user?.id) {
+      return NextResponse.redirect(new URL(`/api/auth/signin`, process.env.NEXTAUTH_URL!));
+    }
+
+    // Already has a tenant — do not re-assign
+    if (session.user.tenantId) {
+      return NextResponse.redirect(
+        new URL(`/gym/${slug}/dashboard/member`, process.env.NEXTAUTH_URL!)
+      );
+    }
+
+    const tenant = await prisma.tenant.findUnique({ where: { slug } });
+    if (!tenant) {
+      return NextResponse.json({ error: "Gym not found" }, { status: 404 });
+    }
+
+    // Assign the user to this tenant
+    await prisma.user.update({
+      where: { id: session.user.id },
+      data: { tenantId: tenant.id },
+    });
+
+    // Force a session refresh by redirecting through sign-in with callback
+    return NextResponse.redirect(
+      new URL(
+        `/api/auth/signin?callbackUrl=/gym/${slug}/dashboard/member`,
+        process.env.NEXTAUTH_URL!
+      )
+    );
+  } catch (err) {
+    console.error(err);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  }
+}

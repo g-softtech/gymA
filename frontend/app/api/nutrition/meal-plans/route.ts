@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthSession } from "@/lib/auth";
+import { getTenantContextFromSession, noTenantContext } from "@/lib/tenant";
 
 export async function POST(req: NextRequest) {
   try {
@@ -8,6 +9,10 @@ export async function POST(req: NextRequest) {
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+
+    // ✅ tenantId from session
+    const ctx = getTenantContextFromSession(session);
+    if (!ctx?.tenantId) return noTenantContext();
 
     const { memberId, title, goal, totalCalories, protein, carbs, fats, meals, isAiGenerated } =
       await req.json();
@@ -19,6 +24,7 @@ export async function POST(req: NextRequest) {
     const plan = await prisma.mealPlan.create({
       data: {
         memberId,
+        tenantId: ctx.tenantId, // ✅
         title,
         goal: goal ?? "GENERAL_HEALTH",
         totalCalories: totalCalories ?? 0,
@@ -44,6 +50,9 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    const ctx = getTenantContextFromSession(session);
+    if (!ctx?.tenantId) return noTenantContext();
+
     const planId = req.nextUrl.searchParams.get("planId");
     if (!planId) return NextResponse.json({ error: "planId required" }, { status: 400 });
 
@@ -52,7 +61,7 @@ export async function DELETE(req: NextRequest) {
     });
 
     const plan = await prisma.mealPlan.findUnique({ where: { id: planId } });
-    if (!plan || plan.memberId !== memberProfile?.id) {
+    if (!plan || plan.memberId !== memberProfile?.id || plan.tenantId !== ctx.tenantId) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 

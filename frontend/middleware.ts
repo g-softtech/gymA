@@ -43,8 +43,12 @@ export default withAuth(
         if (pathname.startsWith("/api/contact")) return true;
         // Public tenant settings (for public gym pages)
         if (pathname.startsWith("/api/tenant/settings")) return true;
+        // Gym join page is server-rendered and handles its own auth redirect
+        // but the join POST handler uses NextAuth internally
+        if (pathname.startsWith("/api/gym/") && pathname.endsWith("/join")) return true;
 
         // ─── Protected API routes — require a valid session token ─────────────
+        // Includes /api/superadmin/** (role check is in the route handler)
         if (pathname.startsWith("/api/")) {
           return !!token;
         }

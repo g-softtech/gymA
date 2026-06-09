@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { getTenantContextFromSession, noTenantContext } from "@/lib/tenant";
 
 export async function POST(req: NextRequest) {
   try {
@@ -9,8 +10,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    // ✅ tenantId from session
+    const ctx = getTenantContextFromSession(session);
+    if (!ctx?.tenantId) return noTenantContext();
+
     const { memberId, fitnessLevel, daysPerWeek, equipment, focusArea, goals } =
       await req.json();
+
 
     const prompt = `Generate a ${daysPerWeek}-day per week workout plan for a gym member with these details:
 - Fitness level: ${fitnessLevel}
@@ -39,7 +45,11 @@ Respond ONLY with a valid JSON object in this exact format:
 
     const response = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": process.env.ANTHROPIC_API_KEY ?? "",
+        "anthropic-version": "2023-06-01",
+      },
       body: JSON.stringify({
         model: "claude-sonnet-4-20250514",
         max_tokens: 2000,
@@ -73,6 +83,7 @@ Respond ONLY with a valid JSON object in this exact format:
       await prisma.workoutPlan.create({
         data: {
           memberId,
+          tenantId: ctx.tenantId, // ✅ from session
           title: plan.title,
           routines,
           isAiGenerated: true,

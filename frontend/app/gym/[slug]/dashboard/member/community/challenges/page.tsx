@@ -59,7 +59,16 @@ export default async function ChallengesPage({
             progress: e.progress,
             completed: e.completed,
           })),
-          myEntry: c.entries.find((e) => e.userId === session.user.id) ?? null,
+          myEntry: (() => {
+            const e = c.entries.find((e) => e.userId === session.user.id);
+            if (!e) return null;
+            return {
+              userId: e.userId,
+              userName: e.user.name ?? e.user.email ?? "Member",
+              progress: e.progress,
+              completed: e.completed,
+            };
+          })(),
         }))}
       />
     </div>

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { getTenantContextFromSession, noTenantContext } from "@/lib/tenant";
 
 export async function POST(req: NextRequest) {
   try {
@@ -8,6 +9,10 @@ export async function POST(req: NextRequest) {
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+
+    // ✅ tenantId from session
+    const ctx = getTenantContextFromSession(session);
+    if (!ctx?.tenantId) return noTenantContext();
 
     const { memberId, weightKg, heightCm, goal, activityLevel, allergies, preferences } =
       await req.json();
@@ -64,7 +69,11 @@ Respond ONLY with valid JSON in this exact format:
 
     const response = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": process.env.ANTHROPIC_API_KEY ?? "",
+        "anthropic-version": "2023-06-01",
+      },
       body: JSON.stringify({
         model: "claude-sonnet-4-20250514",
         max_tokens: 2000,
@@ -88,6 +97,7 @@ Respond ONLY with valid JSON in this exact format:
       await prisma.mealPlan.create({
         data: {
           memberId,
+          tenantId: ctx.tenantId, // ✅ from session
           title: plan.title,
           goal: goal as any,
           totalCalories: plan.totalCalories,
