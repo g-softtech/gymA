@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthSession } from "@/lib/auth";
+import { getTenantContextFromSession, noTenantContext } from "@/lib/tenant";
 
 export async function POST(
   _req: NextRequest,
@@ -12,7 +13,21 @@ export async function POST(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    // ✅ Phase 4: tenantId from session
+    const ctx = getTenantContextFromSession(session);
+    if (!ctx?.tenantId) return noTenantContext();
+
     const { postId } = await params;
+
+    // ✅ Verify the post belongs to the caller's tenant — prevents cross-tenant liking
+    const post = await prisma.post.findUnique({
+      where: { id: postId },
+      select: { tenantId: true },
+    });
+
+    if (!post || post.tenantId !== ctx.tenantId) {
+      return NextResponse.json({ error: "Post not found" }, { status: 404 });
+    }
 
     const existing = await prisma.postLike.findUnique({
       where: { postId_userId: { postId, userId: session.user.id } },

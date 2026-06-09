@@ -1,19 +1,27 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthSession } from "@/lib/auth";
+import {
+  getTenantContextFromSession,
+  requireTrainer,
+  noTenantContext,
+} from "@/lib/tenant";
 
-// PATCH /api/trainer/schedule — update availability
+// PATCH /api/trainer/schedule — update trainer availability
 export async function PATCH(req: NextRequest) {
   try {
     const session = await getAuthSession();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    // ✅ Phase 4: proper role guard + tenantId from session
+    const ctx = getTenantContextFromSession(session);
+
+    const roleErr = requireTrainer(ctx);
+    if (roleErr) return roleErr;
+    if (!ctx?.tenantId) return noTenantContext();
 
     const { availability } = await req.json();
 
     const trainerProfile = await prisma.trainerProfile.findUnique({
-      where: { userId: session.user.id },
+      where: { userId: ctx.userId },
     });
 
     if (!trainerProfile) {
@@ -21,7 +29,7 @@ export async function PATCH(req: NextRequest) {
     }
 
     const updated = await prisma.trainerProfile.update({
-      where: { userId: session.user.id },
+      where: { userId: ctx.userId },
       data: { availability },
     });
 

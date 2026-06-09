@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthSession } from "@/lib/auth";
+import { getTenantContextFromSession, noTenantContext } from "@/lib/tenant";
 
 // PATCH /api/bookings/[bookingId] — update booking status
 export async function PATCH(
@@ -12,6 +13,10 @@ export async function PATCH(
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+
+    // ✅ Phase 4: tenantId from session — never trust client-supplied context
+    const ctx = getTenantContextFromSession(session);
+    if (!ctx?.tenantId) return noTenantContext();
 
     const { bookingId } = await params;
     const { status, meetingLink, notes } = await req.json();
@@ -26,6 +31,11 @@ export async function PATCH(
 
     if (!booking) {
       return NextResponse.json({ error: "Booking not found" }, { status: 404 });
+    }
+
+    // ✅ Phase 4: cross-tenant guard — booking must belong to caller's tenant
+    if (booking.tenantId !== ctx.tenantId) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
     // Only the trainer or admin can update booking status
