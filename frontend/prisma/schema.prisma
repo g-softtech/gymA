@@ -26,6 +26,7 @@ enum NotificationType {
   ATTENDANCE
   BOOKING
   MESSAGE
+  COMMUNITY
   GENERAL
 }
 
@@ -42,6 +43,33 @@ enum SessionType {
   ONLINE
 }
 
+enum DietGoal {
+  WEIGHT_LOSS
+  MUSCLE_GAIN
+  MAINTENANCE
+  ENDURANCE
+  GENERAL_HEALTH
+}
+
+enum BadgeType {
+  FIRST_CHECKIN
+  STREAK_7
+  STREAK_30
+  FIRST_BOOKING
+  FIRST_WORKOUT
+  CHALLENGE_COMPLETE
+  COMMUNITY_STAR
+  WEIGHT_GOAL
+}
+
+enum ChallengeType {
+  ATTENDANCE
+  WORKOUT
+  WEIGHT_LOSS
+  STEPS
+  CUSTOM
+}
+
 model Tenant {
   id              String           @id @default(cuid())
   name            String
@@ -53,20 +81,25 @@ model Tenant {
 }
 
 model User {
-  id             String          @id @default(cuid())
-  name           String?
-  email          String?         @unique
-  emailVerified  DateTime?
-  image          String?
-  role           Role            @default(MEMBER)
-  tenantId       String?
-  tenant         Tenant?         @relation(fields: [tenantId], references: [id])
-  accounts       Account[]
-  sessions       Session[]
-  memberProfile  MemberProfile?
-  trainerProfile TrainerProfile?
-  notifications  Notification[]
-  sentMessages   Message[]       @relation("SentMessages")
+  id               String           @id @default(cuid())
+  name             String?
+  email            String?          @unique
+  emailVerified    DateTime?
+  image            String?
+  role             Role             @default(MEMBER)
+  tenantId         String?
+  tenant           Tenant?          @relation(fields: [tenantId], references: [id])
+  accounts         Account[]
+  sessions         Session[]
+  memberProfile    MemberProfile?
+  trainerProfile   TrainerProfile?
+  notifications    Notification[]
+  sentMessages     Message[]        @relation("SentMessages")
+  posts            Post[]           @relation("UserPosts")
+  postLikes        PostLike[]       @relation("UserLikes")
+  comments         Comment[]        @relation("UserComments")
+  challengeEntries ChallengeEntry[] @relation("UserChallenges")
+  badges           Badge[]          @relation("UserBadges")
 }
 
 model Account {
@@ -104,9 +137,9 @@ model VerificationToken {
 }
 
 model MemberProfile {
-  id              String            @id @default(cuid())
-  userId          String            @unique
-  user            User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id              String           @id @default(cuid())
+  userId          String           @unique
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
   weightKg        Float?
   heightCm        Float?
   fitnessGoals    String[]
@@ -115,12 +148,14 @@ model MemberProfile {
   attendance      Attendance[]
   bookings        Booking[]
   progressRecords ProgressRecord[]
+  mealPlans       MealPlan[]
+  foodLogs        FoodLog[]
 }
 
 model TrainerProfile {
-  id           String           @id @default(cuid())
-  userId       String           @unique
-  user         User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id           String        @id @default(cuid())
+  userId       String        @unique
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   specialties  String[]
   availability Json
   bio          String?
@@ -198,20 +233,135 @@ model Attendance {
 }
 
 model ProgressRecord {
-  id          String        @id @default(cuid())
-  memberId    String
-  member      MemberProfile @relation(fields: [memberId], references: [id], onDelete: Cascade)
-  recordedBy  String
-  weightKg    Float?
-  bodyFatPct  Float?
-  muscleMass  Float?
-  chestCm     Float?
-  waistCm     Float?
-  hipsCm      Float?
-  notes       String?
-  recordedAt  DateTime      @default(now())
+  id         String        @id @default(cuid())
+  memberId   String
+  member     MemberProfile @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  recordedBy String
+  weightKg   Float?
+  bodyFatPct Float?
+  muscleMass Float?
+  chestCm    Float?
+  waistCm    Float?
+  hipsCm     Float?
+  notes      String?
+  recordedAt DateTime      @default(now())
 
   @@index([memberId, recordedAt])
+}
+
+model MealPlan {
+  id            String        @id @default(cuid())
+  memberId      String
+  member        MemberProfile @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  title         String
+  goal          DietGoal      @default(GENERAL_HEALTH)
+  totalCalories Int
+  protein       Float
+  carbs         Float
+  fats          Float
+  meals         Json
+  isAiGenerated Boolean       @default(false)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  @@index([memberId])
+}
+
+model FoodLog {
+  id        String        @id @default(cuid())
+  memberId  String
+  member    MemberProfile @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  date      DateTime      @default(now())
+  mealType  String
+  foodName  String
+  calories  Int
+  protein   Float
+  carbs     Float
+  fats      Float
+  quantity  Float         @default(1)
+  unit      String        @default("serving")
+  createdAt DateTime      @default(now())
+
+  @@index([memberId, date])
+}
+
+model Post {
+  id        String     @id @default(cuid())
+  tenantId  String
+  authorId  String
+  author    User       @relation("UserPosts", fields: [authorId], references: [id], onDelete: Cascade)
+  content   String
+  imageUrl  String?
+  likes     PostLike[]
+  comments  Comment[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  @@index([tenantId, createdAt])
+}
+
+model PostLike {
+  id     String @id @default(cuid())
+  postId String
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  userId String
+  user   User   @relation("UserLikes", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([postId, userId])
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  postId    String
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  authorId  String
+  author    User     @relation("UserComments", fields: [authorId], references: [id], onDelete: Cascade)
+  content   String
+  createdAt DateTime @default(now())
+
+  @@index([postId])
+}
+
+model Challenge {
+  id          String           @id @default(cuid())
+  tenantId    String
+  title       String
+  description String
+  type        ChallengeType    @default(CUSTOM)
+  goal        Int
+  unit        String
+  startDate   DateTime
+  endDate     DateTime
+  createdBy   String
+  entries     ChallengeEntry[]
+  createdAt   DateTime         @default(now())
+
+  @@index([tenantId])
+}
+
+model ChallengeEntry {
+  id          String    @id @default(cuid())
+  challengeId String
+  challenge   Challenge @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User      @relation("UserChallenges", fields: [userId], references: [id], onDelete: Cascade)
+  progress    Int       @default(0)
+  completed   Boolean   @default(false)
+  joinedAt    DateTime  @default(now())
+
+  @@unique([challengeId, userId])
+  @@index([challengeId, progress])
+}
+
+model Badge {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation("UserBadges", fields: [userId], references: [id], onDelete: Cascade)
+  type      BadgeType
+  awardedAt DateTime  @default(now())
+
+  @@unique([userId, type])
+  @@index([userId])
 }
 
 model Message {

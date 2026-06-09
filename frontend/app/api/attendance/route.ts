@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthSession } from "@/lib/auth";
+import { getTenantContextFromSession, noTenantContext } from "@/lib/tenant";
 
 export async function POST(req: NextRequest) {
   try {
@@ -9,7 +10,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { memberId, tenantId, note } = await req.json();
+    // ✅ tenantId from session — never from request body
+    const ctx = getTenantContextFromSession(session);
+    if (!ctx?.tenantId) return noTenantContext();
+
+    const { memberId, note } = await req.json();
 
     // Only admins and trainers can check in members manually
     if (session.user.role === "MEMBER") {
@@ -27,15 +32,16 @@ export async function POST(req: NextRequest) {
       include: { user: { select: { name: true, email: true } } },
     });
 
-    const memberName = memberProfile?.user.name ?? memberProfile?.user.email ?? "A member";
+    const memberName =
+      memberProfile?.user.name ?? memberProfile?.user.email ?? "A member";
 
     const attendance = await prisma.attendance.create({
-      data: { memberId, tenantId, note },
+      data: { memberId, tenantId: ctx.tenantId, note }, // ✅ tenantId from session
     });
 
     // Notify ADMINS only (not the member themselves)
     const admins = await prisma.user.findMany({
-      where: { tenantId, role: { in: ["ADMIN", "SUPERADMIN"] } },
+      where: { tenantId: ctx.tenantId, role: { in: ["ADMIN", "SUPERADMIN"] } },
       select: { id: true },
     });
 
@@ -43,11 +49,14 @@ export async function POST(req: NextRequest) {
       admins.map((admin) =>
         prisma.notification.create({
           data: {
-            tenantId,
+            tenantId: ctx.tenantId,
             userId: admin.id,
             type: "ATTENDANCE",
             title: "Member Check-in",
-            message: `${memberName} checked in at ${new Date().toLocaleTimeString("en-NG", { hour: "2-digit", minute: "2-digit" })}`,
+            message: `${memberName} checked in at ${new Date().toLocaleTimeString(
+              "en-NG",
+              { hour: "2-digit", minute: "2-digit" }
+            )}`,
           },
         })
       )
@@ -67,13 +76,12 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const tenantId = req.nextUrl.searchParams.get("tenantId");
-    if (!tenantId) {
-      return NextResponse.json({ error: "tenantId required" }, { status: 400 });
-    }
+    // ✅ tenantId from session — query param is ignored
+    const ctx = getTenantContextFromSession(session);
+    if (!ctx?.tenantId) return noTenantContext();
 
     const records = await prisma.attendance.findMany({
-      where: { tenantId },
+      where: { tenantId: ctx.tenantId },
       include: {
         member: {
           include: { user: { select: { name: true, email: true } } },

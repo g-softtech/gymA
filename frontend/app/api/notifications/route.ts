@@ -1,24 +1,23 @@
-
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthSession } from "@/lib/auth";
+import { getTenantContextFromSession, noTenantContext } from "@/lib/tenant";
 
-// GET /api/notifications?tenantId=xxx
-export async function GET(req: NextRequest) {
+// GET /api/notifications
+export async function GET(_req: NextRequest) {
   try {
     const session = await getAuthSession();
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const tenantId = req.nextUrl.searchParams.get("tenantId");
-    if (!tenantId) {
-      return NextResponse.json({ error: "tenantId required" }, { status: 400 });
-    }
+    // ✅ tenantId from session — query param ignored
+    const ctx = getTenantContextFromSession(session);
+    if (!ctx?.tenantId) return noTenantContext();
 
     const notifications = await prisma.notification.findMany({
       where: {
-        tenantId,
+        tenantId: ctx.tenantId,
         OR: [{ userId: session.user.id }, { userId: null }],
       },
       orderBy: { createdAt: "desc" },
@@ -33,18 +32,20 @@ export async function GET(req: NextRequest) {
 }
 
 // PATCH /api/notifications — mark all as read
-export async function PATCH(req: NextRequest) {
+export async function PATCH(_req: NextRequest) {
   try {
     const session = await getAuthSession();
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { tenantId } = await req.json();
+    // ✅ tenantId from session — body tenantId ignored
+    const ctx = getTenantContextFromSession(session);
+    if (!ctx?.tenantId) return noTenantContext();
 
     await prisma.notification.updateMany({
       where: {
-        tenantId,
+        tenantId: ctx.tenantId,
         OR: [{ userId: session.user.id }, { userId: null }],
         read: false,
       },

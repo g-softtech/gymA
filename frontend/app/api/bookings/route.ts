@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthSession } from "@/lib/auth";
+import { getTenantContextFromSession, noTenantContext } from "@/lib/tenant";
 
 export async function POST(req: NextRequest) {
   try {
@@ -9,15 +10,21 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { trainerId, date, durationMins, sessionType, notes, tenantId } = await req.json();
+    // ✅ tenantId derived from server session — never from request body
+    const ctx = getTenantContextFromSession(session);
+    if (!ctx?.tenantId) return noTenantContext();
 
-    if (!trainerId || !date || !tenantId) {
+    const { trainerId, date, durationMins, sessionType, notes } = await req.json();
+
+    if (!trainerId || !date) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
     // Validate sessionType
     const validSessionTypes = ["PHYSICAL", "ONLINE"];
-    const finalSessionType = validSessionTypes.includes(sessionType) ? sessionType : "PHYSICAL";
+    const finalSessionType = validSessionTypes.includes(sessionType)
+      ? sessionType
+      : "PHYSICAL";
 
     let memberProfile = await prisma.memberProfile.findUnique({
       where: { userId: session.user.id },
@@ -32,9 +39,11 @@ export async function POST(req: NextRequest) {
     const bookingDate = new Date(date);
     const bookingEnd = new Date(bookingDate.getTime() + (durationMins ?? 60) * 60000);
 
+    // ✅ Conflict check now scoped to the same tenant — prevents cross-tenant phantom conflicts
     const conflict = await prisma.booking.findFirst({
       where: {
         trainerId,
+        tenantId: ctx.tenantId,
         status: { in: ["PENDING", "CONFIRMED"] },
         date: {
           gte: new Date(bookingDate.getTime() - 60 * 60000),
@@ -54,7 +63,7 @@ export async function POST(req: NextRequest) {
       data: {
         trainerId,
         memberId: memberProfile.id,
-        tenantId,
+        tenantId: ctx.tenantId, // ✅ from session
         date: bookingDate,
         durationMins: durationMins ?? 60,
         sessionType: finalSessionType,
@@ -71,7 +80,7 @@ export async function POST(req: NextRequest) {
     if (trainer) {
       await prisma.notification.create({
         data: {
-          tenantId,
+          tenantId: ctx.tenantId,
           userId: trainer.userId,
           type: "BOOKING",
           title: "New Booking Request",
@@ -94,13 +103,12 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const tenantId = req.nextUrl.searchParams.get("tenantId");
-    if (!tenantId) {
-      return NextResponse.json({ error: "tenantId required" }, { status: 400 });
-    }
+    // ✅ tenantId from session — query param tenantId is ignored
+    const ctx = getTenantContextFromSession(session);
+    if (!ctx?.tenantId) return noTenantContext();
 
     const bookings = await prisma.booking.findMany({
-      where: { tenantId },
+      where: { tenantId: ctx.tenantId },
       include: {
         trainer: { include: { user: { select: { name: true, email: true } } } },
         member: { include: { user: { select: { name: true, email: true } } } },

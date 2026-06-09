@@ -1,18 +1,25 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthSession } from "@/lib/auth";
+import {
+  getTenantContextFromSession,
+  requireTrainer,
+  noTenantContext,
+} from "@/lib/tenant";
 
-// POST /api/messages — send a message
+// POST /api/trainer/messages — trainer sends a message
 export async function POST(req: NextRequest) {
   try {
     const session = await getAuthSession();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const ctx = getTenantContextFromSession(session);
 
-    const { receiverId, content, tenantId } = await req.json();
+    const roleErr = requireTrainer(ctx);
+    if (roleErr) return roleErr;
+    if (!ctx?.tenantId) return noTenantContext();
 
-    if (!receiverId || !content || !tenantId) {
+    const { receiverId, content } = await req.json();
+
+    if (!receiverId || !content) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
@@ -20,23 +27,35 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Message cannot be empty" }, { status: 400 });
     }
 
+    // ✅ Verify receiver belongs to the same tenant
+    const receiver = await prisma.user.findUnique({
+      where: { id: receiverId },
+      select: { tenantId: true },
+    });
+
+    if (!receiver || receiver.tenantId !== ctx.tenantId) {
+      return NextResponse.json(
+        { error: "Cannot message users from other gyms" },
+        { status: 403 }
+      );
+    }
+
     const message = await prisma.message.create({
       data: {
-        tenantId,
-        senderId: session.user.id,
+        tenantId: ctx.tenantId, // ✅ from session
+        senderId: session!.user.id,
         receiverId,
         content: content.trim(),
       },
     });
 
-    // Notify receiver
     await prisma.notification.create({
       data: {
-        tenantId,
+        tenantId: ctx.tenantId,
         userId: receiverId,
         type: "MESSAGE",
         title: "New Message",
-        message: `You have a new message from ${session.user.name ?? session.user.email}`,
+        message: `You have a new message from ${session!.user.name ?? session!.user.email}`,
       },
     });
 
@@ -47,38 +66,47 @@ export async function POST(req: NextRequest) {
   }
 }
 
-// GET /api/messages?tenantId=xxx&withUserId=xxx
+// GET /api/trainer/messages?withUserId=xxx
 export async function GET(req: NextRequest) {
   try {
     const session = await getAuthSession();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const ctx = getTenantContextFromSession(session);
+
+    const roleErr = requireTrainer(ctx);
+    if (roleErr) return roleErr;
+    if (!ctx?.tenantId) return noTenantContext();
+
+    const withUserId = req.nextUrl.searchParams.get("withUserId");
+    if (!withUserId) {
+      return NextResponse.json({ error: "withUserId required" }, { status: 400 });
     }
 
-    const tenantId = req.nextUrl.searchParams.get("tenantId");
-    const withUserId = req.nextUrl.searchParams.get("withUserId");
+    // ✅ Verify other user is in same tenant
+    const otherUser = await prisma.user.findUnique({
+      where: { id: withUserId },
+      select: { tenantId: true },
+    });
 
-    if (!tenantId || !withUserId) {
-      return NextResponse.json({ error: "tenantId and withUserId required" }, { status: 400 });
+    if (!otherUser || otherUser.tenantId !== ctx.tenantId) {
+      return NextResponse.json({ error: "User not found in your gym" }, { status: 404 });
     }
 
     const messages = await prisma.message.findMany({
       where: {
-        tenantId,
+        tenantId: ctx.tenantId,
         OR: [
-          { senderId: session.user.id, receiverId: withUserId },
-          { senderId: withUserId, receiverId: session.user.id },
+          { senderId: ctx.userId, receiverId: withUserId },
+          { senderId: withUserId, receiverId: ctx.userId },
         ],
       },
       orderBy: { createdAt: "asc" },
     });
 
-    // Mark as read
     await prisma.message.updateMany({
       where: {
-        tenantId,
+        tenantId: ctx.tenantId,
         senderId: withUserId,
-        receiverId: session.user.id,
+        receiverId: ctx.userId,
         read: false,
       },
       data: { read: true },
