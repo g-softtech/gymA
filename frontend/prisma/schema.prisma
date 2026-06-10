@@ -167,15 +167,18 @@ model MemberProfile {
 }
 
 model TrainerProfile {
-  id           String        @id @default(cuid())
-  userId       String        @unique
-  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  specialties  String[]
-  availability Json
-  bio          String?
-  hourlyRate   Float?
-  bookings     Booking[]
-  workoutPlans WorkoutPlan[]
+  id            String        @id @default(cuid())
+  userId        String        @unique
+  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  specialties   String[]
+  availability  Json
+  bio           String?
+  hourlyRate    Float?
+  // ── Phase 6: Public website visibility ───────────────────────────────────
+  showOnWebsite Boolean       @default(true)
+  publicPhotoUrl String?
+  bookings      Booking[]
+  workoutPlans  WorkoutPlan[]
 }
 
 model MembershipPlan {
@@ -185,6 +188,10 @@ model MembershipPlan {
   name          String
   price         Float
   durationDays  Int
+  // ── Phase 6: Public plans page enhancements ───────────────────────────────
+  featured      Boolean        @default(false)
+  description   String?
+  features      String[]
   subscriptions Subscription[]
 }
 
