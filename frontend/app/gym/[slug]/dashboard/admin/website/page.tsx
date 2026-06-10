@@ -22,6 +22,8 @@ export default async function WebsiteHubPage({
       primaryColor: true,
       tagline: true,
       instagramUrl: true,
+      heroData: true,
+      servicesData: true,
     },
   });
 
@@ -52,6 +54,24 @@ export default async function WebsiteHubPage({
       badge: settings?.instagramUrl ? "Configured" : "Not set",
       badgeColor: settings?.instagramUrl ? "bg-emerald-100 text-emerald-700" : "bg-slate-100 text-slate-500",
       id: "website-social-link",
+    },
+    {
+      href: `/gym/${slug}/dashboard/admin/website/hero`,
+      icon: "🖼️",
+      title: "Hero Section",
+      desc: "Headline, subheadline, CTA button, and background image",
+      badge: settings?.heroData ? "Configured" : "Not set",
+      badgeColor: settings?.heroData ? "bg-emerald-100 text-emerald-700" : "bg-slate-100 text-slate-500",
+      id: "website-hero-link",
+    },
+    {
+      href: `/gym/${slug}/dashboard/admin/website/content`,
+      icon: "📝",
+      title: "Page Content",
+      desc: "Stats, services, testimonials, gallery, and feature highlights",
+      badge: settings?.servicesData ? "Has content" : "Empty",
+      badgeColor: settings?.servicesData ? "bg-emerald-100 text-emerald-700" : "bg-slate-100 text-slate-500",
+      id: "website-content-link",
     },
   ];
 

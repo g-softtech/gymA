@@ -1,76 +1,110 @@
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/auth";
+import { getAuthSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { Prisma } from "@prisma/client";
 
+/**
+ * POST /api/tenant/create
+ *
+ * Creates a new gym tenant and immediately:
+ *   1. Sets the creator's role to ADMIN (was previously missing — critical bug fix)
+ *   2. Creates a default TenantSettings record so the CMS editors never receive null
+ *   3. Handles slug collisions gracefully (P2002 → 409 instead of 500)
+ */
 export async function POST(req: Request) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getAuthSession();
 
-    if (!session?.user?.email) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
+    if (!session?.user?.id || !session.user.email) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { name } = await req.json();
 
-    if (!name || typeof name !== "string") {
+    if (!name || typeof name !== "string" || name.trim().length < 2) {
       return NextResponse.json(
-        { error: "Gym name is required" },
+        { error: "Gym name must be at least 2 characters." },
         { status: 400 }
       );
     }
 
-    // ✅ CLEAN SLUG (VERY IMPORTANT)
+    // Derive a clean URL slug from the gym name
     const slug = name
       .trim()
       .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")   // safer than your current regex
-      .replace(/(^-|-$)/g, "");      // remove leading/trailing hyphens
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/(^-|-$)/g, "");
 
-    const tenant = await prisma.tenant.create({
-      data: {
-        name,
-        slug,
-      },
-    });
-
-    // ⚠️ IMPORTANT: ensure user exists first
-    const user = await prisma.user.findUnique({
-      where: { email: session.user.email },
-    });
-
-    if (!user) {
+    if (!slug) {
       return NextResponse.json(
-        { error: "User not found in database" },
-        { status: 404 }
+        { error: "Could not generate a valid URL from that name. Please use letters or numbers." },
+        { status: 400 }
       );
     }
 
-    await prisma.user.update({
-      where: { email: session.user.email },
-      data: {
-        tenantId: tenant.id,
-      },
-    });
+    // ── Atomic tenant creation + user promotion ──────────────────────────────
+    // Use a transaction so the tenant row and user update either both succeed or both roll back.
+    const { tenant } = await prisma.$transaction(async (tx) => {
+      // Create the tenant
+      const tenant = await tx.tenant.create({
+        data: { name: name.trim(), slug },
+      });
 
-    return NextResponse.json({
-      success: true,
-      tenant: {
-        id: tenant.id,
-        name: tenant.name,
-        slug: tenant.slug,
-      },
-    });
+      // ✅ FIX 1: Promote the creator to ADMIN of the new gym.
+      // Previously, tenantId was set but role stayed "MEMBER" — blocking dashboard access.
+      await tx.user.update({
+        where: { id: session.user!.id },
+        data: {
+          tenantId: tenant.id,
+          role: "ADMIN",
+        },
+      });
 
-  } catch (error) {
-    console.error("TENANT CREATE ERROR:", error);
+      // ✅ FIX 2: Auto-create TenantSettings with sensible defaults so the CMS editors
+      // never receive null on first load, and the public gym page renders something meaningful.
+      await tx.tenantSettings.create({
+        data: {
+          tenantId: tenant.id,
+          primaryColor: "#6366F1",
+          secondaryColor: "#8B5CF6",
+          accentColor: "#A78BFA",
+          fontFamily: "Inter",
+          darkMode: false,
+          country: "Nigeria",
+        },
+      });
+
+      return { tenant };
+    });
 
     return NextResponse.json(
-      { error: "Internal Server Error" },
-      { status: 500 }
+      {
+        success: true,
+        tenant: {
+          id: tenant.id,
+          name: tenant.name,
+          slug: tenant.slug,
+        },
+      },
+      { status: 201 }
     );
+  } catch (error) {
+    // ✅ FIX 3: Catch unique-constraint violations (slug already taken) and return
+    // a user-friendly 409 instead of a raw 500.
+    if (
+      error instanceof Prisma.PrismaClientKnownRequestError &&
+      error.code === "P2002"
+    ) {
+      return NextResponse.json(
+        {
+          error:
+            "A gym with a similar name already exists on this platform. Please choose a different name.",
+        },
+        { status: 409 }
+      );
+    }
+
+    console.error("[POST /api/tenant/create]", error);
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }
