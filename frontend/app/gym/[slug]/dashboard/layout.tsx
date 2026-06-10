@@ -76,6 +76,8 @@ export default async function DashboardLayout({
         { href: `/gym/${slug}/dashboard/admin/trainers`, label: "Trainers", icon: "🏋️" },
         { href: `/gym/${slug}/dashboard/admin/attendance`, label: "Attendance", icon: "✅" },
         { href: `/gym/${slug}/dashboard/admin/revenue`, label: "Revenue", icon: "💰" },
+        { href: `/gym/${slug}/dashboard/admin/ai-usage`, label: "AI Usage", icon: "🤖" },
+        { href: `/gym/${slug}/dashboard/admin/blog`, label: "Blog", icon: "📝" },
         { href: `/gym/${slug}/dashboard/admin/notifications`, label: `Notifications${unreadCount > 0 ? ` (${unreadCount})` : ""}`, icon: "🔔" },
         { href: `/gym/${slug}/dashboard/admin/website`, label: "Website", icon: "🌐" },
       ]

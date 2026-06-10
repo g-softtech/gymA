@@ -9,49 +9,53 @@ import {
 
 /**
  * POST /api/plans — create a membership plan
- * ✅ Phase 4: tenantId derived from session, not from request body
+ * Now accepts: name, price, durationDays, description, features[], featured
  */
 export async function POST(req: NextRequest) {
   try {
     const session = await getAuthSession();
     const ctx = getTenantContextFromSession(session);
 
-    // ✅ Requires ADMIN or SUPERADMIN
     const roleErr = requireAdmin(ctx);
     if (roleErr) return roleErr;
     if (!ctx?.tenantId) return noTenantContext();
 
-    const { name, price, durationDays } = await req.json();
+    const { name, price, durationDays, description, features, featured } =
+      await req.json();
 
-    if (!name || !price || !durationDays) {
-      return NextResponse.json({ error: "All fields are required." }, { status: 400 });
+    if (!name || price === undefined || !durationDays) {
+      return NextResponse.json(
+        { error: "name, price, and durationDays are required." },
+        { status: 400 }
+      );
     }
 
-    // ✅ tenantId always comes from the session — never from the client body
     const plan = await prisma.membershipPlan.create({
       data: {
         tenantId: ctx.tenantId,
-        name,
-        price: parseFloat(price),
-        durationDays: parseInt(durationDays),
+        name: String(name).trim(),
+        price: parseFloat(String(price)),
+        durationDays: parseInt(String(durationDays)),
+        description: description?.trim() ?? null,
+        features: Array.isArray(features) ? features.filter(Boolean) : [],
+        featured: Boolean(featured),
       },
     });
 
     return NextResponse.json(plan, { status: 201 });
   } catch (err) {
-    console.error(err);
+    console.error("[POST /api/plans]", err);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
 
 /**
- * GET /api/plans — list membership plans for the session tenant
+ * GET /api/plans — list all membership plans for the session tenant
  */
 export async function GET(_req: NextRequest) {
   try {
     const session = await getAuthSession();
     const ctx = getTenantContextFromSession(session);
-
     if (!ctx?.tenantId) return noTenantContext();
 
     const plans = await prisma.membershipPlan.findMany({
@@ -61,7 +65,7 @@ export async function GET(_req: NextRequest) {
 
     return NextResponse.json(plans);
   } catch (err) {
-    console.error(err);
+    console.error("[GET /api/plans]", err);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

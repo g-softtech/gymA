@@ -132,6 +132,8 @@ export default withAuth(
         if (pathname.startsWith("/api/contact")) return true;
         if (pathname.startsWith("/api/tenant/settings")) return true;
         if (pathname.startsWith("/api/gym/")) return true; // public gym data + resolve + join
+        if (pathname.startsWith("/api/payments/webhook")) return true; // Paystack webhook (server-to-server)
+        if (pathname.startsWith("/api/cron/")) return true; // Vercel Cron (protected by CRON_SECRET header)
 
         // Onboarding and join flows can be accessed to redirect to auth
         if (pathname.startsWith("/onboarding")) return true;

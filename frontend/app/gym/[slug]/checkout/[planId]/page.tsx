@@ -56,6 +56,7 @@ export default async function CheckoutPage({
           planName={plan.name}
           planId={plan.id}
           tenantSlug={plan.tenant.slug}
+          userId={session.user.id!}
         />
       </div>
     </div>

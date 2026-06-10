@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthSession } from "@/lib/auth";
 import { getTenantContextFromSession, noTenantContext } from "@/lib/tenant";
+import { checkAiRateLimit } from "@/lib/ratelimit";
+import { prisma } from "@/lib/prisma";
 
 export async function POST(req: NextRequest) {
   try {
@@ -9,7 +11,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // ✅ Phase 4: tenantId context for logging / rate-limiting (Phase 10)
+    // ✅ Phase 8: Rate limiting — 20 AI requests per user per hour
+    const rl = await checkAiRateLimit(session.user.id);
+    if (rl.limited) return rl.response!;
+
+    // ✅ Phase 4: tenantId context
     const ctx = getTenantContextFromSession(session);
     if (!ctx?.tenantId) return noTenantContext();
 
@@ -19,7 +25,6 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Messages required" }, { status: 400 });
     }
 
-    // ✅ API key now correctly set in headers
     const response = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
       headers: {
@@ -39,7 +44,23 @@ export async function POST(req: NextRequest) {
     });
 
     const data = await response.json();
-    const reply = data.content?.[0]?.text ?? "Sorry, I could not generate a response. Please try again.";
+    const reply =
+      data.content?.[0]?.text ??
+      "Sorry, I could not generate a response. Please try again.";
+
+    // ✅ Phase 8: Fire-and-forget AI usage log (non-blocking)
+    prisma.aiLog
+      .create({
+        data: {
+          tenantId: ctx.tenantId,
+          userId: session.user.id,
+          feature: "CHAT",
+          inputTokens: data.usage?.input_tokens ?? null,
+          outputTokens: data.usage?.output_tokens ?? null,
+          success: true,
+        },
+      })
+      .catch(() => {}); // never throw — logging must not affect the response
 
     return NextResponse.json({ reply });
   } catch (err) {

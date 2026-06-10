@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { TenantThemeProvider } from "@/components/TenantThemeProvider";
+import ContactForm from "@/components/ContactForm";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types mirroring TenantSettings JSON blobs
@@ -797,6 +798,15 @@ export default async function GymPublicPage({
                 />
               </div>
             )}
+
+            {/* ── Contact Form ─────────────────────────────────────────────── */}
+            <div className="mt-14">
+              <h3 className="text-2xl font-black text-gray-900 mb-2">Send Us a Message</h3>
+              <p className="text-gray-500 text-sm mb-6">
+                Have a question about membership or services? We&apos;d love to hear from you.
+              </p>
+              <ContactForm slug={slug} primaryColor={primary} />
+            </div>
           </div>
         </section>
 

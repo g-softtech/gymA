@@ -515,3 +515,32 @@ model BlogPost {
   @@unique([tenantId, slug])
   @@index([tenantId, published, publishedAt])
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// PHASE 8: AI Usage Logging
+// ─────────────────────────────────────────────────────────────────────────────
+
+enum AiFeature {
+  CHAT
+  WORKOUT
+  NUTRITION
+  PROGRESS
+}
+
+model AiLog {
+  id        String    @id @default(cuid())
+  tenantId  String
+  userId    String
+  feature   AiFeature
+  model     String    @default("claude-sonnet-4-20250514")
+  // Approximate token counts (filled in when available from API response)
+  inputTokens  Int?
+  outputTokens Int?
+  // Whether the call succeeded or was rejected (e.g. parse failure)
+  success   Boolean   @default(true)
+  createdAt DateTime  @default(now())
+
+  @@index([tenantId, createdAt])
+  @@index([userId, createdAt])
+  @@index([tenantId, feature])
+}

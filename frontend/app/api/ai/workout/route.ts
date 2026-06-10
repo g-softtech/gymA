@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getAuthSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getTenantContextFromSession, noTenantContext } from "@/lib/tenant";
+import { checkAiRateLimit } from "@/lib/ratelimit";
 
 export async function POST(req: NextRequest) {
   try {
@@ -10,13 +11,16 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    // ✅ Phase 8: Rate limiting
+    const rl = await checkAiRateLimit(session.user.id);
+    if (rl.limited) return rl.response!;
+
     // ✅ tenantId from session
     const ctx = getTenantContextFromSession(session);
     if (!ctx?.tenantId) return noTenantContext();
 
     const { memberId, fitnessLevel, daysPerWeek, equipment, focusArea, goals } =
       await req.json();
-
 
     const prompt = `Generate a ${daysPerWeek}-day per week workout plan for a gym member with these details:
 - Fitness level: ${fitnessLevel}
@@ -65,7 +69,23 @@ Respond ONLY with a valid JSON object in this exact format:
       const clean = text.replace(/```json|```/g, "").trim();
       plan = JSON.parse(clean);
     } catch {
-      return NextResponse.json({ error: "AI response could not be parsed. Please try again." }, { status: 500 });
+      // ✅ Log failed parse
+      prisma.aiLog
+        .create({
+          data: {
+            tenantId: ctx.tenantId,
+            userId: session.user.id,
+            feature: "WORKOUT",
+            inputTokens: data.usage?.input_tokens ?? null,
+            outputTokens: data.usage?.output_tokens ?? null,
+            success: false,
+          },
+        })
+        .catch(() => {});
+      return NextResponse.json(
+        { error: "AI response could not be parsed. Please try again." },
+        { status: 500 }
+      );
     }
 
     // Save to database if memberId provided
@@ -90,6 +110,20 @@ Respond ONLY with a valid JSON object in this exact format:
         },
       });
     }
+
+    // ✅ Phase 8: Fire-and-forget AI usage log
+    prisma.aiLog
+      .create({
+        data: {
+          tenantId: ctx.tenantId,
+          userId: session.user.id,
+          feature: "WORKOUT",
+          inputTokens: data.usage?.input_tokens ?? null,
+          outputTokens: data.usage?.output_tokens ?? null,
+          success: true,
+        },
+      })
+      .catch(() => {});
 
     return NextResponse.json(plan);
   } catch (err) {
