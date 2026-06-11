@@ -1,3 +1,4 @@
+/** @deprecated Use /api/tenant/create instead */
 "use server"
 
 import { getAuthSession } from "@/lib/auth";

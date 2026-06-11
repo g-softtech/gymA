@@ -100,6 +100,7 @@ model User {
   email            String?          @unique
   emailVerified    DateTime?
   image            String?
+  password         String?          // bcrypt hash — null for OAuth users
   role             Role             @default(MEMBER)
   tenantId         String?
   tenant           Tenant?          @relation(fields: [tenantId], references: [id])
@@ -532,7 +533,7 @@ model AiLog {
   tenantId  String
   userId    String
   feature   AiFeature
-  model     String    @default("claude-sonnet-4-20250514")
+  model     String    @default("gemini-2.0-flash")
   // Approximate token counts (filled in when available from API response)
   inputTokens  Int?
   outputTokens Int?

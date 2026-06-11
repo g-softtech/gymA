@@ -91,7 +91,7 @@ export default function ContactForm() {
             type="text"
             value={form.gymName}
             onChange={(e) => setForm({ ...form, gymName: e.target.value })}
-            placeholder="IronForge Fitness"
+            placeholder="CortexFit Fitness"
             className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
           />
         </div>

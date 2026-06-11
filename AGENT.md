@@ -81,3 +81,71 @@ model WorkoutPlan {
     /prisma.ts          # Database initialization
     /ai-service.ts      # LLM gateway abstraction
 4. KEY FEATURE IMPLEMENTATIONSPayments: Automated webhook handlers for Paystack/Flutterwave to verify transactions and activate memberships.  Booking Engine: Logic to prevent trainer schedule collisions by checking for chronological overlaps.  AI Coach: A conversational panel for members to request personalized workouts and localized meal adjustments.  5. AI PROMPT ENGINEERINGThe system uses strict JSON output definitions for AI features:  Workout Coach: Acts as a biomechanics specialist to generate hypertrophy splits.  Nutrition Coach: Acts as a dietitian using hyper-local African ingredients.  6. DEVELOPMENT ROADMAPPhase 1: Core Multi-tenant Auth and Tenant-switching.  Phase 2: Membership plans and Payment gateway integration.  Phase 3: Booking calendar and manual Workout/Meal tools.  Phase 4: Full AI integration for automated plan generation.  Phase 5: Social community and SEO optimization.  
+
+
+
+# CONTINUATION RULES
+
+This is NOT a new project.
+
+Before making any changes:
+
+1. Read ROADMAP.md
+2. Read REQUIREMENT.md
+3. Audit the current codebase
+4. Identify the current active phase
+5. Continue implementation from the current state
+
+Do NOT:
+- Rebuild completed systems
+- Regenerate architecture
+- Rewrite working features
+- Restart the project
+
+Always determine:
+
+- What is complete
+- What is partially complete
+- What is missing for the current phase
+
+Then continue only with the current phase.
+
+Current Priority:
+
+PHASE 9A - Gym Owner SaaS Onboarding
+
+The backend tenant provisioning system already exists.
+
+Examples:
+- Tenant model
+- TenantSettings
+- /api/tenant/create
+- Admin role assignment
+- Dynamic gym routing
+
+The missing piece is the frontend onboarding flow.
+
+Required deliverables:
+
+- Create Gym page
+- Gym creation wizard
+- Slug generation
+- Slug validation
+- Connect to /api/tenant/create
+- Admin onboarding
+- Redirect to admin dashboard
+
+Before coding:
+
+Provide:
+1. Current phase detected
+2. Existing implementation
+3. Missing implementation
+4. Files to be modified
+5. Execution plan
+
+After completing work:
+
+- Update ROADMAP.md
+- Update implementation logs
+- Mark completed tasks

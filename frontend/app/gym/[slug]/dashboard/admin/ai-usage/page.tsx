@@ -53,7 +53,7 @@ export default function AiUsagePage() {
         <div>
           <h1 className="text-2xl font-black text-gray-900">AI Usage Analytics</h1>
           <p className="text-gray-500 text-sm mt-1">
-            Monitor AI feature usage and estimated Anthropic API costs
+            Monitor AI feature usage and estimated Google Gemini API costs
           </p>
         </div>
         <div className="flex items-center gap-2">

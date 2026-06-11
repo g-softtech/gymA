@@ -24,7 +24,7 @@ export default async function AIWorkoutPage({
       <div>
         <h1 className="text-2xl font-bold text-gray-900">AI Fitness Coach</h1>
         <p className="text-gray-500 mt-1">
-          Generate a personalised workout plan powered by Claude AI
+          Generate a personalised workout plan powered by Google Gemini AI
         </p>
       </div>
       <AIWorkoutGenerator

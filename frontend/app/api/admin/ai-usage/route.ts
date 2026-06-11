@@ -98,9 +98,9 @@ export async function GET(req: NextRequest) {
         totalInputTokens,
         totalOutputTokens,
         estimatedCost: +(
-          // Claude Sonnet 4: ~$3/M input + $15/M output (approximate)
-          (totalInputTokens / 1_000_000) * 3 +
-          (totalOutputTokens / 1_000_000) * 15
+          // Gemini 2.0 Flash pricing: ~$0.075/M input tokens + $0.30/M output tokens
+          (totalInputTokens / 1_000_000) * 0.075 +
+          (totalOutputTokens / 1_000_000) * 0.30
         ).toFixed(4),
       },
       byFeature: byFeature.map((f) => ({

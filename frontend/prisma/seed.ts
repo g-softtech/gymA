@@ -9,21 +9,21 @@ const prisma = new PrismaClient({ adapter });
 async function main() {
   // 1. Create a Test Tenant (Gym)
   const tenant = await prisma.tenant.upsert({
-    where: { slug: "ironforge" },
+    where: { slug: "cortexfit" },
     update: {},
     create: {
       name: "Iron Forge Fitness",
-      slug: "ironforge",
+      slug: "cortexfit",
     },
   });
   console.log("✅ Seeded Tenant:", tenant.name);
 
   // 2. Create a Test Admin User for this Tenant
   const admin = await prisma.user.upsert({
-    where: { email: "admin@ironforge.com" },
+    where: { email: "admin@cortexfit.com" },
     update: {},
     create: {
-      email: "admin@ironforge.com",
+      email: "admin@cortexfit.com",
       role: "ADMIN",
       tenantId: tenant.id,
     },

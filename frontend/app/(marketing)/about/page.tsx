@@ -35,22 +35,22 @@ export default function AboutPage() {
               <h2 className="text-3xl font-extrabold text-gray-900 mb-6">Our Story</h2>
               <div className="space-y-4 text-gray-600 leading-relaxed">
                 <p>
-                  SmartGym was born out of frustration. Our founder Emeka ran a gym in Lagos for 8 years using spreadsheets, WhatsApp groups, and manual receipts. When he looked for a modern gym management solution, everything he found was built for American or European gyms — no Paystack integration, no Nigerian foods, no understanding of how African gyms actually operate.
+                  CortexFit was born out of frustration. Our founder Emeka ran a gym in Lagos for 8 years using spreadsheets, WhatsApp groups, and manual receipts. When he looked for a modern gym management solution, everything he found was built for American or European gyms — no Paystack integration, no Nigerian foods, no understanding of how African gyms actually operate.
                 </p>
                 <p>
-                  So he built SmartGym. Starting with a simple member tracking tool, the platform has grown into a complete fitness business operating system — complete with AI coaching powered by Claude, Nigerian food databases, Paystack payment integration, and multi-tenant support for gym chains.
+                  So he built CortexFit. Starting with a simple member tracking tool, the platform has grown into a complete fitness business operating system — complete with AI coaching powered by Google Gemini, Nigerian food databases, Paystack payment integration, and multi-tenant support for gym chains.
                 </p>
                 <p>
-                  Today, SmartGym powers 500+ gyms across Nigeria, Ghana, Kenya, and South Africa, helping gym owners focus on what they do best — transforming lives through fitness.
+                  Today, CortexFit powers 500+ gyms across Nigeria, Ghana, Kenya, and South Africa, helping gym owners focus on what they do best — transforming lives through fitness.
                 </p>
               </div>
             </div>
             <div className="space-y-4">
               {[
-                { year: "2021", event: "SmartGym founded in Lagos, Nigeria" },
+                { year: "2021", event: "CortexFit founded in Lagos, Nigeria" },
                 { year: "2022", event: "Paystack integration launched, 100 gyms onboarded" },
                 { year: "2023", event: "Trainer module and booking system launched" },
-                { year: "2024", event: "AI Coach powered by Claude launched" },
+                { year: "2024", event: "AI Coach powered by Google Gemini launched" },
                 { year: "2025", event: "500+ gyms, expanding across Africa" },
               ].map((item, i) => (
                 <div key={i} className="flex gap-4 items-start">
@@ -104,10 +104,10 @@ export default function AboutPage() {
       {/* CTA */}
       <section className="py-16 px-6 bg-indigo-600 text-white text-center">
         <div className="max-w-2xl mx-auto">
-          <h2 className="text-3xl font-extrabold mb-4">Join the SmartGym family</h2>
+          <h2 className="text-3xl font-extrabold mb-4">Join the CortexFit family</h2>
           <p className="text-indigo-200 mb-8">Start your free trial today — no credit card required.</p>
           <Link
-            href="/gym/ironforge"
+            href="/gym/cortexfit"
             className="inline-block bg-white text-indigo-700 font-bold px-8 py-4 rounded-xl hover:bg-indigo-50 transition"
           >
             Start Free Trial

@@ -5,7 +5,7 @@ export default function HomePage() {
     { icon: "👥", title: "Member Management", desc: "Track memberships, subscriptions, attendance, and payments in one place." },
     { icon: "🏋️", title: "Trainer Module", desc: "Trainers manage clients, bookings, workout plans, and progress tracking." },
     { icon: "💳", title: "Paystack Payments", desc: "Seamless Nigerian payment integration. Accept cards, bank transfers, and USSD." },
-    { icon: "🤖", title: "AI Fitness Coach", desc: "Claude AI generates personalised workout and Nigerian meal plans for members." },
+    { icon: "🤖", title: "AI Fitness Coach", desc: "Google Gemini generates personalised workout and Nigerian meal plans for members." },
     { icon: "🥗", title: "Nutrition Planner", desc: "60+ Nigerian foods database with calorie tracking and macro breakdowns." },
     { icon: "🏅", title: "Community & Challenges", desc: "Social feed, fitness challenges, leaderboards, and achievement badges." },
     { icon: "📊", title: "Revenue Analytics", desc: "Real-time revenue charts, subscription tracking, and financial reports." },
@@ -22,8 +22,8 @@ export default function HomePage() {
   const testimonials = [
     {
       name: "Adebayo Okonkwo",
-      role: "Owner, IronForge Fitness Lagos",
-      text: "SmartGym transformed how we run our gym. The AI meal planner with Nigerian foods is a game changer for our members.",
+      role: "Owner, CortexFit Fitness Lagos",
+      text: "CortexFit transformed how we run our gym. The AI meal planner with Nigerian foods is a game changer for our members.",
       avatar: "A",
     },
     {
@@ -35,7 +35,7 @@ export default function HomePage() {
     {
       name: "Olumide Fashola",
       role: "CEO, PowerHouse Gym Chain",
-      text: "We run 5 locations seamlessly on SmartGym. The multi-tenant system and revenue analytics are exactly what we needed.",
+      text: "We run 5 locations seamlessly on CortexFit. The multi-tenant system and revenue analytics are exactly what we needed.",
       avatar: "O",
     },
   ];
@@ -47,7 +47,7 @@ export default function HomePage() {
         <div className="max-w-5xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-4 py-1.5 text-sm font-medium mb-8">
             <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-            Now with AI Fitness Coaching powered by Claude
+            Now with AI Fitness Coaching powered by Google Gemini
           </div>
           <h1 className="text-5xl sm:text-6xl font-extrabold leading-tight mb-6">
             The Complete Gym
@@ -61,10 +61,10 @@ export default function HomePage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
-              href="/gym/ironforge"
+              href="/onboarding"
               className="bg-white text-indigo-700 font-bold px-8 py-4 rounded-xl hover:bg-indigo-50 transition text-base"
             >
-              🚀 Try Demo Gym Free
+              🚀 Start Free Trial
             </Link>
             <Link
               href="/pricing"
@@ -97,7 +97,7 @@ export default function HomePage() {
               Everything your gym needs
             </h2>
             <p className="text-xl text-gray-500 max-w-2xl mx-auto">
-              From member check-ins to AI-powered coaching — SmartGym has every feature a modern African gym needs to thrive.
+              From member check-ins to AI-powered coaching — CortexFit has every feature a modern African gym needs to thrive.
             </p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -119,7 +119,7 @@ export default function HomePage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-12 items-center">
               <div>
                 <div className="inline-flex items-center gap-2 bg-white/10 rounded-full px-3 py-1 text-sm mb-6">
-                  🤖 Powered by Claude AI
+                  🤖 Powered by Google Gemini AI
                 </div>
                 <h2 className="text-3xl font-extrabold mb-4">
                   AI Fitness Coach that understands Nigerian nutrition
@@ -128,7 +128,7 @@ export default function HomePage() {
                   Our AI coach generates personalised workout plans and Nigerian meal plans — featuring Jollof Rice, Egusi Soup, Suya, Moin Moin, and 60+ local foods with precise macro breakdowns.
                 </p>
                 <Link
-                  href="/gym/ironforge/dashboard/member/ai"
+                  href="/gym/cortexfit/dashboard/member/ai"
                   className="inline-flex bg-white text-indigo-700 font-bold px-6 py-3 rounded-xl hover:bg-indigo-50 transition"
                 >
                   Try AI Coach →
@@ -184,11 +184,11 @@ export default function HomePage() {
             Ready to transform your gym?
           </h2>
           <p className="text-xl text-indigo-200 mb-10">
-            Join 500+ gyms already using SmartGym to grow their business and serve their members better.
+            Join 500+ gyms already using CortexFit to grow their business and serve their members better.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
-              href="/gym/ironforge"
+              href="/onboarding"
               className="bg-white text-indigo-700 font-bold px-8 py-4 rounded-xl hover:bg-indigo-50 transition"
             >
               Start Free Trial

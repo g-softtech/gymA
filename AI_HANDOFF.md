@@ -170,8 +170,9 @@ NEXTAUTH_URL=                    # e.g. http://localhost:3000
 GOOGLE_CLIENT_ID=
 GOOGLE_CLIENT_SECRET=
 
-# AI
-ANTHROPIC_API_KEY=               # For /api/ai/* routes
+# AI Provider: Google Gemini (gemini-2.0-flash) via lib/gemini.ts
+# ANTHROPIC_API_KEY has been REMOVED. Use GOOGLE_API_KEY instead.
+GOOGLE_API_KEY=                  # For /api/ai/* routes (all 4 AI endpoints)
 
 # Payments
 PAYSTACK_SECRET_KEY=             # Server-side verification
@@ -537,6 +538,7 @@ Tenant
 | Jun 10, 2026 | Created MULTI_TENANT_MIGRATION_TRACKER.md + AI_HANDOFF.md from full codebase scan | Antigravity AI |
 | Jun 10, 2026 | Phase 7: Paystack webhook, subscription cron, contact form API + UI, CheckoutButton metadata, middleware updates | Antigravity AI |
 | Jun 10, 2026 | Phase 8: Upstash Redis rate limiter, AiLog model + migration, logging in all AI routes, admin AI usage analytics page | Antigravity AI |
+| Jun 11, 2026 | AI Provider Migration: Anthropic Claude → Google Gemini 2.0 Flash. Created lib/gemini.ts service layer. Migrated all 4 AI routes. Updated cost formula, marketing FAQ. | Antigravity AI |
 
 ---
 
@@ -559,6 +561,6 @@ Before finishing any session, update:
 
 ---
 
-*Last Updated: June 10, 2026 — Session 3*
-*Updated By: Antigravity AI — Phase 8 complete*
+*Last Updated: June 11, 2026 — Session 4*
+*Updated By: Antigravity AI — Gemini migration complete*
 *Next Session Should Start At: Phase 9 — Custom Domain Verification Flow*

@@ -2,7 +2,7 @@ import ContactForm from "@/components/marketing/ContactForm";
 
 export default function ContactPage() {
   const contactInfo = [
-    { icon: "📧", label: "Email", value: "hello@smartgym.africa", href: "mailto:hello@smartgym.africa" },
+    { icon: "📧", label: "Email", value: "hello@cortexfit.africa", href: "mailto:hello@cortexfit.africa" },
     { icon: "📱", label: "WhatsApp", value: "+234 800 SMART GYM", href: "https://wa.me/2348001234567" },
     { icon: "📍", label: "Office", value: "Victoria Island, Lagos, Nigeria", href: null },
     { icon: "⏰", label: "Support Hours", value: "Mon–Sat, 8AM–8PM WAT", href: null },
@@ -51,7 +51,7 @@ export default function ContactPage() {
                 Try our demo gym with full access to all features — no credit card required.
               </p>
               <a
-                href="/gym/ironforge"
+                href="/gym/cortexfit"
                 className="inline-block bg-white text-indigo-700 font-bold text-sm px-5 py-2.5 rounded-lg hover:bg-indigo-50 transition"
               >
                 Try Demo Free →

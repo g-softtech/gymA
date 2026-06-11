@@ -90,7 +90,7 @@ export default async function WebsiteHubPage({
         <div className="flex-1 min-w-0">
           <p className="text-sm font-semibold text-indigo-900">Your public gym page</p>
           <p className="text-xs text-indigo-600 truncate">
-            smartgym.com/gym/{slug}
+            cortexfit.com/gym/{slug}
           </p>
         </div>
         <Link

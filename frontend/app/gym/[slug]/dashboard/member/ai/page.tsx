@@ -65,7 +65,7 @@ export default async function AIHubPage({
       <div>
         <h1 className="text-2xl font-bold text-gray-900">AI Fitness Assistant</h1>
         <p className="text-gray-500 mt-1">
-          Powered by Claude AI — your personal coach available 24/7
+          Powered by Google Gemini AI — your personal coach available 24/7
         </p>
       </div>
 

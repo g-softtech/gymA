@@ -95,7 +95,7 @@ export default async function SuperAdminOverviewPage() {
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-white">Platform Overview</h1>
         <p className="text-slate-400 text-sm mt-1">
-          Monitor all gyms and users across the SmartGym platform.
+          Monitor all gyms and users across the CortexFit platform.
         </p>
       </div>
 

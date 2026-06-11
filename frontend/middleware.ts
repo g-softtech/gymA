@@ -7,7 +7,7 @@ import type { NextRequest } from "next/server";
 // ─────────────────────────────────────────────────────────────────────────────
 
 /**
- * The root domain the platform runs on (e.g. "smartgym.com" or "localhost:3000").
+ * The root domain the platform runs on (e.g. "cortexfit.com" or "localhost:3000").
  * Set NEXT_PUBLIC_ROOT_DOMAIN in .env. Falls back to "localhost:3000" for local dev.
  */
 const ROOT_DOMAIN = process.env.NEXT_PUBLIC_ROOT_DOMAIN ?? "localhost:3000";
@@ -17,9 +17,9 @@ const ROOT_DOMAIN = process.env.NEXT_PUBLIC_ROOT_DOMAIN ?? "localhost:3000";
  *
  * Supports three routing modes:
  *
- *  1. Subdomain:    powergymlago.smartgym.com  → slug = "powergymlago"
+ *  1. Subdomain:    powergymlago.cortexfit.com  → slug = "powergymlago"
  *  2. Custom domain: powergymlago.com           → slug resolved via DB (handled in page layer)
- *  3. Path-based:   smartgym.com/gym/[slug]     → no rewrite needed, Next.js handles it natively
+ *  3. Path-based:   cortexfit.com/gym/[slug]     → no rewrite needed, Next.js handles it natively
  *
  * Returns null if the hostname is the root domain itself or a well-known system subdomain.
  */
@@ -69,13 +69,13 @@ export default withAuth(
     const hostname = req.headers.get("host") ?? "";
 
     // ── 1. Subdomain routing ────────────────────────────────────────────────
-    // If request arrives at <slug>.smartgym.com, rewrite to /gym/<slug>/...
+    // If request arrives at <slug>.cortexfit.com, rewrite to /gym/<slug>/...
     // The actual page at /gym/[slug] handles all the data fetching and rendering.
     const subdomainSlug = getSubdomainSlug(hostname);
     if (subdomainSlug) {
       // Build the new pathname: replace root with /gym/<slug>
-      // e.g. powergymlago.smartgym.com/dashboard/admin → /gym/powergymlago/dashboard/admin
-      // e.g. powergymlago.smartgym.com/ → /gym/powergymlago
+      // e.g. powergymlago.cortexfit.com/dashboard/admin → /gym/powergymlago/dashboard/admin
+      // e.g. powergymlago.cortexfit.com/ → /gym/powergymlago
       const newPathname = pathname === "/"
         ? `/gym/${subdomainSlug}`
         : `/gym/${subdomainSlug}${pathname}`;

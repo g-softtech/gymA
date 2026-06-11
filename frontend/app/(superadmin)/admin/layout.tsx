@@ -35,7 +35,7 @@ export default async function SuperAdminLayout({
               S
             </div>
             <div>
-              <p className="text-sm font-bold text-white">SmartGym</p>
+              <p className="text-sm font-bold text-white">CortexFit</p>
               <p className="text-[10px] text-violet-400 font-semibold tracking-widest uppercase">
                 Superadmin
               </p>

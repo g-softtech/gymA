@@ -44,7 +44,7 @@ export async function generateMetadata({
 
   const s = tenant.settings;
   const hero = s?.heroData as HeroData | null;
-  const title = s?.metaTitle ?? `${tenant.name} — SmartGym`;
+  const title = s?.metaTitle ?? `${tenant.name} — CortexFit`;
   const description =
     s?.metaDescription ??
     s?.tagline ??

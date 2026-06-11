@@ -66,12 +66,12 @@ export default function PricingPage() {
   ];
 
   const faqs = [
-    { q: "Is there a free trial?", a: "Yes! You can try our demo gym at ironforge with full access to all features. No credit card required." },
+    { q: "Is there a free trial?", a: "Yes! You can try our demo gym at cortexfit with full access to all features. No credit card required." },
     { q: "Which payment methods are supported?", a: "We integrate with Paystack which supports cards, bank transfers, USSD, and mobile money across Nigeria and Africa." },
     { q: "Can I switch plans later?", a: "Absolutely. You can upgrade or downgrade your plan at any time. Changes take effect at the next billing cycle." },
     { q: "Is my data safe?", a: "Yes. Each gym's data is completely isolated. We use encryption at rest and in transit, and never share your data." },
     { q: "Do you support multiple currencies?", a: "Currently we support NGN (Naira) natively. GHS, KES, and ZAR support is coming soon." },
-    { q: "What is the AI Coach powered by?", a: "Our AI features are powered by Claude, Anthropic's AI assistant. It understands Nigerian culture and nutrition." },
+    { q: "What is the AI Coach powered by?", a: "Our AI features are powered by Google Gemini, Google's most capable AI model. It understands Nigerian culture, local foods, and fitness needs — delivering smart, personalised coaching at scale." },
   ];
 
   return (
@@ -105,7 +105,7 @@ export default function PricingPage() {
                 </div>
 
                 <Link
-                  href="/contact"
+                  href={`/onboarding?plan=${plan.name.toLowerCase()}`}
                   className={`block w-full text-center font-bold py-3 rounded-xl transition mb-6 text-sm ${plan.buttonStyle}`}
                 >
                   Get Started
@@ -157,8 +157,8 @@ export default function PricingPage() {
             <Link href="/contact" className="bg-white text-indigo-700 font-bold px-8 py-4 rounded-xl hover:bg-indigo-50 transition">
               Talk to Sales
             </Link>
-            <Link href="/gym/ironforge" className="border-2 border-white/40 font-bold px-8 py-4 rounded-xl hover:bg-white/10 transition">
-              Try Demo Free
+            <Link href="/onboarding" className="border-2 border-white/40 font-bold px-8 py-4 rounded-xl hover:bg-white/10 transition">
+              Start Free Trial
             </Link>
           </div>
         </div>

@@ -12,7 +12,7 @@ import {
  *
  * Two modes:
  *  1. Authenticated: returns TenantSettings for session.user.tenantId
- *  2. Public: GET /api/tenant/settings?slug=ironforge — no auth required (for public gym pages)
+ *  2. Public: GET /api/tenant/settings?slug=cortexfit — no auth required (for public gym pages)
  */
 export async function GET(req: NextRequest) {
   try {

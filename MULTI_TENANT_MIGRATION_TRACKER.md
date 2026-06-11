@@ -100,7 +100,13 @@
 | 8 | Fire-and-forget AI usage logging in all 4 AI routes | ✅ Complete | All `/api/ai/*` routes | AiLog model | Medium |
 | 8 | `/api/admin/ai-usage` — usage analytics with cost estimate | ✅ Complete | `app/api/admin/ai-usage/route.ts` | AiLog model | Medium |
 | 8 | Admin AI Usage Analytics dashboard page | ✅ Complete | `app/gym/[slug]/dashboard/admin/ai-usage/page.tsx` | /api/admin/ai-usage | Low |
-| 8 | AI Usage + Blog nav links added to admin sidebar | ✅ Complete | `dashboard/layout.tsx` | - | Low |
+| 8 | Admin AI Usage + Blog nav links added to admin sidebar | ✅ Complete | `dashboard/layout.tsx` | - | Low |
+| 8 | **AI Provider Migration: Anthropic → Google Gemini** | ✅ Complete | `lib/gemini.ts` (new service layer) | GOOGLE_API_KEY | Low |
+| 8 | Gemini service layer (`lib/gemini.ts`) — generateText, generateJSON, generateChatReply | ✅ Complete | `lib/gemini.ts` | @google/generative-ai | Low |
+| 8 | All 4 AI routes migrated to Gemini (chat, workout, nutrition, progress) | ✅ Complete | `/api/ai/*` | lib/gemini.ts | Low |
+| 8 | Cost formula updated to Gemini 2.0 Flash pricing in admin analytics | ✅ Complete | `/api/admin/ai-usage/route.ts` | - | Low |
+| 8 | Marketing FAQ updated (Claude → Gemini) | ✅ Complete | `app/(marketing)/pricing/page.tsx` | - | Low |
+| 8 | AiLog.model default updated to `gemini-2.0-flash` | ✅ Complete | schema.prisma, migration SQL pending DB | - | Low |
 | 9 | Custom domain verification flow | ⏳ Not Started | `app/api/gym/resolve/route.ts` needs DB | TenantSettings.customDomain | High |
 | 9 | Flutterwave integration | ⏳ Not Started | Parallel to Paystack | Payment system | Medium |
 | 9 | AI Booking Optimizer | ⏳ Not Started | New AI endpoint | Booking model | Medium |
@@ -484,5 +490,5 @@ The `TenantPlan` enum (FREE, STARTER, PROFESSIONAL, ENTERPRISE) exists in the sc
 
 ---
 
-*Last Updated: June 10, 2026 — Session 3: Phase 8 complete (rate limiting, AI logging, usage analytics, admin dashboard)*
+*Last Updated: June 11, 2026 — Session 4: AI provider fully migrated from Anthropic Claude → Google Gemini 2.0 Flash*
 *Next Update Due: End of next development session*

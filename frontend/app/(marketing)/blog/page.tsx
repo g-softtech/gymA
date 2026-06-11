@@ -65,7 +65,7 @@ export default function BlogPage() {
       {/* Hero */}
       <section className="bg-gradient-to-br from-indigo-900 to-purple-900 text-white py-20 px-6 text-center">
         <div className="max-w-3xl mx-auto">
-          <h1 className="text-5xl font-extrabold mb-4">SmartGym Blog</h1>
+          <h1 className="text-5xl font-extrabold mb-4">CortexFit Blog</h1>
           <p className="text-xl text-indigo-200">
             Fitness tips, Nigerian nutrition guides, and gym business insights — written for African gym owners and members.
           </p>

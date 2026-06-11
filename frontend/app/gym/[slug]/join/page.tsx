@@ -100,7 +100,7 @@ export default async function GymJoinPage({
 
         {/* Footer note */}
         <p className="mt-6 text-center text-xs text-slate-600">
-          Powered by SmartGym · Your account will be linked to this gym
+          Powered by CortexFit · Your account will be linked to this gym
         </p>
       </div>
     </div>

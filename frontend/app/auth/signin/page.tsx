@@ -1,54 +1,291 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { signIn } from "next-auth/react";
-import { useSearchParams } from "next/navigation";
-import { Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
 
-function SignInContent() {
+export default function SignInPage() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") || "/";
+  const errorParam = searchParams.get("error");
 
-  const handleSignIn = () => {
-    signIn("google", { 
-      callbackUrl,
-      prompt: "select_account",
-    });
+  const [tab, setTab] = useState<"signin" | "register">("signin");
+  const [form, setForm] = useState({ name: "", email: "", password: "", confirmPassword: "" });
+  const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
+  const [message, setMessage] = useState<{ type: "error" | "success"; text: string } | null>(null);
+
+  // Map NextAuth error codes to human-readable messages
+  const authErrorMap: Record<string, string> = {
+    OAuthAccountNotLinked: "This email is already used with a different sign-in method.",
+    invalid_client: "Google sign-in is not configured. Please use email & password.",
+    AccessDenied: "Access denied.",
+    Verification: "Sign-in link is invalid or has expired.",
+    CredentialsSignin: "Incorrect email or password.",
   };
 
+  useEffect(() => {
+    if (errorParam) {
+      setMessage({ type: "error", text: authErrorMap[errorParam] ?? `Sign-in error: ${errorParam}` });
+    }
+  }, [errorParam]);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
+    setMessage(null);
+  };
+
+  const handleGoogleSignIn = async () => {
+    setGoogleLoading(true);
+    try {
+      await signIn("google", { callbackUrl });
+    } catch {
+      setGoogleLoading(false);
+    }
+  };
+
+  const handleCredentialsSignIn = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setMessage(null);
+
+    const result = await signIn("credentials", {
+      redirect: false,
+      email: form.email,
+      password: form.password,
+    });
+
+    if (result?.ok) {
+      router.push(callbackUrl);
+    } else {
+      setMessage({ type: "error", text: result?.error || "Incorrect email or password." });
+      setLoading(false);
+    }
+  };
+
+  const handleRegister = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (form.password !== form.confirmPassword) {
+      setMessage({ type: "error", text: "Passwords do not match." });
+      return;
+    }
+    if (form.password.length < 8) {
+      setMessage({ type: "error", text: "Password must be at least 8 characters." });
+      return;
+    }
+
+    setLoading(true);
+    setMessage(null);
+
+    const res = await fetch("/api/auth/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name: form.name, email: form.email, password: form.password }),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      setMessage({ type: "error", text: data.error || "Registration failed." });
+      setLoading(false);
+      return;
+    }
+
+    // Auto sign in after successful registration
+    const result = await signIn("credentials", {
+      redirect: false,
+      email: form.email,
+      password: form.password,
+    });
+
+    if (result?.ok) {
+      router.push(callbackUrl);
+    } else {
+      setMessage({ type: "success", text: "Account created! Please sign in." });
+      setTab("signin");
+      setLoading(false);
+    }
+  };
+
+  const inputClass =
+    "w-full px-4 py-3 rounded-xl border border-white/10 bg-white/5 text-white placeholder-white/40 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/60 transition";
+
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-10 w-full max-w-sm text-center">
-        <div className="w-14 h-14 bg-indigo-600 rounded-xl flex items-center justify-center mx-auto mb-6">
-          <span className="text-white text-2xl">💪</span>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-950 via-indigo-950 to-gray-950 px-4">
+      {/* Animated background orbs */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute top-1/4 -left-32 w-96 h-96 bg-indigo-600/20 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-1/4 -right-32 w-96 h-96 bg-purple-600/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: "1s" }} />
+      </div>
+
+      <div className="relative w-full max-w-md">
+        {/* Logo */}
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 mb-4 shadow-lg shadow-indigo-500/30">
+            <span className="text-2xl">💪</span>
+          </div>
+          <h1 className="text-2xl font-black text-white">CortexFit</h1>
+          <p className="text-white/50 text-sm mt-1">Smart Gym Management Platform</p>
         </div>
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">Welcome Back</h1>
-        <p className="text-gray-500 text-sm mb-8">
-          Sign in to access your gym dashboard
-        </p>
-        <button
-          onClick={handleSignIn}
-          className="w-full flex items-center justify-center gap-3 bg-white border-2 border-gray-200 hover:border-indigo-400 hover:bg-indigo-50 text-gray-700 font-semibold py-3 px-4 rounded-xl transition-all"
-        >
-          <svg className="w-5 h-5" viewBox="0 0 24 24">
-            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-          </svg>
-          Continue with Google
-        </button>
-        <p className="text-xs text-gray-400 mt-6">
-          You will be asked to choose your Google account
+
+        {/* Card */}
+        <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8 shadow-2xl">
+
+          {/* Tabs */}
+          <div className="flex bg-white/5 rounded-xl p-1 mb-6">
+            {(["signin", "register"] as const).map((t) => (
+              <button
+                key={t}
+                id={`tab-${t}`}
+                onClick={() => { setTab(t); setMessage(null); }}
+                className={`flex-1 py-2 text-sm font-semibold rounded-lg transition-all ${
+                  tab === t
+                    ? "bg-indigo-600 text-white shadow-sm"
+                    : "text-white/50 hover:text-white"
+                }`}
+              >
+                {t === "signin" ? "Sign In" : "Create Account"}
+              </button>
+            ))}
+          </div>
+
+          {/* Error / Success message */}
+          {message && (
+            <div className={`mb-4 px-4 py-3 rounded-xl text-sm font-medium ${
+              message.type === "error"
+                ? "bg-red-500/10 border border-red-500/20 text-red-300"
+                : "bg-green-500/10 border border-green-500/20 text-green-300"
+            }`}>
+              {message.text}
+            </div>
+          )}
+
+          {tab === "signin" ? (
+            <>
+              {/* Google Sign In */}
+              <button
+                id="google-signin-btn"
+                onClick={handleGoogleSignIn}
+                disabled={googleLoading}
+                className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl bg-white text-gray-800 font-semibold text-sm hover:bg-gray-50 transition-all hover:shadow-lg disabled:opacity-60 mb-4"
+              >
+                <svg className="w-5 h-5" viewBox="0 0 24 24">
+                  <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                  <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                  <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                  <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                </svg>
+                {googleLoading ? "Signing in…" : "Continue with Google"}
+              </button>
+
+              {/* Divider */}
+              <div className="flex items-center gap-3 mb-4">
+                <div className="flex-1 h-px bg-white/10" />
+                <span className="text-white/30 text-xs">or</span>
+                <div className="flex-1 h-px bg-white/10" />
+              </div>
+
+              {/* Credentials form */}
+              <form onSubmit={handleCredentialsSignIn} className="space-y-3">
+                <input
+                  id="signin-email"
+                  name="email"
+                  type="email"
+                  required
+                  value={form.email}
+                  onChange={handleChange}
+                  placeholder="Email address"
+                  className={inputClass}
+                />
+                <input
+                  id="signin-password"
+                  name="password"
+                  type="password"
+                  required
+                  value={form.password}
+                  onChange={handleChange}
+                  placeholder="Password"
+                  className={inputClass}
+                />
+                <button
+                  id="signin-submit-btn"
+                  type="submit"
+                  disabled={loading}
+                  className="w-full py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold text-sm hover:opacity-90 hover:shadow-lg hover:shadow-indigo-500/30 transition-all disabled:opacity-60"
+                >
+                  {loading ? "Signing in…" : "Sign In →"}
+                </button>
+              </form>
+            </>
+          ) : (
+            <form onSubmit={handleRegister} className="space-y-3">
+              <input
+                id="register-name"
+                name="name"
+                type="text"
+                required
+                value={form.name}
+                onChange={handleChange}
+                placeholder="Full name"
+                className={inputClass}
+              />
+              <input
+                id="register-email"
+                name="email"
+                type="email"
+                required
+                value={form.email}
+                onChange={handleChange}
+                placeholder="Email address"
+                className={inputClass}
+              />
+              <input
+                id="register-password"
+                name="password"
+                type="password"
+                required
+                minLength={8}
+                value={form.password}
+                onChange={handleChange}
+                placeholder="Password (min 8 characters)"
+                className={inputClass}
+              />
+              <input
+                id="register-confirm-password"
+                name="confirmPassword"
+                type="password"
+                required
+                value={form.confirmPassword}
+                onChange={handleChange}
+                placeholder="Confirm password"
+                className={inputClass}
+              />
+              <button
+                id="register-submit-btn"
+                type="submit"
+                disabled={loading}
+                className="w-full py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold text-sm hover:opacity-90 hover:shadow-lg hover:shadow-indigo-500/30 transition-all disabled:opacity-60"
+              >
+                {loading ? "Creating account…" : "Create Account →"}
+              </button>
+            </form>
+          )}
+
+          {/* Footer links */}
+          <div className="mt-6 text-center">
+            <Link href="/" className="text-xs text-white/30 hover:text-white/60 transition">
+              ← Back to home
+            </Link>
+          </div>
+        </div>
+
+        {/* Privacy note */}
+        <p className="text-center text-white/20 text-xs mt-4">
+          By signing in, you agree to CortexFit&apos;s Terms of Service and Privacy Policy.
         </p>
       </div>
     </div>
-  );
-}
-
-export default function SignInPage() {
-  return (
-    <Suspense>
-      <SignInContent />
-    </Suspense>
   );
 }

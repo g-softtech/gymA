@@ -11,7 +11,7 @@ export default function MarketingLayout({ children }: { children: ReactNode }) {
             <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
               <span className="text-white text-sm font-bold">SG</span>
             </div>
-            <span className="font-bold text-gray-900 text-lg">SmartGym</span>
+            <span className="font-bold text-gray-900 text-lg">CortexFit</span>
           </Link>
 
           <nav className="hidden md:flex items-center gap-8">
@@ -40,10 +40,10 @@ export default function MarketingLayout({ children }: { children: ReactNode }) {
               Sign In
             </Link>
             <Link
-              href="/gym/ironforge"
+              href="/onboarding"
               className="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-4 py-2 rounded-lg transition"
             >
-              Try Demo Gym
+              Start Free Trial
             </Link>
           </div>
         </div>
@@ -61,7 +61,7 @@ export default function MarketingLayout({ children }: { children: ReactNode }) {
                 <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
                   <span className="text-white text-sm font-bold">SG</span>
                 </div>
-                <span className="font-bold text-white text-lg">SmartGym</span>
+                <span className="font-bold text-white text-lg">CortexFit</span>
               </div>
               <p className="text-sm text-gray-400 leading-relaxed">
                 The complete SaaS platform for modern gyms across Africa. Manage members, trainers, and growth — all in one place.
@@ -74,7 +74,7 @@ export default function MarketingLayout({ children }: { children: ReactNode }) {
                 links: [
                   { label: "Features", href: "/#features" },
                   { label: "Pricing", href: "/pricing" },
-                  { label: "Demo", href: "/gym/ironforge" },
+                  { label: "Demo", href: "/gym/cortexfit" },
                   { label: "AI Coach", href: "/#ai" },
                 ],
               },
@@ -111,7 +111,7 @@ export default function MarketingLayout({ children }: { children: ReactNode }) {
 
           <div className="border-t border-gray-800 pt-8 flex flex-col sm:flex-row justify-between items-center gap-4">
             <p className="text-xs text-gray-500">
-              &copy; {new Date().getFullYear()} SmartGym SaaS. All rights reserved.
+              &copy; {new Date().getFullYear()} CortexFit SaaS. All rights reserved.
             </p>
             <p className="text-xs text-gray-500">
               Built with ❤️ for African fitness businesses

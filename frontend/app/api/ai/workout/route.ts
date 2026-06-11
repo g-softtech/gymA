@@ -3,6 +3,7 @@ import { getAuthSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getTenantContextFromSession, noTenantContext } from "@/lib/tenant";
 import { checkAiRateLimit } from "@/lib/ratelimit";
+import { generateJSON, GEMINI_MODEL } from "@/lib/gemini";
 
 export async function POST(req: NextRequest) {
   try {
@@ -32,7 +33,7 @@ Create a structured weekly workout plan. For each training day provide:
 - Day name (e.g. Monday)
 - 4-6 exercises with sets, reps, and rest time
 
-Respond ONLY with a valid JSON object in this exact format:
+Respond ONLY with a valid JSON object in this exact format (no markdown, no explanation):
 {
   "title": "plan title",
   "weeklyPlan": [
@@ -47,37 +48,30 @@ Respond ONLY with a valid JSON object in this exact format:
   "tips": ["tip1", "tip2", "tip3"]
 }`;
 
-    const response = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": process.env.ANTHROPIC_API_KEY ?? "",
-        "anthropic-version": "2023-06-01",
-      },
-      body: JSON.stringify({
-        model: "claude-sonnet-4-20250514",
-        max_tokens: 2000,
-        messages: [{ role: "user", content: prompt }],
-      }),
-    });
+    // ── Gemini JSON generation ────────────────────────────────────────────────
+    let plan: Record<string, unknown>;
+    let inputTokens: number | null = null;
+    let outputTokens: number | null = null;
 
-    const data = await response.json();
-    const text = data.content?.[0]?.text ?? "";
-
-    let plan;
     try {
-      const clean = text.replace(/```json|```/g, "").trim();
-      plan = JSON.parse(clean);
-    } catch {
-      // ✅ Log failed parse
+      const result = await generateJSON<Record<string, unknown>>(prompt, {
+        maxOutputTokens: 2048,
+      });
+      plan = result.data;
+      inputTokens = result.inputTokens;
+      outputTokens = result.outputTokens;
+    } catch (parseErr) {
+      console.error("[ai/workout] JSON parse error:", parseErr);
+      // Log failed call
       prisma.aiLog
         .create({
           data: {
             tenantId: ctx.tenantId,
             userId: session.user.id,
             feature: "WORKOUT",
-            inputTokens: data.usage?.input_tokens ?? null,
-            outputTokens: data.usage?.output_tokens ?? null,
+            model: GEMINI_MODEL,
+            inputTokens,
+            outputTokens,
             success: false,
           },
         })
@@ -90,7 +84,7 @@ Respond ONLY with a valid JSON object in this exact format:
 
     // Save to database if memberId provided
     if (memberId) {
-      const routines = plan.weeklyPlan.map((day: any) => ({
+      const routines = (plan.weeklyPlan as any[]).map((day: any) => ({
         day: day.day,
         exercises: day.exercises.map((ex: any) => ({
           name: ex.name,
@@ -104,7 +98,7 @@ Respond ONLY with a valid JSON object in this exact format:
         data: {
           memberId,
           tenantId: ctx.tenantId, // ✅ from session
-          title: plan.title,
+          title: plan.title as string,
           routines,
           isAiGenerated: true,
         },
@@ -118,8 +112,9 @@ Respond ONLY with a valid JSON object in this exact format:
           tenantId: ctx.tenantId,
           userId: session.user.id,
           feature: "WORKOUT",
-          inputTokens: data.usage?.input_tokens ?? null,
-          outputTokens: data.usage?.output_tokens ?? null,
+          model: GEMINI_MODEL,
+          inputTokens,
+          outputTokens,
           success: true,
         },
       })
@@ -127,7 +122,7 @@ Respond ONLY with a valid JSON object in this exact format:
 
     return NextResponse.json(plan);
   } catch (err) {
-    console.error(err);
+    console.error("[ai/workout]", err);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

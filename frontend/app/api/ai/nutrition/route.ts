@@ -3,6 +3,7 @@ import { getAuthSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getTenantContextFromSession, noTenantContext } from "@/lib/tenant";
 import { checkAiRateLimit } from "@/lib/ratelimit";
+import { generateJSON, GEMINI_MODEL } from "@/lib/gemini";
 
 export async function POST(req: NextRequest) {
   try {
@@ -51,7 +52,7 @@ export async function POST(req: NextRequest) {
 IMPORTANT: Use Nigerian foods where possible (jollof rice, egusi soup, pounded yam, moin moin, suya, 
 ogi, akara, efo riro, ogbono soup, eba, amala, zobo, kunu, plantain, groundnut soup, etc.)
 
-Respond ONLY with valid JSON in this exact format:
+Respond ONLY with valid JSON (no markdown, no explanation):
 {
   "title": "meal plan title",
   "totalCalories": ${targetCalories},
@@ -73,36 +74,29 @@ Respond ONLY with valid JSON in this exact format:
   ]
 }`;
 
-    const response = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": process.env.ANTHROPIC_API_KEY ?? "",
-        "anthropic-version": "2023-06-01",
-      },
-      body: JSON.stringify({
-        model: "claude-sonnet-4-20250514",
-        max_tokens: 2000,
-        messages: [{ role: "user", content: prompt }],
-      }),
-    });
+    // ── Gemini JSON generation ────────────────────────────────────────────────
+    let plan: Record<string, unknown>;
+    let inputTokens: number | null = null;
+    let outputTokens: number | null = null;
 
-    const data = await response.json();
-    const text = data.content?.[0]?.text ?? "";
-
-    let plan;
     try {
-      const clean = text.replace(/```json|```/g, "").trim();
-      plan = JSON.parse(clean);
-    } catch {
+      const result = await generateJSON<Record<string, unknown>>(prompt, {
+        maxOutputTokens: 2048,
+      });
+      plan = result.data;
+      inputTokens = result.inputTokens;
+      outputTokens = result.outputTokens;
+    } catch (parseErr) {
+      console.error("[ai/nutrition] JSON parse error:", parseErr);
       prisma.aiLog
         .create({
           data: {
             tenantId: ctx.tenantId,
             userId: session.user.id,
             feature: "NUTRITION",
-            inputTokens: data.usage?.input_tokens ?? null,
-            outputTokens: data.usage?.output_tokens ?? null,
+            model: GEMINI_MODEL,
+            inputTokens,
+            outputTokens,
             success: false,
           },
         })
@@ -119,13 +113,13 @@ Respond ONLY with valid JSON in this exact format:
         data: {
           memberId,
           tenantId: ctx.tenantId, // ✅ from session
-          title: plan.title,
+          title: plan.title as string,
           goal: goal as any,
-          totalCalories: plan.totalCalories,
-          protein: plan.protein,
-          carbs: plan.carbs,
-          fats: plan.fats,
-          meals: plan.meals,
+          totalCalories: plan.totalCalories as number,
+          protein: plan.protein as number,
+          carbs: plan.carbs as number,
+          fats: plan.fats as number,
+          meals: plan.meals as any,
           isAiGenerated: true,
         },
       });
@@ -138,8 +132,9 @@ Respond ONLY with valid JSON in this exact format:
           tenantId: ctx.tenantId,
           userId: session.user.id,
           feature: "NUTRITION",
-          inputTokens: data.usage?.input_tokens ?? null,
-          outputTokens: data.usage?.output_tokens ?? null,
+          model: GEMINI_MODEL,
+          inputTokens,
+          outputTokens,
           success: true,
         },
       })
@@ -147,7 +142,7 @@ Respond ONLY with valid JSON in this exact format:
 
     return NextResponse.json({ ...plan, targetCalories, tdee });
   } catch (err) {
-    console.error(err);
+    console.error("[ai/nutrition]", err);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
