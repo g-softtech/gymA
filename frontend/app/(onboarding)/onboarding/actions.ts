@@ -22,7 +22,7 @@ export async function createTenant(formData: FormData) {
   const slug = gymName.toLowerCase().replace(/[^a-z0-9]+/g, '-') + '-' + Math.floor(Math.random() * 1000);
 
   // ACID compliance: Create Tenant and update User in a single transaction
-  await prisma.$transaction(async (tx) => {
+  await prisma.$transaction(async (tx: any) => {
     const tenant = await tx.tenant.create({
       data: {
         name: gymName,
