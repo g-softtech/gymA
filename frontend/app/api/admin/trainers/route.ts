@@ -6,6 +6,7 @@ import {
   requireAdmin,
   noTenantContext,
 } from "@/lib/tenant";
+import { checkTrainerQuota } from "@/lib/enforcement";
 
 export async function POST(req: NextRequest) {
   try {
@@ -16,6 +17,12 @@ export async function POST(req: NextRequest) {
     const roleErr = requireAdmin(ctx);
     if (roleErr) return roleErr;
     if (!ctx?.tenantId) return noTenantContext();
+
+    // ✅ Phase 9B.4: SaaS Trainer Limit Enforcement
+    const quota = await checkTrainerQuota(ctx.tenantId);
+    if (!quota.allowed) {
+      return NextResponse.json({ error: quota.reason }, { status: 403 });
+    }
 
     const { email, specialties, bio, hourlyRate } = await req.json();
 

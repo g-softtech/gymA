@@ -8,7 +8,7 @@ import Link from "next/link";
 export default function SignInPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl") || "/";
+  const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
   const errorParam = searchParams.get("error");
 
   const [tab, setTab] = useState<"signin" | "register">("signin");

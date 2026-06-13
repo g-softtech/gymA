@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthSession } from "@/lib/auth";
-import { getTenantContextFromSession, noTenantContext } from "@/lib/tenant";
+import { getTenantContextFromSession, noTenantContext, assertUserCanManageMember } from "@/lib/tenant";
 
 export async function POST(req: NextRequest) {
   try {
@@ -20,6 +20,10 @@ export async function POST(req: NextRequest) {
     if (!memberId || !title || !meals) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
+
+    // ✅ Phase 9C: Enforce RBAC and Tenant ownership before allowing writes
+    const authErr = await assertUserCanManageMember(ctx, memberId);
+    if (authErr) return authErr;
 
     const plan = await prisma.mealPlan.create({
       data: {

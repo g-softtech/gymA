@@ -15,17 +15,46 @@ export default async function GymJoinPage({
     redirect(`/api/auth/signin?callbackUrl=/gym/${slug}/join`);
   }
 
-  // If they already have a tenantId, redirect them to their dashboard
-  if (session.user.tenantId) {
-    redirect(`/gym/${slug}/dashboard/member`);
-  }
-
   const tenant = await prisma.tenant.findUnique({
     where: { slug },
     include: { settings: true },
   });
 
   if (!tenant) notFound();
+
+  // If they already have a tenantId for THIS gym, redirect them to their dashboard
+  if (session.user.tenantId === tenant.id) {
+    const role = session.user.role;
+    if (role === "ADMIN" || role === "SUPERADMIN") redirect(`/gym/${slug}/dashboard/admin`);
+    if (role === "TRAINER") redirect(`/gym/${slug}/dashboard/trainer`);
+    redirect(`/gym/${slug}/dashboard/member`);
+  }
+
+  // If they belong to ANOTHER gym, they cannot join this one with the same account.
+  if (session.user.tenantId && session.user.tenantId !== tenant.id) {
+    return (
+      <div className="flex min-h-screen bg-slate-50 items-center justify-center p-6 text-center">
+        <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 max-w-md">
+          <h2 className="text-2xl font-bold text-red-600">Access Denied</h2>
+          <p className="mt-4 text-gray-600">
+            Your account is already linked to a different gym. 
+            CortexFit requires a unique account for each gym you join.
+          </p>
+          <p className="mt-2 text-sm text-gray-500">
+            Please sign out and register with a different email address to join <strong>{tenant.name}</strong>.
+          </p>
+          <a 
+            href={`/api/auth/signout?callbackUrl=/gym/${slug}/join`} 
+            className="mt-6 inline-block w-full py-3 px-4 bg-indigo-600 text-white font-semibold rounded-xl hover:bg-indigo-700 transition"
+          >
+            Sign Out
+          </a>
+        </div>
+      </div>
+    );
+  }
+
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 flex items-center justify-center p-6">

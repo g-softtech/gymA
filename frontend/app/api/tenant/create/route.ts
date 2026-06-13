@@ -45,9 +45,18 @@ export async function POST(req: Request) {
     // ── Atomic tenant creation + user promotion ──────────────────────────────
     // Use a transaction so the tenant row and user update either both succeed or both roll back.
     const { tenant } = await prisma.$transaction(async (tx) => {
-      // Create the tenant
+      // Create the tenant with 14-day free trial
+      const trialEndsAt = new Date();
+      trialEndsAt.setDate(trialEndsAt.getDate() + 14);
+      
       const tenant = await tx.tenant.create({
-        data: { name: name.trim(), slug },
+        data: { 
+          name: name.trim(), 
+          slug,
+          plan: "FREE",
+          trialEndsAt,
+          planStartedAt: new Date(),
+        },
       });
 
       // ✅ FIX 1: Promote the creator to ADMIN of the new gym.

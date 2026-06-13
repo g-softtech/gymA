@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthSession } from "@/lib/auth";
-import { getTenantContextFromSession, noTenantContext } from "@/lib/tenant";
+import { getTenantContextFromSession, noTenantContext, assertTrainerBelongsToTenant } from "@/lib/tenant";
 
 export async function POST(req: NextRequest) {
   try {
@@ -19,6 +19,10 @@ export async function POST(req: NextRequest) {
     if (!trainerId || !date) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
+
+    // ✅ Phase 9C: Assert trainer belongs to caller's tenant
+    const trainerErr = await assertTrainerBelongsToTenant(ctx, trainerId);
+    if (trainerErr) return trainerErr;
 
     // Validate sessionType
     const validSessionTypes = ["PHYSICAL", "ONLINE"];

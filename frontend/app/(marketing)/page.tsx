@@ -62,9 +62,9 @@ export default function HomePage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/onboarding"
-              className="bg-white text-indigo-700 font-bold px-8 py-4 rounded-xl hover:bg-indigo-50 transition text-base"
+              className="bg-white text-indigo-700 font-bold px-8 py-4 rounded-xl hover:bg-indigo-50 transition text-base shadow-xl shadow-indigo-500/20"
             >
-              🚀 Start Free Trial
+              🚀 Register Your Gym
             </Link>
             <Link
               href="/pricing"

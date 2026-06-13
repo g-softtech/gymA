@@ -15,6 +15,101 @@ interface Settings {
   darkMode?: boolean;
 }
 
+function ImageUploader({
+  label,
+  value,
+  onChange,
+  recommended,
+}: {
+  label: string;
+  value: string;
+  onChange: (url: string) => void;
+  recommended: string;
+}) {
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState("");
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 2 * 1024 * 1024) {
+      setError("File must be less than 2MB");
+      return;
+    }
+    setError("");
+    setUploading(true);
+
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("folder", "cortexfit_branding");
+
+    try {
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Upload failed");
+
+      onChange(data.url);
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  return (
+    <div className="space-y-2">
+      <label className="block text-sm font-medium text-gray-700">{label}</label>
+
+      <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center bg-gray-50/50 p-4 rounded-xl border border-gray-100">
+        {value ? (
+          <div className="relative w-16 h-16 rounded-lg border border-gray-200 overflow-hidden bg-white flex items-center justify-center shrink-0 shadow-sm">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={value} alt="preview" className="max-w-full max-h-full object-contain p-1" />
+          </div>
+        ) : (
+          <div className="w-16 h-16 rounded-lg border border-gray-200 border-dashed bg-white flex items-center justify-center shrink-0 text-xs text-gray-400">
+            None
+          </div>
+        )}
+
+        <div className="flex-1 w-full space-y-3">
+          <div>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleFileChange}
+              disabled={uploading}
+              className="block w-full text-sm text-gray-500
+                file:mr-4 file:py-2 file:px-4
+                file:rounded-full file:border-0
+                file:text-sm file:font-semibold
+                file:bg-indigo-50 file:text-indigo-700
+                hover:file:bg-indigo-100 disabled:opacity-50 transition-colors cursor-pointer"
+            />
+            <p className="text-xs text-gray-400 mt-1.5">{uploading ? "Uploading..." : recommended}</p>
+            {error && <p className="text-xs text-red-500 mt-1">{error}</p>}
+          </div>
+
+          {/* Fallback for backward compatibility */}
+          <div>
+            <input
+              type="url"
+              value={value ?? ""}
+              onChange={(e) => onChange(e.target.value)}
+              placeholder="Or paste an existing URL here..."
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent placeholder:text-gray-400"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function BrandingPage() {
   const { slug } = useParams<{ slug: string }>();
   const [settings, setSettings] = useState<Settings>({
@@ -84,32 +179,22 @@ export default function BrandingPage() {
         <form onSubmit={handleSave} className="lg:col-span-3 space-y-6">
 
           {/* Logo */}
-          <section className="bg-white border border-gray-100 rounded-xl p-6 shadow-sm space-y-4">
+          <section className="bg-white border border-gray-100 rounded-xl p-6 shadow-sm space-y-6">
             <h2 className="font-semibold text-gray-800 text-sm uppercase tracking-wider">Logo & Favicon</h2>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Logo URL</label>
-              <input
-                id="logo-url-input"
-                type="url"
-                value={settings.logoUrl ?? ""}
-                onChange={(e) => setSettings((s) => ({ ...s, logoUrl: e.target.value }))}
-                placeholder="https://your-cdn.com/logo.png"
-                className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-              />
-              <p className="text-xs text-gray-400 mt-1">PNG or SVG, recommended 200×60px</p>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Favicon URL</label>
-              <input
-                id="favicon-url-input"
-                type="url"
-                value={settings.faviconUrl ?? ""}
-                onChange={(e) => setSettings((s) => ({ ...s, faviconUrl: e.target.value }))}
-                placeholder="https://your-cdn.com/favicon.ico"
-                className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-              />
-              <p className="text-xs text-gray-400 mt-1">ICO or PNG 32×32px</p>
-            </div>
+            
+            <ImageUploader
+              label="Logo"
+              value={settings.logoUrl ?? ""}
+              onChange={(url) => setSettings((s) => ({ ...s, logoUrl: url }))}
+              recommended="PNG or SVG, recommended 200×60px, max 2MB"
+            />
+
+            <ImageUploader
+              label="Favicon"
+              value={settings.faviconUrl ?? ""}
+              onChange={(url) => setSettings((s) => ({ ...s, faviconUrl: url }))}
+              recommended="ICO or PNG, exactly 32×32px, max 2MB"
+            />
           </section>
 
           {/* Colors */}

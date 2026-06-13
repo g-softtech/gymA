@@ -4,6 +4,7 @@ import { getTenantContextFromSession, noTenantContext } from "@/lib/tenant";
 import { checkAiRateLimit } from "@/lib/ratelimit";
 import { prisma } from "@/lib/prisma";
 import { generateChatReply, GEMINI_MODEL, type ChatMessage } from "@/lib/gemini";
+import { checkAiQuota } from "@/lib/enforcement";
 
 export async function POST(req: NextRequest) {
   try {
@@ -19,6 +20,12 @@ export async function POST(req: NextRequest) {
     // ✅ Phase 4: tenantId context
     const ctx = getTenantContextFromSession(session);
     if (!ctx?.tenantId) return noTenantContext();
+
+    // ✅ Phase 9B.4: SaaS AI Quota Enforcement
+    const quota = await checkAiQuota(ctx.tenantId);
+    if (!quota.allowed) {
+      return NextResponse.json({ error: quota.reason }, { status: 403 });
+    }
 
     const { messages, systemContext } = await req.json();
 

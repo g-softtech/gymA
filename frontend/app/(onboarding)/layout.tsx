@@ -1,6 +1,15 @@
 import { ReactNode } from "react";
+import { redirect } from "next/navigation";
+import { getAuthSession } from "@/lib/auth";
 
-export default function OnboardingLayout({ children }: { children: ReactNode }) {
+export default async function OnboardingLayout({ children }: { children: ReactNode }) {
+  const session = await getAuthSession();
+
+  // If the user already belongs to a gym, they should not see the "Create Gym" page.
+  if (session?.user?.tenantId) {
+    redirect("/dashboard");
+  }
+
   return (
     <div className="min-h-screen bg-black bg-gradient-to-br from-black via-gray-900 to-indigo-950 text-white selection:bg-indigo-500/30 flex items-center justify-center p-4">
       {/* Dynamic Background Effects */}

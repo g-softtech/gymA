@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Loader2, ArrowRight, Building, CheckCircle2 } from "lucide-react";
 
 export default function OnboardingPage() {
   const router = useRouter();
@@ -37,6 +36,13 @@ export default function OnboardingPage() {
         body: JSON.stringify({ name: gymName }),
       });
 
+      const contentType = res.headers.get("content-type");
+      if (contentType && contentType.includes("text/html")) {
+        // NextAuth middleware redirected us to the login page
+        router.push("/auth/signin?callbackUrl=/onboarding");
+        return;
+      }
+
       const data = await res.json();
 
       if (!res.ok) {
@@ -55,7 +61,7 @@ export default function OnboardingPage() {
     <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8 md:p-10 shadow-2xl">
       <div className="mb-8 text-center">
         <div className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-indigo-500/25">
-          <Building className="w-8 h-8 text-white" />
+          <span className="text-3xl">🏢</span>
         </div>
         <h1 className="text-3xl font-extrabold text-white tracking-tight mb-2">
           Set up your Gym
@@ -84,7 +90,7 @@ export default function OnboardingPage() {
         {/* Live Preview Box */}
         <div className={`rounded-xl p-4 transition-all duration-300 ${gymName.length > 0 ? "bg-white/5 border border-indigo-500/30" : "bg-white/5 border border-white/5 opacity-50"}`}>
           <div className="flex items-start gap-3">
-            <CheckCircle2 className={`w-5 h-5 mt-0.5 ${gymName.length > 0 ? "text-indigo-400" : "text-gray-600"}`} />
+            <span className={`text-xl ${gymName.length > 0 ? "opacity-100" : "opacity-30"}`}>✅</span>
             <div>
               <p className="text-sm font-medium text-gray-300">Your Workspace URL</p>
               <p className="text-sm font-mono text-indigo-300 mt-1 break-all">
@@ -105,26 +111,23 @@ export default function OnboardingPage() {
           disabled={isSubmitting || !gymName.trim()}
           className="w-full bg-gradient-to-r from-indigo-600 to-blue-600 text-white font-bold py-3.5 px-4 rounded-xl hover:from-indigo-500 hover:to-blue-500 focus:ring-4 focus:ring-indigo-500/30 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
         >
-          {isSubmitting ? (
-            <>
-              <Loader2 className="w-5 h-5 animate-spin" />
-              Creating Workspace...
-            </>
-          ) : (
-            <>
-              Launch Workspace
-              <ArrowRight className="w-5 h-5" />
-            </>
-          )}
+          {isSubmitting ? "⏳ Creating Workspace..." : "Launch Workspace 🚀"}
         </button>
       </form>
 
       <div className="mt-8 text-center">
         <p className="text-sm text-gray-500">
-          Already have a gym?{" "}
-          <Link href="/auth/signin" className="text-indigo-400 hover:text-indigo-300 font-medium transition">
-            Sign in here
-          </Link>
+          Already have a gym under a different account?{" "}
+          <button 
+            type="button"
+            onClick={() => {
+              // Sign out and redirect to sign in
+              window.location.href = "/api/auth/signout?callbackUrl=/auth/signin";
+            }}
+            className="text-indigo-400 hover:text-indigo-300 font-medium transition"
+          >
+            Sign out to switch
+          </button>
         </p>
       </div>
     </div>

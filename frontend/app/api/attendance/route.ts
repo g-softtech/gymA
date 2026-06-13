@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthSession } from "@/lib/auth";
-import { getTenantContextFromSession, noTenantContext } from "@/lib/tenant";
+import { getTenantContextFromSession, noTenantContext, assertMemberBelongsToTenant } from "@/lib/tenant";
 
 export async function POST(req: NextRequest) {
   try {
@@ -15,6 +15,10 @@ export async function POST(req: NextRequest) {
     if (!ctx?.tenantId) return noTenantContext();
 
     const { memberId, note } = await req.json();
+
+    // ✅ Phase 9C: Enforce Tenant boundaries for manual check-ins
+    const memberErr = await assertMemberBelongsToTenant(ctx, memberId);
+    if (memberErr) return memberErr;
 
     // Only admins and trainers can check in members manually
     if (session.user.role === "MEMBER") {

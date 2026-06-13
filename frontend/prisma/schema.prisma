@@ -73,7 +73,7 @@ enum ChallengeType {
 enum TenantPlan {
   FREE
   STARTER
-  PROFESSIONAL
+  GROWTH
   ENTERPRISE
 }
 
@@ -84,6 +84,8 @@ model Tenant {
   // ── SaaS billing ──────────────────────────────────────────────────────────
   plan            TenantPlan       @default(FREE)
   trialEndsAt     DateTime?
+  billingEndsAt   DateTime?
+  planStartedAt   DateTime?
   isActive        Boolean          @default(true)
   // ── Relations ────────────────────────────────────────────────────────────
   users           User[]
@@ -92,6 +94,7 @@ model Tenant {
   messages        Message[]
   settings        TenantSettings?
   blogPosts       BlogPost[]
+  saasInvoices    SaaSInvoice[]
 }
 
 model User {
@@ -457,6 +460,8 @@ model TenantSettings {
   customDomain    String? @unique
   subdomain       String? @unique
   domainVerified  Boolean @default(false)
+  verificationToken String? // Stores Vercel TXT challenge
+  dnsVerifiedAt     DateTime? // Audit trail for verification
 
   // ── Business Info ─────────────────────────────────────────────────────────
   tagline         String?
@@ -545,3 +550,23 @@ model AiLog {
   @@index([userId, createdAt])
   @@index([tenantId, feature])
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// PHASE 9B: SaaS Billing & Monetization
+// ─────────────────────────────────────────────────────────────────────────────
+
+model SaaSInvoice {
+  id          String     @id @default(cuid())
+  tenantId    String
+  tenant      Tenant     @relation(fields: [tenantId], references: [id])
+  plan        TenantPlan
+  amount      Float
+  currency    String     @default("NGN")
+  reference   String     @unique
+  gateway     String     @default("PAYSTACK")
+  status      String     @default("SUCCESS")
+  createdAt   DateTime   @default(now())
+
+  @@index([tenantId])
+}
+

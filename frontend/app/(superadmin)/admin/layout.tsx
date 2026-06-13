@@ -15,7 +15,7 @@ export default async function SuperAdminLayout({
   }
 
   if (session.user.role !== "SUPERADMIN") {
-    redirect("/api/auth/signin");
+    redirect("/dashboard");
   }
 
   const navItems = [

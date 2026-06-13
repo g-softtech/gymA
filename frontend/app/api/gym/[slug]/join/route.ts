@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthSession } from "@/lib/auth";
+import { checkMemberQuota } from "@/lib/enforcement";
 
 /**
  * POST /api/gym/[slug]/join
@@ -30,6 +31,14 @@ export async function POST(
     const tenant = await prisma.tenant.findUnique({ where: { slug } });
     if (!tenant) {
       return NextResponse.json({ error: "Gym not found" }, { status: 404 });
+    }
+
+    // ✅ Phase 9B.4: Enforce Member Limit
+    const quota = await checkMemberQuota(tenant.id);
+    if (!quota.allowed) {
+      return NextResponse.redirect(
+        new URL(`/gym/${slug}/join?error=${encodeURIComponent(quota.reason!)}`, process.env.NEXTAUTH_URL!)
+      );
     }
 
     // Assign the user to this tenant

@@ -109,7 +109,7 @@ export default withAuth(
     if (pathname.startsWith("/admin")) {
       if (token?.role !== "SUPERADMIN") {
         const url = req.nextUrl.clone();
-        url.pathname = "/api/auth/signin";
+        url.pathname = "/dashboard"; // Prevent infinite redirect loops for logged-in users
         return NextResponse.redirect(url);
       }
     }
@@ -136,7 +136,7 @@ export default withAuth(
         if (pathname.startsWith("/api/cron/")) return true; // Vercel Cron (protected by CRON_SECRET header)
 
         // Onboarding and join flows can be accessed to redirect to auth
-        if (pathname.startsWith("/onboarding")) return true;
+        // We removed /onboarding from public list so users must sign in first
         if (pathname.includes("/join")) return true;
 
         // Platform-level marketing pages
@@ -159,6 +159,9 @@ export default withAuth(
 
         // SuperAdmin panel
         if (pathname.startsWith("/admin")) return !!token;
+
+        // Onboarding flow (must be logged in)
+        if (pathname.startsWith("/onboarding")) return !!token;
 
         // Everything else (marketing pages) — allow through
         return true;

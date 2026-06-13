@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthSession } from "@/lib/auth";
+import { getTenantContextFromSession, noTenantContext, assertPlanBelongsToTenant } from "@/lib/tenant";
 
 export async function POST(req: NextRequest) {
   try {
@@ -15,6 +16,13 @@ export async function POST(req: NextRequest) {
     if (!reference || !planId || !tenantSlug) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
+
+    // ✅ Phase 9C: Enforce cross-tenant security — prevent paying for another gym's plan
+    const ctx = getTenantContextFromSession(session);
+    if (!ctx?.tenantId) return noTenantContext();
+    
+    const planErr = await assertPlanBelongsToTenant(ctx, planId);
+    if (planErr) return planErr;
 
     const paystackRes = await fetch(
       `https://api.paystack.co/transaction/verify/${encodeURIComponent(reference)}`,

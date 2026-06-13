@@ -56,7 +56,14 @@ export async function POST(req: NextRequest) {
   // ── 4. Handle charge.success ───────────────────────────────────────────────
   if (event.event === "charge.success") {
     try {
-      await handleChargeSuccess(event.data);
+      const customFields = event.data.metadata?.custom_fields ?? [];
+      const paymentType = customFields.find((f) => f.variable_name === "payment_type")?.value;
+
+      if (paymentType === "saas") {
+        await handleSaaSChargeSuccess(event.data);
+      } else {
+        await handleChargeSuccess(event.data);
+      }
     } catch (err) {
       // Log the error but still return 200 so Paystack doesn't retry
       // indefinitely for unrecoverable errors (e.g., plan deleted).
@@ -163,6 +170,31 @@ async function handleChargeSuccess(data: PaystackChargeData) {
   });
 
   console.log(`[webhook] ✅ Subscription created for user ${user.id} — plan: ${plan.name}, ref: ${reference}`);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Handler: SaaS charge.success
+// ─────────────────────────────────────────────────────────────────────────────
+import { upgradeTenantSaaS } from "@/lib/billing-service";
+import { TenantPlan } from "@prisma/client";
+
+async function handleSaaSChargeSuccess(data: PaystackChargeData) {
+  const { reference, metadata, amount, currency } = data;
+  console.log(`[webhook] SaaS charge.success — reference: ${reference}`);
+
+  const customFields = metadata?.custom_fields ?? [];
+  const tenantId = customFields.find((f) => f.variable_name === "tenant_id")?.value;
+  const planName = customFields.find((f) => f.variable_name === "plan_name")?.value as TenantPlan;
+
+  if (!tenantId || !planName) {
+    console.error(`[webhook] Missing tenant_id or plan_name in SaaS payment metadata. Reference: ${reference}`);
+    return;
+  }
+
+  // Upgrade the tenant
+  // Paystack amount is in kobo, so divide by 100
+  const actualAmount = amount / 100;
+  await upgradeTenantSaaS(tenantId, planName, actualAmount, reference, currency, "PAYSTACK");
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

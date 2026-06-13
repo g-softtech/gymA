@@ -34,16 +34,16 @@ export default function MarketingLayout({ children }: { children: ReactNode }) {
 
           <div className="flex items-center gap-3">
             <Link
-              href="/api/auth/signin"
+              href="/auth/signin?callbackUrl=/dashboard"
               className="text-sm font-semibold text-gray-700 hover:text-indigo-600 transition"
             >
               Sign In
             </Link>
             <Link
               href="/onboarding"
-              className="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-4 py-2 rounded-lg transition"
+              className="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-4 py-2 rounded-lg transition ml-2 shadow-sm"
             >
-              Start Free Trial
+              Register Gym
             </Link>
           </div>
         </div>

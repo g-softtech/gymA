@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { getTenantByCustomDomain } from "@/lib/tenant";
 
 /**
  * GET /api/gym/resolve?domain=<hostname>&path=<pathname>
@@ -22,20 +22,15 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "domain param required" }, { status: 400 });
   }
 
-  // Normalise: strip www prefix
-  const normalisedDomain = domain.replace(/^www\./, "");
+  // Normalise: strip www prefix before passing to the lookup helper
+  // (The helper will further trim and lowercase it)
+  const baseDomain = domain.replace(/^www\./i, "");
 
   try {
-    const settings = await prisma.tenantSettings.findFirst({
-      where: { customDomain: normalisedDomain },
-      select: {
-        domainVerified: true,
-        tenant: { select: { slug: true, isActive: true } },
-      },
-    });
+    const settings = await getTenantByCustomDomain(baseDomain);
 
-    if (!settings || !settings.domainVerified || !settings.tenant.isActive) {
-      // Domain not registered or not verified — serve a 404
+    if (!settings || !settings.tenant || !settings.tenant.isActive) {
+      // Domain not registered, not verified, or tenant inactive — serve a 404
       const url = req.nextUrl.clone();
       url.pathname = "/not-found";
       return NextResponse.rewrite(url);

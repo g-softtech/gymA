@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { notFound, redirect } from "next/navigation";
 import { getAuthSession } from "@/lib/auth";
 import Link from "next/link";
+import AdminLockoutGuard from "@/components/admin/AdminLockoutGuard";
 
 export default async function DashboardLayout({
   children,
@@ -68,6 +69,17 @@ export default async function DashboardLayout({
   const textPrimary = darkMode ? "#f9fafb" : "#111827";
   const textMuted = darkMode ? "#9ca3af" : "#6b7280";
 
+  // ✅ Phase 9B.4: Grace Period / Lockout calculations
+  const now = new Date();
+  const daysRemaining = tenant.billingEndsAt 
+    ? Math.ceil((tenant.billingEndsAt.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
+    : tenant.trialEndsAt
+    ? Math.ceil((tenant.trialEndsAt.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
+    : 0;
+
+  const isActive = daysRemaining >= -3; // Includes 3-day grace period
+  const isGrace = daysRemaining < 0 && daysRemaining >= -3;
+
   const navLinks = isAdmin
     ? [
         { href: `/gym/${slug}/dashboard/admin`, label: "Overview", icon: "📊" },
@@ -80,6 +92,7 @@ export default async function DashboardLayout({
         { href: `/gym/${slug}/dashboard/admin/blog`, label: "Blog", icon: "📝" },
         { href: `/gym/${slug}/dashboard/admin/notifications`, label: `Notifications${unreadCount > 0 ? ` (${unreadCount})` : ""}`, icon: "🔔" },
         { href: `/gym/${slug}/dashboard/admin/website`, label: "Website", icon: "🌐" },
+        { href: `/gym/${slug}/dashboard/admin/billing`, label: "Billing", icon: "💳" },
       ]
     : isTrainer
     ? [
@@ -220,7 +233,17 @@ export default async function DashboardLayout({
           </div>
         </aside>
 
-        <main className="flex-1 p-6 overflow-y-auto">{children}</main>
+        <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
+          {isAdmin && (
+            <AdminLockoutGuard
+              isActive={isActive}
+              isGrace={isGrace}
+              slug={slug}
+              daysRemaining={daysRemaining}
+            />
+          )}
+          <div className="flex-1 p-6 overflow-y-auto">{children}</div>
+        </main>
       </div>
     </>
   );

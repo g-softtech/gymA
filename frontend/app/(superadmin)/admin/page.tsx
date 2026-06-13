@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import { getAuthSession } from "@/lib/auth";
 import { redirect } from "next/navigation";
+import { SAAS_PLANS } from "@/lib/billing";
+import { TenantPlan } from "@prisma/client";
 
 async function getPlatformStats() {
   const [
@@ -11,6 +13,8 @@ async function getPlatformStats() {
     totalTrainers,
     totalMembers,
     recentTenants,
+    totalSaaSRevenue,
+    recentInvoices,
   ] = await Promise.all([
     prisma.tenant.count(),
     prisma.tenant.count({ where: { isActive: true } }),
@@ -26,11 +30,29 @@ async function getPlatformStats() {
         _count: { select: { users: true } },
       },
     }),
+    prisma.saaSInvoice.aggregate({
+      _sum: { amount: true },
+      where: { status: "PAID" },
+    }),
+    prisma.saaSInvoice.findMany({
+      take: 5,
+      orderBy: { createdAt: "desc" },
+      include: { tenant: { select: { name: true, slug: true } } },
+    }),
   ]);
 
   const planBreakdown = await prisma.tenant.groupBy({
     by: ["plan"],
     _count: { _all: true },
+    where: { isActive: true }, // Only count active tenants for MRR
+  });
+
+  let estimatedMRR = 0;
+  planBreakdown.forEach((p) => {
+    const planDetails = SAAS_PLANS[p.plan as TenantPlan];
+    if (planDetails && planDetails.price > 0) {
+      estimatedMRR += p._count._all * planDetails.price;
+    }
   });
 
   return {
@@ -42,6 +64,9 @@ async function getPlatformStats() {
     totalMembers,
     recentTenants,
     planBreakdown,
+    totalRevenue: totalSaaSRevenue._sum.amount ?? 0,
+    estimatedMRR,
+    recentInvoices,
   };
 }
 
@@ -74,11 +99,18 @@ export default async function SuperAdminOverviewPage() {
       icon: "🏋️",
     },
     {
-      label: "Gym Admins",
-      value: stats.totalAdmins,
-      sub: "gym owners",
-      color: "from-orange-500 to-amber-600",
-      icon: "🔑",
+      label: "Total Revenue",
+      value: `₦${stats.totalRevenue.toLocaleString()}`,
+      sub: "Lifetime SaaS Revenue",
+      color: "from-green-500 to-emerald-600",
+      icon: "💰",
+    },
+    {
+      label: "Est. MRR",
+      value: `₦${stats.estimatedMRR.toLocaleString()}`,
+      sub: "Monthly Recurring Rev",
+      color: "from-blue-600 to-indigo-700",
+      icon: "📈",
     },
   ];
 
@@ -173,6 +205,61 @@ export default async function SuperAdminOverviewPage() {
             {stats.recentTenants.length === 0 && (
               <p className="text-sm text-slate-500">No gyms yet.</p>
             )}
+          </div>
+        </div>
+
+        {/* Recent Revenue (Phase 9B.5) */}
+        <div className="bg-white/[0.03] border border-white/5 rounded-xl p-6 lg:col-span-2">
+          <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4 flex items-center justify-between">
+            <span>Recent SaaS Invoices</span>
+            <span className="text-xs text-indigo-400 font-medium normal-case">Phase 9B.5</span>
+          </h2>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="border-b border-white/10 text-xs uppercase text-slate-500">
+                  <th className="py-3 px-4 font-semibold">Date</th>
+                  <th className="py-3 px-4 font-semibold">Gym</th>
+                  <th className="py-3 px-4 font-semibold">Plan</th>
+                  <th className="py-3 px-4 font-semibold">Amount</th>
+                  <th className="py-3 px-4 font-semibold">Status</th>
+                </tr>
+              </thead>
+              <tbody className="text-sm">
+                {stats.recentInvoices.map((inv) => (
+                  <tr key={inv.id} className="border-b border-white/5 hover:bg-white/[0.02]">
+                    <td className="py-3 px-4 text-slate-300">
+                      {new Date(inv.createdAt).toLocaleDateString()}
+                    </td>
+                    <td className="py-3 px-4 font-medium text-white">
+                      {inv.tenant.name}
+                    </td>
+                    <td className="py-3 px-4">
+                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${planColors[inv.plan] ?? "bg-slate-700 text-slate-300"}`}>
+                        {inv.plan}
+                      </span>
+                    </td>
+                    <td className="py-3 px-4 text-emerald-400 font-semibold">
+                      ₦{inv.amount.toLocaleString()}
+                    </td>
+                    <td className="py-3 px-4">
+                      <span className={`text-xs px-2 py-1 rounded-md font-medium ${
+                        inv.status === "PAID" ? "bg-green-500/10 text-green-400" : "bg-yellow-500/10 text-yellow-400"
+                      }`}>
+                        {inv.status}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+                {stats.recentInvoices.length === 0 && (
+                  <tr>
+                    <td colSpan={5} className="py-8 text-center text-slate-500">
+                      No invoices found.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
