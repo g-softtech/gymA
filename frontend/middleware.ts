@@ -68,6 +68,12 @@ export default withAuth(
     const { pathname } = req.nextUrl;
     const hostname = req.headers.get("host") ?? "";
 
+    // ── 0. API Route Bailout ────────────────────────────────────────────────
+    // Never rewrite API routes. Let them resolve globally to prevent 404s on custom domains/subdomains.
+    if (pathname.startsWith("/api/")) {
+      return NextResponse.next();
+    }
+
     // ── 1. Subdomain routing ────────────────────────────────────────────────
     // If request arrives at <slug>.cortexfit.com, rewrite to /gym/<slug>/...
     // The actual page at /gym/[slug] handles all the data fetching and rendering.
@@ -96,7 +102,7 @@ export default withAuth(
     //   2. Redirect to /gym/[slug][pathname]
     //
     // We skip this for API routes and Next.js internals on custom domains.
-    if (isCustomDomain(hostname) && !pathname.startsWith("/api/auth")) {
+    if (isCustomDomain(hostname)) {
       const url = req.nextUrl.clone();
       // Pass along to the domain resolver — it will handle the DB lookup
       url.pathname = "/api/gym/resolve";
@@ -106,13 +112,9 @@ export default withAuth(
     }
 
     // ── 3. SuperAdmin route guard ───────────────────────────────────────────
-    if (pathname.startsWith("/admin")) {
-      if (token?.role !== "SUPERADMIN") {
-        const url = req.nextUrl.clone();
-        url.pathname = "/dashboard"; // Prevent infinite redirect loops for logged-in users
-        return NextResponse.redirect(url);
-      }
-    }
+    // Removed: We no longer check token.role in Edge middleware to prevent 
+    // infinite redirect loops when a user is promoted to SUPERADMIN but their 
+    // cookie is stale. The role check is safely handled in app/admin/layout.tsx.
 
     return NextResponse.next();
   },
