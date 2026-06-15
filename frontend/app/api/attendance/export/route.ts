@@ -33,7 +33,7 @@ export async function GET(req: NextRequest) {
         tenantId: ctx.tenantId,
         ...(from || to
           ? {
-              checkedInAt: {
+              checkInTime: {
                 ...(from ? { gte: new Date(from) } : {}),
                 ...(to ? { lte: new Date(`${to}T23:59:59.999Z`) } : {}),
               },
@@ -47,13 +47,13 @@ export async function GET(req: NextRequest) {
           },
         },
       },
-      orderBy: { checkedInAt: "desc" },
+      orderBy: { checkInTime: "desc" },
     });
 
     // Build CSV
     const header = "Date,Time,Member Name,Member Email,Note";
-    const rows = records.map((r) => {
-      const date = new Date(r.checkedInAt);
+    const rows = records.map((r: any) => {
+      const date = new Date(r.checkInTime);
       const dateStr = date.toLocaleDateString("en-GB"); // DD/MM/YYYY
       const timeStr = date.toLocaleTimeString("en-NG", {
         hour: "2-digit",
@@ -61,7 +61,7 @@ export async function GET(req: NextRequest) {
       });
       const name = (r.member.user.name ?? "").replace(/,/g, " ");
       const email = r.member.user.email ?? "";
-      const note = (r.note ?? "").replace(/,/g, " ");
+      const note = (r.events?.[0]?.notes ?? "").replace(/,/g, " ");
       return `${dateStr},${timeStr},${name},${email},${note}`;
     });
 

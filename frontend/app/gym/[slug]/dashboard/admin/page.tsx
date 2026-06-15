@@ -58,12 +58,12 @@ export default async function AdminDashboardPage({
   const totalMembers = tenant.users.length;
 
   const activeSubscriptions = tenant.users.filter(
-    (u: UserWithProfile) => u.memberProfile?.subscriptions[0]?.status === "ACTIVE"
+    (u: UserWithProfile) => u.memberProfile?.subscriptions?.[0]?.status === "ACTIVE"
   ).length;
 
   const revenue = tenant.users.reduce((sum: number, u: UserWithProfile) => {
-    const sub = u.memberProfile?.subscriptions[0];
-    if (sub?.status === "ACTIVE") return sum + (sub.plan?.price ?? 0);
+    const sub = u.memberProfile?.subscriptions?.[0];
+    if (sub?.status === "ACTIVE") return sum + Number(sub.plan?.price ?? 0);
     return sum;
   }, 0);
 
@@ -126,7 +126,7 @@ export default async function AdminDashboardPage({
                 </tr>
               ) : (
                 tenant.users.map((user: UserWithProfile) => {
-                  const sub = user.memberProfile?.subscriptions[0];
+                  const sub = user.memberProfile?.subscriptions?.[0];
                   const isActive = sub?.status === "ACTIVE";
                   const isExpired = sub && new Date(sub.endDate) < new Date();
                   return (
@@ -179,8 +179,8 @@ export default async function AdminDashboardPage({
             tenant.membershipPlans.map((plan: MembershipPlan) => {
               const planSubs = tenant.users.filter(
                 (u: UserWithProfile) =>
-                  u.memberProfile?.subscriptions[0]?.planId === plan.id &&
-                  u.memberProfile?.subscriptions[0]?.status === "ACTIVE"
+                  u.memberProfile?.subscriptions?.[0]?.planId === plan.id &&
+                  u.memberProfile?.subscriptions?.[0]?.status === "ACTIVE"
               ).length;
               return (
                 <div key={plan.id} className="px-6 py-4 flex justify-between items-center">

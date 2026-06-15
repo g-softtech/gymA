@@ -24,12 +24,14 @@ export default async function WebsiteHubPage({
       instagramUrl: true,
       heroData: true,
       servicesData: true,
+      customDomain: true,
+      domainVerified: true,
     },
   });
 
   const sections = [
     {
-      href: `/gym/${slug}/dashboard/admin/website/branding`,
+      href: `/gym/${slug}/dashboard/admin/branding`,
       icon: "🎨",
       title: "Branding",
       desc: "Logo, colors, fonts, and dark mode",
@@ -72,6 +74,17 @@ export default async function WebsiteHubPage({
       badge: settings?.servicesData ? "Has content" : "Empty",
       badgeColor: settings?.servicesData ? "bg-emerald-100 text-emerald-700" : "bg-slate-100 text-slate-500",
       id: "website-content-link",
+    },
+    {
+      href: `/gym/${slug}/dashboard/admin/domains`,
+      icon: "🌍",
+      title: "Custom Domain",
+      desc: "Connect your own domain (e.g. powergym.com)",
+      badge: settings?.customDomain ? (settings.domainVerified ? "Active" : "Pending") : "Not set",
+      badgeColor: settings?.customDomain 
+        ? (settings.domainVerified ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700") 
+        : "bg-slate-100 text-slate-500",
+      id: "website-domains-link",
     },
   ];
 

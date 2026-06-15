@@ -2,12 +2,21 @@ import { ReactNode } from "react";
 import { redirect } from "next/navigation";
 import { getAuthSession } from "@/lib/auth";
 
+import { prisma } from "@/lib/prisma";
+
 export default async function OnboardingLayout({ children }: { children: ReactNode }) {
   const session = await getAuthSession();
 
   // If the user already belongs to a gym, they should not see the "Create Gym" page.
+  // We explicitly check the database to prevent infinite loops if the JWT token is stale.
   if (session?.user?.tenantId) {
-    redirect("/dashboard");
+    const tenant = await prisma.tenant.findUnique({
+      where: { id: session.user.tenantId }
+    });
+    
+    if (tenant) {
+      redirect("/dashboard");
+    }
   }
 
   return (

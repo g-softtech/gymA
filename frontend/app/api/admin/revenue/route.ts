@@ -73,12 +73,12 @@ export async function GET(req: NextRequest) {
       const subscriptionCount = s._count._all;
       // Annualise: price * (30 / durationDays) ≈ monthly value per subscription
       const monthlyValuePerSub = plan
-        ? plan.price * (30 / (plan.durationDays || 30))
+        ? Number(plan.price) * (30 / (plan.durationDays || 30))
         : 0;
       return {
         planId: s.planId,
         planName: plan?.name ?? "Unknown",
-        price: plan?.price ?? 0,
+        price: plan ? Number(plan.price) : 0,
         durationDays: plan?.durationDays ?? 30,
         subscriptionCount,
         estimatedMRR: Math.round(monthlyValuePerSub * subscriptionCount),

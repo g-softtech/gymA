@@ -15,23 +15,23 @@ export default async function MemberAttendancePage({
   const memberProfile = await prisma.memberProfile.findUnique({
     where: { userId: session.user.id },
     include: {
-      attendance: {
-        orderBy: { checkedInAt: "desc" },
+      attendances: {
+        orderBy: { checkInTime: "desc" },
       },
     },
   });
 
-  const records = memberProfile?.attendance ?? [];
+  const records = memberProfile?.attendances ?? [];
 
   // Stats
   const now = new Date();
   const thisMonth = records.filter((r) => {
-    const d = new Date(r.checkedInAt);
+    const d = new Date(r.checkInTime);
     return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
   }).length;
 
   const thisWeek = records.filter((r) => {
-    const d = new Date(r.checkedInAt);
+    const d = new Date(r.checkInTime);
     const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
     return d >= weekAgo;
   }).length;
@@ -41,7 +41,7 @@ export default async function MemberAttendancePage({
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const uniqueDays = [...new Set(records.map((r) => {
-    const d = new Date(r.checkedInAt);
+    const d = new Date(r.checkInTime);
     d.setHours(0, 0, 0, 0);
     return d.getTime();
   }))].sort((a, b) => b - a);
@@ -92,15 +92,14 @@ export default async function MemberAttendancePage({
                   </div>
                   <div>
                     <p className="font-medium text-gray-900">
-                      {new Date(r.checkedInAt).toLocaleDateString("en-NG", {
+                      {new Date(r.checkInTime).toLocaleDateString("en-NG", {
                         weekday: "long", year: "numeric", month: "long", day: "numeric",
                       })}
                     </p>
-                    {r.note && <p className="text-sm text-gray-400 italic mt-0.5">{r.note}</p>}
                   </div>
                 </div>
                 <p className="text-sm text-gray-400">
-                  {new Date(r.checkedInAt).toLocaleTimeString("en-NG", {
+                  {new Date(r.checkInTime).toLocaleTimeString("en-NG", {
                     hour: "2-digit", minute: "2-digit",
                   })}
                 </p>

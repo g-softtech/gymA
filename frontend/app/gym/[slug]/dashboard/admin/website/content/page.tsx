@@ -4,23 +4,39 @@ import { useState, useEffect } from "react";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface Stat { value: string; label: string }
-interface Service { icon?: string; title: string; description: string; imageUrl?: string }
-interface GalleryItem { imageUrl: string; caption?: string }
+interface Service { icon?: string; title: string; description: string; imageUrl?: string; scheduleInfo?: string; }
+interface GalleryItem { imageUrl: string; caption?: string; category?: string; }
 interface Testimonial { name: string; role?: string; quote: string; avatarUrl?: string; rating?: number }
 interface FeatureItem { icon?: string; title: string; description: string }
 
-type ActiveTab = "stats" | "features" | "services" | "testimonials" | "gallery";
+type ActiveTab = "layout" | "stats" | "features" | "activities" | "testimonials" | "gallery";
+
+const DEFAULT_LAYOUT = [
+  { id: "hero", label: "Hero (Top)" },
+  { id: "stats", label: "Stats Bar" },
+  { id: "about", label: "About Us" },
+  { id: "features", label: "Feature Highlights" },
+  { id: "activities", label: "Activities & Programs" },
+  { id: "trainers", label: "Our Trainers" },
+  { id: "plans", label: "Membership Plans" },
+  { id: "testimonials", label: "Testimonials" },
+  { id: "gallery", label: "Facility Gallery" },
+  { id: "blog", label: "Blog Posts" },
+  { id: "contact", label: "Contact & Location" },
+];
 
 export default function ContentEditorPage() {
-  const [activeTab, setActiveTab] = useState<ActiveTab>("stats");
+  const [activeTab, setActiveTab] = useState<ActiveTab>("layout");
   const [stats, setStats] = useState<Stat[]>([]);
   const [features, setFeatures] = useState<FeatureItem[]>([]);
   const [services, setServices] = useState<Service[]>([]);
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [gallery, setGallery] = useState<GalleryItem[]>([]);
+  const [homepageLayout, setHomepageLayout] = useState<string[]>(DEFAULT_LAYOUT.map(l => l.id));
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [uploadingImage, setUploadingImage] = useState<string | null>(null);
 
   useEffect(() => {
     fetch("/api/tenant/settings")
@@ -33,11 +49,23 @@ export default function ContentEditorPage() {
           if (s.servicesData) setServices(s.servicesData);
           if (s.testimonialData) setTestimonials(s.testimonialData);
           if (s.galleryData) setGallery(s.galleryData);
+          if (s.homepageLayout && Array.isArray(s.homepageLayout) && s.homepageLayout.length > 0) {
+            setHomepageLayout(s.homepageLayout);
+          }
         }
         setLoading(false);
       })
       .catch(() => setLoading(false));
   }, []);
+
+  const uploadFile = async (file: File): Promise<string> => {
+    const formData = new FormData();
+    formData.append("file", file);
+    const res = await fetch("/api/upload", { method: "POST", body: formData });
+    if (!res.ok) throw new Error("Upload failed");
+    const data = await res.json();
+    return data.url;
+  };
 
   async function handleSave() {
     setSaving(true);
@@ -52,6 +80,7 @@ export default function ContentEditorPage() {
           servicesData: services,
           testimonialData: testimonials,
           galleryData: gallery,
+          homepageLayout: homepageLayout,
         }),
       });
       if (res.ok) {
@@ -64,9 +93,10 @@ export default function ContentEditorPage() {
   }
 
   const TABS: { id: ActiveTab; label: string; icon: string }[] = [
+    { id: "layout", label: "Layout", icon: "📐" },
     { id: "stats", label: "Stats", icon: "📊" },
     { id: "features", label: "Features", icon: "⚡" },
-    { id: "services", label: "Services", icon: "🏋️" },
+    { id: "activities", label: "Activities", icon: "🏋️" },
     { id: "testimonials", label: "Testimonials", icon: "💬" },
     { id: "gallery", label: "Gallery", icon: "🖼️" },
   ];
@@ -106,6 +136,80 @@ export default function ContentEditorPage() {
           </button>
         ))}
       </div>
+
+      {/* ── Layout Builder ── */}
+      {activeTab === "layout" && (
+        <div className="bg-white border border-gray-100 rounded-xl p-6 shadow-sm space-y-4">
+          <div>
+            <h2 className="font-semibold text-gray-800 mb-1">Homepage Layout Builder</h2>
+            <p className="text-xs text-gray-400">Reorder the sections on your public gym website. Drag and drop is supported (use up/down buttons).</p>
+          </div>
+          <div className="space-y-2">
+            {homepageLayout.map((id, index) => {
+              const def = DEFAULT_LAYOUT.find(d => d.id === id) || { id, label: id };
+              return (
+                <div key={id} className="flex items-center gap-3 bg-gray-50 border border-gray-200 p-3 rounded-lg">
+                  <div className="flex flex-col gap-1">
+                    <button
+                      type="button"
+                      disabled={index === 0}
+                      onClick={() => {
+                        const newLayout = [...homepageLayout];
+                        [newLayout[index - 1], newLayout[index]] = [newLayout[index], newLayout[index - 1]];
+                        setHomepageLayout(newLayout);
+                      }}
+                      className="text-gray-400 hover:text-indigo-600 disabled:opacity-30"
+                    >
+                      ▲
+                    </button>
+                    <button
+                      type="button"
+                      disabled={index === homepageLayout.length - 1}
+                      onClick={() => {
+                        const newLayout = [...homepageLayout];
+                        [newLayout[index + 1], newLayout[index]] = [newLayout[index], newLayout[index + 1]];
+                        setHomepageLayout(newLayout);
+                      }}
+                      className="text-gray-400 hover:text-indigo-600 disabled:opacity-30"
+                    >
+                      ▼
+                    </button>
+                  </div>
+                  <div className="flex-1 font-medium text-sm text-gray-800">
+                    {def.label}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setHomepageLayout(homepageLayout.filter(l => l !== id));
+                    }}
+                    className="text-xs text-red-500 hover:underline"
+                  >
+                    Remove
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+          {DEFAULT_LAYOUT.filter(d => !homepageLayout.includes(d.id)).length > 0 && (
+            <div className="pt-4 border-t border-gray-100">
+              <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Available Sections</h3>
+              <div className="flex flex-wrap gap-2">
+                {DEFAULT_LAYOUT.filter(d => !homepageLayout.includes(d.id)).map(d => (
+                  <button
+                    key={d.id}
+                    type="button"
+                    onClick={() => setHomepageLayout([...homepageLayout, d.id])}
+                    className="text-xs bg-indigo-50 text-indigo-700 px-3 py-1.5 rounded-full hover:bg-indigo-100 font-medium"
+                  >
+                    + Add {d.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* ── Stats ── */}
       {activeTab === "stats" && (
@@ -229,12 +333,12 @@ export default function ContentEditorPage() {
         </div>
       )}
 
-      {/* ── Services ── */}
-      {activeTab === "services" && (
+      {/* ── Activities / Programs ── */}
+      {activeTab === "activities" && (
         <div className="bg-white border border-gray-100 rounded-xl p-6 shadow-sm space-y-5">
           <div>
-            <h2 className="font-semibold text-gray-800 mb-1">Services / Programmes</h2>
-            <p className="text-xs text-gray-400">Displayed as cards with optional images. E.g. &ldquo;Personal Training&rdquo;, &ldquo;Group Fitness&rdquo;.</p>
+            <h2 className="font-semibold text-gray-800 mb-1">Activities / Programs</h2>
+            <p className="text-xs text-gray-400">Displayed as cards with optional images. E.g. &ldquo;Strength Training&rdquo;, &ldquo;HIIT Classes&rdquo;.</p>
           </div>
           {services.map((svc, i) => (
             <div key={i} className="flex gap-3 items-start border-b border-gray-50 pb-5 last:border-0 last:pb-0">
@@ -254,7 +358,7 @@ export default function ContentEditorPage() {
                   <input
                     id={`svc-title-${i}`}
                     className={inputCls}
-                    placeholder="Service name"
+                    placeholder="Activity name"
                     value={svc.title}
                     onChange={(e) => {
                       const updated = [...services];
@@ -275,23 +379,51 @@ export default function ContentEditorPage() {
                     setServices(updated);
                   }}
                 />
-                <input
-                  id={`svc-img-${i}`}
-                  className={inputCls}
-                  placeholder="Image URL (optional)"
-                  value={svc.imageUrl ?? ""}
-                  onChange={(e) => {
-                    const updated = [...services];
-                    updated[i] = { ...updated[i], imageUrl: e.target.value };
-                    setServices(updated);
-                  }}
-                />
+                <div className="grid grid-cols-2 gap-2">
+                  <input
+                    id={`svc-schedule-${i}`}
+                    className={inputCls}
+                    placeholder="Schedule info (e.g. Mon/Wed/Fri 6AM)"
+                    value={svc.scheduleInfo ?? ""}
+                    onChange={(e) => {
+                      const updated = [...services];
+                      updated[i] = { ...updated[i], scheduleInfo: e.target.value };
+                      setServices(updated);
+                    }}
+                  />
+                  <div className="relative">
+                    <input
+                      type="file"
+                      id={`svc-img-file-${i}`}
+                      accept="image/*"
+                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                      onChange={async (e) => {
+                        if (!e.target.files?.[0]) return;
+                        const key = `svc-${i}`;
+                        setUploadingImage(key);
+                        try {
+                          const url = await uploadFile(e.target.files[0]);
+                          const updated = [...services];
+                          updated[i] = { ...updated[i], imageUrl: url };
+                          setServices(updated);
+                        } catch (err) {
+                          alert("Failed to upload");
+                        } finally {
+                          setUploadingImage(null);
+                        }
+                      }}
+                    />
+                    <div className={`${inputCls} flex items-center text-gray-500 overflow-hidden bg-gray-50`}>
+                      {uploadingImage === `svc-${i}` ? "Uploading..." : svc.imageUrl ? "Image Uploaded ✓" : "Upload Image..."}
+                    </div>
+                  </div>
+                </div>
               </div>
               <button
                 type="button"
                 className={removeBtnCls}
                 onClick={() => setServices(services.filter((_, j) => j !== i))}
-                aria-label="Remove service"
+                aria-label="Remove activity"
               >
                 ✕
               </button>
@@ -299,11 +431,11 @@ export default function ContentEditorPage() {
           ))}
           <button
             type="button"
-            id="add-service-btn"
+            id="add-activity-btn"
             className={addBtnCls}
             onClick={() => setServices([...services, { icon: "", title: "", description: "" }])}
           >
-            + Add Service
+            + Add Activity
           </button>
         </div>
       )}
@@ -408,23 +540,38 @@ export default function ContentEditorPage() {
       {activeTab === "gallery" && (
         <div className="bg-white border border-gray-100 rounded-xl p-6 shadow-sm space-y-4">
           <div>
-            <h2 className="font-semibold text-gray-800 mb-1">Photo Gallery</h2>
-            <p className="text-xs text-gray-400">Add image URLs to build a masonry gallery of your gym facilities.</p>
+            <h2 className="font-semibold text-gray-800 mb-1">Facility Gallery</h2>
+            <p className="text-xs text-gray-400">Upload images of your gym facilities and categorize them.</p>
           </div>
           {gallery.map((item, i) => (
-            <div key={i} className="flex gap-3 items-center">
-              <div className="flex-1 grid grid-cols-2 gap-2">
-                <input
-                  id={`gallery-url-${i}`}
-                  className={inputCls}
-                  placeholder="Image URL"
-                  value={item.imageUrl}
-                  onChange={(e) => {
-                    const updated = [...gallery];
-                    updated[i] = { ...updated[i], imageUrl: e.target.value };
-                    setGallery(updated);
-                  }}
-                />
+            <div key={i} className="flex gap-3 items-center border-b border-gray-50 pb-4 last:border-0 last:pb-0">
+              <div className="flex-1 grid grid-cols-1 sm:grid-cols-3 gap-2">
+                <div className="relative col-span-1">
+                  <input
+                    type="file"
+                    id={`gal-img-file-${i}`}
+                    accept="image/*"
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                    onChange={async (e) => {
+                      if (!e.target.files?.[0]) return;
+                      const key = `gal-${i}`;
+                      setUploadingImage(key);
+                      try {
+                        const url = await uploadFile(e.target.files[0]);
+                        const updated = [...gallery];
+                        updated[i] = { ...updated[i], imageUrl: url };
+                        setGallery(updated);
+                      } catch (err) {
+                        alert("Failed to upload");
+                      } finally {
+                        setUploadingImage(null);
+                      }
+                    }}
+                  />
+                  <div className={`${inputCls} flex items-center text-gray-500 overflow-hidden bg-gray-50`}>
+                    {uploadingImage === `gal-${i}` ? "Uploading..." : item.imageUrl ? "Image Uploaded ✓" : "Upload Image..."}
+                  </div>
+                </div>
                 <input
                   id={`gallery-caption-${i}`}
                   className={inputCls}
@@ -436,6 +583,23 @@ export default function ContentEditorPage() {
                     setGallery(updated);
                   }}
                 />
+                <select
+                  id={`gallery-category-${i}`}
+                  className={inputCls}
+                  value={item.category ?? ""}
+                  onChange={(e) => {
+                    const updated = [...gallery];
+                    updated[i] = { ...updated[i], category: e.target.value };
+                    setGallery(updated);
+                  }}
+                >
+                  <option value="">No Category</option>
+                  <option value="Weight Area">Weight Area</option>
+                  <option value="Cardio Zone">Cardio Zone</option>
+                  <option value="Yoga Studio">Yoga Studio</option>
+                  <option value="Boxing Area">Boxing Area</option>
+                  <option value="General">General</option>
+                </select>
               </div>
               {item.imageUrl && (
                 // eslint-disable-next-line @next/next/no-img-element

@@ -43,7 +43,7 @@ export default async function CheckoutPage({
             {plan.durationDays} day{plan.durationDays > 1 ? "s" : ""} access
           </p>
           <p className="text-4xl font-extrabold text-gray-900 mt-4">
-            ₦{plan.price.toLocaleString()}
+            ₦{Number(plan.price).toLocaleString()}
           </p>
         </div>
         <p className="text-sm text-gray-500 mb-4">
@@ -52,7 +52,7 @@ export default async function CheckoutPage({
         </p>
         <CheckoutButton
           email={session.user.email!}
-          amount={plan.price}
+          amount={Number(plan.price)}
           planName={plan.name}
           planId={plan.id}
           tenantSlug={plan.tenant.slug}

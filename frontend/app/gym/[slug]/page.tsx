@@ -17,12 +17,17 @@ interface HeroData {
   overlayOpacity?: number;
 }
 interface Stat { value: string; label: string }
-interface Service { icon?: string; title: string; description: string; imageUrl?: string }
+interface Service { icon?: string; title: string; description: string; imageUrl?: string; scheduleInfo?: string; }
 interface GalleryItem { imageUrl: string; caption?: string; category?: string }
 interface Testimonial { name: string; role?: string; quote: string; avatarUrl?: string; rating?: number }
 interface FeatureItem { icon?: string; title: string; description: string }
 interface OpeningHoursDay { open: string; close: string; closed?: boolean }
 type OpeningHours = Record<string, OpeningHoursDay>
+
+const DEFAULT_LAYOUT = [
+  "hero", "stats", "about", "features", "activities", "trainers", 
+  "plans", "testimonials", "gallery", "blog", "contact"
+];
 
 const DAYS = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
 
@@ -44,7 +49,8 @@ export async function generateMetadata({
 
   const s = tenant.settings;
   const hero = s?.heroData as HeroData | null;
-  const title = s?.metaTitle ?? `${tenant.name} — CortexFit`;
+  const brandName = s?.brandName || tenant.name;
+  const title = s?.metaTitle ?? (s?.whiteLabelEnabled ? brandName : `${brandName} — CortexFit`);
   const description =
     s?.metaDescription ??
     s?.tagline ??
@@ -106,6 +112,14 @@ export default async function GymPublicPage({
   const testimonials = ((s?.testimonialData ?? []) as unknown) as Testimonial[];
   const features = ((s?.featuresData ?? []) as unknown) as FeatureItem[];
   const openingHours = ((s?.openingHours ?? {}) as unknown) as OpeningHours;
+  const layout = Array.isArray(s?.homepageLayout) && s.homepageLayout.length > 0 
+    ? (s.homepageLayout as string[]) 
+    : DEFAULT_LAYOUT;
+
+  const optimizeImageUrl = (url?: string | null) => {
+    if (!url) return "";
+    return url.includes('cloudinary.com') ? url.replace('/upload/', '/upload/f_auto,q_auto/') : url;
+  };
 
   const heroHeadline = hero.headline ?? tenant.name;
   const heroSub = hero.subheadline ?? s?.tagline ?? "Join our gym and transform your fitness journey.";
@@ -169,7 +183,7 @@ export default async function GymPublicPage({
                 Sign In
               </Link>
               <Link
-                href="#plans"
+                href={`/gym/${slug}/join`}
                 id="nav-join-btn"
                 className="px-5 py-2 text-sm font-semibold rounded-lg text-white transition-all hover:opacity-90 hover:shadow-md"
                 style={{ background: gradientMain }}
@@ -180,13 +194,18 @@ export default async function GymPublicPage({
           </div>
         </nav>
 
-        {/* ── Hero ───────────────────────────────────────────────────────────── */}
-        <section
+        {/* ── Sections ── */}
+        {layout.map((sectionId) => {
+          switch (sectionId) {
+            case "hero":
+              return (
+                <section
+                  key="hero"
           id="hero"
           className="relative min-h-[88vh] flex flex-col items-center justify-center text-center px-6 overflow-hidden"
           style={
             heroBg
-              ? { backgroundImage: `url(${heroBg})`, backgroundSize: "cover", backgroundPosition: "center" }
+              ? { backgroundImage: `url(${optimizeImageUrl(heroBg)})`, backgroundSize: "cover", backgroundPosition: "center" }
               : { background: gradientMain }
           }
         >
@@ -216,7 +235,7 @@ export default async function GymPublicPage({
             {s?.logoUrl && (
               <div className="flex justify-center mb-8">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={s.logoUrl} alt={tenant.name} className="h-20 object-contain drop-shadow-xl" />
+                <img src={optimizeImageUrl(s.logoUrl)} alt={tenant.name} className="h-20 object-contain drop-shadow-xl" loading="lazy" />
               </div>
             )}
 
@@ -236,7 +255,7 @@ export default async function GymPublicPage({
 
             <div className="flex flex-wrap justify-center gap-4">
               <Link
-                href="#plans"
+                href={`/gym/${slug}/join`}
                 id="hero-join-btn"
                 className="px-10 py-4 text-lg font-bold rounded-2xl text-white transition-all hover:scale-105 hover:shadow-2xl"
                 style={{ background: "rgba(255,255,255,0.2)", backdropFilter: "blur(10px)", border: "2px solid rgba(255,255,255,0.4)" }}
@@ -259,9 +278,11 @@ export default async function GymPublicPage({
             ↓
           </div>
         </section>
+              );
 
-        {/* ── Stats ──────────────────────────────────────────────────────────── */}
-        {stats.length > 0 && (
+            case "stats":
+              if (stats.length === 0) return null;
+              return (
           <section id="stats" className="py-14" style={{ background: gradientMain }}>
             <div className="max-w-5xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
               {stats.map((stat, i) => (
@@ -272,10 +293,11 @@ export default async function GymPublicPage({
               ))}
             </div>
           </section>
-        )}
+              );
 
-        {/* ── About ──────────────────────────────────────────────────────────── */}
-        {s?.description && (
+            case "about":
+              if (!s?.description) return null;
+              return (
           <section id="about" className="py-20 px-6">
             <div className="max-w-4xl mx-auto text-center">
               <span
@@ -288,10 +310,11 @@ export default async function GymPublicPage({
               <p className="text-gray-600 text-lg leading-relaxed">{s.description}</p>
             </div>
           </section>
-        )}
+              );
 
-        {/* ── Features ───────────────────────────────────────────────────────── */}
-        {features.length > 0 && (
+            case "features":
+              if (features.length === 0) return null;
+              return (
           <section id="features" className="py-20 px-6" style={{ background: "#f8fafc" }}>
             <div className="max-w-6xl mx-auto">
               <div className="text-center mb-14">
@@ -324,22 +347,28 @@ export default async function GymPublicPage({
               </div>
             </div>
           </section>
-        )}
+              );
 
-        {/* ── Services ───────────────────────────────────────────────────────── */}
-        {services.length > 0 && (
-          <section id="services" className="py-20 px-6">
+            case "activities":
+              return (
+          <section key="activities" id="services" className="py-20 px-6 scroll-mt-24">
             <div className="max-w-6xl mx-auto">
               <div className="text-center mb-14">
                 <span
                   className="inline-block text-xs font-bold uppercase tracking-widest mb-4 px-3 py-1 rounded-full"
                   style={{ background: `${primary}15`, color: primary }}
                 >
-                  What We Offer
+                  Activities & Programs
                 </span>
-                <h2 className="text-4xl font-black text-gray-900">Our Services</h2>
+                <h2 className="text-4xl font-black text-gray-900">What We Offer</h2>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {services.length === 0 ? (
+                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm py-16 text-center">
+                  <div className="text-4xl mb-4 opacity-50">🏋️</div>
+                  <p className="text-gray-500 font-medium">No programs available yet</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {services.map((svc, i) => (
                   <div
                     key={i}
@@ -348,8 +377,9 @@ export default async function GymPublicPage({
                     {svc.imageUrl ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
-                        src={svc.imageUrl}
+                        src={optimizeImageUrl(svc.imageUrl)}
                         alt={svc.title}
+                        loading="lazy"
                         className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-500"
                       />
                     ) : (
@@ -362,18 +392,25 @@ export default async function GymPublicPage({
                     )}
                     <div className="p-6 bg-white">
                       <h3 className="font-bold text-gray-900 text-xl mb-2">{svc.title}</h3>
-                      <p className="text-gray-500 text-sm leading-relaxed">{svc.description}</p>
+                      <p className="text-gray-500 text-sm leading-relaxed mb-4">{svc.description}</p>
+                      {svc.scheduleInfo && (
+                        <div className="flex items-center gap-2 text-xs font-semibold text-indigo-700 bg-indigo-50 px-3 py-1.5 rounded-lg inline-flex">
+                          🗓️ {svc.scheduleInfo}
+                        </div>
+                      )}
                     </div>
                   </div>
                 ))}
               </div>
+              )}
             </div>
           </section>
-        )}
+              );
 
-        {/* ── Trainers ───────────────────────────────────────────────────────── */}
-        {trainers.length > 0 && (
-          <section id="trainers" className="py-20 px-6" style={{ background: "#f8fafc" }}>
+            case "trainers":
+              if (trainers.length === 0) return null;
+              return (
+          <section id="trainers" className="py-20 px-6 scroll-mt-24" style={{ background: "#f8fafc" }}>
             <div className="max-w-6xl mx-auto">
               <div className="text-center mb-14">
                 <span
@@ -396,8 +433,9 @@ export default async function GymPublicPage({
                         {photo ? (
                           // eslint-disable-next-line @next/next/no-img-element
                           <img
-                            src={photo}
+                            src={optimizeImageUrl(photo)}
                             alt={trainer.user.name ?? "Trainer"}
+                            loading="lazy"
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                           />
                         ) : (
@@ -405,7 +443,15 @@ export default async function GymPublicPage({
                         )}
                       </div>
                       <div className="p-5">
-                        <h3 className="font-bold text-gray-900 text-lg">{trainer.user.name ?? "Trainer"}</h3>
+                        <h3 className="font-bold text-gray-900 text-lg flex items-center gap-2">
+                          {trainer.user.name ?? "Trainer"}
+                        </h3>
+                        {trainer.title && (
+                          <p className="text-indigo-600 font-semibold text-sm mb-1">{trainer.title}</p>
+                        )}
+                        {trainer.yearsOfExperience && trainer.yearsOfExperience > 0 && (
+                          <p className="text-gray-500 text-xs font-medium mb-3">{trainer.yearsOfExperience} years of experience</p>
+                        )}
                         {trainer.bio && (
                           <p className="text-gray-500 text-sm mt-1 line-clamp-2">{trainer.bio}</p>
                         )}
@@ -434,13 +480,13 @@ export default async function GymPublicPage({
               </div>
             </div>
           </section>
-        )}
+              );
 
-        {/* ── Membership Plans ───────────────────────────────────────────────── */}
-        {tenant.membershipPlans.length > 0 && (
-          <section id="plans" className="py-20 px-6">
-            <div className="max-w-5xl mx-auto">
-              <div className="text-center mb-14">
+            case "plans":
+              return (
+          <section key="plans" id="plans" className="py-20 px-6 scroll-mt-24">
+          <div className="max-w-5xl mx-auto">
+            <div className="text-center mb-14">
                 <span
                   className="inline-block text-xs font-bold uppercase tracking-widest mb-4 px-3 py-1 rounded-full"
                   style={{ background: `${primary}15`, color: primary }}
@@ -449,7 +495,20 @@ export default async function GymPublicPage({
                 </span>
                 <h2 className="text-4xl font-black text-gray-900">Membership Plans</h2>
                 <p className="text-gray-500 mt-3 text-lg">Choose the plan that fits your goals.</p>
+            </div>
+
+            {tenant.membershipPlans.length === 0 ? (
+              <div className="text-center py-10 bg-white rounded-2xl border border-gray-100 shadow-sm">
+                <p className="text-gray-500 mb-4">Membership plans are coming soon.</p>
+                <Link
+                  href={`/gym/${slug}/join`}
+                  className="inline-block px-8 py-3 rounded-xl font-semibold text-white transition-all hover:opacity-90 hover:shadow-md"
+                  style={{ background: gradientMain }}
+                >
+                  Join for Free Account →
+                </Link>
               </div>
+            ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                 {tenant.membershipPlans.map((plan) => (
                   <div
@@ -507,13 +566,15 @@ export default async function GymPublicPage({
                   </div>
                 ))}
               </div>
-            </div>
-          </section>
-        )}
+            )}
+          </div>
+        </section>
+              );
 
-        {/* ── Testimonials ───────────────────────────────────────────────────── */}
-        {testimonials.length > 0 && (
-          <section id="testimonials" className="py-20 px-6" style={{ background: gradientSoft }}>
+            case "testimonials":
+              if (testimonials.length === 0) return null;
+              return (
+          <section key="testimonials" id="testimonials" className="py-20 px-6" style={{ background: gradientSoft }}>
             <div className="max-w-6xl mx-auto">
               <div className="text-center mb-14">
                 <span
@@ -536,7 +597,7 @@ export default async function GymPublicPage({
                     <div className="flex items-center gap-3">
                       {t.avatarUrl ? (
                         // eslint-disable-next-line @next/next/no-img-element
-                        <img src={t.avatarUrl} alt={t.name} className="w-10 h-10 rounded-full object-cover" />
+                        <img src={optimizeImageUrl(t.avatarUrl)} alt={t.name} loading="lazy" className="w-10 h-10 rounded-full object-cover" />
                       ) : (
                         <div
                           className="w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-bold uppercase"
@@ -555,11 +616,11 @@ export default async function GymPublicPage({
               </div>
             </div>
           </section>
-        )}
+              );
 
-        {/* ── Gallery ────────────────────────────────────────────────────────── */}
-        {gallery.length > 0 && (
-          <section id="gallery" className="py-20 px-6">
+            case "gallery":
+              return (
+          <section key="gallery" id="gallery" className="py-20 px-6">
             <div className="max-w-6xl mx-auto">
               <div className="text-center mb-14">
                 <span
@@ -570,25 +631,44 @@ export default async function GymPublicPage({
                 </span>
                 <h2 className="text-4xl font-black text-gray-900">Inside {tenant.name}</h2>
               </div>
-              <div className="columns-2 md:columns-3 gap-4 space-y-4">
+              {gallery.length === 0 ? (
+                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm py-16 text-center">
+                  <div className="text-4xl mb-4 opacity-50">🖼️</div>
+                  <p className="text-gray-500 font-medium">No facilities uploaded yet</p>
+                </div>
+              ) : (
+                <div className="columns-2 md:columns-3 gap-4 space-y-4">
                 {gallery.map((item, i) => (
-                  <div key={i} className="break-inside-avoid rounded-xl overflow-hidden group">
+                  <div key={i} className="break-inside-avoid rounded-xl overflow-hidden group relative">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
-                      src={item.imageUrl}
+                      src={optimizeImageUrl(item.imageUrl)}
                       alt={item.caption ?? "Gallery image"}
+                      loading="lazy"
                       className="w-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
+                    {item.category && (
+                      <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold text-gray-900 shadow-sm">
+                        {item.category}
+                      </div>
+                    )}
+                    {item.caption && (
+                      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4">
+                        <p className="text-white text-sm font-medium drop-shadow-md">{item.caption}</p>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
+              )}
             </div>
           </section>
-        )}
+              );
 
-        {/* ── Blog ───────────────────────────────────────────────────────────── */}
-        {tenant.blogPosts.length > 0 && (
-          <section id="blog" className="py-20 px-6" style={{ background: "#f8fafc" }}>
+            case "blog":
+              if (tenant.blogPosts.length === 0) return null;
+              return (
+          <section key="blog" id="blog" className="py-20 px-6 scroll-mt-24" style={{ background: "#f8fafc" }}>
             <div className="max-w-6xl mx-auto">
               <div className="text-center mb-14">
                 <span
@@ -610,8 +690,9 @@ export default async function GymPublicPage({
                     {post.coverImage ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
-                        src={post.coverImage}
+                        src={optimizeImageUrl(post.coverImage)}
                         alt={post.title}
+                        loading="lazy"
                         className="w-full h-44 object-cover group-hover:scale-105 transition-transform duration-500"
                       />
                     ) : (
@@ -654,10 +735,11 @@ export default async function GymPublicPage({
               </div>
             </div>
           </section>
-        )}
+              );
 
-        {/* ── Opening Hours + Contact ─────────────────────────────────────────── */}
-        <section id="contact" className="py-20 px-6">
+            case "contact":
+              return (
+          <section key="contact" id="contact" className="py-20 px-6 scroll-mt-24">
           <div className="max-w-5xl mx-auto">
             <div className="text-center mb-14">
               <span
@@ -807,8 +889,14 @@ export default async function GymPublicPage({
               </p>
               <ContactForm slug={slug} primaryColor={primary} />
             </div>
-          </div>
-        </section>
+            </div>
+          </section>
+              );
+
+            default:
+              return null;
+          }
+        })}
 
         {/* ── Footer CTA ─────────────────────────────────────────────────────── */}
         <section className="py-20 px-6 text-center text-white relative overflow-hidden" style={{ background: gradientMain }}>
@@ -850,7 +938,7 @@ export default async function GymPublicPage({
             <div className="flex items-center gap-2">
               {s?.logoUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={s.logoUrl} alt={tenant.name} className="h-6 object-contain brightness-0 invert opacity-70" />
+                <img src={optimizeImageUrl(s.logoUrl)} alt={tenant.name} loading="lazy" className="h-6 object-contain brightness-0 invert opacity-70" />
               ) : (
                 <span className="font-bold text-white">{tenant.name}</span>
               )}

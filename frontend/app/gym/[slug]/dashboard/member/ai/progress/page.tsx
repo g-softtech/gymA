@@ -16,7 +16,7 @@ export default async function AIProgressPage({
     where: { userId: session.user.id },
     include: {
       progressRecords: { orderBy: { recordedAt: "asc" } },
-      attendance: { orderBy: { checkedInAt: "desc" }, take: 30 },
+      attendances: { orderBy: { checkInTime: "asc" } },
       workouts: { orderBy: { createdAt: "desc" }, take: 5 },
     },
   });
@@ -41,7 +41,7 @@ export default async function AIProgressPage({
             waistCm: r.waistCm,
             recordedAt: r.recordedAt.toISOString(),
           })),
-          totalAttendance: memberProfile?.attendance.length ?? 0,
+          totalAttendance: memberProfile?.attendances.length ?? 0,
           totalWorkouts: memberProfile?.workouts.length ?? 0,
         }}
       />

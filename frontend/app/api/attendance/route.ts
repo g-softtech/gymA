@@ -40,7 +40,21 @@ export async function POST(req: NextRequest) {
       memberProfile?.user.name ?? memberProfile?.user.email ?? "A member";
 
     const attendance = await prisma.attendance.create({
-      data: { memberId, tenantId: ctx.tenantId, note }, // ✅ tenantId from session
+      data: { 
+        memberId, 
+        tenantId: ctx.tenantId, 
+        method: "MANUAL",
+        type: "GENERAL",
+        status: "PRESENT",
+        events: note ? {
+          create: {
+            tenantId: ctx.tenantId,
+            memberId,
+            eventType: "CHECK_IN_SUCCESS",
+            notes: note
+          }
+        } : undefined
+      },
     });
 
     // Notify ADMINS only (not the member themselves)
@@ -91,7 +105,7 @@ export async function GET(req: NextRequest) {
           include: { user: { select: { name: true, email: true } } },
         },
       },
-      orderBy: { checkedInAt: "desc" },
+      orderBy: { checkInTime: "desc" },
       take: 100,
     });
 

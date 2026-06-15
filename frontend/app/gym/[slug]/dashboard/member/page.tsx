@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { getAuthSession } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import { AccessPass } from "@/components/member/AccessPass";
 
 export default async function MemberDashboardPage({
   params,
@@ -38,14 +39,15 @@ export default async function MemberDashboardPage({
         orderBy: { createdAt: "desc" },
         take: 3,
       },
-      attendance: {
-        orderBy: { checkedInAt: "desc" },
+      attendances: {
+        orderBy: { checkInTime: "desc" },
         take: 5,
       },
       bookings: {
         where: { status: { in: ["PENDING", "CONFIRMED"] } },
         include: {
           trainer: { include: { user: { select: { name: true } } } },
+          classSession: true,
         },
         orderBy: { date: "asc" },
         take: 3,
@@ -82,14 +84,17 @@ export default async function MemberDashboardPage({
           </h1>
           <p className="text-gray-500 mt-1">Here is your fitness overview.</p>
         </div>
-        {unreadMessages > 0 && (
-          <Link
-            href={`/gym/${slug}/dashboard/member/messages`}
-            className="flex items-center gap-2 bg-indigo-50 text-indigo-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-100 transition"
-          >
-            💬 {unreadMessages} new message{unreadMessages > 1 ? "s" : ""}
-          </Link>
-        )}
+        <div className="flex items-center gap-3">
+          {unreadMessages > 0 && (
+            <Link
+              href={`/gym/${slug}/dashboard/member/messages`}
+              className="flex items-center gap-2 bg-indigo-50 text-indigo-700 px-4 py-2.5 rounded-xl text-sm font-bold hover:bg-indigo-100 transition"
+            >
+              💬 {unreadMessages}
+            </Link>
+          )}
+          <AccessPass />
+        </div>
       </div>
 
       {/* Membership status */}
@@ -124,7 +129,7 @@ export default async function MemberDashboardPage({
             {daysLeft! <= 7 && (
               <div className="mt-2 bg-red-50 border border-red-200 rounded-lg p-3 text-sm text-red-700">
                 ⚠️ Your membership expires soon.{" "}
-                <Link href={`/gym/${slug}`} className="underline font-medium">Renew now</Link>
+                <Link href={`/gym/${slug}#plans`} className="underline font-medium">Renew now</Link>
               </div>
             )}
           </div>
@@ -132,7 +137,7 @@ export default async function MemberDashboardPage({
           <div className="text-center py-6">
             <p className="text-gray-500 mb-4">You have no active membership plan.</p>
             <Link
-              href={`/gym/${slug}`}
+              href={`/gym/${slug}#plans`}
               className="inline-block bg-indigo-600 text-white px-5 py-2 rounded-lg font-semibold hover:bg-indigo-700 transition"
             >
               Browse Plans
@@ -142,10 +147,10 @@ export default async function MemberDashboardPage({
       </div>
 
       {/* Quick stats */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
         {[
           { label: "Workouts", value: memberProfile?.workouts.length ?? 0, icon: "💪", href: `member/workouts` },
-          { label: "Attendances", value: memberProfile?.attendance.length ?? 0, icon: "📅", href: `member/attendance` },
+          { label: "Attendances", value: memberProfile?.attendances.length ?? 0, icon: "📅", href: `member/attendance` },
           { label: "Bookings", value: memberProfile?.bookings.length ?? 0, icon: "📋", href: `member/bookings` },
           { label: "Progress", value: memberProfile?.progressRecords.length ?? 0, icon: "📊", href: `member/progress` },
         ].map((s) => (
@@ -175,7 +180,7 @@ export default async function MemberDashboardPage({
               <div key={b.id} className="px-6 py-4 flex justify-between items-center">
                 <div>
                   <p className="font-medium text-gray-900">
-                    Session with {b.trainer.user.name ?? "Trainer"}
+                    {b.classSessionId ? `Class: ${b.classSession?.title}` : `Session with ${b.trainer?.user.name ?? "Trainer"}`}
                   </p>
                   <p className="text-sm text-gray-500">
                     {new Date(b.date).toLocaleDateString("en-NG", { weekday: "short", month: "short", day: "numeric" })}
@@ -220,6 +225,23 @@ export default async function MemberDashboardPage({
           </div>
         </div>
       )}
+      {/* Sticky Bottom Actions for Mobile */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 md:hidden shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] z-40">
+        <div className="flex gap-3">
+          <Link
+            href={`/gym/${slug}/dashboard/member/bookings/new`}
+            className="flex-1 bg-indigo-600 text-white text-center py-3 rounded-xl font-bold min-h-[44px]"
+          >
+            Book Class
+          </Link>
+          <Link
+            href={`/gym/${slug}/dashboard/member/profile`}
+            className="flex-1 bg-gray-100 text-gray-900 text-center py-3 rounded-xl font-bold min-h-[44px]"
+          >
+            Profile
+          </Link>
+        </div>
+      </div>
     </div>
   );
 }

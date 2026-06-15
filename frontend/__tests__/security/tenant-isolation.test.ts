@@ -162,7 +162,7 @@ describe("Phase 9C: Multi-Tenant Security Boundaries", () => {
       });
 
       const res = await BookingsPOST(req);
-      expect(res.status).toBe(403);
+      expect(res?.status).toBe(403);
     });
 
     it("Attendance: Should reject cross-tenant attendance marking by Trainer", async () => {
@@ -264,7 +264,7 @@ describe("Phase 9C: Multi-Tenant Security Boundaries", () => {
       });
 
       const res = await BookingsPOST(req);
-      expect(res.status).toBe(201);
+      expect(res?.status).toBe(201);
     });
   });
 });

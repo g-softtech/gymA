@@ -16,6 +16,21 @@ export default function SignInPage() {
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [message, setMessage] = useState<{ type: "error" | "success"; text: string } | null>(null);
+  const [branding, setBranding] = useState<any>(null);
+
+  useEffect(() => {
+    const fetchBranding = async () => {
+      const match = callbackUrl.match(/\/gym\/([^\/]+)/);
+      if (match) {
+        try {
+          const res = await fetch(`/api/public/branding?slug=${match[1]}`);
+          const json = await res.json();
+          if (json.data) setBranding(json.data);
+        } catch (e) {}
+      }
+    };
+    fetchBranding();
+  }, [callbackUrl]);
 
   // Map NextAuth error codes to human-readable messages
   const authErrorMap: Record<string, string> = {
@@ -123,10 +138,17 @@ export default function SignInPage() {
       <div className="relative w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 mb-4 shadow-lg shadow-indigo-500/30">
-            <span className="text-2xl">💪</span>
-          </div>
-          <h1 className="text-2xl font-black text-white">CortexFit</h1>
+          {branding?.logoUrl ? (
+            <img src={branding.logoUrl} alt="Logo" className="h-14 w-auto object-contain mx-auto mb-4" />
+          ) : (
+            <div 
+              className="inline-flex items-center justify-center w-14 h-14 rounded-2xl mb-4 shadow-lg shadow-indigo-500/30 text-white font-bold"
+              style={branding ? { background: `linear-gradient(135deg, ${branding.primaryColor}, ${branding.secondaryColor})` } : { background: "linear-gradient(to bottom right, #6366f1, #9333ea)" }}
+            >
+              <span className="text-2xl">{branding?.brandName ? branding.brandName[0] : "💪"}</span>
+            </div>
+          )}
+          <h1 className="text-2xl font-black text-white">{branding?.brandName || "CortexFit"}</h1>
           <p className="text-white/50 text-sm mt-1">Smart Gym Management Platform</p>
         </div>
 
@@ -282,9 +304,11 @@ export default function SignInPage() {
         </div>
 
         {/* Privacy note */}
-        <p className="text-center text-white/20 text-xs mt-4">
-          By signing in, you agree to CortexFit&apos;s Terms of Service and Privacy Policy.
-        </p>
+        {!branding?.whiteLabelEnabled && (
+          <p className="text-center text-white/20 text-xs mt-4">
+            By signing in, you agree to CortexFit&apos;s Terms of Service and Privacy Policy.
+          </p>
+        )}
       </div>
     </div>
   );

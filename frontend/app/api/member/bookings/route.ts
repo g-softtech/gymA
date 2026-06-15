@@ -26,7 +26,7 @@ export async function DELETE(req: NextRequest) {
 
     const booking = await prisma.booking.findUnique({
       where: { id: bookingId },
-      include: { trainer: true },
+      include: { trainer: true, classSession: { include: { instructor: true } } },
     });
 
     if (!booking) return NextResponse.json({ error: "Booking not found" }, { status: 404 });
@@ -45,16 +45,19 @@ export async function DELETE(req: NextRequest) {
       data: { status: "CANCELLED" },
     });
 
-    // Notify trainer
-    await prisma.notification.create({
-      data: {
-        tenantId: booking.tenantId,
-        userId: booking.trainer.userId,
-        type: "BOOKING",
-        title: "Booking Cancelled",
-        message: `A member cancelled their session on ${new Date(booking.date).toLocaleDateString("en-NG", { weekday: "short", month: "short", day: "numeric" })}`,
-      },
-    });
+    // Notify trainer or instructor
+    const notifyUserId = booking.trainer?.userId || booking.classSession?.instructor?.userId;
+    if (notifyUserId) {
+      await prisma.notification.create({
+        data: {
+          tenantId: booking.tenantId,
+          userId: notifyUserId,
+          type: "BOOKING",
+          title: "Booking Cancelled",
+          message: `A member cancelled their session on ${new Date(booking.date).toLocaleDateString("en-NG", { weekday: "short", month: "short", day: "numeric" })}`,
+        },
+      });
+    }
 
     return NextResponse.json({ success: true });
   } catch (err) {

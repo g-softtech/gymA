@@ -3,9 +3,11 @@ import { prisma } from "@/lib/prisma";
 import { getAuthSession } from "@/lib/auth";
 import { normalizeDomain } from "@/lib/tenant";
 import { addDomainToVercel, removeDomainFromVercel } from "@/lib/vercel";
+import { canUseCustomDomain } from "@/lib/feature-gates";
 
 // Validate domain format (e.g. powergym.com or app.powergym.com)
 const isValidDomain = (domain: string) => {
+  if (domain.length > 253) return false;
   const regex = /^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z0-9][a-z0-9-]{0,61}[a-z0-9]$/i;
   return regex.test(domain);
 };
@@ -15,6 +17,15 @@ export async function POST(req: NextRequest) {
     const session = await getAuthSession();
     if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "SUPERADMIN")) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const tenant = await prisma.tenant.findUnique({
+      where: { id: session.user.tenantId },
+      include: { settings: true },
+    });
+
+    if (!tenant || !canUseCustomDomain(tenant.settings?.subscriptionPlan)) {
+      return NextResponse.json({ error: "Feature requires PRO or ENTERPRISE plan" }, { status: 403 });
     }
 
     const { domain } = await req.json();
@@ -32,8 +43,16 @@ export async function POST(req: NextRequest) {
       where: { customDomain: normalized },
     });
 
-    if (existing && existing.tenantId !== session.user.tenantId) {
-      return NextResponse.json({ error: "Domain already registered" }, { status: 409 });
+    if (existing) {
+      if (existing.tenantId !== session.user.tenantId) {
+        return NextResponse.json({ error: "Domain already registered" }, { status: 409 });
+      }
+      // Tenant already owns this exact domain. Idempotent return.
+      return NextResponse.json({ 
+        success: true, 
+        data: existing, 
+        message: "Domain is already configured for this tenant" 
+      });
     }
 
     // Register with Vercel
@@ -69,8 +88,12 @@ export async function GET(req: NextRequest) {
 
     const settings = await prisma.tenantSettings.findUnique({
       where: { tenantId: session.user.tenantId },
-      select: { customDomain: true, domainVerified: true, verificationToken: true, dnsVerifiedAt: true },
+      include: { tenant: true },
     });
+
+    if (settings && !canUseCustomDomain(settings.subscriptionPlan)) {
+      return NextResponse.json({ error: "Feature requires PRO or ENTERPRISE plan" }, { status: 403 });
+    }
 
     if (!settings?.customDomain) {
       return NextResponse.json({ data: null });
@@ -99,8 +122,12 @@ export async function DELETE(req: NextRequest) {
 
     const settings = await prisma.tenantSettings.findUnique({
       where: { tenantId: session.user.tenantId },
-      select: { customDomain: true },
+      include: { tenant: true },
     });
+
+    if (settings && !canUseCustomDomain(settings.subscriptionPlan)) {
+      return NextResponse.json({ error: "Feature requires PRO or ENTERPRISE plan" }, { status: 403 });
+    }
 
     if (settings?.customDomain !== normalized) {
       return NextResponse.json({ error: "Domain ownership mismatch" }, { status: 403 });

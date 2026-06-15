@@ -18,13 +18,13 @@ export async function POST(
     const session = await getAuthSession();
 
     if (!session?.user?.id) {
-      return NextResponse.redirect(new URL(`/api/auth/signin`, process.env.NEXTAUTH_URL!));
+      return NextResponse.redirect(new URL(`/api/auth/signin`, _req.url));
     }
 
     // Already has a tenant — do not re-assign
     if (session.user.tenantId) {
       return NextResponse.redirect(
-        new URL(`/gym/${slug}/dashboard/member`, process.env.NEXTAUTH_URL!)
+        new URL(`/gym/${slug}/dashboard/member`, _req.url)
       );
     }
 
@@ -37,7 +37,7 @@ export async function POST(
     const quota = await checkMemberQuota(tenant.id);
     if (!quota.allowed) {
       return NextResponse.redirect(
-        new URL(`/gym/${slug}/join?error=${encodeURIComponent(quota.reason!)}`, process.env.NEXTAUTH_URL!)
+        new URL(`/gym/${slug}/join?error=${encodeURIComponent(quota.reason!)}`, _req.url)
       );
     }
 
@@ -51,7 +51,7 @@ export async function POST(
     return NextResponse.redirect(
       new URL(
         `/api/auth/signin?callbackUrl=/gym/${slug}/dashboard/member`,
-        process.env.NEXTAUTH_URL!
+        _req.url
       )
     );
   } catch (err) {

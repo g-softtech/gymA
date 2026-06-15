@@ -39,7 +39,7 @@ export async function PATCH(
     }
 
     // Only the trainer or admin can update booking status
-    const isTrainer = booking.trainer.userId === session.user.id;
+    const isTrainer = booking.trainer?.userId === session.user.id;
     const isAdmin = session.user.role === "ADMIN" || session.user.role === "SUPERADMIN";
     const isMember = booking.member.userId === session.user.id;
 

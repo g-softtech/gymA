@@ -32,7 +32,7 @@ async function getPlatformStats() {
     }),
     prisma.saaSInvoice.aggregate({
       _sum: { amount: true },
-      where: { status: "PAID" },
+      where: { status: { in: ["SUCCESS", "PAID", "paid"] } },
     }),
     prisma.saaSInvoice.findMany({
       take: 5,
@@ -220,7 +220,6 @@ export default async function SuperAdminOverviewPage() {
                 <tr className="border-b border-white/10 text-xs uppercase text-slate-500">
                   <th className="py-3 px-4 font-semibold">Date</th>
                   <th className="py-3 px-4 font-semibold">Gym</th>
-                  <th className="py-3 px-4 font-semibold">Plan</th>
                   <th className="py-3 px-4 font-semibold">Amount</th>
                   <th className="py-3 px-4 font-semibold">Status</th>
                 </tr>
@@ -234,17 +233,12 @@ export default async function SuperAdminOverviewPage() {
                     <td className="py-3 px-4 font-medium text-white">
                       {inv.tenant.name}
                     </td>
-                    <td className="py-3 px-4">
-                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${planColors[inv.plan] ?? "bg-slate-700 text-slate-300"}`}>
-                        {inv.plan}
-                      </span>
-                    </td>
                     <td className="py-3 px-4 text-emerald-400 font-semibold">
                       ₦{inv.amount.toLocaleString()}
                     </td>
                     <td className="py-3 px-4">
                       <span className={`text-xs px-2 py-1 rounded-md font-medium ${
-                        inv.status === "PAID" ? "bg-green-500/10 text-green-400" : "bg-yellow-500/10 text-yellow-400"
+                        inv.status === "SUCCESS" || inv.status === "paid" || inv.status === "PAID" ? "bg-green-500/10 text-green-400" : "bg-yellow-500/10 text-yellow-400"
                       }`}>
                         {inv.status}
                       </span>
@@ -253,7 +247,7 @@ export default async function SuperAdminOverviewPage() {
                 ))}
                 {stats.recentInvoices.length === 0 && (
                   <tr>
-                    <td colSpan={5} className="py-8 text-center text-slate-500">
+                    <td colSpan={4} className="py-8 text-center text-slate-500">
                       No invoices found.
                     </td>
                   </tr>

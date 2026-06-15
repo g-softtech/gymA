@@ -56,10 +56,10 @@ export async function GET(req: NextRequest) {
   for (const sub of expiredSubscriptions) {
     try {
       await prisma.$transaction([
-        // Mark as INACTIVE
+        // Mark as EXPIRED
         prisma.subscription.update({
           where: { id: sub.id },
-          data: { status: "INACTIVE" },
+          data: { status: "EXPIRED" },
         }),
         // Create expiry notification for the member
         prisma.notification.create({

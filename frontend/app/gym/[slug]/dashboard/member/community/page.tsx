@@ -39,7 +39,7 @@ export default async function CommunityPage({
   const memberProfile = await prisma.memberProfile.findUnique({
     where: { userId: session.user.id },
     include: {
-      attendance: true,
+      attendances: true,
       bookings: { where: { status: "CONFIRMED" } },
       workouts: true,
     },
@@ -49,11 +49,11 @@ export default async function CommunityPage({
   const newBadges: string[] = [];
 
   if (memberProfile) {
-    if (!existingBadgeTypes.includes("FIRST_CHECKIN") && memberProfile.attendance.length > 0) {
+    if (!existingBadgeTypes.includes("FIRST_CHECKIN") && memberProfile.attendances.length > 0) {
       await prisma.badge.create({ data: { userId: session.user.id, type: "FIRST_CHECKIN" } });
       newBadges.push("FIRST_CHECKIN");
     }
-    if (!existingBadgeTypes.includes("STREAK_7") && memberProfile.attendance.length >= 7) {
+    if (!existingBadgeTypes.includes("STREAK_7") && memberProfile.attendances.length >= 7) {
       await prisma.badge.create({ data: { userId: session.user.id, type: "STREAK_7" } });
       newBadges.push("STREAK_7");
     }

@@ -37,8 +37,9 @@ export default async function GymJoinPage({
         <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 max-w-md">
           <h2 className="text-2xl font-bold text-red-600">Access Denied</h2>
           <p className="mt-4 text-gray-600">
-            Your account is already linked to a different gym. 
-            CortexFit requires a unique account for each gym you join.
+            {tenant.settings?.whiteLabelEnabled 
+              ? `${tenant.settings.brandName || tenant.name} requires a unique account for each gym you join.`
+              : "CortexFit requires a unique account for each gym you join."}
           </p>
           <p className="mt-2 text-sm text-gray-500">
             Please sign out and register with a different email address to join <strong>{tenant.name}</strong>.
@@ -53,8 +54,6 @@ export default async function GymJoinPage({
       </div>
     );
   }
-
-
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 flex items-center justify-center p-6">
@@ -128,8 +127,10 @@ export default async function GymJoinPage({
         </div>
 
         {/* Footer note */}
-        <p className="mt-6 text-center text-xs text-slate-600">
-          Powered by CortexFit · Your account will be linked to this gym
+        <p className="text-center text-sm text-gray-400 mt-8">
+          {tenant.settings?.whiteLabelEnabled 
+            ? `Your account will be linked to ${tenant.settings.brandName || tenant.name}`
+            : "Powered by CortexFit · Your account will be linked to this gym"}
         </p>
       </div>
     </div>

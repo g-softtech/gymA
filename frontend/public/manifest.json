@@ -1,0 +1,17 @@
+{
+  "name": "CortexFit Gym OS",
+  "short_name": "CortexFit",
+  "description": "Mobile-first Gym Management System",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#4f46e5",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "64x64",
+      "type": "image/x-icon"
+    }
+  ]
+}

@@ -42,21 +42,25 @@ export default async function AttendancePage({
       member: {
         include: { user: { select: { name: true, email: true } } },
       },
+      events: {
+        orderBy: { timestamp: "desc" },
+        take: 1
+      }
     },
-    orderBy: { checkedInAt: "desc" },
-    take: 50,
-  }) as AttendanceWithMember[];
+    orderBy: { checkInTime: "desc" },
+    take: 100,
+  }) as any[];
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const todayCount = recentAttendance.filter(
-    (a: AttendanceWithMember) => new Date(a.checkedInAt) >= today
+    (a: any) => new Date(a.checkInTime) >= today
   ).length;
 
   const thisWeek = new Date();
   thisWeek.setDate(thisWeek.getDate() - 7);
   const weekCount = recentAttendance.filter(
-    (a: AttendanceWithMember) => new Date(a.checkedInAt) >= thisWeek
+    (a: any) => new Date(a.checkInTime) >= thisWeek
   ).length;
 
   const members = tenant.users
@@ -91,11 +95,11 @@ export default async function AttendancePage({
       <AttendanceManager
         tenantId={tenant.id}
         members={members}
-        initialRecords={recentAttendance.map((a: AttendanceWithMember) => ({
+        initialRecords={recentAttendance.map((a: any) => ({
           id: a.id,
           memberName: a.member.user.name ?? a.member.user.email ?? "Unknown",
-          checkedInAt: a.checkedInAt.toISOString(),
-          note: a.note ?? "",
+          checkInTime: a.checkInTime.toISOString(),
+          notes: a.events?.[0]?.notes ?? "",
         }))}
       />
     </div>

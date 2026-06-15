@@ -5,6 +5,7 @@ import { notFound, redirect } from "next/navigation";
 import { getAuthSession } from "@/lib/auth";
 import Link from "next/link";
 import AdminLockoutGuard from "@/components/admin/AdminLockoutGuard";
+import { MobileNav } from "@/components/MobileNav";
 
 export default async function DashboardLayout({
   children,
@@ -61,6 +62,7 @@ export default async function DashboardLayout({
   const secondaryColor = settings?.secondaryColor ?? "#8B5CF6";
   const fontFamily = settings?.fontFamily ?? "Inter";
   const logoUrl = settings?.logoUrl;
+  const brandName = settings?.brandName || tenant.name;
   const darkMode = settings?.darkMode ?? false;
 
   // Sidebar theme
@@ -139,9 +141,9 @@ export default async function DashboardLayout({
           ["--brand-accent" as string]: settings?.accentColor ?? "#A78BFA",
         } as React.CSSProperties}
       >
-        {/* Sidebar */}
+        {/* Sidebar (Tablet/Desktop only) */}
         <aside
-          className="w-56 flex flex-col shrink-0"
+          className="hidden md:flex w-56 flex-col shrink-0"
           style={{
             background: sidebarBg,
             borderRight: `1px solid ${sidebarBorder}`,
@@ -156,7 +158,7 @@ export default async function DashboardLayout({
               // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={logoUrl}
-                alt={tenant.name}
+                alt={brandName}
                 className="h-8 w-auto object-contain mb-1"
               />
             ) : (
@@ -167,13 +169,13 @@ export default async function DashboardLayout({
                     background: `linear-gradient(135deg, ${primaryColor}, ${secondaryColor})`,
                   }}
                 >
-                  {tenant.name[0]}
+                  {brandName[0]}
                 </div>
                 <p
                   className="font-bold text-sm truncate"
                   style={{ color: textPrimary }}
                 >
-                  {tenant.name}
+                  {brandName}
                 </p>
               </div>
             )}
@@ -242,9 +244,12 @@ export default async function DashboardLayout({
               daysRemaining={daysRemaining}
             />
           )}
-          <div className="flex-1 p-6 overflow-y-auto">{children}</div>
+          <div className="flex-1 p-6 overflow-y-auto pb-24 md:pb-6">{children}</div>
         </main>
       </div>
+
+      {/* Mobile Navigation */}
+      <MobileNav slug={slug} role={role as "SUPERADMIN" | "ADMIN" | "TRAINER" | "MEMBER"} allLinks={navLinks} primaryColor={primaryColor} />
     </>
   );
 }

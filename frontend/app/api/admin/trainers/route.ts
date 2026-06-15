@@ -104,3 +104,47 @@ export async function GET(_req: NextRequest) {
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
+
+export async function PATCH(req: NextRequest) {
+  try {
+    const session = await getAuthSession();
+    const ctx = getTenantContextFromSession(session);
+
+    // ✅ Role check via helper
+    const roleErr = requireAdmin(ctx);
+    if (roleErr) return roleErr;
+    if (!ctx?.tenantId) return noTenantContext();
+
+    const { userId, showOnWebsite, title, yearsOfExperience, specialties, bio, publicPhotoUrl } = await req.json();
+
+    if (!userId) {
+      return NextResponse.json({ error: "User ID is required." }, { status: 400 });
+    }
+
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+    if (!user || user.tenantId !== ctx.tenantId) {
+      return NextResponse.json(
+        { error: "User not found or does not belong to your gym." },
+        { status: 404 }
+      );
+    }
+
+    const profile = await prisma.trainerProfile.update({
+      where: { userId },
+      data: {
+        showOnWebsite: showOnWebsite ?? false,
+        title: title ?? null,
+        yearsOfExperience: yearsOfExperience ?? null,
+        specialties: specialties ?? [],
+        bio: bio ?? null,
+        publicPhotoUrl: publicPhotoUrl ?? null,
+      },
+    });
+
+    return NextResponse.json({ success: true, profile });
+  } catch (err) {
+    console.error("[PATCH /api/admin/trainers]", err);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  }
+}
+

@@ -1,4 +1,0 @@
--- Phase 2 cleanup: schema reconciliation
--- This migration is intentionally empty.
--- All Phase 2 changes were consolidated into 20260521075021_phase2_memberships.
--- Keeping this file preserves the migration history without re-running dropped SQL.

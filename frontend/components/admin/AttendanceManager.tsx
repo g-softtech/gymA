@@ -12,8 +12,8 @@ interface Member {
 interface AttendanceRecord {
   id: string;
   memberName: string;
-  checkedInAt: string;
-  note: string;
+  checkInTime: string;
+  notes: string;
 }
 
 interface Props {
@@ -26,7 +26,7 @@ export default function AttendanceManager({ tenantId, members, initialRecords }:
   const router = useRouter();
   const [records, setRecords] = useState<AttendanceRecord[]>(initialRecords);
   const [selectedMember, setSelectedMember] = useState("");
-  const [note, setNote] = useState("");
+  const [notes, setNotes] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -43,7 +43,7 @@ export default function AttendanceManager({ tenantId, members, initialRecords }:
       const res = await fetch("/api/attendance", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ memberId: selectedMember, tenantId, note }),
+        body: JSON.stringify({ memberId: selectedMember, tenantId, note: notes }),
       });
 
       if (!res.ok) {
@@ -54,12 +54,12 @@ export default function AttendanceManager({ tenantId, members, initialRecords }:
         const newRecord: AttendanceRecord = {
           id: crypto.randomUUID(),
           memberName,
-          checkedInAt: new Date().toISOString(),
-          note,
+          checkInTime: new Date().toISOString(),
+          notes,
         };
         setRecords((prev) => [newRecord, ...prev]);
         setSelectedMember("");
-        setNote("");
+        setNotes("");
         setSuccess(`${memberName} checked in successfully!`);
         router.refresh();
         setTimeout(() => setSuccess(""), 3000);
@@ -97,8 +97,8 @@ export default function AttendanceManager({ tenantId, members, initialRecords }:
             <input
               type="text"
               placeholder="e.g. Morning session"
-              value={note}
-              onChange={(e) => setNote(e.target.value)}
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
               className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
           </div>
@@ -118,7 +118,41 @@ export default function AttendanceManager({ tenantId, members, initialRecords }:
           <h2 className="text-base font-semibold text-gray-900">Recent Check-ins</h2>
           <span className="text-sm text-gray-400">{records.length} records</span>
         </div>
-        <div className="overflow-x-auto">
+        {/* Mobile View: Timeline UI */}
+        <div className="md:hidden divide-y divide-gray-50">
+          {records.length === 0 ? (
+            <div className="p-6 text-center text-gray-400">No check-ins yet.</div>
+          ) : (
+            <div className="p-4 space-y-4">
+              {records.map((r) => (
+                <div key={r.id} className="relative flex gap-4">
+                  <div className="flex flex-col items-center">
+                    <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold flex-shrink-0">
+                      {r.memberName.charAt(0)}
+                    </div>
+                    <div className="w-px h-full bg-gray-200 my-1"></div>
+                  </div>
+                  <div className="pb-4">
+                    <p className="font-bold text-gray-900">{r.memberName}</p>
+                    <p className="text-sm text-gray-500">
+                      {new Date(r.checkInTime).toLocaleTimeString("en-NG", { hour: "2-digit", minute: "2-digit" })}
+                      {" "}·{" "}
+                      {new Date(r.checkInTime).toLocaleDateString("en-NG", { month: "short", day: "numeric" })}
+                    </p>
+                    {r.notes && (
+                      <p className="text-sm text-gray-400 italic mt-1 bg-gray-50 p-2 rounded-lg">
+                        "{r.notes}"
+                      </p>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Tablet/Desktop View: Table */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="bg-gray-50 text-left text-gray-500 text-xs uppercase tracking-wide border-b border-gray-100">
@@ -138,19 +172,24 @@ export default function AttendanceManager({ tenantId, members, initialRecords }:
               ) : (
                 records.map((r) => (
                   <tr key={r.id} className="hover:bg-gray-50 transition-colors">
-                    <td className="px-6 py-4 font-medium text-gray-900">{r.memberName}</td>
+                    <td className="px-6 py-4 font-medium text-gray-900 flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold text-xs">
+                        {r.memberName.charAt(0)}
+                      </div>
+                      {r.memberName}
+                    </td>
                     <td className="px-6 py-4 text-gray-500">
-                      {new Date(r.checkedInAt).toLocaleDateString("en-NG", {
+                      {new Date(r.checkInTime).toLocaleDateString("en-NG", {
                         year: "numeric", month: "short", day: "numeric",
                       })}
                     </td>
                     <td className="px-6 py-4 text-gray-500">
-                      {new Date(r.checkedInAt).toLocaleTimeString("en-NG", {
+                      {new Date(r.checkInTime).toLocaleTimeString("en-NG", {
                         hour: "2-digit", minute: "2-digit",
                       })}
                     </td>
                     <td className="px-6 py-4 text-gray-400 italic">
-                      {r.note || "—"}
+                      {r.notes || "—"}
                     </td>
                   </tr>
                 ))

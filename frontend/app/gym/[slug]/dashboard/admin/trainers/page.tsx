@@ -50,9 +50,13 @@ export default async function AdminTrainersPage({
           email: u.email ?? "—",
           specialties: u.trainerProfile?.specialties ?? [],
           bio: u.trainerProfile?.bio ?? "",
-          hourlyRate: u.trainerProfile?.hourlyRate ?? null,
+          hourlyRate: u.trainerProfile?.hourlyRate ? Number(u.trainerProfile.hourlyRate) : null,
           totalBookings: u.trainerProfile?.bookings?.length ?? 0,
           hasProfile: !!u.trainerProfile,
+          showOnWebsite: u.trainerProfile?.showOnWebsite ?? false,
+          title: u.trainerProfile?.title ?? null,
+          yearsOfExperience: u.trainerProfile?.yearsOfExperience ?? null,
+          publicPhotoUrl: u.trainerProfile?.publicPhotoUrl ?? null,
         }))}
       />
     </div>

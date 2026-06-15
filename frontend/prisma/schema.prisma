@@ -14,10 +14,31 @@ enum Role {
   MEMBER
 }
 
-enum SubscriptionStatus {
+enum Currency {
+  NGN
+  USD
+}
+
+enum MembershipStatus {
   ACTIVE
-  INACTIVE
+  EXPIRED
+  SUSPENDED
   CANCELLED
+  PENDING_PAYMENT
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCESS
+  FAILED
+  REFUNDED
+}
+
+enum PaymentType {
+  MEMBERSHIP
+  CLASS_BOOKING
+  TRAINER_SESSION
+  JOINING_FEE
 }
 
 enum NotificationType {
@@ -95,6 +116,10 @@ model Tenant {
   settings        TenantSettings?
   blogPosts       BlogPost[]
   saasInvoices    SaaSInvoice[]
+  classSessions   ClassSession[]
+  transactions    Transaction[]
+  attendances     Attendance[]
+  attendanceEvents AttendanceEvent[]
 }
 
 model User {
@@ -161,13 +186,17 @@ model MemberProfile {
   weightKg        Float?
   heightCm        Float?
   fitnessGoals    String[]
+  lastQrNonce     String?
+  qrNonceExpiresAt DateTime?
+
   subscriptions   Subscription[]
   workouts        WorkoutPlan[]
-  attendance      Attendance[]
+  attendances     Attendance[]
   bookings        Booking[]
   progressRecords ProgressRecord[]
   mealPlans       MealPlan[]
   foodLogs        FoodLog[]
+  transactions    Transaction[]
 }
 
 model TrainerProfile {
@@ -177,12 +206,15 @@ model TrainerProfile {
   specialties   String[]
   availability  Json
   bio           String?
-  hourlyRate    Float?
-  // ── Phase 6: Public website visibility ───────────────────────────────────
-  showOnWebsite Boolean       @default(true)
+  hourlyRate    Decimal?      @db.Decimal(10, 2)
+  // ── Phase 6/13: Public website visibility ───────────────────────────────────
+  showOnWebsite Boolean       @default(false)
   publicPhotoUrl String?
+  title         String?       // e.g. Head Coach, Yoga Instructor
+  yearsOfExperience Int?
   bookings      Booking[]
   workoutPlans  WorkoutPlan[]
+  classSessions ClassSession[]
 }
 
 model MembershipPlan {
@@ -190,7 +222,9 @@ model MembershipPlan {
   tenantId      String
   tenant        Tenant         @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   name          String
-  price         Float
+  price         Decimal        @db.Decimal(10, 2)
+  currency      Currency       @default(NGN)
+  isActive      Boolean        @default(true)
   durationDays  Int
   // ── Phase 6: Public plans page enhancements ───────────────────────────────
   featured      Boolean        @default(false)
@@ -209,7 +243,7 @@ model Subscription {
   tenantId         String
   startDate        DateTime           @default(now())
   endDate          DateTime
-  status           SubscriptionStatus @default(ACTIVE)
+  status           MembershipStatus @default(PENDING_PAYMENT)
   paymentGatewayId String?
 
   @@index([tenantId, status])
@@ -232,37 +266,122 @@ model WorkoutPlan {
   @@index([tenantId, createdAt])
 }
 
+model ClassSession {
+  id            String          @id @default(cuid())
+  tenantId      String
+  tenant        Tenant          @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  title         String
+  description   String?
+  instructorId  String?         
+  instructor    TrainerProfile? @relation(fields: [instructorId], references: [id])
+  startTime     DateTime
+  durationMins  Int             @default(60)
+  capacity      Int
+  price         Decimal?        @db.Decimal(10, 2)
+  imageUrl      String?
+  bookings      Booking[]
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+
+  @@index([tenantId, startTime])
+}
+
 model Booking {
-  id           String         @id @default(cuid())
-  trainerId    String
-  trainer      TrainerProfile @relation(fields: [trainerId], references: [id], onDelete: Cascade)
-  memberId     String
-  member       MemberProfile  @relation(fields: [memberId], references: [id], onDelete: Cascade)
-  tenantId     String
-  date         DateTime
-  durationMins Int            @default(60)
-  sessionType  SessionType    @default(PHYSICAL)
-  status       BookingStatus  @default(PENDING)
-  notes        String?
-  meetingLink  String?
-  createdAt    DateTime       @default(now())
-  updatedAt    DateTime       @updatedAt
+  id             String          @id @default(cuid())
+  tenantId       String
+  memberId       String
+  member         MemberProfile   @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  
+  // -- 1-on-1 Booking Fields --
+  trainerId      String?
+  trainer        TrainerProfile? @relation(fields: [trainerId], references: [id], onDelete: Cascade)
+  
+  // -- Group Class Booking Fields --
+  classSessionId String?
+  classSession   ClassSession?   @relation(fields: [classSessionId], references: [id], onDelete: Cascade)
+
+  // -- Shared Context --
+  date           DateTime
+  durationMins   Int             @default(60)
+  sessionType    SessionType     @default(PHYSICAL)
+  status         BookingStatus   @default(PENDING)
+  notes          String?
+  meetingLink    String?
+  
+  // -- Phase 15 Payments --
+  paymentRequired  Boolean       @default(false)
+  paymentStatus    PaymentStatus @default(PENDING)
+  paymentAmount    Decimal?      @db.Decimal(10, 2)
+  paymentExpiresAt DateTime?
+  
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+
+  attendances    Attendance[]
 
   @@index([trainerId, date])
+  @@index([classSessionId])
   @@index([memberId])
   @@index([tenantId, status])
 }
 
-model Attendance {
-  id          String        @id @default(cuid())
-  memberId    String
-  member      MemberProfile @relation(fields: [memberId], references: [id], onDelete: Cascade)
-  tenantId    String
-  checkedInAt DateTime      @default(now())
-  note        String?
+// ==========================================
+// Phase 16: Attendance & Check-In
+// ==========================================
 
-  @@index([tenantId, checkedInAt])
-  @@index([memberId])
+enum CheckInMethod {
+  QR
+  MANUAL
+  PIN
+}
+
+enum AttendanceStatus {
+  PRESENT
+  LATE
+  NO_SHOW
+}
+
+enum AttendanceType {
+  GENERAL
+  CLASS
+  TRAINER
+  GUEST
+}
+
+model Attendance {
+  id             String    @id @default(cuid())
+  tenantId       String
+  memberId       String
+  bookingId      String?   
+  
+  checkInTime    DateTime  @default(now())
+  checkOutTime   DateTime?
+  
+  method         CheckInMethod
+  status         AttendanceStatus @default(PRESENT)
+  type           AttendanceType
+
+  tenant         Tenant        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  member         MemberProfile @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  booking        Booking?      @relation(fields: [bookingId], references: [id], onDelete: SetNull)
+  events         AttendanceEvent[]
+
+  @@unique([bookingId, memberId])
+  @@index([tenantId, checkInTime])
+}
+
+model AttendanceEvent {
+  id             String    @id @default(cuid())
+  attendanceId   String?
+  tenantId       String
+  memberId       String
+  eventType      String    // e.g., "CHECK_IN_SUCCESS", "MEMBERSHIP_OVERRIDE", "DENIED_EXPIRED"
+  overrideType   String?   // e.g., "EMERGENCY_ACCESS", "PROMOTIONAL_ACCESS", "STAFF_TESTING"
+  timestamp      DateTime  @default(now())
+  notes          String?
+
+  tenant         Tenant        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  attendance     Attendance?   @relation(fields: [attendanceId], references: [id], onDelete: SetNull)
 }
 
 model ProgressRecord {
@@ -446,6 +565,7 @@ model TenantSettings {
   id              String  @id @default(cuid())
   tenantId        String  @unique
   tenant          Tenant  @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  defaultCurrency Currency @default(NGN)
 
   // ── Branding ──────────────────────────────────────────────────────────────
   logoUrl         String?
@@ -455,6 +575,8 @@ model TenantSettings {
   accentColor     String?
   fontFamily      String? // e.g. "Inter"
   darkMode        Boolean @default(false)
+  brandName         String?
+  whiteLabelEnabled Boolean @default(false)
 
   // ── Domain ────────────────────────────────────────────────────────────────
   customDomain    String? @unique
@@ -462,6 +584,14 @@ model TenantSettings {
   domainVerified  Boolean @default(false)
   verificationToken String? // Stores Vercel TXT challenge
   dnsVerifiedAt     DateTime? // Audit trail for verification
+
+  // ── SaaS Billing (Phase 12 Paystack) ────────────────────────────────────────
+  subscriptionPlan         String    @default("FREE")
+  subscriptionStatus       String    @default("inactive")
+  currentPeriodEnd         DateTime?
+  paystackCustomerCode     String?   @unique
+  paystackSubscriptionCode String?   @unique
+  paystackEmailToken       String?
 
   // ── Business Info ─────────────────────────────────────────────────────────
   tagline         String?
@@ -492,6 +622,7 @@ model TenantSettings {
   featuresData    Json?  // [{ icon, title, description }]
   statsData       Json?  // [{ value, label }]
   openingHours    Json?  // { monday: { open, close }, tuesday: ... }
+  homepageLayout  Json?  // Array of section IDs e.g. ["hero", "stats", "gallery", ...]
 
   // ── SEO ───────────────────────────────────────────────────────────────────
   metaTitle         String?
@@ -552,21 +683,95 @@ model AiLog {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// PHASE 9B: SaaS Billing & Monetization
+// PHASE 19: INTELLIGENCE FEEDBACK LOOP
+// ─────────────────────────────────────────────────────────────────────────────
+
+model ActionRegistry {
+  id          String   @id @default(cuid())
+  tenantId    String
+  actionType  String   // WIN_BACK_OFFER, PRICE_INCREASE, etc.
+  targetId    String   // memberId, trainerId, etc.
+  context     String
+  status      String   @default("PENDING") // PENDING, APPROVED, REJECTED, EXECUTED, EXPIRED
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  executedAt  DateTime?
+
+  feedback    ActionFeedback?
+}
+
+model ActionFeedback {
+  id           String   @id @default(cuid())
+  actionId     String   @unique
+  action       ActionRegistry @relation(fields: [actionId], references: [id], onDelete: Cascade)
+  beforeMetric Float
+  afterMetric  Float?
+  delta        Float?
+  success      Boolean  @default(false)
+  measuredAt   DateTime?
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// PHASE 17 SCAFFOLDING (ANALYTICS & RETENTION)Monetization
 // ─────────────────────────────────────────────────────────────────────────────
 
 model SaaSInvoice {
-  id          String     @id @default(cuid())
-  tenantId    String
-  tenant      Tenant     @relation(fields: [tenantId], references: [id])
-  plan        TenantPlan
-  amount      Float
-  currency    String     @default("NGN")
-  reference   String     @unique
-  gateway     String     @default("PAYSTACK")
-  status      String     @default("SUCCESS")
-  createdAt   DateTime   @default(now())
+  id        String   @id @default(cuid())
+  tenantId  String
+  tenant    Tenant   @relation(fields: [tenantId], references: [id])
+  amount    Decimal  @db.Decimal(10, 2)
+  status    String   @default("pending") // pending, paid, failed
+  reference String   @unique
+  createdAt DateTime @default(now())
 
   @@index([tenantId])
 }
 
+// ── Webhook Idempotency & Audit (Phase 12) ──────────────────────────────────
+model BillingEvent {
+  id        String   @id @default(cuid())
+  tenantId  String
+  eventId   String   @unique
+  eventType String
+  payload   Json
+  createdAt DateTime @default(now())
+}
+
+// ── Phase 15 Payments & Revenue ──────────────────────────────────────────────
+model Transaction {
+  id              String        @id @default(cuid())
+  tenantId        String
+  memberId        String
+  
+  // IMMUTABLE SNAPSHOT DATA
+  itemName        String
+  itemType        PaymentType
+  amount          Decimal       @db.Decimal(10, 2)
+  currency        Currency
+  
+  status          PaymentStatus @default(PENDING)
+  reference       String        @unique // Paystack Reference
+  metadata        Json?         
+  
+  // REFUND ARCHITECTURE
+  refundedAmount  Decimal?      @db.Decimal(10, 2)
+  refundReason    String?
+  refundedAt      DateTime?
+  
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  tenant          Tenant        @relation(fields: [tenantId], references: [id])
+  member          MemberProfile @relation(fields: [memberId], references: [id])
+}
+
+model PaymentEvent {
+  id          String   @id @default(cuid())
+  eventKey    String   @unique 
+  reference   String?
+  eventType   String
+  payload     Json
+  processed   Boolean  @default(false)
+  processedAt DateTime?
+  createdAt   DateTime @default(now())
+}

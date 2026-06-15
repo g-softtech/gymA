@@ -33,6 +33,7 @@ export default async function MemberMessagesPage({
 
   const contactMap = new Map<string, { userId: string; name: string; email: string }>();
   memberProfile?.bookings.forEach((b) => {
+    if (!b.trainer) return;
     const uid = b.trainer.user.id;
     if (!contactMap.has(uid)) {
       contactMap.set(uid, {
