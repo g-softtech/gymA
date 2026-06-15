@@ -15,7 +15,16 @@ export async function POST(req: Request) {
   try {
     const session = await getAuthSession();
 
+    const TRACE = `[FORENSIC:tenant-create][${Date.now()}]`;
+    console.log(`${TRACE} ┌─ POST /api/tenant/create`);
+    console.log(`${TRACE} │  session present  = ${!!session?.user?.id}`);
+    console.log(`${TRACE} │  user.id          = ${session?.user?.id ?? "undefined"}`);
+    console.log(`${TRACE} │  user.email       = ${session?.user?.email ?? "undefined"}`);
+    console.log(`${TRACE} │  user.role        = ${(session?.user as any)?.role ?? "undefined"}`);
+    console.log(`${TRACE} │  user.tenantId    = ${(session?.user as any)?.tenantId ?? "undefined"}`);
+
     if (!session?.user?.id || !session.user.email) {
+      console.log(`${TRACE} └─ DENY: no session`);
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -85,6 +94,9 @@ export async function POST(req: Request) {
 
       return { tenant };
     });
+
+    console.log(`[FORENSIC:tenant-create] │  DB WRITE SUCCESS: tenant.id=${tenant.id} tenant.slug=${tenant.slug}`);
+    console.log(`[FORENSIC:tenant-create] └─ RESPONSE 201: returning slug=${tenant.slug} to client (client will router.push to /gym/${tenant.slug}/dashboard/admin)`);
 
     return NextResponse.json(
       {

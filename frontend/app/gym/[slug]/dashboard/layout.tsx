@@ -20,12 +20,30 @@ export default async function DashboardLayout({
   if (!session?.user) return null;
   const ctx = getUserAccessContext(session);
 
+  // ── FORENSIC ─────────────────────────────────────────────────────────────────
+  const TRACE = `[FORENSIC:dashboard-layout][${Date.now()}]`;
+  console.log(`${TRACE} ┌─ ENTRY slug=${slug}`);
+  console.log(`${TRACE} │  user.id          = ${session.user.id}`);
+  console.log(`${TRACE} │  user.email       = ${session.user.email ?? "undefined"}`);
+  console.log(`${TRACE} │  ctx.role         = ${ctx.role}`);
+  console.log(`${TRACE} │  ctx.hasTenant    = ${ctx.hasTenant}`);
+  console.log(`${TRACE} │  ctx.tenantId     = ${ctx.tenantId ?? "null"}`);
+  console.log(`${TRACE} │  ctx.tenantSlug   = ${ctx.tenantSlug ?? "null"}`);
+  console.log(`${TRACE} │  url.slug         = ${slug}`);
+  console.log(`${TRACE} │  slugMatch        = ${ctx.tenantSlug === slug}`);
+  console.log(`${TRACE} │  ctx.defaultRedirect = ${ctx.defaultRedirect}`);
+
   // Use pure centralized logic to verify identity and tenant alignment
   if (!ctx.hasTenant || ctx.tenantSlug !== slug) {
     // SUPERADMIN is exempt from cross-tenant isolation
     if (ctx.role !== "SUPERADMIN") {
+      console.log(`${TRACE} └─ REDIRECT: hasTenant=${ctx.hasTenant} tenantSlug=${ctx.tenantSlug} url.slug=${slug} role=${ctx.role} → ${ctx.defaultRedirect}`);
       redirect(ctx.defaultRedirect);
+    } else {
+      console.log(`${TRACE} │  SUPERADMIN cross-tenant access: allowed into slug=${slug}`);
     }
+  } else {
+    console.log(`${TRACE} │  ALLOW: tenant match confirmed, rendering dashboard`);
   }
 
   // ✅ Phase 5: Fetch TenantSettings alongside the tenant for branding

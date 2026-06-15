@@ -8,10 +8,21 @@ export default async function OnboardingLayout({ children }: { children: ReactNo
   const session = await getAuthSession();
   const ctx = getUserAccessContext(session);
 
+  const TRACE = `[FORENSIC:onboarding-layout][${Date.now()}]`;
+  console.log(`${TRACE} ┌─ ENTRY`);
+  console.log(`${TRACE} │  ctx.role        = ${ctx.role}`);
+  console.log(`${TRACE} │  ctx.hasTenant   = ${ctx.hasTenant}`);
+  console.log(`${TRACE} │  ctx.tenantId    = ${ctx.tenantId ?? "null"}`);
+  console.log(`${TRACE} │  ctx.tenantSlug  = ${ctx.tenantSlug ?? "null"}`);
+  console.log(`${TRACE} │  ctx.defaultRedirect = ${ctx.defaultRedirect}`);
+
   // If user already has a tenant or is SUPERADMIN, they don't belong in onboarding.
   if (ctx.hasTenant || ctx.role === "SUPERADMIN") {
+    console.log(`${TRACE} └─ REDIRECT: hasTenant=${ctx.hasTenant} role=${ctx.role} → ${ctx.defaultRedirect}`);
     redirect(ctx.defaultRedirect);
   }
+
+  console.log(`${TRACE} └─ ALLOW: rendering onboarding form`);
 
   return (
     <div className="min-h-screen bg-black bg-gradient-to-br from-black via-gray-900 to-indigo-950 text-white selection:bg-indigo-500/30 flex items-center justify-center p-4">

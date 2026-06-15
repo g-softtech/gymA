@@ -14,9 +14,21 @@ export default async function SuperAdminLayout({
   if (!session?.user) return null;
   const ctx = getUserAccessContext(session);
 
+  const TRACE = `[FORENSIC:superadmin-layout][${Date.now()}]`;
+  console.log(`${TRACE} ┌─ ENTRY`);
+  console.log(`${TRACE} │  user.id         = ${session.user.id}`);
+  console.log(`${TRACE} │  user.email      = ${session.user.email ?? "undefined"}`);
+  console.log(`${TRACE} │  ctx.role        = ${ctx.role}`);
+  console.log(`${TRACE} │  ctx.hasTenant   = ${ctx.hasTenant}`);
+  console.log(`${TRACE} │  ctx.tenantId    = ${ctx.tenantId ?? "null"}`);
+  console.log(`${TRACE} │  ctx.tenantSlug  = ${ctx.tenantSlug ?? "null"}`);
+
   if (ctx.role !== "SUPERADMIN") {
+    console.log(`${TRACE} └─ REDIRECT: role=${ctx.role} is not SUPERADMIN → ${ctx.defaultRedirect}`);
     redirect(ctx.defaultRedirect);
   }
+
+  console.log(`${TRACE} └─ ALLOW: SUPERADMIN confirmed, rendering admin panel`);
 
   const navItems = [
     { href: "/admin", label: "Overview", icon: "⚡" },
