@@ -72,7 +72,7 @@ export default withAuth(
     const TRACE = `[FORENSIC:middleware][${Date.now()}]`;
     console.log(`${TRACE} ┌─ REQUEST: ${hostname}${pathname}`);
     console.log(`${TRACE} │  token present   = ${!!token}`);
-    console.log(`${TRACE} │  token.sub       = ${token?.sub ?? "undefined"}`);
+    console.log(`${TRACE} │  token.sub       = ${(token as any)?.sub ?? "undefined"}`);
     console.log(`${TRACE} │  token.email     = ${(token as any)?.email ?? "undefined"}`);
     console.log(`${TRACE} │  token.role      = ${(token as any)?.role ?? "undefined"}`);
     console.log(`${TRACE} │  token.tenantId  = ${(token as any)?.tenantId ?? "undefined"}`);
