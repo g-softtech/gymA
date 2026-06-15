@@ -6,15 +6,15 @@ export default async function DashboardRouter() {
   const session = await getAuthSession();
 
   if (!session?.user?.id) {
-    redirect("/auth/signin");
+    redirect("/api/auth/signin?callbackUrl=/dashboard");
   }
 
-  // SuperAdmin goes to global admin panel
+  // SUPERADMIN -> /admin
   if (session.user.role === "SUPERADMIN") {
     redirect("/admin");
   }
 
-  // If user has a tenant, redirect them to their gym's dashboard
+  // If user has a tenant, redirect them to their gym's dashboard based on role
   if (session.user.tenantId) {
     const tenant = await prisma.tenant.findUnique({
       where: { id: session.user.tenantId },
@@ -22,14 +22,18 @@ export default async function DashboardRouter() {
     });
 
     if (tenant) {
-      if (session.user.role === "ADMIN" || session.user.role === "TRAINER") {
+      if (session.user.role === "ADMIN") {
         redirect(`/gym/${tenant.slug}/dashboard/admin`);
+      } else if (session.user.role === "TRAINER") {
+        redirect(`/gym/${tenant.slug}/dashboard/trainer`);
+      } else if (session.user.role === "STAFF") { // Future proofing
+        redirect(`/gym/${tenant.slug}/dashboard/staff`);
       } else {
         redirect(`/gym/${tenant.slug}/dashboard/member`);
       }
     }
   }
 
-  // If no tenant, they need to onboard
+  // Authenticated user without tenant -> /onboarding
   redirect("/onboarding");
 }

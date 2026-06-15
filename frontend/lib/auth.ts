@@ -37,19 +37,28 @@ export const authOptions: NextAuthOptions = {
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null;
 
+        const email = credentials.email.toLowerCase().trim();
         const user = await prisma.user.findUnique({
-          where: { email: credentials.email.toLowerCase().trim() },
+          where: { email },
         });
 
-        if (!user?.password) {
+        console.log(`[AUTH VERIFY] authorize(): email=${email} provider=credentials dbFound=${!!user}`);
+
+        if (!user) {
+          throw new Error("Invalid email or password.");
+        }
+
+        if (!user.password) {
           // User exists but signed up via Google — no password set
           throw new Error("This account uses Google Sign-In. Please use the Google button.");
         }
 
         const passwordMatch = await bcrypt.compare(credentials.password, user.password);
         if (!passwordMatch) {
-          throw new Error("Incorrect password.");
+          throw new Error("Invalid email or password.");
         }
+
+        console.log(`[AUTH VERIFY] authorize() Success: id=${user.id} role=${user.role} tenantId=${user.tenantId}`);
 
         return {
           id: user.id,
@@ -75,23 +84,27 @@ export const authOptions: NextAuthOptions = {
 
   callbacks: {
     async jwt({ token, user, account }) {
-      // On first sign in
-      if (user && account) {
-        token.id = user.id;
-        token.role = (user as any).role ?? "MEMBER";
-        token.tenantId = (user as any).tenantId ?? undefined;
-      }
+      // 1. Establish anchor: always use the email to look up the real database user.
+      const anchorEmail = token.email || user?.email;
+      
+      console.log(`[AUTH VERIFY] jwt() Input: token.id=${token.id} token.sub=${token.sub} user.id=${user?.id} anchorEmail=${anchorEmail}`);
 
-      // ALWAYS re-fetch role and tenantId from DB on every request
-      // This ensures role changes (e.g. MEMBER → TRAINER) take effect immediately
-      if (token.id) {
+      // 2. Fetch the single source of truth from Database
+      if (anchorEmail) {
         const dbUser = await prisma.user.findUnique({
-          where: { id: token.id as string },
-          select: { role: true, tenantId: true },
+          where: { email: anchorEmail as string },
+          select: { id: true, role: true, tenantId: true },
         });
+        
         if (dbUser) {
+          // 3. Hydrate token with guaranteed DB values
+          token.id = dbUser.id;
           token.role = dbUser.role;
           token.tenantId = dbUser.tenantId ?? undefined;
+          
+          console.log(`[AUTH VERIFY] jwt() Hydrated from DB: id=${token.id} role=${token.role} tenantId=${token.tenantId}`);
+        } else {
+          console.error(`[AUTH VERIFY] jwt() CRITICAL: User not found in DB for email=${anchorEmail}`);
         }
       }
 
@@ -99,11 +112,15 @@ export const authOptions: NextAuthOptions = {
     },
 
     async session({ session, token }) {
+      // 4. Ensure complete, unconditional hydration of the client session
       if (token && session.user) {
         session.user.id = token.id as string;
         session.user.role = token.role as string;
         session.user.tenantId = token.tenantId as string | undefined;
       }
+      
+      console.log(`[AUTH VERIFY] session() Out: id=${session.user?.id} email=${session.user?.email} role=${session.user?.role} tenantId=${session.user?.tenantId}`);
+      
       return session;
     },
   },

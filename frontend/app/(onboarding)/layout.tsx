@@ -7,15 +7,21 @@ import { prisma } from "@/lib/prisma";
 export default async function OnboardingLayout({ children }: { children: ReactNode }) {
   const session = await getAuthSession();
 
-  // If the user already belongs to a gym, they should not see the "Create Gym" page.
-  // We explicitly check the database to prevent infinite loops if the JWT token is stale.
-  if (session?.user?.tenantId) {
-    const tenant = await prisma.tenant.findUnique({
-      where: { id: session.user.tenantId }
-    });
-    
-    if (tenant) {
-      redirect("/dashboard");
+  if (session?.user) {
+    // Super Admin -> Start Free Trial -> Redirect to /admin
+    if (session.user.role === "SUPERADMIN") {
+      redirect("/admin");
+    }
+
+    // Logged-in user with existing gym -> Redirect directly to their gym dashboard
+    if (session.user.tenantId) {
+      const tenant = await prisma.tenant.findUnique({
+        where: { id: session.user.tenantId }
+      });
+      
+      if (tenant) {
+        redirect("/dashboard"); // Global router handles role-based routing
+      }
     }
   }
 

@@ -67,6 +67,7 @@ export default withAuth(
 
     const { pathname } = req.nextUrl;
     const hostname = req.headers.get("host") ?? "";
+    console.log(`[FORENSIC] Middleware analyzing req: ${hostname}${pathname}`);
 
     // ── 0. API Route Bailout ────────────────────────────────────────────────
     // Never rewrite API routes. Let them resolve globally to prevent 404s on custom domains/subdomains.
@@ -88,6 +89,7 @@ export default withAuth(
 
       const url = req.nextUrl.clone();
       url.pathname = newPathname;
+      console.log(`[FORENSIC] Middleware rewriting subdomain to: ${newPathname}`);
       return NextResponse.rewrite(url);
     }
 
@@ -108,6 +110,7 @@ export default withAuth(
       url.pathname = "/api/gym/resolve";
       url.searchParams.set("domain", hostname);
       url.searchParams.set("path", pathname);
+      console.log(`[FORENSIC] Middleware rewriting custom domain to: /api/gym/resolve?domain=${hostname}`);
       return NextResponse.rewrite(url);
     }
 
