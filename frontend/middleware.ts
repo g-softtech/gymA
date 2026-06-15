@@ -61,64 +61,52 @@ export default withAuth(
   function middleware(req: NextRequest) {
     const token = (
       req as NextRequest & {
-        nextauth: { token: { role?: string; tenantId?: string } | null };
+        nextauth: { token: { role?: string; tenantId?: string; tenantSlug?: string; email?: string } | null };
       }
     ).nextauth?.token;
 
     const { pathname } = req.nextUrl;
     const hostname = req.headers.get("host") ?? "";
-    console.log(`[FORENSIC] Middleware analyzing req: ${hostname}${pathname}`);
+
+    // ── FORENSIC: log every middleware invocation with full token state ──
+    const TRACE = `[FORENSIC:middleware][${Date.now()}]`;
+    console.log(`${TRACE} ┌─ REQUEST: ${hostname}${pathname}`);
+    console.log(`${TRACE} │  token present   = ${!!token}`);
+    console.log(`${TRACE} │  token.sub       = ${token?.sub ?? "undefined"}`);
+    console.log(`${TRACE} │  token.email     = ${(token as any)?.email ?? "undefined"}`);
+    console.log(`${TRACE} │  token.role      = ${(token as any)?.role ?? "undefined"}`);
+    console.log(`${TRACE} │  token.tenantId  = ${(token as any)?.tenantId ?? "undefined"}`);
+    console.log(`${TRACE} │  token.tenantSlug= ${(token as any)?.tenantSlug ?? "undefined"}`);
 
     // ── 0. API Route Bailout ────────────────────────────────────────────────
-    // Never rewrite API routes. Let them resolve globally to prevent 404s on custom domains/subdomains.
     if (pathname.startsWith("/api/")) {
+      console.log(`${TRACE} └─ PASS: API route bailout`);
       return NextResponse.next();
     }
 
     // ── 1. Subdomain routing ────────────────────────────────────────────────
-    // If request arrives at <slug>.cortexfit.com, rewrite to /gym/<slug>/...
-    // The actual page at /gym/[slug] handles all the data fetching and rendering.
     const subdomainSlug = getSubdomainSlug(hostname);
     if (subdomainSlug) {
-      // Build the new pathname: replace root with /gym/<slug>
-      // e.g. powergymlago.cortexfit.com/dashboard/admin → /gym/powergymlago/dashboard/admin
-      // e.g. powergymlago.cortexfit.com/ → /gym/powergymlago
       const newPathname = pathname === "/"
         ? `/gym/${subdomainSlug}`
         : `/gym/${subdomainSlug}${pathname}`;
-
       const url = req.nextUrl.clone();
       url.pathname = newPathname;
-      console.log(`[FORENSIC] Middleware rewriting subdomain to: ${newPathname}`);
+      console.log(`${TRACE} └─ REWRITE: subdomain → ${newPathname}`);
       return NextResponse.rewrite(url);
     }
 
     // ── 2. Custom domain routing ────────────────────────────────────────────
-    // If request arrives at powergymlago.com, we need to look up the tenant slug
-    // from the DB and rewrite. Since middleware cannot do async DB calls on the
-    // Edge runtime, we rewrite to a special resolver route that does the lookup
-    // and then redirects to the correct /gym/[slug] path.
-    //
-    // The resolver route at /api/gym/resolve?domain=<hostname> will:
-    //   1. Query TenantSettings.customDomain = hostname
-    //   2. Redirect to /gym/[slug][pathname]
-    //
-    // We skip this for API routes and Next.js internals on custom domains.
     if (isCustomDomain(hostname)) {
       const url = req.nextUrl.clone();
-      // Pass along to the domain resolver — it will handle the DB lookup
       url.pathname = "/api/gym/resolve";
       url.searchParams.set("domain", hostname);
       url.searchParams.set("path", pathname);
-      console.log(`[FORENSIC] Middleware rewriting custom domain to: /api/gym/resolve?domain=${hostname}`);
+      console.log(`${TRACE} └─ REWRITE: custom domain → /api/gym/resolve?domain=${hostname}`);
       return NextResponse.rewrite(url);
     }
 
-    // ── 3. SuperAdmin route guard ───────────────────────────────────────────
-    // Removed: We no longer check token.role in Edge middleware to prevent 
-    // infinite redirect loops when a user is promoted to SUPERADMIN but their 
-    // cookie is stale. The role check is safely handled in app/admin/layout.tsx.
-
+    console.log(`${TRACE} └─ PASS: proceeding to page handler`);
     return NextResponse.next();
   },
   {
@@ -127,48 +115,54 @@ export default withAuth(
         const { pathname } = req.nextUrl;
         const hostname = req.headers.get("host") ?? "";
 
-        // ── Public routes (always allow, no token needed) ──────────────────
+        // ── FORENSIC: log every authorized() call ────────────────────────
+        const ATRACE = `[FORENSIC:authorized][${Date.now()}]`;
+        console.log(`${ATRACE} ┌─ PATH: ${pathname}`);
+        console.log(`${ATRACE} │  token present    = ${!!token}`);
+        console.log(`${ATRACE} │  token.role       = ${(token as any)?.role ?? "undefined"}`);
+        console.log(`${ATRACE} │  token.tenantId   = ${(token as any)?.tenantId ?? "undefined"}`);
+        console.log(`${ATRACE} │  token.tenantSlug = ${(token as any)?.tenantSlug ?? "undefined"}`);
+        console.log(`${ATRACE} │  token.email      = ${(token as any)?.email ?? "undefined"}`);
 
-        // NextAuth internal routes
-        if (pathname.startsWith("/api/auth")) return true;
-
-        // Public API endpoints (blog, contact, public gym data)
+        // ── Public routes ─────────────────────────────────────────────────
+        if (pathname.startsWith("/api/auth")) {
+          console.log(`${ATRACE} └─ ALLOW: /api/auth (public)`);
+          return true;
+        }
         if (pathname.startsWith("/api/blog")) return true;
         if (pathname.startsWith("/api/contact")) return true;
         if (pathname.startsWith("/api/tenant/settings")) return true;
-        if (pathname.startsWith("/api/gym/")) return true; // public gym data + resolve + join
-        if (pathname.startsWith("/api/payments/webhook")) return true; // Paystack webhook (server-to-server)
-        if (pathname.startsWith("/api/cron/")) return true; // Vercel Cron (protected by CRON_SECRET header)
-
-        // Onboarding and join flows can be accessed to redirect to auth
-        // We removed /onboarding from public list so users must sign in first
+        if (pathname.startsWith("/api/gym/")) return true;
+        if (pathname.startsWith("/api/payments/webhook")) return true;
+        if (pathname.startsWith("/api/cron/")) return true;
         if (pathname.includes("/join")) return true;
-
-        // Platform-level marketing pages
         if (pathname.startsWith("/(marketing)")) return true;
-
-        // Public gym pages (no auth required to view the public website)
-        // These are at /gym/[slug] but NOT /gym/[slug]/dashboard
         if (pathname.startsWith("/gym/") && !pathname.includes("/dashboard")) return true;
-
-        // Custom domain requests: let the resolver handle auth
         if (isCustomDomain(hostname)) return true;
 
-        // ── Protected routes (require a valid session token) ──────────────
+        // ── Protected routes ──────────────────────────────────────────────
+        if (pathname.startsWith("/api/")) {
+          const result = !!token;
+          console.log(`${ATRACE} └─ ${result ? "ALLOW" : "DENY (no token)"}: protected API`);
+          return result;
+        }
+        if (pathname.includes("/dashboard")) {
+          const result = !!token;
+          console.log(`${ATRACE} └─ ${result ? "ALLOW" : "DENY → sign-in redirect"}: /dashboard requires token`);
+          return result;
+        }
+        if (pathname.startsWith("/admin")) {
+          const result = !!token;
+          console.log(`${ATRACE} └─ ${result ? "ALLOW" : "DENY"}: /admin`);
+          return result;
+        }
+        if (pathname.startsWith("/onboarding")) {
+          const result = !!token;
+          console.log(`${ATRACE} └─ ${result ? "ALLOW" : "DENY"}: /onboarding`);
+          return result;
+        }
 
-        // All other /api routes
-        if (pathname.startsWith("/api/")) return !!token;
-
-        // All dashboard routes (tenant-level)
-        if (pathname.includes("/dashboard")) return !!token;
-
-        // SuperAdmin panel
-        if (pathname.startsWith("/admin")) return !!token;
-
-        // Onboarding flow (must be logged in)
-        if (pathname.startsWith("/onboarding")) return !!token;
-
-        // Everything else (marketing pages) — allow through
+        console.log(`${ATRACE} └─ ALLOW: default pass-through`);
         return true;
       },
     },

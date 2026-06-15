@@ -103,42 +103,81 @@ export const authOptions: NextAuthOptions = {
 
   callbacks: {
     async jwt({ token, user, account }) {
-      // 1. Establish anchor: always use the email to look up the real database user.
+      // ── FORENSIC INSTRUMENTATION (read-only, no logic changes) ──────────────
+      const TRACE = `[FORENSIC:jwt][${Date.now()}]`;
+
       const anchorEmail = token.email || user?.email;
-      
-      console.log(`[AUTH VERIFY] jwt() Input: token.id=${token.id} token.sub=${token.sub} user.id=${user?.id} anchorEmail=${anchorEmail}`);
+
+      console.log(`${TRACE} ┌─ ENTRY`);
+      console.log(`${TRACE} │  token.sub       = ${token.sub ?? "undefined"}`);
+      console.log(`${TRACE} │  token.email     = ${token.email ?? "undefined"}`);
+      console.log(`${TRACE} │  token.id        = ${token.id ?? "undefined"}`);
+      console.log(`${TRACE} │  token.role      = ${token.role ?? "undefined"}`);
+      console.log(`${TRACE} │  token.tenantId  = ${token.tenantId ?? "undefined"}`);
+      console.log(`${TRACE} │  token.tenantSlug= ${token.tenantSlug ?? "undefined"}`);
+      console.log(`${TRACE} │  user?.id        = ${user?.id ?? "undefined"}`);
+      console.log(`${TRACE} │  user?.email     = ${(user as any)?.email ?? "undefined"}`);
+      console.log(`${TRACE} │  account?.provider=${account?.provider ?? "none (token refresh)"}`);
+      console.log(`${TRACE} │  anchorEmail     = ${anchorEmail ?? "⚠️  NULL — DB lookup will be SKIPPED"}`);
+
+      if (!anchorEmail) {
+        console.error(`${TRACE} └─ ⚠️  SKIPPING DB LOOKUP: anchorEmail is null/undefined. Returning stale token.`);
+        console.log(`${TRACE}    FINAL TOKEN: role=${token.role} tenantId=${token.tenantId} tenantSlug=${token.tenantSlug}`);
+        return token;
+      }
 
       // 2. Fetch the single source of truth from Database
-      if (anchorEmail) {
-        const dbUser = await prisma.user.findUnique({
-          where: { email: anchorEmail as string },
-          select: { 
-            id: true, 
-            role: true, 
-            tenantId: true,
-            tenant: { select: { slug: true } }
-          },
-        });
-        
-        if (dbUser) {
-          // 3. Hydrate token with guaranteed DB values
-          token.id = dbUser.id;
-          token.role = dbUser.role;
-          token.tenantId = dbUser.tenantId ?? undefined;
-          
-          // CRITICAL: Ensure tenantSlug is populated explicitly (null if absent)
-          token.tenantSlug = dbUser.tenant?.slug ?? null;
-          
-          console.log(`[AUTH VERIFY] jwt() Hydrated from DB: id=${token.id} role=${token.role} tenantId=${token.tenantId} tenantSlug=${token.tenantSlug}`);
-        } else {
-          console.error(`[AUTH VERIFY] jwt() CRITICAL: User not found in DB for email=${anchorEmail}`);
-        }
+      const dbUser = await prisma.user.findUnique({
+        where: { email: anchorEmail as string },
+        select: {
+          id: true,
+          role: true,
+          tenantId: true,
+          tenant: { select: { slug: true } },
+        },
+      });
+
+      console.log(`${TRACE} │  DB query by email="${anchorEmail}"`);
+
+      if (!dbUser) {
+        console.error(`${TRACE} └─ ❌ DB MISS: No user found for email=${anchorEmail}. Returning stale token.`);
+        console.log(`${TRACE}    FINAL TOKEN: role=${token.role} tenantId=${token.tenantId} tenantSlug=${token.tenantSlug}`);
+        return token;
       }
+
+      console.log(`${TRACE} │  DB result:`);
+      console.log(`${TRACE} │    dbUser.id        = ${dbUser.id}`);
+      console.log(`${TRACE} │    dbUser.role      = ${dbUser.role}`);
+      console.log(`${TRACE} │    dbUser.tenantId  = ${dbUser.tenantId ?? "null"}`);
+      console.log(`${TRACE} │    dbUser.tenant.slug= ${dbUser.tenant?.slug ?? "null"}`);
+
+      // 3. Hydrate token with guaranteed DB values
+      token.id = dbUser.id;
+      token.role = dbUser.role;
+      token.tenantId = dbUser.tenantId ?? undefined;
+      token.tenantSlug = dbUser.tenant?.slug ?? null;
+
+      console.log(`${TRACE} └─ FINAL TOKEN (after hydration):`);
+      console.log(`${TRACE}    token.id        = ${token.id}`);
+      console.log(`${TRACE}    token.role      = ${token.role}`);
+      console.log(`${TRACE}    token.tenantId  = ${token.tenantId ?? "undefined"}`);
+      console.log(`${TRACE}    token.tenantSlug= ${token.tenantSlug ?? "null"}`);
 
       return token;
     },
 
     async session({ session, token }) {
+      // ── FORENSIC INSTRUMENTATION ──────────────────────────────────────────
+      const TRACE = `[FORENSIC:session][${Date.now()}]`;
+
+      console.log(`${TRACE} ┌─ ENTRY (incoming token)`);
+      console.log(`${TRACE} │  token.sub        = ${token.sub ?? "undefined"}`);
+      console.log(`${TRACE} │  token.id         = ${token.id ?? "undefined"}`);
+      console.log(`${TRACE} │  token.role       = ${token.role ?? "undefined"}`);
+      console.log(`${TRACE} │  token.tenantId   = ${token.tenantId ?? "undefined"}`);
+      console.log(`${TRACE} │  token.tenantSlug = ${token.tenantSlug ?? "undefined"}`);
+      console.log(`${TRACE} │  token.email      = ${token.email ?? "undefined"}`);
+
       // 4. Ensure complete, unconditional hydration of the client session
       if (token && session.user) {
         session.user.id = token.id as string;
@@ -146,9 +185,14 @@ export const authOptions: NextAuthOptions = {
         session.user.tenantId = token.tenantId as string | undefined;
         session.user.tenantSlug = token.tenantSlug as string | null | undefined;
       }
-      
-      console.log(`[AUTH VERIFY] session() Out: id=${session.user?.id} email=${session.user?.email} role=${session.user?.role} tenantId=${session.user?.tenantId} tenantSlug=${session.user?.tenantSlug}`);
-      
+
+      console.log(`${TRACE} └─ OUTGOING session.user:`);
+      console.log(`${TRACE}    session.user.id        = ${session.user?.id ?? "undefined"}`);
+      console.log(`${TRACE}    session.user.email     = ${session.user?.email ?? "undefined"}`);
+      console.log(`${TRACE}    session.user.role      = ${session.user?.role ?? "undefined"}`);
+      console.log(`${TRACE}    session.user.tenantId  = ${session.user?.tenantId ?? "undefined"}`);
+      console.log(`${TRACE}    session.user.tenantSlug= ${session.user?.tenantSlug ?? "undefined"}`);
+
       return session;
     },
   },
