@@ -33,7 +33,7 @@ export async function GET(req: NextRequest) {
       // Domain not registered, not verified, or tenant inactive — serve a 404
       const url = req.nextUrl.clone();
       url.pathname = "/not-found";
-      return NextResponse.rewrite(url);
+      return NextResponse.redirect(url);
     }
 
     const { slug } = settings.tenant;
@@ -45,7 +45,7 @@ export async function GET(req: NextRequest) {
     url.searchParams.delete("domain");
     url.searchParams.delete("path");
 
-    return NextResponse.rewrite(url);
+    return NextResponse.redirect(url);
   } catch (err) {
     console.error("[GET /api/gym/resolve]", err);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });

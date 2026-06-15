@@ -10,8 +10,8 @@ export default async function NutritionPage({
 }) {
   const { slug } = await params;
   const session = await getAuthSession();
-  if (!session?.user?.id) redirect(`/api/auth/signin`);
 
+  if (!session?.user) return null;
   const memberProfile = await prisma.memberProfile.findUnique({
     where: { userId: session.user.id },
     include: {
@@ -26,6 +26,7 @@ export default async function NutritionPage({
       },
     },
   });
+  if (!memberProfile) return null;
 
   // Today's totals
   const todayLogs = memberProfile?.foodLogs ?? [];

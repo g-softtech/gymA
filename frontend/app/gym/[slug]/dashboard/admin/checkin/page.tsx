@@ -10,6 +10,7 @@ export default async function AdminCheckInPage({
   const { slug } = await params;
   const session = await getAuthSession();
 
+  if (!session?.user) return null;
   if (!session?.user?.id || !["ADMIN", "SUPERADMIN"].includes(session.user.role)) {
     redirect(`/api/auth/signin?callbackUrl=/gym/${slug}/dashboard/admin/checkin`);
   }

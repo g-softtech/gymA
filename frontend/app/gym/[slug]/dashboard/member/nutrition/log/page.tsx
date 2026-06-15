@@ -13,8 +13,8 @@ export default async function FoodLogPage({
   const { slug } = await params;
   const { date: dateParam } = await searchParams;
   const session = await getAuthSession();
-  if (!session?.user?.id) redirect(`/api/auth/signin`);
 
+  if (!session?.user) return null;
   const selectedDate = dateParam ? new Date(dateParam) : new Date();
   selectedDate.setHours(0, 0, 0, 0);
   const endOfDay = new Date(selectedDate);
@@ -29,6 +29,7 @@ export default async function FoodLogPage({
       },
     },
   });
+  if (!memberProfile) return null;
 
   if (!memberProfile) {
     await prisma.memberProfile.create({

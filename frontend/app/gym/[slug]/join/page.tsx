@@ -11,10 +11,9 @@ export default async function GymJoinPage({
   const { slug } = await params;
   const session = await getAuthSession();
 
-  if (!session?.user) {
-    redirect(`/api/auth/signin?callbackUrl=/gym/${slug}/join`);
-  }
 
+
+  if (!session?.user) return null;
   const tenant = await prisma.tenant.findUnique({
     where: { slug },
     include: { settings: true },
@@ -24,10 +23,7 @@ export default async function GymJoinPage({
 
   // If they already have a tenantId for THIS gym, redirect them to their dashboard
   if (session.user.tenantId === tenant.id) {
-    const role = session.user.role;
-    if (role === "ADMIN" || role === "SUPERADMIN") redirect(`/gym/${slug}/dashboard/admin`);
-    if (role === "TRAINER") redirect(`/gym/${slug}/dashboard/trainer`);
-    redirect(`/gym/${slug}/dashboard/member`);
+    redirect(`/dashboard`);
   }
 
   // If they belong to ANOTHER gym, they cannot join this one with the same account.

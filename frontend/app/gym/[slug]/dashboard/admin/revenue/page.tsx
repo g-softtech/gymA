@@ -12,12 +12,14 @@ export default async function RevenuePage({
   const { slug } = await params;
   const session = await getAuthSession();
 
-  if (!session?.user) redirect(`/api/auth/signin`);
+
+  if (!session?.user) return null;
   if (session.user.role !== "ADMIN" && session.user.role !== "SUPERADMIN") {
     return <p className="p-6 text-red-600">Access Denied.</p>;
   }
 
   const tenant = await prisma.tenant.findUnique({ where: { slug } });
+  if (!tenant) return null;
   if (!tenant) return <p>Gym not found.</p>;
 
   const subscriptions = await prisma.subscription.findMany({

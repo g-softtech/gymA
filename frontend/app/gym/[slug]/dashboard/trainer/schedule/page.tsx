@@ -11,8 +11,8 @@ export default async function TrainerSchedulePage({
   const { slug } = await params;
   const session = await getAuthSession();
 
-  if (!session?.user) redirect(`/api/auth/signin`);
 
+  if (!session?.user) return null;
   const trainerProfile = await prisma.trainerProfile.findUnique({
     where: { userId: session.user.id },
     include: {
@@ -28,8 +28,8 @@ export default async function TrainerSchedulePage({
       },
     },
   });
+  if (!trainerProfile) return null;
 
-  if (!trainerProfile) redirect(`/gym/${slug}/dashboard/trainer`);
 
   return (
     <div className="max-w-5xl mx-auto space-y-6">

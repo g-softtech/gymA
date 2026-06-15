@@ -10,14 +10,15 @@ export default async function AIWorkoutPage({
 }) {
   const { slug } = await params;
   const session = await getAuthSession();
-  if (!session?.user?.id) redirect(`/api/auth/signin`);
 
+  if (!session?.user) return null;
   const memberProfile = await prisma.memberProfile.findUnique({
     where: { userId: session.user.id },
     include: {
       progressRecords: { orderBy: { recordedAt: "desc" }, take: 1 },
     },
   });
+  if (!memberProfile) return null;
 
   return (
     <div className="max-w-3xl mx-auto space-y-6">

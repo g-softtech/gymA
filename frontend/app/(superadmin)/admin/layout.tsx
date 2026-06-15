@@ -1,6 +1,7 @@
 import { ReactNode } from "react";
 import { getAuthSession } from "@/lib/auth";
 import { redirect } from "next/navigation";
+import { getUserAccessContext } from "@/lib/access-control";
 import Link from "next/link";
 
 export default async function SuperAdminLayout({
@@ -10,12 +11,11 @@ export default async function SuperAdminLayout({
 }) {
   const session = await getAuthSession();
 
-  if (!session?.user) {
-    redirect("/api/auth/signin?callbackUrl=/admin");
-  }
+  if (!session?.user) return null;
+  const ctx = getUserAccessContext(session);
 
-  if (session.user.role !== "SUPERADMIN") {
-    redirect("/dashboard");
+  if (ctx.role !== "SUPERADMIN") {
+    redirect(ctx.defaultRedirect);
   }
 
   const navItems = [
@@ -62,13 +62,13 @@ export default async function SuperAdminLayout({
         <div className="px-4 py-4 border-t border-white/5">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-full bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center text-xs font-bold uppercase">
-              {session.user.name?.[0] ?? session.user.email?.[0] ?? "?"}
+              {session?.user?.name?.[0] ?? session?.user?.email?.[0] ?? "?"}
             </div>
             <div className="min-w-0">
               <p className="text-xs font-semibold text-white truncate">
-                {session.user.name ?? "Superadmin"}
+                {session?.user?.name ?? "Superadmin"}
               </p>
-              <p className="text-[10px] text-slate-500 truncate">{session.user.email}</p>
+              <p className="text-[10px] text-slate-500 truncate">{session?.user?.email}</p>
             </div>
           </div>
           <a

@@ -8,8 +8,8 @@ export default async function SuperAdminUsersPage({
   searchParams: Promise<{ tenantId?: string; role?: string }>;
 }) {
   const session = await getAuthSession();
-  if (session?.user?.role !== "SUPERADMIN") redirect("/api/auth/signin");
 
+  if (!session?.user) return null;
   const { tenantId: filterTenantId, role: filterRole } = await searchParams;
 
   const [users, tenants] = await Promise.all([

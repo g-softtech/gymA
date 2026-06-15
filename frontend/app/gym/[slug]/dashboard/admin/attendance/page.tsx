@@ -19,7 +19,8 @@ export default async function AttendancePage({
   const { slug } = await params;
   const session = await getAuthSession();
 
-  if (!session?.user) redirect(`/api/auth/signin`);
+
+  if (!session?.user) return null;
   if (session.user.role !== "ADMIN" && session.user.role !== "SUPERADMIN") {
     return <p className="p-6 text-red-600">Access Denied.</p>;
   }
@@ -33,6 +34,7 @@ export default async function AttendancePage({
       },
     },
   });
+  if (!tenant) return null;
 
   if (!tenant) return <p>Gym not found.</p>;
 

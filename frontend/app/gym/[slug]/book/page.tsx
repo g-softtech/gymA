@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { redirect } from "next/navigation";
+import { redirect, notFound } from "next/navigation";
 import PublicBookingClient from "@/components/gym/PublicBookingClient";
 
 export const metadata = {
@@ -18,9 +18,7 @@ export default async function GymBookingPage({
     include: { settings: true },
   });
 
-  if (!tenant || !tenant.isActive) {
-    redirect("/404");
-  }
+  if (!tenant) notFound();
 
   // Fetch upcoming classes (from now until +14 days)
   const now = new Date();

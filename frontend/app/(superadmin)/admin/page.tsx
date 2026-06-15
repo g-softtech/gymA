@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { getAuthSession } from "@/lib/auth";
 import { redirect } from "next/navigation";
+import { getUserAccessContext } from "@/lib/access-control";
 import { SAAS_PLANS } from "@/lib/billing";
 import { TenantPlan } from "@prisma/client";
 
@@ -72,7 +73,9 @@ async function getPlatformStats() {
 
 export default async function SuperAdminOverviewPage() {
   const session = await getAuthSession();
-  if (session?.user?.role !== "SUPERADMIN") redirect("/api/auth/signin");
+  if (!session?.user) return null;
+  const ctx = getUserAccessContext(session);
+  if (ctx.role !== "SUPERADMIN") redirect(ctx.defaultRedirect);
 
   const stats = await getPlatformStats();
 

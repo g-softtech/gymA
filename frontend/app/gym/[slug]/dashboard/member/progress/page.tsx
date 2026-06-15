@@ -11,8 +11,8 @@ export default async function MemberProgressPage({
   const { slug } = await params;
   const session = await getAuthSession();
 
-  if (!session?.user?.id) redirect(`/api/auth/signin`);
 
+  if (!session?.user) return null;
   const memberProfile = await prisma.memberProfile.findUnique({
     where: { userId: session.user.id },
     include: {
@@ -21,6 +21,7 @@ export default async function MemberProgressPage({
       },
     },
   });
+  if (!memberProfile) return null;
 
   const records = memberProfile?.progressRecords ?? [];
 

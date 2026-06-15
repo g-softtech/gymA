@@ -19,8 +19,8 @@ export default async function TrainerProgressPage({
   const { memberId } = await searchParams;
   const session = await getAuthSession();
 
-  if (!session?.user) redirect(`/api/auth/signin`);
 
+  if (!session?.user) return null;
   const trainerProfile = await prisma.trainerProfile.findUnique({
     where: { userId: session.user.id },
     include: {
@@ -32,8 +32,8 @@ export default async function TrainerProgressPage({
       },
     },
   });
+  if (!trainerProfile) return null;
 
-  if (!trainerProfile) redirect(`/gym/${slug}/dashboard/trainer`);
 
   // Deduplicate clients
   const clientMap = new Map<string, { id: string; name: string }>();

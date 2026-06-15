@@ -20,7 +20,8 @@ export default async function AdminMembersPage({
   const { slug } = await params;
   const session = await getAuthSession();
 
-  if (!session?.user) redirect(`/api/auth/signin?callbackUrl=/gym/${slug}/dashboard/admin/members`);
+
+  if (!session?.user) return null;
   if (session.user.role !== "ADMIN" && session.user.role !== "SUPERADMIN") {
     return (
       <div className="flex min-h-screen items-center justify-center">
@@ -49,6 +50,7 @@ export default async function AdminMembersPage({
       },
     },
   });
+  if (!tenant) return null;
 
   if (!tenant) return <p>Gym not found.</p>;
 

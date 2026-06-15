@@ -16,8 +16,8 @@ export default async function TrainerDashboardPage({
   const { slug } = await params;
   const session = await getAuthSession();
 
-  if (!session?.user) redirect(`/api/auth/signin`);
 
+  if (!session?.user) return null;
   let trainerProfile = await prisma.trainerProfile.findUnique({
     where: { userId: session.user.id },
     include: {

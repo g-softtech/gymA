@@ -13,10 +13,9 @@ export default async function CheckoutPage({
   const { slug, planId } = await params;
   const session = await getAuthSession();
 
-  if (!session?.user) {
-    redirect(`/api/auth/signin?callbackUrl=/gym/${slug}/checkout/${planId}`);
-  }
 
+
+  if (!session?.user) return null;
   const plan = await prisma.membershipPlan.findUnique({
     where: { id: planId },
     include: { tenant: true },

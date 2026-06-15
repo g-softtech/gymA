@@ -3,6 +3,7 @@ import { ReactNode } from "react";
 import { prisma } from "@/lib/prisma";
 import { notFound, redirect } from "next/navigation";
 import { getAuthSession } from "@/lib/auth";
+import { getUserAccessContext } from "@/lib/access-control";
 import Link from "next/link";
 import AdminLockoutGuard from "@/components/admin/AdminLockoutGuard";
 import { MobileNav } from "@/components/MobileNav";
@@ -16,9 +17,15 @@ export default async function DashboardLayout({
 }) {
   const { slug } = await params;
   const session = await getAuthSession();
+  if (!session?.user) return null;
+  const ctx = getUserAccessContext(session);
 
-  if (!session?.user) {
-    redirect(`/api/auth/signin?callbackUrl=/gym/${slug}/dashboard/member`);
+  // Use pure centralized logic to verify identity and tenant alignment
+  if (!ctx.hasTenant || ctx.tenantSlug !== slug) {
+    // SUPERADMIN is exempt from cross-tenant isolation
+    if (ctx.role !== "SUPERADMIN") {
+      redirect(ctx.defaultRedirect);
+    }
   }
 
   // ✅ Phase 5: Fetch TenantSettings alongside the tenant for branding
@@ -27,22 +34,6 @@ export default async function DashboardLayout({
     include: { settings: true },
   });
   if (!tenant) notFound();
-
-  // ✅ Phase 3: No silent auto-assign. New users must explicitly confirm joining a gym.
-  if (!session.user.tenantId) {
-    redirect(`/gym/${slug}/join`);
-  }
-
-  if (session.user.tenantId !== tenant.id) {
-    return (
-      <div className="flex min-h-screen items-center justify-center p-6 text-center">
-        <div>
-          <h2 className="text-2xl font-bold text-red-600">Access Denied</h2>
-          <p className="mt-2 text-gray-600">You do not have access to {tenant.name}.</p>
-        </div>
-      </div>
-    );
-  }
 
   const role = session.user.role;
   const isAdmin = role === "ADMIN" || role === "SUPERADMIN";

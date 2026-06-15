@@ -19,10 +19,10 @@ export default async function TrainerMessagesPage({
   const { userId: selectedUserId } = await searchParams;
   const session = await getAuthSession();
 
-  if (!session?.user) redirect(`/api/auth/signin`);
 
+  if (!session?.user) return null;
   const tenant = await prisma.tenant.findUnique({ where: { slug } });
-  if (!tenant) redirect(`/gym/${slug}/dashboard/trainer`);
+  if (!tenant) return null;
 
   const trainerProfile = await prisma.trainerProfile.findUnique({
     where: { userId: session.user.id },
@@ -37,8 +37,8 @@ export default async function TrainerMessagesPage({
       },
     },
   });
+  if (!trainerProfile) return null;
 
-  if (!trainerProfile) redirect(`/gym/${slug}/dashboard/trainer`);
 
   const contactMap = new Map<string, { userId: string; name: string; email: string }>();
   trainerProfile.bookings.forEach((b: BookingWithMember) => {

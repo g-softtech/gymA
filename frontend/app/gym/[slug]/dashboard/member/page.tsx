@@ -15,17 +15,12 @@ export default async function MemberDashboardPage({
   const { welcome } = await searchParams;
   const session = await getAuthSession();
 
-  if (!session?.user?.id) {
-    redirect(`/api/auth/signin?callbackUrl=/gym/${slug}/dashboard/member`);
-  }
 
-  if (session.user.role === "ADMIN" || session.user.role === "SUPERADMIN") {
-    redirect(`/gym/${slug}/dashboard/admin`);
-  }
-  if (session.user.role === "TRAINER") {
-    redirect(`/gym/${slug}/dashboard/trainer`);
-  }
 
+
+
+
+  if (!session?.user) return null;
   const memberProfile = await prisma.memberProfile.findUnique({
     where: { userId: session.user.id },
     include: {
@@ -58,6 +53,7 @@ export default async function MemberDashboardPage({
       },
     },
   });
+  if (!memberProfile) return null;
 
   const activeSub = memberProfile?.subscriptions[0];
   const daysLeft = activeSub

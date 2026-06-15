@@ -15,10 +15,9 @@ export default async function MemberBookingsPage({
   const { slug } = await params;
   const session = await getAuthSession();
 
-  if (!session?.user?.id) {
-    redirect(`/api/auth/signin?callbackUrl=/gym/${slug}/dashboard/member/bookings`);
-  }
 
+
+  if (!session?.user) return null;
   const profile = await prisma.memberProfile.findUnique({
     where: { userId: session.user.id }
   });

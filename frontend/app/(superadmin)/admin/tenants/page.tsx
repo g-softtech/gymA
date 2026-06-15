@@ -5,8 +5,8 @@ import Link from "next/link";
 
 export default async function SuperAdminTenantsPage() {
   const session = await getAuthSession();
-  if (session?.user?.role !== "SUPERADMIN") redirect("/api/auth/signin");
 
+  if (!session?.user) return null;
   const tenants = await prisma.tenant.findMany({
     include: {
       settings: {

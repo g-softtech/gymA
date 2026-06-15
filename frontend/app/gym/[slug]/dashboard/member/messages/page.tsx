@@ -14,10 +14,10 @@ export default async function MemberMessagesPage({
   const { userId: selectedUserId } = await searchParams;
   const session = await getAuthSession();
 
-  if (!session?.user?.id) redirect(`/api/auth/signin`);
 
+  if (!session?.user) return null;
   const tenant = await prisma.tenant.findUnique({ where: { slug } });
-  if (!tenant) redirect(`/gym/${slug}/dashboard/member`);
+  if (!tenant) return null;
 
   const memberProfile = await prisma.memberProfile.findUnique({
     where: { userId: session.user.id },
@@ -30,6 +30,7 @@ export default async function MemberMessagesPage({
       },
     },
   });
+  if (!memberProfile) return null;
 
   const contactMap = new Map<string, { userId: string; name: string; email: string }>();
   memberProfile?.bookings.forEach((b) => {

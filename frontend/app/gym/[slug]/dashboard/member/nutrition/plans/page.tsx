@@ -10,16 +10,16 @@ export default async function MealPlansPage({
 }) {
   const { slug } = await params;
   const session = await getAuthSession();
-  if (!session?.user?.id) redirect(`/api/auth/signin`);
 
+  if (!session?.user) return null;
   const memberProfile = await prisma.memberProfile.findUnique({
     where: { userId: session.user.id },
     include: {
       mealPlans: { orderBy: { createdAt: "desc" } },
     },
   });
+  if (!memberProfile) return null;
 
-  if (!memberProfile) redirect(`/gym/${slug}/dashboard/member/nutrition`);
 
   return (
     <div className="max-w-5xl mx-auto space-y-6">

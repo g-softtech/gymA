@@ -11,14 +11,14 @@ export default async function MemberProfilePage({
   const { slug } = await params;
   const session = await getAuthSession();
 
-  if (!session?.user?.id) redirect(`/api/auth/signin`);
 
+  if (!session?.user) return null;
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },
     include: { memberProfile: true },
   });
+  if (!user) return null;
 
-  if (!user) redirect(`/gym/${slug}/dashboard/member`);
 
   // Auto-create profile if missing
   if (!user.memberProfile) {

@@ -11,6 +11,7 @@ export default async function BrandingPage({ params }: { params: Promise<{ slug:
   const { slug } = await params;
   const session = await getAuthSession();
 
+  if (!session?.user) return null;
   if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "SUPERADMIN")) {
     redirect(`/gym/${slug}/dashboard`);
   }
@@ -18,10 +19,9 @@ export default async function BrandingPage({ params }: { params: Promise<{ slug:
   const tenant = await prisma.tenant.findUnique({
     where: { slug },
   });
+  if (!tenant) return null;
 
-  if (!tenant) {
-    redirect("/dashboard");
-  }
+
 
   const settings = await prisma.tenantSettings.findUnique({
     where: { tenantId: tenant.id },

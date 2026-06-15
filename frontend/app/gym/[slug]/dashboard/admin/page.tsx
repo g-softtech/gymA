@@ -20,7 +20,8 @@ export default async function AdminDashboardPage({
   const { slug } = await params;
   const session = await getAuthSession();
 
-  if (!session?.user) redirect(`/api/auth/signin?callbackUrl=/gym/${slug}/dashboard/admin`);
+
+  if (!session?.user) return null;
   // if (session.user.role !== "ADMIN" && session.user.role !== "SUPERADMIN") {
   //   return (
   //     <div className="flex min-h-screen items-center justify-center">
@@ -28,12 +29,8 @@ export default async function AdminDashboardPage({
   //     </div>
   //   );
   // }
-  if (session.user.role === "TRAINER") {
-    redirect(`/gym/${slug}/dashboard/trainer`);
-  }
-  if (session.user.role !== "ADMIN" && session.user.role !== "SUPERADMIN") {
-    redirect(`/gym/${slug}/dashboard/member`);
-  }
+
+
 
   const tenant = await prisma.tenant.findUnique({
     where: { slug },
@@ -52,6 +49,7 @@ export default async function AdminDashboardPage({
       },
     },
   });
+  if (!tenant) return null;
 
   if (!tenant) return <p>Gym not found.</p>;
 

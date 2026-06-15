@@ -11,10 +11,10 @@ export default async function MemberNotificationsPage({
   const { slug } = await params;
   const session = await getAuthSession();
 
-  if (!session?.user?.id) redirect(`/api/auth/signin`);
 
+  if (!session?.user) return null;
   const tenant = await prisma.tenant.findUnique({ where: { slug } });
-  if (!tenant) redirect(`/gym/${slug}/dashboard/member`);
+  if (!tenant) return null;
 
   const notifications = await prisma.notification.findMany({
     where: {

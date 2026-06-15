@@ -35,30 +35,49 @@ export const authOptions: NextAuthOptions = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) return null;
+        if (!credentials?.email || !credentials?.password) {
+          console.log("[AUTH TRACE] Missing email or password in credentials");
+          return null;
+        }
 
         const email = credentials.email.toLowerCase().trim();
         const user = await prisma.user.findUnique({
           where: { email },
         });
 
-        console.log(`[AUTH VERIFY] authorize(): email=${email} provider=credentials dbFound=${!!user}`);
+        console.log("[AUTH TRACE] User Found", {
+          id: user?.id,
+          email: user?.email,
+          hasPassword: !!user?.password,
+        });
 
         if (!user) {
+          console.log("[AUTH TRACE] Rejecting: User not found in DB");
           throw new Error("Invalid email or password.");
         }
 
         if (!user.password) {
-          // User exists but signed up via Google — no password set
+          console.log("[AUTH TRACE] Rejecting: Account has no password (Google-only)");
           throw new Error("This account uses Google Sign-In. Please use the Google button.");
         }
 
-        const passwordMatch = await bcrypt.compare(credentials.password, user.password);
-        if (!passwordMatch) {
+        console.log("[AUTH TRACE] Password Compare Starting");
+        const passwordValid = await bcrypt.compare(
+          credentials.password,
+          user.password
+        );
+        console.log("[AUTH TRACE] Password Compare Result", passwordValid);
+
+        if (!passwordValid) {
+          console.log("[AUTH TRACE] Rejecting: Password mismatch");
           throw new Error("Invalid email or password.");
         }
 
-        console.log(`[AUTH VERIFY] authorize() Success: id=${user.id} role=${user.role} tenantId=${user.tenantId}`);
+        console.log("[AUTH TRACE] Returning User", {
+          id: user.id,
+          role: user.role,
+          tenantId: user.tenantId
+        });
 
         return {
           id: user.id,
@@ -93,7 +112,12 @@ export const authOptions: NextAuthOptions = {
       if (anchorEmail) {
         const dbUser = await prisma.user.findUnique({
           where: { email: anchorEmail as string },
-          select: { id: true, role: true, tenantId: true },
+          select: { 
+            id: true, 
+            role: true, 
+            tenantId: true,
+            tenant: { select: { slug: true } }
+          },
         });
         
         if (dbUser) {
@@ -102,7 +126,10 @@ export const authOptions: NextAuthOptions = {
           token.role = dbUser.role;
           token.tenantId = dbUser.tenantId ?? undefined;
           
-          console.log(`[AUTH VERIFY] jwt() Hydrated from DB: id=${token.id} role=${token.role} tenantId=${token.tenantId}`);
+          // CRITICAL: Ensure tenantSlug is populated explicitly (null if absent)
+          token.tenantSlug = dbUser.tenant?.slug ?? null;
+          
+          console.log(`[AUTH VERIFY] jwt() Hydrated from DB: id=${token.id} role=${token.role} tenantId=${token.tenantId} tenantSlug=${token.tenantSlug}`);
         } else {
           console.error(`[AUTH VERIFY] jwt() CRITICAL: User not found in DB for email=${anchorEmail}`);
         }
@@ -117,9 +144,10 @@ export const authOptions: NextAuthOptions = {
         session.user.id = token.id as string;
         session.user.role = token.role as string;
         session.user.tenantId = token.tenantId as string | undefined;
+        session.user.tenantSlug = token.tenantSlug as string | null | undefined;
       }
       
-      console.log(`[AUTH VERIFY] session() Out: id=${session.user?.id} email=${session.user?.email} role=${session.user?.role} tenantId=${session.user?.tenantId}`);
+      console.log(`[AUTH VERIFY] session() Out: id=${session.user?.id} email=${session.user?.email} role=${session.user?.role} tenantId=${session.user?.tenantId} tenantSlug=${session.user?.tenantSlug}`);
       
       return session;
     },

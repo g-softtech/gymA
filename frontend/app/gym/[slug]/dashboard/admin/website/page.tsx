@@ -11,6 +11,7 @@ export default async function WebsiteHubPage({
   const { slug } = await params;
   const session = await getAuthSession();
 
+  if (!session?.user) return null;
   if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "SUPERADMIN")) {
     redirect(`/gym/${slug}/dashboard/admin`);
   }

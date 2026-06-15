@@ -2,27 +2,15 @@ import { ReactNode } from "react";
 import { redirect } from "next/navigation";
 import { getAuthSession } from "@/lib/auth";
 
-import { prisma } from "@/lib/prisma";
+import { getUserAccessContext } from "@/lib/access-control";
 
 export default async function OnboardingLayout({ children }: { children: ReactNode }) {
   const session = await getAuthSession();
+  const ctx = getUserAccessContext(session);
 
-  if (session?.user) {
-    // Super Admin -> Start Free Trial -> Redirect to /admin
-    if (session.user.role === "SUPERADMIN") {
-      redirect("/admin");
-    }
-
-    // Logged-in user with existing gym -> Redirect directly to their gym dashboard
-    if (session.user.tenantId) {
-      const tenant = await prisma.tenant.findUnique({
-        where: { id: session.user.tenantId }
-      });
-      
-      if (tenant) {
-        redirect("/dashboard"); // Global router handles role-based routing
-      }
-    }
+  // If user already has a tenant or is SUPERADMIN, they don't belong in onboarding.
+  if (ctx.hasTenant || ctx.role === "SUPERADMIN") {
+    redirect(ctx.defaultRedirect);
   }
 
   return (

@@ -10,10 +10,10 @@ export default async function LeaderboardPage({
 }) {
   const { slug } = await params;
   const session = await getAuthSession();
-  if (!session?.user?.id) redirect(`/api/auth/signin`);
 
+  if (!session?.user) return null;
   const tenant = await prisma.tenant.findUnique({ where: { slug } });
-  if (!tenant) redirect(`/gym/${slug}/dashboard/member/community`);
+  if (!tenant) return null;
 
   // Attendance leaderboard
   const attendanceRaw = await prisma.attendance.groupBy({
