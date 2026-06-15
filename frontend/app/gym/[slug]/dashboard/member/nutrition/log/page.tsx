@@ -14,14 +14,14 @@ export default async function FoodLogPage({
   const { date: dateParam } = await searchParams;
   const session = await getAuthSession();
 
-  if (!session?.user) return null;
+
   const selectedDate = dateParam ? new Date(dateParam) : new Date();
   selectedDate.setHours(0, 0, 0, 0);
   const endOfDay = new Date(selectedDate);
   endOfDay.setHours(23, 59, 59, 999);
 
   const memberProfile = await prisma.memberProfile.findUnique({
-    where: { userId: session.user.id },
+    where: { userId: session!.user.id },
     include: {
       foodLogs: {
         where: { date: { gte: selectedDate, lte: endOfDay } },
@@ -33,7 +33,7 @@ export default async function FoodLogPage({
 
   if (!memberProfile) {
     await prisma.memberProfile.create({
-      data: { userId: session.user.id, fitnessGoals: [] },
+      data: { userId: session!.user.id, fitnessGoals: [] },
     });
     redirect(`/gym/${slug}/dashboard/member/nutrition/log`);
   }

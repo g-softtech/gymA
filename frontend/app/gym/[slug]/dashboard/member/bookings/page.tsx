@@ -17,9 +17,9 @@ export default async function MemberBookingsPage({
 
 
 
-  if (!session?.user) return null;
+
   const profile = await prisma.memberProfile.findUnique({
-    where: { userId: session.user.id }
+    where: { userId: session!.user.id }
   });
 
   if (!profile) {

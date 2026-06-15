@@ -17,9 +17,9 @@ export default async function TrainerDashboardPage({
   const session = await getAuthSession();
 
 
-  if (!session?.user) return null;
+
   let trainerProfile = await prisma.trainerProfile.findUnique({
-    where: { userId: session.user.id },
+    where: { userId: session!.user.id },
     include: {
       bookings: {
         include: {
@@ -36,7 +36,7 @@ export default async function TrainerDashboardPage({
   // Auto-create trainer profile if missing
   if (!trainerProfile) {
     await prisma.trainerProfile.create({
-      data: { userId: session.user.id, specialties: [], availability: {} },
+      data: { userId: session!.user.id, specialties: [], availability: {} },
     });
     redirect(`/gym/${slug}/dashboard/trainer`);
   }
@@ -58,7 +58,7 @@ export default async function TrainerDashboardPage({
       <div>
         <h1 className="text-2xl font-bold text-gray-900">Trainer Dashboard</h1>
         <p className="text-gray-500 mt-1">
-          Welcome back, {session.user.name ?? session.user.email}
+          Welcome back, {session!.user.name ?? session!.user.email}
         </p>
       </div>
 

@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { getAuthSession } from "@/lib/auth";
-import { redirect, notFound } from "next/navigation";
+import { notFound } from "next/navigation";
 import BlogEditor from "@/components/admin/BlogEditor";
 
 export default async function EditBlogPostPage({
@@ -11,10 +11,7 @@ export default async function EditBlogPostPage({
   const { slug, postId } = await params;
   const session = await getAuthSession();
 
-  if (!session?.user) return null;
-  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "SUPERADMIN")) {
-    redirect(`/gym/${slug}/dashboard/admin`);
-  }
+
 
   const post = await prisma.blogPost.findUnique({
     where: { id: postId },

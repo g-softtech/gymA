@@ -1,6 +1,5 @@
 import { prisma } from "@/lib/prisma";
 import { getAuthSession } from "@/lib/auth";
-import { redirect } from "next/navigation";
 import Link from "next/link";
 
 export default async function WebsiteHubPage({
@@ -10,12 +9,6 @@ export default async function WebsiteHubPage({
 }) {
   const { slug } = await params;
   const session = await getAuthSession();
-
-  if (!session?.user) return null;
-  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "SUPERADMIN")) {
-    redirect(`/gym/${slug}/dashboard/admin`);
-  }
-
   const settings = await prisma.tenantSettings.findFirst({
     where: { tenant: { slug } },
     select: {

@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { getAuthSession } from "@/lib/auth";
-import { redirect } from "next/navigation";
+
 import BrandingManagerClient from "./BrandingManagerClient";
 
 export const metadata = {
@@ -11,24 +11,18 @@ export default async function BrandingPage({ params }: { params: Promise<{ slug:
   const { slug } = await params;
   const session = await getAuthSession();
 
-  if (!session?.user) return null;
-  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "SUPERADMIN")) {
-    redirect(`/gym/${slug}/dashboard`);
-  }
+
 
   const tenant = await prisma.tenant.findUnique({
     where: { slug },
   });
-  if (!tenant) return null;
-
-
 
   const settings = await prisma.tenantSettings.findUnique({
-    where: { tenantId: tenant.id },
+    where: { tenantId: tenant!.id },
   });
 
   const brandingData = {
-    brandName: settings?.brandName || tenant.name,
+    brandName: settings?.brandName || tenant!.name,
     logoUrl: settings?.logoUrl || "",
     primaryColor: settings?.primaryColor || "#6366F1",
     secondaryColor: settings?.secondaryColor || "#8B5CF6",
