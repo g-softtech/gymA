@@ -34,7 +34,7 @@ export default async function AdminMembersPage({
     where: { slug },
     include: {
       users: {
-        where: { role: "MEMBER" },
+        where: { role: { notIn: ["SUPERADMIN"] } },
         include: {
           memberProfile: {
             include: {
@@ -95,7 +95,11 @@ export default async function AdminMembersPage({
                           <div className="w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-xs font-bold uppercase">
                             {user.name?.[0] ?? user.email?.[0] ?? "?"}
                           </div>
-                          <span className="font-medium text-gray-900">{user.name ?? "—"}</span>
+                          <div>
+                            <span className="font-medium text-gray-900">{user.name ?? "—"}</span>
+                            {user.role === "TRAINER" && <span className="ml-2 px-2 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-700 uppercase">Trainer</span>}
+                            {user.role === "ADMIN" && <span className="ml-2 px-2 py-0.5 rounded text-[10px] font-bold bg-purple-100 text-purple-700 uppercase">Admin</span>}
+                          </div>
                         </div>
                       </td>
                       <td className="px-6 py-4 text-gray-500">{user.email ?? "—"}</td>

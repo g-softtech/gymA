@@ -44,7 +44,7 @@ export default async function AdminDashboardPage({
             },
           },
         },
-        where: { role: "MEMBER" },
+        where: { role: { notIn: ["SUPERADMIN"] } },
         orderBy: { name: "asc" },
       },
     },
@@ -129,7 +129,11 @@ export default async function AdminDashboardPage({
                   const isExpired = sub && new Date(sub.endDate) < new Date();
                   return (
                     <tr key={user.id} className="hover:bg-gray-50 transition-colors">
-                      <td className="px-6 py-4 font-medium text-gray-900">{user.name ?? "—"}</td>
+                      <td className="px-6 py-4 font-medium text-gray-900">
+                        {user.name ?? "—"}
+                        {user.role === "TRAINER" && <span className="ml-2 px-2 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-700 uppercase">Trainer</span>}
+                        {user.role === "ADMIN" && <span className="ml-2 px-2 py-0.5 rounded text-[10px] font-bold bg-purple-100 text-purple-700 uppercase">Admin</span>}
+                      </td>
                       <td className="px-6 py-4 text-gray-500">{user.email ?? "—"}</td>
                       <td className="px-6 py-4 text-gray-700">
                         {sub?.plan?.name ?? <span className="text-gray-400 italic">No plan</span>}
