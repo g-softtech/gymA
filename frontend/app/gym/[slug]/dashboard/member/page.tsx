@@ -21,8 +21,10 @@ export default async function MemberDashboardPage({
 
 
   if (!session?.user) return null;
-  const memberProfile = await prisma.memberProfile.findUnique({
+  const memberProfile = await prisma.memberProfile.upsert({
     where: { userId: session.user.id },
+    create: { userId: session.user.id, fitnessGoals: [] },
+    update: {},
     include: {
       subscriptions: {
         where: { status: "ACTIVE" },
