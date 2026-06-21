@@ -95,6 +95,15 @@ export function MobileNav({ slug, role, allLinks, primaryColor }: MobileNavProps
                 </Link>
               ))}
             </div>
+            <div className="mt-4 pt-4 border-t border-gray-100">
+              <a
+                href={`/api/auth/signout?callbackUrl=/gym/${slug}`}
+                className="flex items-center gap-4 px-4 py-3 rounded-xl hover:bg-red-50 text-red-600 transition"
+              >
+                <span className="text-2xl">🚪</span>
+                <span className="font-semibold">Sign out</span>
+              </a>
+            </div>
           </div>
         </div>
       )}
