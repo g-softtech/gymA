@@ -16,6 +16,25 @@ export default function HeroEditorPage() {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [uploadingImage, setUploadingImage] = useState(false);
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files?.[0]) return;
+    setUploadingImage(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", e.target.files[0]);
+      const res = await fetch("/api/upload", { method: "POST", body: formData });
+      const data = await res.json();
+      if (res.ok && data.url) {
+        setHero((h) => ({ ...h, bgImageUrl: data.url }));
+      } else {
+        alert("Image upload failed");
+      }
+    } finally {
+      setUploadingImage(false);
+    }
+  };
 
   useEffect(() => {
     fetch("/api/tenant/settings")
@@ -154,10 +173,38 @@ export default function HeroEditorPage() {
 
         <section className="bg-white border border-gray-100 rounded-xl p-6 shadow-sm space-y-4">
           <h2 className="font-semibold text-gray-800 text-sm uppercase tracking-wider">Background</h2>
-          {field("bgImageUrl", "Background Image URL", {
-            placeholder: "https://images.unsplash.com/...",
-            hint: "Leave blank to use a gradient background from your brand colors.",
-          })}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Background Image
+            </label>
+            <p className="text-xs text-gray-400 mb-3">
+              Upload an image to use as the hero background. Leave blank to use a gradient background from your brand colors.
+            </p>
+            <div className="flex items-center gap-4">
+              <label className="relative cursor-pointer bg-white px-4 py-2 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50">
+                <span>{uploadingImage ? "Uploading..." : "Upload Image"}</span>
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="sr-only"
+                  onChange={handleImageUpload}
+                  disabled={uploadingImage}
+                />
+              </label>
+              {hero.bgImageUrl && !uploadingImage && (
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-emerald-600 font-medium">✓ Uploaded</span>
+                  <button
+                    type="button"
+                    onClick={() => setHero((h) => ({ ...h, bgImageUrl: undefined }))}
+                    className="text-xs text-red-500 hover:text-red-700 hover:underline"
+                  >
+                    Remove
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
           {hero.bgImageUrl && (
             <div>
               <label htmlFor="field-overlayOpacity" className="block text-sm font-medium text-gray-700 mb-1">
