@@ -7,6 +7,7 @@ import { getUserAccessContext } from "@/lib/access-control";
 import Link from "next/link";
 import AdminLockoutGuard from "@/components/admin/AdminLockoutGuard";
 import { MobileNav } from "@/components/MobileNav";
+import { SidebarNav } from "@/components/SidebarNav";
 
 export default async function DashboardLayout({
   children,
@@ -96,43 +97,43 @@ export default async function DashboardLayout({
   const isActive = daysRemaining >= -3; // Includes 3-day grace period
   const isGrace = daysRemaining < 0 && daysRemaining >= -3;
 
-  const navLinks = isAdmin
-    ? [
-        { href: `/gym/${slug}/dashboard/admin`, label: "Overview", icon: "📊" },
-        { href: `/gym/${slug}/dashboard/admin/members`, label: "Members", icon: "👥" },
-        { href: `/gym/${slug}/dashboard/admin/plans`, label: "Plans", icon: "📋" },
-        { href: `/gym/${slug}/dashboard/admin/trainers`, label: "Trainers", icon: "🏋️" },
-        { href: `/gym/${slug}/dashboard/admin/attendance`, label: "Attendance", icon: "✅" },
-        { href: `/gym/${slug}/dashboard/admin/revenue`, label: "Revenue", icon: "💰" },
-        { href: `/gym/${slug}/dashboard/admin/ai-usage`, label: "AI Usage", icon: "🤖" },
-        { href: `/gym/${slug}/dashboard/admin/blog`, label: "Blog", icon: "📝" },
-        { href: `/gym/${slug}/dashboard/admin/notifications`, label: `Notifications${unreadCount > 0 ? ` (${unreadCount})` : ""}`, icon: "🔔" },
-        { href: `/gym/${slug}/dashboard/admin/website`, label: "Website", icon: "🌐" },
-        { href: `/gym/${slug}/dashboard/admin/billing`, label: "Billing", icon: "💳" },
-      ]
-    : isTrainer
-    ? [
-        { href: `/gym/${slug}/dashboard/trainer`, label: "Overview", icon: "📊" },
-        { href: `/gym/${slug}/dashboard/trainer/clients`, label: "My Clients", icon: "👥" },
-        { href: `/gym/${slug}/dashboard/trainer/workouts`, label: "Workout Plans", icon: "💪" },
-        { href: `/gym/${slug}/dashboard/trainer/schedule`, label: "My Schedule", icon: "📅" },
-        { href: `/gym/${slug}/dashboard/trainer/bookings`, label: "Bookings", icon: "📋" },
-        { href: `/gym/${slug}/dashboard/trainer/progress`, label: "Progress", icon: "📊" },
-        { href: `/gym/${slug}/dashboard/trainer/messages`, label: "Messages", icon: "💬" },
-      ]
-    : [
-        { href: `/gym/${slug}/dashboard/member`, label: "Dashboard", icon: "🏠" },
-        { href: `/gym/${slug}/dashboard/member/profile`, label: "My Profile", icon: "👤" },
-        { href: `/gym/${slug}/dashboard/member/workouts`, label: "Workouts", icon: "💪" },
-        { href: `/gym/${slug}/dashboard/member/nutrition`, label: "Nutrition", icon: "🥗" },
-        { href: `/gym/${slug}/dashboard/member/community`, label: "Community", icon: "🏅" },
-        { href: `/gym/${slug}/dashboard/member/ai`, label: "AI Coach", icon: "🤖" },
-        { href: `/gym/${slug}/dashboard/member/bookings`, label: "Book Trainer", icon: "📅" },
-        { href: `/gym/${slug}/dashboard/member/progress`, label: "My Progress", icon: "📊" },
-        { href: `/gym/${slug}/dashboard/member/attendance`, label: "Attendance", icon: "✅" },
-        { href: `/gym/${slug}/dashboard/member/notifications`, label: "Notifications", icon: "🔔" },
-        { href: `/gym/${slug}/dashboard/member/messages`, label: "Messages", icon: "💬" },
-      ];
+  const adminLinks = [
+    { href: `/gym/${slug}/dashboard/admin`, label: "Overview", icon: "📊" },
+    { href: `/gym/${slug}/dashboard/admin/members`, label: "Members", icon: "👥" },
+    { href: `/gym/${slug}/dashboard/admin/plans`, label: "Plans", icon: "📋" },
+    { href: `/gym/${slug}/dashboard/admin/trainers`, label: "Trainers", icon: "🏋️" },
+    { href: `/gym/${slug}/dashboard/admin/attendance`, label: "Attendance", icon: "✅" },
+    { href: `/gym/${slug}/dashboard/admin/revenue`, label: "Revenue", icon: "💰" },
+    { href: `/gym/${slug}/dashboard/admin/ai-usage`, label: "AI Usage", icon: "🤖" },
+    { href: `/gym/${slug}/dashboard/admin/blog`, label: "Blog", icon: "📝" },
+    { href: `/gym/${slug}/dashboard/admin/notifications`, label: `Notifications${unreadCount > 0 ? ` (${unreadCount})` : ""}`, icon: "🔔" },
+    { href: `/gym/${slug}/dashboard/admin/website`, label: "Website", icon: "🌐" },
+    { href: `/gym/${slug}/dashboard/admin/billing`, label: "Billing", icon: "💳" },
+  ];
+
+  const trainerLinks = [
+    { href: `/gym/${slug}/dashboard/trainer`, label: "Overview", icon: "📊" },
+    { href: `/gym/${slug}/dashboard/trainer/clients`, label: "My Clients", icon: "👥" },
+    { href: `/gym/${slug}/dashboard/trainer/workouts`, label: "Workout Plans", icon: "💪" },
+    { href: `/gym/${slug}/dashboard/trainer/schedule`, label: "My Schedule", icon: "📅" },
+    { href: `/gym/${slug}/dashboard/trainer/bookings`, label: "Bookings", icon: "📋" },
+    { href: `/gym/${slug}/dashboard/trainer/progress`, label: "Progress", icon: "📊" },
+    { href: `/gym/${slug}/dashboard/trainer/messages`, label: "Messages", icon: "💬" },
+  ];
+
+  const memberLinks = [
+    { href: `/gym/${slug}/dashboard/member`, label: "Dashboard", icon: "🏠" },
+    { href: `/gym/${slug}/dashboard/member/profile`, label: "My Profile", icon: "👤" },
+    { href: `/gym/${slug}/dashboard/member/workouts`, label: "Workouts", icon: "💪" },
+    { href: `/gym/${slug}/dashboard/member/nutrition`, label: "Nutrition", icon: "🥗" },
+    { href: `/gym/${slug}/dashboard/member/community`, label: "Community", icon: "🏅" },
+    { href: `/gym/${slug}/dashboard/member/ai`, label: "AI Coach", icon: "🤖" },
+    { href: `/gym/${slug}/dashboard/member/bookings`, label: "Book Trainer", icon: "📅" },
+    { href: `/gym/${slug}/dashboard/member/progress`, label: "My Progress", icon: "📊" },
+    { href: `/gym/${slug}/dashboard/member/attendance`, label: "Attendance", icon: "✅" },
+    { href: `/gym/${slug}/dashboard/member/notifications`, label: "Notifications", icon: "🔔" },
+    { href: `/gym/${slug}/dashboard/member/messages`, label: "Messages", icon: "💬" },
+  ];
 
   return (
     <>
@@ -156,98 +157,25 @@ export default async function DashboardLayout({
         } as React.CSSProperties}
       >
         {/* Sidebar (Tablet/Desktop only) */}
-        <aside
-          className="hidden md:flex w-56 flex-col shrink-0"
-          style={{
-            background: sidebarBg,
-            borderRight: `1px solid ${sidebarBorder}`,
+        <SidebarNav
+          slug={slug}
+          role={role}
+          adminLinks={adminLinks}
+          trainerLinks={trainerLinks}
+          memberLinks={memberLinks}
+          user={session.user}
+          branding={{
+            brandName,
+            logoUrl,
+            primaryColor,
+            secondaryColor,
+            darkMode,
+            sidebarBg,
+            sidebarBorder,
+            textPrimary,
+            textMuted,
           }}
-        >
-          {/* ✅ Phase 5: Logo or text fallback */}
-          <div
-            className="px-5 py-5"
-            style={{ borderBottom: `1px solid ${sidebarBorder}` }}
-          >
-            {logoUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={logoUrl}
-                alt={brandName}
-                className="h-8 w-auto object-contain mb-1"
-              />
-            ) : (
-              <div className="flex items-center gap-2.5 mb-1">
-                <div
-                  className="w-7 h-7 rounded-lg flex items-center justify-center text-white text-xs font-black uppercase shrink-0"
-                  style={{
-                    background: `linear-gradient(135deg, ${primaryColor}, ${secondaryColor})`,
-                  }}
-                >
-                  {brandName[0]}
-                </div>
-                <p
-                  className="font-bold text-sm truncate"
-                  style={{ color: textPrimary }}
-                >
-                  {brandName}
-                </p>
-              </div>
-            )}
-            <p className="text-xs font-semibold mt-0.5" style={{ color: primaryColor }}>
-              {role}
-            </p>
-          </div>
-
-          {/* Navigation */}
-          <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors"
-                style={{ color: textMuted }}
-              >
-                <span className="text-base">{link.icon}</span>
-                {link.label}
-              </Link>
-            ))}
-          </nav>
-
-          {/* User footer */}
-          <div
-            className="px-4 py-4"
-            style={{ borderTop: `1px solid ${sidebarBorder}` }}
-          >
-            <div className="flex items-center gap-2">
-              <div
-                className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold uppercase text-white shrink-0"
-                style={{
-                  background: `linear-gradient(135deg, ${primaryColor}, ${secondaryColor})`,
-                }}
-              >
-                {session.user.name?.[0] ?? session.user.email?.[0] ?? "?"}
-              </div>
-              <div className="min-w-0">
-                <p
-                  className="text-xs font-medium truncate"
-                  style={{ color: textPrimary }}
-                >
-                  {session.user.name ?? "User"}
-                </p>
-                <p className="text-xs truncate" style={{ color: textMuted }}>
-                  {session.user.email}
-                </p>
-              </div>
-            </div>
-            <a
-              href={`/api/auth/signout?callbackUrl=/gym/${slug}`}
-              className="block mt-3 text-xs hover:underline"
-              style={{ color: darkMode ? "#6b7280" : "#ef4444" }}
-            >
-              Sign out
-            </a>
-          </div>
-        </aside>
+        />
 
         <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
           {isAdmin && (
@@ -263,7 +191,14 @@ export default async function DashboardLayout({
       </div>
 
       {/* Mobile Navigation */}
-      <MobileNav slug={slug} role={role as "SUPERADMIN" | "ADMIN" | "TRAINER" | "MEMBER"} allLinks={navLinks} primaryColor={primaryColor} />
+      <MobileNav
+        slug={slug}
+        role={role as "SUPERADMIN" | "ADMIN" | "TRAINER" | "MEMBER"}
+        adminLinks={adminLinks}
+        trainerLinks={trainerLinks}
+        memberLinks={memberLinks}
+        primaryColor={primaryColor}
+      />
     </>
   );
 }

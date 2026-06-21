@@ -4,14 +4,22 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 
+interface NavLink {
+  href: string;
+  label: string;
+  icon: string;
+}
+
 interface MobileNavProps {
   slug: string;
   role: "MEMBER" | "TRAINER" | "ADMIN" | "SUPERADMIN";
-  allLinks: { href: string; label: string; icon: string }[];
+  adminLinks: NavLink[];
+  trainerLinks: NavLink[];
+  memberLinks: NavLink[];
   primaryColor: string;
 }
 
-export function MobileNav({ slug, role, allLinks, primaryColor }: MobileNavProps) {
+export function MobileNav({ slug, role, adminLinks, trainerLinks, memberLinks, primaryColor }: MobileNavProps) {
   const pathname = usePathname();
   const [moreOpen, setMoreOpen] = useState(false);
 
@@ -19,11 +27,38 @@ export function MobileNav({ slug, role, allLinks, primaryColor }: MobileNavProps
   const shouldHide = pathname.includes("/checkin") || pathname.includes("/bookings/new") || pathname.includes("/checkout");
   if (shouldHide) return null;
 
-  const isAdmin = role === "ADMIN" || role === "SUPERADMIN";
+  let activeLinks = memberLinks;
+  let currentContext = "MEMBER";
 
-  // Define bottom bar links based on role
+  if (role === "SUPERADMIN" || role === "ADMIN") {
+    if (pathname.includes("/dashboard/admin")) {
+      activeLinks = adminLinks;
+      currentContext = "ADMIN";
+    } else if (pathname.includes("/dashboard/trainer")) {
+      activeLinks = trainerLinks;
+      currentContext = "TRAINER";
+    } else {
+      activeLinks = memberLinks;
+      currentContext = "MEMBER";
+    }
+  } else if (role === "TRAINER") {
+    if (pathname.includes("/dashboard/member")) {
+      activeLinks = memberLinks;
+      currentContext = "MEMBER";
+    } else {
+      activeLinks = trainerLinks;
+      currentContext = "TRAINER";
+    }
+  } else {
+    activeLinks = memberLinks;
+    currentContext = "MEMBER";
+  }
+
+  const isAdminContext = currentContext === "ADMIN";
+
+  // Define bottom bar links based on context
   let bottomLinks = [];
-  if (isAdmin) {
+  if (isAdminContext) {
     bottomLinks = [
       { href: `/gym/${slug}/dashboard/admin`, label: "Home", icon: "🏠" },
       { href: `/gym/${slug}/dashboard/admin/bookings`, label: "Bookings", icon: "📅" },
@@ -32,13 +67,13 @@ export function MobileNav({ slug, role, allLinks, primaryColor }: MobileNavProps
     ];
   } else {
     // Member or Trainer
-    bottomLinks = allLinks.slice(0, 4).map(l => ({
+    bottomLinks = activeLinks.slice(0, 4).map(l => ({
       ...l,
       label: l.label === "Dashboard" || l.label === "Overview" ? "Home" : l.label
     }));
   }
 
-  const moreLinks = allLinks.filter(l => !bottomLinks.some(bl => bl.href === l.href));
+  const moreLinks = activeLinks.filter(l => !bottomLinks.some(bl => bl.href === l.href));
 
   return (
     <>
@@ -94,6 +129,32 @@ export function MobileNav({ slug, role, allLinks, primaryColor }: MobileNavProps
                   <span className="font-semibold text-gray-900">{link.label}</span>
                 </Link>
               ))}
+
+              {/* DUAL ROLE TOGGLE */}
+              {(role === "TRAINER" || role === "ADMIN" || role === "SUPERADMIN") && (
+                <>
+                  <div className="my-2 border-t border-gray-100" />
+                  {currentContext !== "MEMBER" ? (
+                    <Link
+                      href={`/gym/${slug}/dashboard/member`}
+                      onClick={() => setMoreOpen(false)}
+                      className="flex items-center gap-4 px-4 py-3 rounded-xl bg-indigo-50 text-indigo-700 hover:bg-indigo-100 transition"
+                    >
+                      <span className="text-2xl">👤</span>
+                      <span className="font-semibold">Switch to Member View</span>
+                    </Link>
+                  ) : (
+                    <Link
+                      href={`/gym/${slug}/dashboard/${role === "TRAINER" ? "trainer" : "admin"}`}
+                      onClick={() => setMoreOpen(false)}
+                      className="flex items-center gap-4 px-4 py-3 rounded-xl bg-indigo-50 text-indigo-700 hover:bg-indigo-100 transition"
+                    >
+                      <span className="text-2xl">{role === "TRAINER" ? "🏋️" : "👑"}</span>
+                      <span className="font-semibold">Switch to {role === "TRAINER" ? "Trainer" : "Admin"} View</span>
+                    </Link>
+                  )}
+                </>
+              )}
             </div>
             <div className="mt-4 pt-4 border-t border-gray-100">
               <a
