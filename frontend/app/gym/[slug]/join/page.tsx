@@ -21,8 +21,8 @@ export default async function GymJoinPage({
   console.log(`${TRACE} │  user.tenantSlug  = ${(session?.user as any)?.tenantSlug ?? "undefined"}`);
 
   if (!session?.user) {
-    console.log(`${TRACE} └─ BRANCH: no session → returning null (BLANK PAGE)`);
-    return null;
+    console.log(`${TRACE} └─ BRANCH: no session → redirecting to signin`);
+    redirect(`/api/auth/signin?callbackUrl=/gym/${slug}/join`);
   }
   const tenant = await prisma.tenant.findUnique({
     where: { slug },

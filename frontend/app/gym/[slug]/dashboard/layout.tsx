@@ -37,8 +37,13 @@ export default async function DashboardLayout({
   if (!ctx.hasTenant || ctx.tenantSlug !== slug) {
     // SUPERADMIN is exempt from cross-tenant isolation
     if (ctx.role !== "SUPERADMIN") {
-      console.log(`${TRACE} └─ REDIRECT: hasTenant=${ctx.hasTenant} tenantSlug=${ctx.tenantSlug} url.slug=${slug} role=${ctx.role} → ${ctx.defaultRedirect}`);
-      redirect(ctx.defaultRedirect);
+      if (!ctx.hasTenant) {
+        console.log(`${TRACE} └─ REDIRECT: User has no tenant, redirecting to join page`);
+        redirect(`/gym/${slug}/join`);
+      } else {
+        console.log(`${TRACE} └─ REDIRECT: hasTenant=${ctx.hasTenant} tenantSlug=${ctx.tenantSlug} url.slug=${slug} role=${ctx.role} → ${ctx.defaultRedirect}`);
+        redirect(ctx.defaultRedirect);
+      }
     } else {
       console.log(`${TRACE} │  SUPERADMIN cross-tenant access: allowed into slug=${slug}`);
     }
