@@ -63,10 +63,7 @@ export async function getRetentionRate(tenantId: string) {
         some: {
           status: "ACTIVE",
           startDate: { lt: startOfThisMonth },
-          OR: [
-            { endDate: null },
-            { endDate: { gt: startOfLastMonth } }
-          ]
+          endDate: { gt: startOfLastMonth }
         },
       },
     },
