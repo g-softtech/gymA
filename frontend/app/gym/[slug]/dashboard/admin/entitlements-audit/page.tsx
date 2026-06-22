@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 // Icons replaced with emojis
+import EntitlementAnalyticsClient from "./EntitlementAnalyticsClient";
 
 interface EntitlementAuditData {
   id: string;
@@ -61,6 +62,8 @@ export default function EntitlementsAuditPage() {
           <p className="text-gray-500">Monitor limits, blocked requests, and engine telemetry across plans.</p>
         </div>
       </div>
+
+      <EntitlementAnalyticsClient />
 
       <div className="grid grid-cols-1 gap-6">
         {data.map((plan) => (
