@@ -103,7 +103,7 @@ async function _evaluateEntitlement(member: any, activeSub: any, feature: Entitl
 
       const usage = await prisma.aiLog.count({
         where: {
-          userId: memberId,
+          userId: member.userId,
           createdAt: { gte: startOfMonth },
         },
       });
