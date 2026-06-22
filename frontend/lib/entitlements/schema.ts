@@ -3,6 +3,7 @@ import { EntitlementKeys } from "./registry";
 
 // Strictly typed schema for the JSON column in the database
 export const EntitlementsSchema = z.object({
+  version: z.number().int().default(1),
   [EntitlementKeys.MAX_CLASSES_PER_MONTH]: z.number().int().default(-1),
   [EntitlementKeys.MAX_TRAINER_SESSIONS]: z.number().int().default(0),
   [EntitlementKeys.AI_ACCESS]: z.boolean().default(false),
