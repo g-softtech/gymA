@@ -230,6 +230,7 @@ model MembershipPlan {
   featured      Boolean        @default(false)
   description   String?
   features      String[]
+  entitlements  Json           @default("{}")
   subscriptions Subscription[]
 }
 

@@ -6,10 +6,11 @@ import {
   requireAdmin,
   noTenantContext,
 } from "@/lib/tenant";
+import { EntitlementsSchema, defaultEntitlements } from "@/lib/entitlements/schema";
 
 /**
  * POST /api/plans — create a membership plan
- * Now accepts: name, price, durationDays, description, features[], featured
+ * Now accepts: name, price, durationDays, description, features[], featured, entitlements
  */
 export async function POST(req: NextRequest) {
   try {
@@ -20,7 +21,7 @@ export async function POST(req: NextRequest) {
     if (roleErr) return roleErr;
     if (!ctx?.tenantId) return noTenantContext();
 
-    const { name, price, durationDays, description, features, featured } =
+    const { name, price, durationDays, description, features, featured, entitlements } =
       await req.json();
 
     if (!name || price === undefined || !durationDays) {
@@ -28,6 +29,15 @@ export async function POST(req: NextRequest) {
         { error: "name, price, and durationDays are required." },
         { status: 400 }
       );
+    }
+
+    // Validate entitlements JSON, fallback to defaults if parsing fails
+    let validatedEntitlements = defaultEntitlements;
+    if (entitlements) {
+      const parsed = EntitlementsSchema.safeParse(entitlements);
+      if (parsed.success) {
+        validatedEntitlements = parsed.data;
+      }
     }
 
     const plan = await prisma.membershipPlan.create({
@@ -39,6 +49,7 @@ export async function POST(req: NextRequest) {
         description: description?.trim() ?? null,
         features: Array.isArray(features) ? features.filter(Boolean) : [],
         featured: Boolean(featured),
+        entitlements: validatedEntitlements,
       },
     });
 

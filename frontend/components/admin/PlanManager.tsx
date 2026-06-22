@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import type { MembershipPlan } from "@prisma/client";
+import { EntitlementKeys, ENTITLEMENTS_REGISTRY } from "@/lib/entitlements/registry";
+import { defaultEntitlements, type Entitlements } from "@/lib/entitlements/schema";
 
 interface PlanManagerProps {
   tenantId: string;
@@ -15,7 +17,12 @@ export default function PlanManager({ tenantId, slug, initialPlans }: PlanManage
   const [plans, setPlans] = useState<MembershipPlan[]>(initialPlans);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [form, setForm] = useState({ name: "", price: "", durationDays: "" });
+  const [form, setForm] = useState({ 
+    name: "", 
+    price: "", 
+    durationDays: "",
+    entitlements: { ...defaultEntitlements } as Entitlements,
+  });
 
   const handleCreate = async () => {
     setError("");
@@ -33,6 +40,7 @@ export default function PlanManager({ tenantId, slug, initialPlans }: PlanManage
           name: form.name,
           price: parseFloat(form.price),
           durationDays: parseInt(form.durationDays),
+          entitlements: form.entitlements,
         }),
       });
       if (!res.ok) {
@@ -41,7 +49,12 @@ export default function PlanManager({ tenantId, slug, initialPlans }: PlanManage
       } else {
         const newPlan = await res.json();
         setPlans((prev) => [...prev, newPlan]);
-        setForm({ name: "", price: "", durationDays: "" });
+        setForm({ 
+          name: "", 
+          price: "", 
+          durationDays: "",
+          entitlements: { ...defaultEntitlements } as Entitlements,
+        });
         router.refresh();
       }
     } catch {
@@ -101,6 +114,56 @@ export default function PlanManager({ tenantId, slug, initialPlans }: PlanManage
               onChange={(e) => setForm({ ...form, durationDays: e.target.value })}
               className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
+          </div>
+        </div>
+
+        <div className="mb-6">
+          <h3 className="text-sm font-semibold text-gray-900 mb-3">Plan Features & Limits</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-gray-50 p-4 rounded-lg border border-gray-100">
+            {Object.entries(ENTITLEMENTS_REGISTRY).map(([key, config]) => {
+              const typedKey = key as keyof Entitlements;
+              return (
+                <div key={key} className="flex flex-col">
+                  <label className="block text-xs font-medium text-gray-700 mb-1">
+                    {config.label}
+                  </label>
+                  {config.type === "boolean" ? (
+                    <select
+                      value={form.entitlements[typedKey] ? "true" : "false"}
+                      onChange={(e) =>
+                        setForm({
+                          ...form,
+                          entitlements: {
+                            ...form.entitlements,
+                            [key]: e.target.value === "true",
+                          },
+                        })
+                      }
+                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    >
+                      <option value="false">No</option>
+                      <option value="true">Yes</option>
+                    </select>
+                  ) : (
+                    <input
+                      type="number"
+                      value={form.entitlements[typedKey] as number}
+                      onChange={(e) =>
+                        setForm({
+                          ...form,
+                          entitlements: {
+                            ...form.entitlements,
+                            [key]: parseInt(e.target.value),
+                          },
+                        })
+                      }
+                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    />
+                  )}
+                  <p className="text-[10px] text-gray-400 mt-1">{config.description}</p>
+                </div>
+              );
+            })}
           </div>
         </div>
         <button

@@ -5,6 +5,7 @@ import { getTenantContextFromSession, noTenantContext } from "@/lib/tenant";
 import { checkAiRateLimit } from "@/lib/ratelimit";
 import { generateJSON, GEMINI_MODEL } from "@/lib/gemini";
 import { checkAiQuota } from "@/lib/enforcement";
+import { checkEntitlement } from "@/lib/entitlements/check-entitlement";
 
 export async function POST(req: NextRequest) {
   try {
@@ -26,6 +27,12 @@ export async function POST(req: NextRequest) {
     if (!quota.allowed) {
       return NextResponse.json({ error: quota.reason }, { status: 403 });
     }
+
+    const entAccess = await checkEntitlement(session.user.id, "AI_ACCESS");
+    if (!entAccess.allowed) return NextResponse.json({ error: entAccess.reason }, { status: 403 });
+
+    const entLimit = await checkEntitlement(session.user.id, "MAX_AI_REQUESTS");
+    if (!entLimit.allowed) return NextResponse.json({ error: entLimit.reason }, { status: 403 });
 
     const { memberId, weightKg, heightCm, goal, activityLevel, allergies, preferences } =
       await req.json();

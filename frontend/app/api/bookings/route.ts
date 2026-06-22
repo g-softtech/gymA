@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthSession } from "@/lib/auth";
+import { checkEntitlement } from "@/lib/entitlements/check-entitlement";
 
 // GET /api/bookings
 export async function GET(req: Request) {
@@ -85,6 +86,16 @@ export async function POST(req: Request) {
 
     if (!activeSub) {
       return NextResponse.json({ error: "Active membership required to book" }, { status: 403 });
+    }
+
+    if (classSessionId) {
+      const ent = await checkEntitlement(session.user.id, "MAX_CLASSES_PER_MONTH");
+      if (!ent.allowed) return NextResponse.json({ error: ent.reason }, { status: 403 });
+    }
+    
+    if (trainerId) {
+      const ent = await checkEntitlement(session.user.id, "MAX_TRAINER_SESSIONS");
+      if (!ent.allowed) return NextResponse.json({ error: ent.reason }, { status: 403 });
     }
 
     const MAX_RETRIES = 3;
