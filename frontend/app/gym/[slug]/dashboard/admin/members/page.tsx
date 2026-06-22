@@ -3,6 +3,8 @@ import { prisma } from "@/lib/prisma";
 import { getAuthSession } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import type { User, MemberProfile, Subscription, MembershipPlan } from "@prisma/client";
+import MembershipAnalyticsClient from "./MembershipAnalyticsClient";
+import UpgradeIntelligenceClient from "./UpgradeIntelligenceClient";
 
 type UserWithProfile = User & {
   memberProfile:
@@ -62,6 +64,9 @@ export default async function AdminMembersPage({
         <h1 className="text-2xl font-bold text-gray-900">Members</h1>
         <p className="text-gray-500 mt-1">{members.length} registered member{members.length !== 1 ? "s" : ""}</p>
       </div>
+
+      <MembershipAnalyticsClient />
+      <UpgradeIntelligenceClient />
 
       <div className="bg-white rounded-xl shadow-sm border border-gray-100">
         <div className="overflow-x-auto">

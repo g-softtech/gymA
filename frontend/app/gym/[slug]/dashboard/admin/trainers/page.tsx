@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { getAuthSession } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import TrainerManager from "@/components/admin/TrainerManager";
+import TrainerAnalyticsClient from "./TrainerAnalyticsClient";
 
 export default async function AdminTrainersPage({
   params,
@@ -44,6 +45,7 @@ export default async function AdminTrainersPage({
           {tenant.users.length} trainer{tenant.users.length !== 1 ? "s" : ""} at {tenant.name}
         </p>
       </div>
+      <TrainerAnalyticsClient />
       <TrainerManager
         tenantId={tenant.id}
         trainers={tenant.users.map((u) => ({
