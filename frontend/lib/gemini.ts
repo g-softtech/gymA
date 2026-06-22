@@ -126,8 +126,14 @@ export async function generateJSON<T = unknown>(
     .replace(/\s*```\s*$/i, "")
     .trim();
 
-  const data = JSON.parse(clean) as T;
-  return { data, inputTokens, outputTokens };
+  try {
+    const data = JSON.parse(clean) as T;
+    return { data, inputTokens, outputTokens };
+  } catch (error) {
+    console.error("[generateJSON] JSON.parse failed. Raw text:", text);
+    console.error("[generateJSON] Cleaned text:", clean);
+    throw error;
+  }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
