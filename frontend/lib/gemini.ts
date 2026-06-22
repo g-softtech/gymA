@@ -76,7 +76,7 @@ export interface GeminiResult {
 
 export async function generateText(
   prompt: string,
-  options?: { systemInstruction?: string; maxOutputTokens?: number }
+  options?: { systemInstruction?: string; maxOutputTokens?: number; responseMimeType?: string }
 ): Promise<GeminiResult> {
   const model = genAI.getGenerativeModel({
     model: GEMINI_MODEL,
@@ -86,6 +86,7 @@ export async function generateText(
       topP: 0.95,
       topK: 40,
       maxOutputTokens: options?.maxOutputTokens ?? 2048,
+      ...(options?.responseMimeType ? { responseMimeType: options.responseMimeType } : {}),
     },
     ...(options?.systemInstruction
       ? { systemInstruction: options.systemInstruction }
@@ -114,7 +115,10 @@ export async function generateJSON<T = unknown>(
   prompt: string,
   options?: { systemInstruction?: string; maxOutputTokens?: number }
 ): Promise<{ data: T; inputTokens: number | null; outputTokens: number | null }> {
-  const { text, inputTokens, outputTokens } = await generateText(prompt, options);
+  const { text, inputTokens, outputTokens } = await generateText(prompt, {
+    ...options,
+    responseMimeType: "application/json",
+  });
 
   // Strip markdown code fences if Gemini wraps output in ```json ... ```
   const clean = text
