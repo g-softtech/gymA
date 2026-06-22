@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
-import { ShieldAlert, Users, TrendingUp, AlertTriangle, ShieldCheck, Activity } from "lucide-react";
+// Icons replaced with emojis
 
 interface EntitlementAuditData {
   id: string;
@@ -54,7 +54,7 @@ export default function EntitlementsAuditPage() {
     <div className="space-y-6">
       <div className="flex items-center space-x-3 mb-8">
         <div className="p-3 bg-indigo-100 rounded-lg">
-          <ShieldAlert className="w-6 h-6 text-indigo-700" />
+          <span className="text-2xl">🛡️</span>
         </div>
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Entitlements Audit</h1>
@@ -75,7 +75,7 @@ export default function EntitlementsAuditPage() {
             <div className="grid grid-cols-1 lg:grid-cols-3 divide-y lg:divide-y-0 lg:divide-x border-b border-gray-200">
               <div className="p-6">
                 <div className="flex items-center text-sm font-medium text-gray-500 mb-4">
-                  <Activity className="w-4 h-4 mr-2" />
+                  <span className="mr-2">📊</span>
                   Usage This Month
                 </div>
                 <div className="text-3xl font-bold text-gray-900">{plan.usageThisMonth}</div>
@@ -84,7 +84,7 @@ export default function EntitlementsAuditPage() {
 
               <div className="p-6">
                 <div className="flex items-center text-sm font-medium text-gray-500 mb-4">
-                  <AlertTriangle className="w-4 h-4 mr-2 text-amber-500" />
+                  <span className="mr-2">⚠️</span>
                   Members at Limit
                 </div>
                 <div className="text-3xl font-bold text-gray-900">{plan.membersAtLimit}</div>
@@ -93,7 +93,7 @@ export default function EntitlementsAuditPage() {
 
               <div className="p-6">
                 <div className="flex items-center text-sm font-medium text-gray-500 mb-4">
-                  <ShieldAlert className="w-4 h-4 mr-2 text-rose-500" />
+                  <span className="mr-2">🚨</span>
                   Blocked Requests
                 </div>
                 <div className="text-3xl font-bold text-gray-900">{plan.blockedRequests}</div>
@@ -136,7 +136,7 @@ export default function EntitlementsAuditPage() {
                   </div>
                 ) : (
                   <div className="flex flex-col justify-center items-center h-full text-gray-400 py-8">
-                    <ShieldCheck className="w-8 h-8 mb-2 opacity-50" />
+                    <span className="text-3xl mb-2 opacity-50">✅</span>
                     <span className="text-sm">No telemetry recorded yet</span>
                   </div>
                 )}
@@ -146,7 +146,7 @@ export default function EntitlementsAuditPage() {
         ))}
         {data.length === 0 && (
           <div className="text-center py-12 bg-white rounded-xl shadow-sm border border-gray-200">
-            <Users className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+            <span className="text-5xl mx-auto mb-4 opacity-50 block">👥</span>
             <h3 className="text-lg font-medium text-gray-900">No Plans Found</h3>
             <p className="text-gray-500 mt-2">Create membership plans to see entitlement telemetry.</p>
           </div>

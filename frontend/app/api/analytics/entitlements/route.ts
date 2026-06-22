@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthSession } from "@/lib/auth";
-import { getTenantContextFromSession } from "@/lib/tenant/context";
+import { getTenantContextFromSession } from "@/lib/tenant";
 import { getEntitlementAnalytics } from "@/lib/analytics/entitlement-analytics";
 
 export async function GET(req: NextRequest) {

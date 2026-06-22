@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
-import { TrendingUp, Users, AlertOctagon, LayoutDashboard } from "lucide-react";
+// Icons replaced with emojis
 
 interface PlanPerformanceData {
   planId: string;
@@ -45,7 +45,7 @@ export default function PlanPerformancePage() {
     <div className="space-y-6">
       <div className="flex items-center space-x-3 mb-8">
         <div className="p-3 bg-indigo-100 rounded-lg">
-          <LayoutDashboard className="w-6 h-6 text-indigo-700" />
+          <span className="text-2xl">📋</span>
         </div>
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Plan Performance Dashboard</h1>
@@ -63,19 +63,19 @@ export default function PlanPerformancePage() {
                 </th>
                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   <div className="flex items-center">
-                    <Users className="w-4 h-4 mr-1" />
+                    <span className="mr-1">👥</span>
                     Active Members
                   </div>
                 </th>
                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   <div className="flex items-center">
-                    <TrendingUp className="w-4 h-4 mr-1" />
+                    <span className="mr-1">📈</span>
                     MRR (Revenue)
                   </div>
                 </th>
                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   <div className="flex items-center">
-                    <AlertOctagon className="w-4 h-4 mr-1 text-rose-500" />
+                    <span className="mr-1">🚨</span>
                     Blocked Requests
                   </div>
                 </th>
