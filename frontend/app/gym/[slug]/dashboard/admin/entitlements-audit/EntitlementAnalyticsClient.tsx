@@ -73,7 +73,7 @@ export default function EntitlementAnalyticsClient() {
               <XAxis type="number" tickFormatter={(val) => `${val}%`} domain={[0, 100]} tick={{ fontSize: 11, fill: "#9ca3af" }} axisLine={false} tickLine={false} />
               <YAxis dataKey="feature" type="category" tick={{ fontSize: 10, fill: "#6b7280" }} axisLine={false} tickLine={false} width={100} />
               <Tooltip
-                formatter={(val: number, name: string) => [
+                formatter={(val: any, name: any) => [
                   name === "adoptionPercent" ? `${val}%` : val,
                   name === "adoptionPercent" ? "Adoption" : "Distinct Users",
                 ]}

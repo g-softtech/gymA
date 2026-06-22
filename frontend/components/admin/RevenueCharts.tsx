@@ -44,7 +44,7 @@ export default function RevenueCharts({ monthlyData, planData }: Props) {
               <XAxis dataKey="month" tick={{ fontSize: 11, fill: "#9ca3af" }} axisLine={false} tickLine={false} />
               <YAxis tickFormatter={formatNaira} tick={{ fontSize: 11, fill: "#9ca3af" }} axisLine={false} tickLine={false} width={55} />
               <Tooltip
-                formatter={(val: number) => [`₦${Number(val).toLocaleString()}`, "Revenue"]}
+                formatter={(val: any) => [`₦${Number(val).toLocaleString()}`, "Revenue"]}
                 contentStyle={{ borderRadius: "12px", border: "1px solid #e5e7eb", fontSize: "12px" }}
               />
               <Area
@@ -73,7 +73,7 @@ export default function RevenueCharts({ monthlyData, planData }: Props) {
                 <XAxis dataKey="name" tick={{ fontSize: 11, fill: "#9ca3af" }} axisLine={false} tickLine={false} />
                 <YAxis tickFormatter={formatNaira} tick={{ fontSize: 11, fill: "#9ca3af" }} axisLine={false} tickLine={false} width={55} />
                 <Tooltip
-                  formatter={(val: number, name: string) => [
+                  formatter={(val: any, name: any) => [
                     name === "revenue" ? `₦${Number(val).toLocaleString()}` : val,
                     name === "revenue" ? "Revenue" : "Subscribers",
                   ]}

@@ -85,7 +85,7 @@ export default function TrainerAnalyticsClient() {
                 tickLine={false}
               />
               <Tooltip
-                formatter={(val: number, name: string) => [
+                formatter={(val: any, name: any) => [
                   val,
                   name === "totalSessions" ? "Sessions" : "Active Clients",
                 ]}
