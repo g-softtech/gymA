@@ -17,8 +17,10 @@ export async function getNewMembers(tenantId: string, startDate?: Date) {
 
   return prisma.memberProfile.count({
     where: {
-      user: { tenantId },
-      createdAt: { gte: startOfMonth },
+      user: {
+        tenantId,
+        createdAt: { gte: startOfMonth },
+      },
     },
   });
 }
