@@ -21,6 +21,8 @@ export default function PlanManager({ tenantId, slug, initialPlans }: PlanManage
     name: "", 
     price: "", 
     durationDays: "",
+    description: "",
+    features: "",
     entitlements: { ...defaultEntitlements } as Entitlements,
   });
 
@@ -40,6 +42,8 @@ export default function PlanManager({ tenantId, slug, initialPlans }: PlanManage
           name: form.name,
           price: parseFloat(form.price),
           durationDays: parseInt(form.durationDays),
+          description: form.description,
+          features: form.features.split(",").map(f => f.trim()).filter(Boolean),
           entitlements: form.entitlements,
         }),
       });
@@ -53,6 +57,8 @@ export default function PlanManager({ tenantId, slug, initialPlans }: PlanManage
           name: "", 
           price: "", 
           durationDays: "",
+          description: "",
+          features: "",
           entitlements: { ...defaultEntitlements } as Entitlements,
         });
         router.refresh();
@@ -114,6 +120,30 @@ export default function PlanManager({ tenantId, slug, initialPlans }: PlanManage
               onChange={(e) => setForm({ ...form, durationDays: e.target.value })}
               className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+          <div>
+            <label className="block text-xs font-medium text-gray-600 mb-1">Description (Optional)</label>
+            <input
+              type="text"
+              placeholder="e.g. Best for beginners"
+              value={form.description}
+              onChange={(e) => setForm({ ...form, description: e.target.value })}
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-gray-600 mb-1">Marketing Features (Comma separated)</label>
+            <input
+              type="text"
+              placeholder="e.g. 24/7 Access, Free Towel"
+              value={form.features}
+              onChange={(e) => setForm({ ...form, features: e.target.value })}
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
+            <p className="text-[10px] text-gray-400 mt-1">These show up on the plan card alongside your limits.</p>
           </div>
         </div>
 

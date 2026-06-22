@@ -1,9 +1,9 @@
-
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { notFound, redirect } from "next/navigation";
 import { getAuthSession } from "@/lib/auth";
 import CheckoutButton from "@/components/CheckoutButton";
+import { getEntitlementFeatures } from "@/lib/entitlements/registry";
 
 export default async function CheckoutPage({
   params,
@@ -12,8 +12,6 @@ export default async function CheckoutPage({
 }) {
   const { slug, planId } = await params;
   const session = await getAuthSession();
-
-
 
   if (!session?.user) return null;
   const plan = await prisma.membershipPlan.findUnique({
@@ -45,6 +43,30 @@ export default async function CheckoutPage({
             ₦{Number(plan.price).toLocaleString()}
           </p>
         </div>
+
+        {(() => {
+          const customFeatures = plan.features as string[];
+          const entitlementFeatures = getEntitlementFeatures(plan.entitlements as any);
+          const combinedFeatures = [...customFeatures, ...entitlementFeatures];
+          
+          if (combinedFeatures.length > 0) {
+            return (
+              <div className="mb-6">
+                <h3 className="text-sm font-semibold text-gray-900 mb-3">Included in this plan:</h3>
+                <ul className="space-y-2">
+                  {combinedFeatures.map((feat, i) => (
+                    <li key={i} className="flex items-center gap-2 text-sm text-gray-600">
+                      <span className="text-indigo-600">✓</span>
+                      {feat}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            );
+          }
+          return null;
+        })()}
+
         <p className="text-sm text-gray-500 mb-4">
           Paying as:{" "}
           <span className="font-medium text-gray-700">{session.user.email}</span>

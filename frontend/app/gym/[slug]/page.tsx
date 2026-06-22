@@ -4,6 +4,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { TenantThemeProvider } from "@/components/TenantThemeProvider";
 import ContactForm from "@/components/ContactForm";
+import { getEntitlementFeatures } from "@/lib/entitlements/registry";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types mirroring TenantSettings JSON blobs
@@ -543,16 +544,24 @@ export default async function GymPublicPage({
                         {plan.durationDays} day{plan.durationDays > 1 ? "s" : ""} access
                       </p>
 
-                      {(plan.features as string[]).length > 0 && (
-                        <ul className="space-y-2 mb-8 flex-1">
-                          {(plan.features as string[]).map((feat, i) => (
-                            <li key={i} className="flex items-center gap-2 text-sm text-gray-600">
-                              <span style={{ color: primary }}>✓</span>
-                              {feat}
-                            </li>
-                          ))}
-                        </ul>
-                      )}
+                      {(() => {
+                        const customFeatures = plan.features as string[];
+                        const entitlementFeatures = getEntitlementFeatures(plan.entitlements as any);
+                        const combinedFeatures = [...customFeatures, ...entitlementFeatures];
+                        
+                        if (combinedFeatures.length === 0) return null;
+                        
+                        return (
+                          <ul className="space-y-2 mb-8 flex-1">
+                            {combinedFeatures.map((feat, i) => (
+                              <li key={i} className="flex items-center gap-2 text-sm text-gray-600">
+                                <span style={{ color: primary }}>✓</span>
+                                {feat}
+                              </li>
+                            ))}
+                          </ul>
+                        );
+                      })()}
 
                       <Link
                         href={`/gym/${slug}/checkout/${plan.id}`}
