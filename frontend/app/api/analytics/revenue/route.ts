@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthSession } from "@/lib/auth";
 import { getTenantContextFromSession } from "@/lib/tenant/context";
-import { getTrainerAnalytics } from "@/lib/analytics/trainer-analytics";
+import { getMRR, getRevenueByPlan, getChurnRate, getAverageRevenuePerMember, getRevenueTrend } from "@/lib/analytics/revenue-analytics";
 
 export async function GET(req: NextRequest) {
   try {
@@ -10,12 +10,21 @@ export async function GET(req: NextRequest) {
 
     const tenantContext = await getTenantContextFromSession(session);
     if (!tenantContext) return NextResponse.json({ error: "Tenant not found" }, { status: 404 });
+    const tenantId = tenantContext.tenantId;
 
-    const data = await getTrainerAnalytics(tenantContext.tenantId);
+    const [mrr, revenueByPlan, churnRate, arpu, trend] = await Promise.all([
+      getMRR(tenantId),
+      getRevenueByPlan(tenantId),
+      getChurnRate(tenantId),
+      getAverageRevenuePerMember(tenantId),
+      getRevenueTrend(tenantId),
+    ]);
 
-    return NextResponse.json({ data });
+    return NextResponse.json({
+      data: { mrr, revenueByPlan, churnRate, arpu, trend }
+    });
   } catch (error) {
-    console.error("[Trainer Analytics API] Error:", error);
+    console.error("[Revenue Analytics API] Error:", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }

@@ -119,6 +119,7 @@ model Tenant {
   classSessions   ClassSession[]
   transactions    Transaction[]
   attendances     Attendance[]
+  entitlementLogs EntitlementLog[]
   attendanceEvents AttendanceEvent[]
 }
 
@@ -143,6 +144,7 @@ model User {
   comments         Comment[]        @relation("UserComments")
   challengeEntries ChallengeEntry[] @relation("UserChallenges")
   badges           Badge[]          @relation("UserBadges")
+  entitlementLogs  EntitlementLog[]
 }
 
 model Account {
@@ -201,8 +203,8 @@ model MemberProfile {
 
 model TrainerProfile {
   id            String        @id @default(cuid())
-  userId        String        @unique
-  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId            String           @unique
+  user              User             @relation(fields: [userId], references: [id], onDelete: Cascade)
   specialties   String[]
   availability  Json
   bio           String?
@@ -232,6 +234,7 @@ model MembershipPlan {
   features      String[]
   entitlements  Json           @default("{}")
   subscriptions Subscription[]
+  entitlementLogs EntitlementLog[]
 }
 
 model Subscription {
@@ -429,7 +432,7 @@ model MealPlan {
 model FoodLog {
   id        String        @id @default(cuid())
   memberId  String
-  member    MemberProfile @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  member        MemberProfile @relation(fields: [memberId], references: [id], onDelete: Cascade)
   // ✅ Phase 2: tenant isolation — non-nullable after Migration B backfill
   tenantId  String
   date      DateTime      @default(now())
@@ -506,7 +509,7 @@ model ChallengeEntry {
   challengeId String
   challenge   Challenge @relation(fields: [challengeId], references: [id], onDelete: Cascade)
   userId      String
-  user        User      @relation("UserChallenges", fields: [userId], references: [id], onDelete: Cascade)
+  user      User      @relation("UserChallenges", fields: [userId], references: [id], onDelete: Cascade)
   progress    Int       @default(0)
   completed   Boolean   @default(false)
   joinedAt    DateTime  @default(now())
@@ -775,4 +778,25 @@ model PaymentEvent {
   processed   Boolean  @default(false)
   processedAt DateTime?
   createdAt   DateTime @default(now())
+}
+
+model EntitlementLog {
+  id        String   @id @default(cuid())
+  tenantId  String
+  userId    String
+  planId    String?
+  feature   String   // e.g. "MAX_CLASSES_PER_MONTH", "AI_ACCESS"
+  allowed   Boolean  // true = allowed, false = blocked
+  reason    String?  // e.g. "Limit reached (4)"
+  quantity  Int      @default(1)
+  metadata  Json?
+  createdAt DateTime @default(now())
+
+  tenant    Tenant          @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  user      User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan      MembershipPlan? @relation(fields: [planId], references: [id], onDelete: SetNull)
+
+  @@index([tenantId, planId])
+  @@index([tenantId, feature, allowed])
+  @@index([createdAt])
 }

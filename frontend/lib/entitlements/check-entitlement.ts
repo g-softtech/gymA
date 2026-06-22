@@ -9,28 +9,36 @@ export interface EntitlementResult {
   reason?: string;
 }
 
-export async function checkEntitlement(memberId: string, feature: EntitlementKey): Promise<EntitlementResult> {
-  // 1. Fetch user's active subscription
-  const member = await prisma.memberProfile.findUnique({
-    where: { userId: memberId },
-    include: {
-      subscriptions: {
-        where: { status: "ACTIVE" },
-        include: { plan: true },
-        take: 1,
-      },
-    },
+// Fire and forget telemetry logger
+function queueEntitlementLog(
+  tenantId: string,
+  userId: string,
+  planId: string,
+  feature: string,
+  result: EntitlementResult,
+  metadata?: any
+) {
+  prisma.entitlementLog.create({
+    data: {
+      tenantId,
+      userId,
+      planId,
+      feature,
+      allowed: result.allowed,
+      reason: result.reason,
+      quantity: 1,
+      metadata: {
+        limit: result.limit,
+        currentUsage: result.usage,
+        ...metadata
+      }
+    }
+  }).catch((err) => {
+    console.error("[Entitlements Engine] Failed to log telemetry:", err);
   });
+}
 
-  if (!member) {
-    return { allowed: false, reason: "Member profile not found." };
-  }
-
-  const activeSub = member.subscriptions[0];
-  if (!activeSub) {
-    return { allowed: false, reason: "No active subscription found. Please purchase a membership plan." };
-  }
-
+async function _evaluateEntitlement(member: any, activeSub: any, feature: EntitlementKey): Promise<EntitlementResult> {
   // 2. Parse Entitlements from JSON safely
   let rawEntitlements = {};
   if (activeSub.plan.entitlements && typeof activeSub.plan.entitlements === "object") {
@@ -118,5 +126,46 @@ export async function checkEntitlement(memberId: string, feature: EntitlementKey
 
     default:
       return { allowed: false, reason: "Unknown entitlement requested." };
+  }
+}
+
+export async function checkEntitlement(memberId: string, feature: EntitlementKey, metadata?: any): Promise<EntitlementResult> {
+  try {
+    const member = await prisma.memberProfile.findUnique({
+      where: { userId: memberId },
+      include: {
+        subscriptions: {
+          where: { status: "ACTIVE" },
+          include: { plan: true },
+          take: 1,
+        },
+      },
+    });
+    
+    if (!member) {
+      return { allowed: false, reason: "Member profile not found." };
+    }
+
+    const activeSub = member.subscriptions[0];
+    if (!activeSub) {
+      return { allowed: false, reason: "No active subscription found. Please purchase a membership plan." };
+    }
+
+    const result = await _evaluateEntitlement(member, activeSub, feature);
+  
+    // Log telemetry
+    queueEntitlementLog(
+      activeSub.tenantId || activeSub.plan.tenantId,
+      memberId,
+      activeSub.planId,
+      feature,
+      result,
+      metadata
+    );
+
+    return result;
+  } catch (err) {
+    console.error("[Entitlements Engine] Error in checkEntitlement:", err);
+    return { allowed: false, reason: "An internal error occurred while verifying access." };
   }
 }

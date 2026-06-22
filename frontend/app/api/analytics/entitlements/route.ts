@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthSession } from "@/lib/auth";
 import { getTenantContextFromSession } from "@/lib/tenant/context";
-import { getTrainerAnalytics } from "@/lib/analytics/trainer-analytics";
+import { getEntitlementAnalytics } from "@/lib/analytics/entitlement-analytics";
 
 export async function GET(req: NextRequest) {
   try {
@@ -11,11 +11,11 @@ export async function GET(req: NextRequest) {
     const tenantContext = await getTenantContextFromSession(session);
     if (!tenantContext) return NextResponse.json({ error: "Tenant not found" }, { status: 404 });
 
-    const data = await getTrainerAnalytics(tenantContext.tenantId);
+    const data = await getEntitlementAnalytics(tenantContext.tenantId);
 
     return NextResponse.json({ data });
   } catch (error) {
-    console.error("[Trainer Analytics API] Error:", error);
+    console.error("[Entitlements Analytics API] Error:", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }
