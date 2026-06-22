@@ -40,6 +40,20 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    const existingPlan = await prisma.membershipPlan.findFirst({
+      where: {
+        tenantId: ctx.tenantId,
+        name: String(name).trim()
+      }
+    });
+
+    if (existingPlan) {
+      return NextResponse.json(
+        { error: "A plan with this name already exists." },
+        { status: 400 }
+      );
+    }
+
     const plan = await prisma.membershipPlan.create({
       data: {
         tenantId: ctx.tenantId,

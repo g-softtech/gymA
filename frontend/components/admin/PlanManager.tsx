@@ -25,8 +25,35 @@ export default function PlanManager({ tenantId, slug, initialPlans }: PlanManage
     features: "",
     entitlements: { ...defaultEntitlements } as Entitlements,
   });
+  const [editingPlanId, setEditingPlanId] = useState<string | null>(null);
 
-  const handleCreate = async () => {
+  const resetForm = () => {
+    setForm({ 
+      name: "", 
+      price: "", 
+      durationDays: "",
+      description: "",
+      features: "",
+      entitlements: { ...defaultEntitlements } as Entitlements,
+    });
+    setEditingPlanId(null);
+    setError("");
+  };
+
+  const handleEdit = (plan: MembershipPlan) => {
+    setEditingPlanId(plan.id);
+    setForm({
+      name: plan.name,
+      price: plan.price.toString(),
+      durationDays: plan.durationDays.toString(),
+      description: plan.description || "",
+      features: (plan.features as string[] || []).join(", "),
+      entitlements: (plan.entitlements as Entitlements) || { ...defaultEntitlements },
+    });
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleSubmit = async () => {
     setError("");
     if (!form.name || !form.price || !form.durationDays) {
       setError("All fields are required.");
@@ -34,8 +61,11 @@ export default function PlanManager({ tenantId, slug, initialPlans }: PlanManage
     }
     setLoading(true);
     try {
-      const res = await fetch("/api/plans", {
-        method: "POST",
+      const url = editingPlanId ? `/api/plans/${editingPlanId}` : "/api/plans";
+      const method = editingPlanId ? "PUT" : "POST";
+      
+      const res = await fetch(url, {
+        method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           tenantId,
@@ -47,20 +77,18 @@ export default function PlanManager({ tenantId, slug, initialPlans }: PlanManage
           entitlements: form.entitlements,
         }),
       });
+      
       if (!res.ok) {
         const data = await res.json();
-        setError(data.error ?? "Failed to create plan.");
+        setError(data.error ?? `Failed to ${editingPlanId ? "update" : "create"} plan.`);
       } else {
-        const newPlan = await res.json();
-        setPlans((prev) => [...prev, newPlan]);
-        setForm({ 
-          name: "", 
-          price: "", 
-          durationDays: "",
-          description: "",
-          features: "",
-          entitlements: { ...defaultEntitlements } as Entitlements,
-        });
+        const savedPlan = await res.json();
+        if (editingPlanId) {
+          setPlans((prev) => prev.map(p => p.id === editingPlanId ? savedPlan : p));
+        } else {
+          setPlans((prev) => [...prev, savedPlan]);
+        }
+        resetForm();
         router.refresh();
       }
     } catch {
@@ -86,7 +114,19 @@ export default function PlanManager({ tenantId, slug, initialPlans }: PlanManage
   return (
     <div className="space-y-6">
       <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
-        <h2 className="text-base font-semibold text-gray-900 mb-4">Create New Plan</h2>
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-base font-semibold text-gray-900">
+            {editingPlanId ? "Edit Plan" : "Create New Plan"}
+          </h2>
+          {editingPlanId && (
+            <button
+              onClick={resetForm}
+              className="text-sm text-gray-500 hover:text-gray-700 font-medium"
+            >
+              Cancel Edit
+            </button>
+          )}
+        </div>
         {error && (
           <p className="text-sm text-red-600 bg-red-50 px-3 py-2 rounded mb-4">{error}</p>
         )}
@@ -197,11 +237,11 @@ export default function PlanManager({ tenantId, slug, initialPlans }: PlanManage
           </div>
         </div>
         <button
-          onClick={handleCreate}
+          onClick={handleSubmit}
           disabled={loading}
           className="bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white font-semibold px-5 py-2 rounded-lg text-sm transition"
         >
-          {loading ? "Creating..." : "Create Plan"}
+          {loading ? "Saving..." : editingPlanId ? "Update Plan" : "Create Plan"}
         </button>
       </div>
 
@@ -221,6 +261,12 @@ export default function PlanManager({ tenantId, slug, initialPlans }: PlanManage
                 </div>
                 <div className="flex items-center gap-4">
                   <p className="font-semibold text-gray-900">₦{plan.price.toLocaleString()}</p>
+                  <button
+                    onClick={() => handleEdit(plan)}
+                    className="text-sm text-indigo-500 hover:text-indigo-700 hover:underline"
+                  >
+                    Edit
+                  </button>
                   <button
                     onClick={() => handleDelete(plan.id)}
                     className="text-sm text-red-500 hover:text-red-700 hover:underline"
