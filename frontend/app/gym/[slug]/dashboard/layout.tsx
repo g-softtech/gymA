@@ -108,7 +108,7 @@ export default async function DashboardLayout({
     { href: `/gym/${slug}/dashboard/admin/blog`, label: "Blog", icon: "📝" },
     { href: `/gym/${slug}/dashboard/admin/notifications`, label: `Notifications${unreadCount > 0 ? ` (${unreadCount})` : ""}`, icon: "🔔" },
     { href: `/gym/${slug}/dashboard/admin/website`, label: "Website", icon: "🌐" },
-    { href: `/gym/${slug}/dashboard/admin/billing`, label: "Billing", icon: "💳" },
+    { href: `/gym/${slug}/dashboard/admin/billing`, label: "Platform Subscription", icon: "💳" },
   ];
 
   const trainerLinks = [

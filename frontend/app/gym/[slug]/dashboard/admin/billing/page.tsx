@@ -1,7 +1,7 @@
 import BillingManagerClient from "./BillingManagerClient";
 
 export const metadata = {
-  title: "Billing & Subscription | Admin",
+  title: "Platform Subscription | Admin",
 };
 
 export default function BillingPage() {

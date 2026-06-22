@@ -59,7 +59,7 @@ export default function BillingManagerClient() {
   const plans = [
     {
       name: "FREE",
-      price: "$0",
+      price: "₦0",
       description: "Basic gym management",
       features: ["Up to 50 members", "Basic analytics", "Standard support"],
       isCurrent: status?.subscriptionPlan === "FREE",
@@ -67,7 +67,7 @@ export default function BillingManagerClient() {
     },
     {
       name: "PRO",
-      price: "$49/mo",
+      price: "₦49,000/mo",
       description: "For growing gyms",
       features: ["Custom Domain", "Up to 500 members", "Basic branding"],
       isCurrent: status?.subscriptionPlan === "PRO",
@@ -77,7 +77,7 @@ export default function BillingManagerClient() {
     },
     {
       name: "ENTERPRISE",
-      price: "$199/mo",
+      price: "₦199,000/mo",
       description: "Full white-label SaaS experience",
       features: ["White-Label Mode", "Unlimited members", "Multiple Domains"],
       isCurrent: status?.subscriptionPlan === "ENTERPRISE",
@@ -90,7 +90,7 @@ export default function BillingManagerClient() {
   return (
     <div className="max-w-5xl mx-auto space-y-8">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">Billing & Subscription</h1>
+        <h1 className="text-3xl font-bold text-gray-900">Platform Subscription</h1>
         <p className="mt-2 text-gray-600">Manage your subscription, plan limits, and billing history.</p>
       </div>
 
