@@ -48,32 +48,38 @@ export const ENTITLEMENTS_REGISTRY = {
   },
 };
 
-export function getEntitlementFeatures(entitlements: Record<string, any>): string[] {
-  const features: string[] = [];
+export function getEntitlementFeatures(entitlements: Record<string, any>): { name: string; included: boolean }[] {
+  const features: { name: string; included: boolean }[] = [];
   
   const classCount = entitlements[EntitlementKeys.MAX_CLASSES_PER_MONTH];
-  if (classCount === -1) features.push("Unlimited Group Classes");
-  else if (classCount > 0) features.push(`${classCount} Group Classes per month`);
+  if (classCount === -1) features.push({ name: "Unlimited Group Classes", included: true });
+  else if (classCount > 0) features.push({ name: `${classCount} Group Classes per month`, included: true });
+  else features.push({ name: "Group Classes", included: false });
 
   const trainerCount = entitlements[EntitlementKeys.MAX_TRAINER_SESSIONS];
-  if (trainerCount === -1) features.push("Unlimited PT Sessions");
-  else if (trainerCount > 0) features.push(`${trainerCount} Personal Trainer Sessions`);
-  else if (trainerCount === 0) features.push("No Trainer Sessions included");
+  if (trainerCount === -1) features.push({ name: "Unlimited PT Sessions", included: true });
+  else if (trainerCount > 0) features.push({ name: `${trainerCount} Personal Trainer Sessions`, included: true });
+  else features.push({ name: "Personal Trainer Sessions", included: false });
 
   if (entitlements[EntitlementKeys.AI_ACCESS]) {
-    features.push("AI Coach Access");
+    const aiRequests = entitlements[EntitlementKeys.MAX_AI_REQUESTS];
+    if (aiRequests === -1) features.push({ name: "Unlimited AI Coach Access", included: true });
+    else if (aiRequests > 0) features.push({ name: `AI Coach (${aiRequests} msgs/mo)`, included: true });
+    else features.push({ name: "AI Coach Access", included: true });
+  } else {
+    features.push({ name: "AI Coach Access", included: false });
   }
 
-  const aiRequests = entitlements[EntitlementKeys.MAX_AI_REQUESTS];
-  if (aiRequests === -1) features.push("Unlimited AI Requests");
-  else if (aiRequests > 0) features.push(`Up to ${aiRequests} AI requests / month`);
-
   if (entitlements[EntitlementKeys.PRIORITY_BOOKING]) {
-    features.push("Priority Booking");
+    features.push({ name: "Priority Booking", included: true });
+  } else {
+    features.push({ name: "Priority Booking", included: false });
   }
 
   if (entitlements[EntitlementKeys.SAUNA_ACCESS]) {
-    features.push("Sauna Access");
+    features.push({ name: "Sauna Access", included: true });
+  } else {
+    features.push({ name: "Sauna Access", included: false });
   }
 
   return features;

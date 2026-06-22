@@ -45,7 +45,7 @@ export default async function CheckoutPage({
         </div>
 
         {(() => {
-          const customFeatures = plan.features as string[];
+          const customFeatures = (plan.features as string[]).map(f => ({ name: f, included: true }));
           const entitlementFeatures = getEntitlementFeatures(plan.entitlements as any);
           const combinedFeatures = [...customFeatures, ...entitlementFeatures];
           
@@ -55,9 +55,13 @@ export default async function CheckoutPage({
                 <h3 className="text-sm font-semibold text-gray-900 mb-3">Included in this plan:</h3>
                 <ul className="space-y-2">
                   {combinedFeatures.map((feat, i) => (
-                    <li key={i} className="flex items-center gap-2 text-sm text-gray-600">
-                      <span className="text-indigo-600">✓</span>
-                      {feat}
+                    <li key={i} className={`flex items-center gap-2 text-sm ${feat.included ? "text-gray-600" : "text-gray-400 line-through"}`}>
+                      {feat.included ? (
+                        <span className="text-indigo-600">✓</span>
+                      ) : (
+                        <span className="text-gray-300">✗</span>
+                      )}
+                      {feat.name}
                     </li>
                   ))}
                 </ul>

@@ -545,7 +545,7 @@ export default async function GymPublicPage({
                       </p>
 
                       {(() => {
-                        const customFeatures = plan.features as string[];
+                        const customFeatures = (plan.features as string[]).map(f => ({ name: f, included: true }));
                         const entitlementFeatures = getEntitlementFeatures(plan.entitlements as any);
                         const combinedFeatures = [...customFeatures, ...entitlementFeatures];
                         
@@ -554,9 +554,13 @@ export default async function GymPublicPage({
                         return (
                           <ul className="space-y-2 mb-8 flex-1">
                             {combinedFeatures.map((feat, i) => (
-                              <li key={i} className="flex items-center gap-2 text-sm text-gray-600">
-                                <span style={{ color: primary }}>✓</span>
-                                {feat}
+                              <li key={i} className={`flex items-center gap-2 text-sm ${feat.included ? "text-gray-600" : "text-gray-400 line-through"}`}>
+                                {feat.included ? (
+                                  <span style={{ color: primary }}>✓</span>
+                                ) : (
+                                  <span className="text-gray-300">✗</span>
+                                )}
+                                {feat.name}
                               </li>
                             ))}
                           </ul>
