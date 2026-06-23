@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { Html5QrcodeScanner } from "html5-qrcode";
+import { Scanner } from '@yudiel/react-qr-scanner';
 
 type MemberData = {
   id: string;
@@ -27,43 +27,11 @@ export function CheckInKiosk() {
   const [showOverrideModal, setShowOverrideModal] = useState(false);
   const [overrideTarget, setOverrideTarget] = useState<{ memberId: string, originalMethod?: string } | null>(null);
   
-  const scannerRef = useRef<Html5QrcodeScanner | null>(null);
   const loadingRef = useRef(loading);
 
   useEffect(() => {
     loadingRef.current = loading;
   }, [loading]);
-
-  useEffect(() => {
-    // Initialize QR Scanner only on mount (client-side)
-    scannerRef.current = new Html5QrcodeScanner(
-      "qr-reader",
-      { 
-        fps: 10, 
-        qrbox: { width: 250, height: 250 },
-        rememberLastUsedCamera: true,
-        supportedScanTypes: [0] // Html5QrcodeScanType.SCAN_TYPE_CAMERA
-      },
-      false
-    );
-
-    scannerRef.current.render(
-      (decodedText) => {
-        // Debounce/Prevent duplicate rapid scans
-        if (!loadingRef.current) {
-          handleScan(decodedText);
-        }
-      },
-      (error) => {
-        // ignore continuous scanning errors
-      }
-    );
-
-    return () => {
-      scannerRef.current?.clear().catch(console.error);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   const handleScan = async (token: string) => {
     if (!navigator.onLine) {
@@ -178,7 +146,23 @@ export function CheckInKiosk() {
             QR Scanner
           </div>
           <div className="p-4">
-            <div id="qr-reader" className="w-full overflow-hidden rounded-lg border-2 border-dashed border-gray-200"></div>
+            <div className="w-full overflow-hidden rounded-lg border-2 border-dashed border-gray-200 aspect-square relative bg-gray-50 flex items-center justify-center">
+              {typeof window !== 'undefined' && (
+                <Scanner 
+                  onScan={(result) => {
+                    if (result && result.length > 0 && !loadingRef.current) {
+                      handleScan(result[0].rawValue);
+                    }
+                  }}
+                  onError={(error) => console.log(error?.message)}
+                  components={{
+                    audio: false,
+                    tracker: true,
+                  }}
+                  allowMultiple={false}
+                />
+              )}
+            </div>
           </div>
         </div>
 
