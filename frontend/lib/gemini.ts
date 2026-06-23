@@ -32,7 +32,7 @@ const genAI = new GoogleGenerativeAI(apiKey);
 // Model name (update here to change globally)
 // ─────────────────────────────────────────────────────────────────────────────
 
-export const GEMINI_MODEL = "gemini-1.5-flash";
+export const GEMINI_MODEL = "gemini-2.5-flash";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Safety settings — keep permissive for gym/fitness content
