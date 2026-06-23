@@ -90,6 +90,14 @@ export async function PATCH(req: NextRequest) {
       create: { tenantId: ctx.tenantId, ...settingsData },
     });
 
+    try {
+      const { revalidatePath } = require("next/cache");
+      revalidatePath(`/gym/${ctx.tenantSlug}`);
+      revalidatePath(`/gym/${ctx.tenantSlug}/[...path]`, "layout");
+    } catch (e) {
+      console.error("Failed to revalidate cache", e);
+    }
+
     return NextResponse.json(settings);
   } catch (err) {
     console.error(err);
