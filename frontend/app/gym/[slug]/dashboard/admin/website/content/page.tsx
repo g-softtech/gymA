@@ -543,7 +543,6 @@ export default function ContentEditorPage() {
                     ))}
                   </select>
                 </div>
-                </div>
               </div>
               <button
                 type="button"
