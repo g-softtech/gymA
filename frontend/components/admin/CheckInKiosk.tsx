@@ -28,19 +28,29 @@ export function CheckInKiosk() {
   const [overrideTarget, setOverrideTarget] = useState<{ memberId: string, originalMethod?: string } | null>(null);
   
   const scannerRef = useRef<Html5QrcodeScanner | null>(null);
+  const loadingRef = useRef(loading);
+
+  useEffect(() => {
+    loadingRef.current = loading;
+  }, [loading]);
 
   useEffect(() => {
     // Initialize QR Scanner only on mount (client-side)
     scannerRef.current = new Html5QrcodeScanner(
       "qr-reader",
-      { fps: 10, qrbox: { width: 250, height: 250 } },
+      { 
+        fps: 10, 
+        qrbox: { width: 250, height: 250 },
+        rememberLastUsedCamera: true,
+        supportedScanTypes: [0] // Html5QrcodeScanType.SCAN_TYPE_CAMERA
+      },
       false
     );
 
     scannerRef.current.render(
       (decodedText) => {
         // Debounce/Prevent duplicate rapid scans
-        if (!loading) {
+        if (!loadingRef.current) {
           handleScan(decodedText);
         }
       },
@@ -52,7 +62,8 @@ export function CheckInKiosk() {
     return () => {
       scannerRef.current?.clear().catch(console.error);
     };
-  }, [loading]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleScan = async (token: string) => {
     if (!navigator.onLine) {
