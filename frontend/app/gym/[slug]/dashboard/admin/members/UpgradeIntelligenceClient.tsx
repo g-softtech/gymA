@@ -17,8 +17,8 @@ interface UpgradeOpportunity {
 
 export default function UpgradeIntelligenceClient() {
   const [data, setData] = useState<{
-    opportunities: UpgradeOpportunity[];
-    totalUpside: number;
+    candidatesDetails: UpgradeOpportunity[];
+    potentialRevenue: number;
   } | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -40,7 +40,7 @@ export default function UpgradeIntelligenceClient() {
   }, []);
 
   if (loading) return null; // Fail silently, it's an enhancement
-  if (!data || data.opportunities.length === 0) return null;
+  if (!data || !data.candidatesDetails || data.candidatesDetails.length === 0) return null;
 
   return (
     <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl p-6 border border-indigo-100 shadow-sm mb-8">
@@ -54,7 +54,7 @@ export default function UpgradeIntelligenceClient() {
         </div>
         <div className="text-right">
           <p className="text-xs font-semibold text-indigo-600 uppercase tracking-wide">Potential Pipeline</p>
-          <p className="text-2xl font-black text-indigo-900">₦{data.totalUpside.toLocaleString()}/mo</p>
+          <p className="text-2xl font-black text-indigo-900">₦{data.potentialRevenue.toLocaleString()}/mo</p>
         </div>
       </div>
 
@@ -72,7 +72,7 @@ export default function UpgradeIntelligenceClient() {
               </tr>
             </thead>
             <tbody className="divide-y divide-indigo-50">
-              {data.opportunities.map((opp) => (
+              {data.candidatesDetails.map((opp) => (
                 <tr key={opp.userId} className="hover:bg-indigo-50/30 transition-colors">
                   <td className="px-6 py-4">
                     <div className="text-sm font-medium text-gray-900">{opp.userName || "Unknown"}</div>
