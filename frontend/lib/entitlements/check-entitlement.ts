@@ -98,7 +98,7 @@ async function _evaluateEntitlement(member: any, activeSub: any, feature: Entitl
       if (!entitlements[EntitlementKeys.AI_ACCESS]) {
         return { allowed: false, reason: "AI Coach access is not included in your plan." };
       }
-      const limit = 9999; // entitlements[EntitlementKeys.MAX_AI_REQUESTS];
+      const limit = entitlements[EntitlementKeys.MAX_AI_REQUESTS];
       if (limit === -1) return { allowed: true, limit };
 
       const usage = await prisma.aiLog.count({
