@@ -90,7 +90,7 @@ export default async function AdminMembersPage({
                 </tr>
               ) : (
                 members.map((user: UserWithProfile) => {
-                  const sub = user.memberProfile?.subscriptions[0];
+                  const sub = user.memberProfile?.subscriptions?.[0];
                   const isActive = sub?.status === "ACTIVE" && new Date(sub.endDate) > new Date();
                   const isExpired = sub && new Date(sub.endDate) < new Date();
                   return (
