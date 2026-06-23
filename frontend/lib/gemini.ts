@@ -115,16 +115,20 @@ export async function generateJSON<T = unknown>(
   prompt: string,
   options?: { systemInstruction?: string; maxOutputTokens?: number }
 ): Promise<{ data: T; inputTokens: number | null; outputTokens: number | null }> {
-  const { text, inputTokens, outputTokens } = await generateText(prompt, {
-    ...options,
-    responseMimeType: "application/json",
-  });
+  const { text, inputTokens, outputTokens } = await generateText(prompt, options);
 
   // Strip markdown code fences if Gemini wraps output in ```json ... ```
-  const clean = text
+  let clean = text
     .replace(/^```(?:json)?\s*/i, "")
     .replace(/\s*```\s*$/i, "")
     .trim();
+
+  // Failsafe: if there's text before or after the JSON, extract just the outermost {} or []
+  const jsonMatch = clean.match(/(\{[\s\S]*\}|\[[\s\S]*\])/);
+  if (jsonMatch) {
+    clean = jsonMatch[0];
+  }
+
 
   try {
     const data = JSON.parse(clean) as T;
