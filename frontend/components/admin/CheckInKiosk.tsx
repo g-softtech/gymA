@@ -155,9 +155,6 @@ export function CheckInKiosk() {
                     }
                   }}
                   onError={(error) => console.log(error?.message)}
-                  components={{
-                    audio: false
-                  }}
                   allowMultiple={false}
                 />
               )}
