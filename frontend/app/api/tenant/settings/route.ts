@@ -91,9 +91,12 @@ export async function PATCH(req: NextRequest) {
     });
 
     try {
-      const { revalidatePath } = require("next/cache");
-      revalidatePath(`/gym/${ctx.tenantSlug}`);
-      revalidatePath(`/gym/${ctx.tenantSlug}/[...path]`, "layout");
+      const tenantRecord = await prisma.tenant.findUnique({ where: { id: ctx.tenantId }, select: { slug: true } });
+      if (tenantRecord?.slug) {
+        const { revalidatePath } = require("next/cache");
+        revalidatePath(`/gym/${tenantRecord.slug}`);
+        revalidatePath(`/gym/${tenantRecord.slug}/[...path]`, "layout");
+      }
     } catch (e) {
       console.error("Failed to revalidate cache", e);
     }
