@@ -500,17 +500,33 @@ export default function ContentEditorPage() {
                   }}
                 />
                 <div className="grid grid-cols-2 gap-2">
-                  <input
-                    id={`test-avatar-${i}`}
-                    className={inputCls}
-                    placeholder="Avatar image URL (optional)"
-                    value={t.avatarUrl ?? ""}
-                    onChange={(e) => {
-                      const updated = [...testimonials];
-                      updated[i] = { ...updated[i], avatarUrl: e.target.value };
-                      setTestimonials(updated);
-                    }}
-                  />
+                  <div className="relative">
+                    <input
+                      type="file"
+                      id={`test-avatar-file-${i}`}
+                      accept="image/*"
+                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                      onChange={async (e) => {
+                        if (!e.target.files?.[0]) return;
+                        const key = `test-${i}`;
+                        setUploadingImage(key);
+                        try {
+                          const url = await uploadFile(e.target.files[0]);
+                          const updated = [...testimonials];
+                          updated[i] = { ...updated[i], avatarUrl: url };
+                          setTestimonials(updated);
+                        } catch (err: any) {
+                          alert(err.message || "Failed to upload");
+                        } finally {
+                          setUploadingImage(null);
+                          e.target.value = "";
+                        }
+                      }}
+                    />
+                    <div className={`${inputCls} flex items-center text-gray-500 overflow-hidden bg-gray-50`}>
+                      {uploadingImage === `test-${i}` ? "Uploading..." : t.avatarUrl ? "Image Uploaded ✓" : "Upload Avatar..."}
+                    </div>
+                  </div>
                   <select
                     id={`test-rating-${i}`}
                     className={inputCls}
@@ -526,6 +542,7 @@ export default function ContentEditorPage() {
                       <option key={r} value={r}>{"★".repeat(r)} ({r}/5)</option>
                     ))}
                   </select>
+                </div>
                 </div>
               </div>
               <button
