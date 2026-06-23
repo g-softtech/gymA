@@ -427,7 +427,7 @@ export default function ContentEditorPage() {
                       }}
                     />
                     <div className={`${inputCls} flex items-center text-gray-500 overflow-hidden bg-gray-50`}>
-                      {uploadingImage === `svc-${i}` ? "Uploading..." : svc.imageUrl ? "Image Uploaded ✓" : "Upload Image..."}
+                      {uploadingImage === `svc-${i}` ? "Uploading..." : svc.imageUrl ? "Image Uploaded ✓" : "Upload Image (Max 4.5MB)"}
                     </div>
                   </div>
                 </div>
@@ -524,7 +524,7 @@ export default function ContentEditorPage() {
                       }}
                     />
                     <div className={`${inputCls} flex items-center text-gray-500 overflow-hidden bg-gray-50`}>
-                      {uploadingImage === `test-${i}` ? "Uploading..." : t.avatarUrl ? "Image Uploaded ✓" : "Upload Avatar..."}
+                      {uploadingImage === `test-${i}` ? "Uploading..." : t.avatarUrl ? "Image Uploaded ✓" : "Upload Avatar (Max 4.5MB)"}
                     </div>
                   </div>
                   <select
@@ -600,7 +600,7 @@ export default function ContentEditorPage() {
                     }}
                   />
                   <div className={`${inputCls} flex items-center text-gray-500 overflow-hidden bg-gray-50`}>
-                    {uploadingImage === `gal-${i}` ? "Uploading..." : item.imageUrl ? "Image Uploaded ✓" : "Upload Image..."}
+                    {uploadingImage === `gal-${i}` ? "Uploading..." : item.imageUrl ? "Image Uploaded ✓" : "Upload Image (Max 4.5MB)"}
                   </div>
                 </div>
                 <input

@@ -201,7 +201,7 @@ export default function HeroEditorPage() {
             </p>
             <div className="flex items-center gap-4">
               <label className="relative cursor-pointer bg-white px-4 py-2 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50">
-                <span>{uploadingImage ? "Uploading..." : "Upload Image"}</span>
+                <span>{uploadingImage ? "Uploading..." : "Upload Image (Max 4.5MB)"}</span>
                 <input
                   type="file"
                   accept="image/*"
