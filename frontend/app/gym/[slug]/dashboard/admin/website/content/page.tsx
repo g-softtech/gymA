@@ -59,11 +59,23 @@ export default function ContentEditorPage() {
   }, []);
 
   const uploadFile = async (file: File): Promise<string> => {
+    if (file.size > 4.5 * 1024 * 1024) {
+      throw new Error("Image is too large. Please upload an image smaller than 4.5MB.");
+    }
     const formData = new FormData();
     formData.append("file", file);
     const res = await fetch("/api/upload", { method: "POST", body: formData });
-    if (!res.ok) throw new Error("Upload failed");
-    const data = await res.json();
+    
+    let data;
+    try {
+      data = await res.json();
+    } catch (err) {
+      throw new Error("Upload failed. The image might be too large or the server is busy.");
+    }
+    
+    if (!res.ok || !data.url) {
+      throw new Error(data?.error || "Upload failed");
+    }
     return data.url;
   };
 
@@ -406,10 +418,11 @@ export default function ContentEditorPage() {
                           const updated = [...services];
                           updated[i] = { ...updated[i], imageUrl: url };
                           setServices(updated);
-                        } catch (err) {
-                          alert("Failed to upload");
+                        } catch (err: any) {
+                          alert(err.message || "Failed to upload");
                         } finally {
                           setUploadingImage(null);
+                          e.target.value = "";
                         }
                       }}
                     />
@@ -561,10 +574,11 @@ export default function ContentEditorPage() {
                         const updated = [...gallery];
                         updated[i] = { ...updated[i], imageUrl: url };
                         setGallery(updated);
-                      } catch (err) {
-                        alert("Failed to upload");
+                      } catch (err: any) {
+                        alert(err.message || "Failed to upload");
                       } finally {
                         setUploadingImage(null);
+                        e.target.value = "";
                       }
                     }}
                   />
