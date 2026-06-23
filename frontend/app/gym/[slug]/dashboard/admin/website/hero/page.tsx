@@ -19,20 +19,39 @@ export default function HeroEditorPage() {
   const [uploadingImage, setUploadingImage] = useState(false);
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!e.target.files?.[0]) return;
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Vercel serverless functions have a ~4.5MB payload limit by default
+    if (file.size > 4.5 * 1024 * 1024) {
+      alert("Image is too large. Please upload an image smaller than 4.5MB.");
+      e.target.value = ""; // clear the input
+      return;
+    }
+
     setUploadingImage(true);
     try {
       const formData = new FormData();
-      formData.append("file", e.target.files[0]);
+      formData.append("file", file);
       const res = await fetch("/api/upload", { method: "POST", body: formData });
-      const data = await res.json();
+      
+      let data;
+      try {
+        data = await res.json();
+      } catch (err) {
+        throw new Error("Upload failed. The image might be too large or the server is busy.");
+      }
+
       if (res.ok && data.url) {
         setHero((h) => ({ ...h, bgImageUrl: data.url }));
       } else {
-        alert("Image upload failed");
+        throw new Error(data.error || "Image upload failed");
       }
+    } catch (err: any) {
+      alert(err.message || "An error occurred during upload");
     } finally {
       setUploadingImage(false);
+      e.target.value = ""; // clear the input so they can try again if they want
     }
   };
 
