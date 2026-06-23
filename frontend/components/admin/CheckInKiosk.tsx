@@ -98,7 +98,11 @@ export function CheckInKiosk() {
       const res = await fetch(`/api/admin/checkin/lookup?query=${encodeURIComponent(searchQuery)}`);
       const data = await res.json();
       setSearchResults(data.members || []);
-      setScanResult(null); // Clear previous scan UI
+      if (data.members && data.members.length === 0) {
+        setScanResult({ error: "No members found matching that search." });
+      } else {
+        setScanResult(null); // Clear previous scan UI
+      }
     } catch (err: any) {
       console.error(err);
     } finally {
