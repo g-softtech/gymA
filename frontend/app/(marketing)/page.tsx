@@ -324,81 +324,107 @@ export default function HomePage() {
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 xl:gap-6">
             {/* Starter Plan */}
-            <div className="relative bg-gray-900 rounded-3xl border border-gray-800 p-8 shadow-xl flex flex-col">
-              <h3 className="text-xl font-bold text-white mb-2">Starter Plan</h3>
-              <p className="text-sm text-gray-400 mb-6">Perfect for small studios</p>
+            <div className="relative bg-white rounded-3xl border border-gray-200 p-8 shadow-sm flex flex-col hover:border-indigo-200 hover:shadow-md transition-all">
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Starter Plan</h3>
+              <p className="text-sm text-gray-500 mb-6 min-h-[40px]">Perfect for small gyms just getting started</p>
               <div className="mb-6">
-                <span className="text-4xl font-extrabold text-white">₦100k</span>
-                <span className="text-gray-400 text-sm"> / year</span>
-                <p className="text-emerald-400 text-xs mt-1 font-medium">Equals ₦10k/mo</p>
+                <span className="text-4xl font-extrabold text-gray-900">₦100,000</span>
+                <span className="text-gray-500 text-sm"> / year</span>
               </div>
-              <ul className="space-y-4 mb-8 flex-1 text-sm text-gray-300">
-                <li className="flex gap-3"><span className="text-emerald-400">✓</span> Up to 50 Active Members</li>
-                <li className="flex gap-3"><span className="text-emerald-400">✓</span> Manual payment logging</li>
-                <li className="flex gap-3"><span className="text-emerald-400">✓</span> Class scheduling</li>
-                <li className="flex gap-3"><span className="text-emerald-400">✓</span> QR attendance desk tracking</li>
+              <ul className="space-y-4 mb-8 flex-1 text-sm text-gray-600">
+                <li className="flex gap-3"><span className="text-indigo-600 font-bold">✓</span> Up to 50 members</li>
+                <li className="flex gap-3"><span className="text-indigo-600 font-bold">✓</span> 1 trainer account</li>
+                <li className="flex gap-3"><span className="text-indigo-600 font-bold">✓</span> Member management</li>
+                <li className="flex gap-3"><span className="text-indigo-600 font-bold">✓</span> Paystack & Flutterwave billing logs</li>
+                <li className="flex gap-3"><span className="text-indigo-600 font-bold">✓</span> Basic attendance tracking (QR Check-in)</li>
+                <li className="flex gap-3"><span className="text-indigo-600 font-bold">✓</span> Member dashboard view</li>
+                <li className="flex gap-3"><span className="text-indigo-600 font-bold">✓</span> Email support</li>
+                
+                {/* Excluded */}
+                <li className="flex gap-3 text-gray-400 opacity-70"><span className="text-gray-300 font-bold">✗</span> AI Coach suites</li>
+                <li className="flex gap-3 text-gray-400 opacity-70"><span className="text-gray-300 font-bold">✗</span> Community features</li>
+                <li className="flex gap-3 text-gray-400 opacity-70"><span className="text-gray-300 font-bold">✗</span> Advanced revenue analytics</li>
+                <li className="flex gap-3 text-gray-400 opacity-70"><span className="text-gray-300 font-bold">✗</span> Multiple locations</li>
               </ul>
-              <Link href="/onboarding" className="w-full bg-gray-800 text-white font-bold px-6 py-3 rounded-xl hover:bg-gray-700 transition text-center block">Start 14-Day Free Trial</Link>
+              <Link href="/onboarding" className="w-full bg-indigo-50 text-indigo-700 font-bold px-6 py-3 rounded-xl hover:bg-indigo-100 transition text-center block">Start Free Trial</Link>
             </div>
 
-            {/* Growth Plan */}
-            <div className="relative bg-gray-900 rounded-3xl border border-gray-800 p-8 shadow-xl flex flex-col">
-              <h3 className="text-xl font-bold text-white mb-2">Growth Plan</h3>
-              <p className="text-sm text-gray-400 mb-6">For growing fitness centers</p>
+            {/* Professional Plan */}
+            <div className="relative bg-white rounded-3xl border border-gray-200 p-8 shadow-sm flex flex-col hover:border-indigo-200 hover:shadow-md transition-all">
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Professional Plan</h3>
+              <p className="text-sm text-gray-500 mb-6 min-h-[40px]">For growing gyms that need more power</p>
               <div className="mb-6">
-                <span className="text-4xl font-extrabold text-white">₦200k</span>
-                <span className="text-gray-400 text-sm"> / year</span>
-                <p className="text-emerald-400 text-xs mt-1 font-medium">Equals ₦20k/mo</p>
+                <span className="text-4xl font-extrabold text-gray-900">₦200,000</span>
+                <span className="text-gray-500 text-sm"> / year</span>
               </div>
-              <ul className="space-y-4 mb-8 flex-1 text-sm text-gray-300">
-                <li className="flex gap-3"><span className="text-emerald-400">✓</span> Up to 150 Active Members</li>
-                <li className="flex gap-3"><span className="text-emerald-400">✓</span> Paystack/Flutterwave automation</li>
-                <li className="flex gap-3"><span className="text-emerald-400">✓</span> No-code web builder</li>
-                <li className="flex gap-3"><span className="text-emerald-400">✓</span> Basic AI Trainer chat</li>
+              <ul className="space-y-4 mb-8 flex-1 text-sm text-gray-600">
+                <li className="flex gap-3"><span className="text-indigo-600 font-bold">✓</span> Up to 150 members</li>
+                <li className="flex gap-3"><span className="text-indigo-600 font-bold">✓</span> 5 trainer accounts</li>
+                <li className="flex gap-3"><span className="text-indigo-600 font-bold">✓</span> Everything in Starter</li>
+                <li className="flex gap-3"><span className="text-indigo-600 font-bold">✓</span> Gemini AI Fitness Coach</li>
+                <li className="flex gap-3"><span className="text-indigo-600 font-bold">✓</span> AI Nutrition Planner (60+ Nigerian foods)</li>
+                <li className="flex gap-3"><span className="text-indigo-600 font-bold">✓</span> Progress tracking & analytics</li>
+                <li className="flex gap-3"><span className="text-indigo-600 font-bold">✓</span> Community boards & challenges</li>
+                <li className="flex gap-3"><span className="text-indigo-600 font-bold">✓</span> Trainer booking system</li>
+                <li className="flex gap-3"><span className="text-indigo-600 font-bold">✓</span> Basic revenue reports</li>
+                <li className="flex gap-3"><span className="text-indigo-600 font-bold">✓</span> Priority support</li>
+                
+                {/* Excluded */}
+                <li className="flex gap-3 text-gray-400 opacity-70"><span className="text-gray-300 font-bold">✗</span> Custom domain support</li>
+                <li className="flex gap-3 text-gray-400 opacity-70"><span className="text-gray-300 font-bold">✗</span> Multiple locations</li>
               </ul>
-              <Link href="/onboarding" className="w-full bg-gray-800 text-white font-bold px-6 py-3 rounded-xl hover:bg-gray-700 transition text-center block">Start 14-Day Free Trial</Link>
+              <Link href="/onboarding" className="w-full bg-indigo-50 text-indigo-700 font-bold px-6 py-3 rounded-xl hover:bg-indigo-100 transition text-center block">Start Free Trial</Link>
             </div>
 
             {/* Scale-Up Plan (Most Popular) */}
-            <div className="relative bg-gray-900 rounded-3xl border-2 border-emerald-500 p-8 shadow-2xl shadow-emerald-500/20 flex flex-col transform md:-translate-y-4">
-              <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-emerald-500 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">
+            <div className="relative bg-white rounded-3xl border-2 border-indigo-600 p-8 shadow-xl shadow-indigo-100 flex flex-col transform md:-translate-y-2">
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-indigo-600 text-white text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-wider shadow-sm">
                 Most Popular
               </div>
-              <h3 className="text-xl font-bold text-white mb-2">Scale-Up Plan</h3>
-              <p className="text-sm text-gray-400 mb-6">The ultimate gym OS</p>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Scale-Up Plan</h3>
+              <p className="text-sm text-gray-500 mb-6 min-h-[40px]">For elite gyms scaling their digital tracking</p>
               <div className="mb-6">
-                <span className="text-4xl font-extrabold text-white">₦300k</span>
-                <span className="text-gray-400 text-sm"> / year</span>
-                <p className="text-emerald-400 text-xs mt-1 font-medium">Equals ₦30k/mo</p>
+                <span className="text-4xl font-extrabold text-gray-900">₦300,000</span>
+                <span className="text-gray-500 text-sm"> / year</span>
               </div>
-              <ul className="space-y-4 mb-8 flex-1 text-sm text-gray-300">
-                <li className="flex gap-3"><span className="text-emerald-400">✓</span> Up to 400 Active Members</li>
-                <li className="flex gap-3"><span className="text-emerald-400">✓</span> Custom domain routing</li>
-                <li className="flex gap-3"><span className="text-emerald-400">✓</span> Complete Gemini AI planners</li>
-                <li className="flex gap-3"><span className="text-emerald-400">✓</span> Leaderboards & achievements</li>
-                <li className="flex gap-3"><span className="text-emerald-400">✓</span> Gym blog dashboard</li>
+              <ul className="space-y-4 mb-8 flex-1 text-sm text-gray-600">
+                <li className="flex gap-3"><span className="text-indigo-600 font-bold">✓</span> Up to 400 members</li>
+                <li className="flex gap-3"><span className="text-indigo-600 font-bold">✓</span> Unlimited trainers</li>
+                <li className="flex gap-3"><span className="text-indigo-600 font-bold">✓</span> Everything in Professional</li>
+                <li className="flex gap-3"><span className="text-indigo-600 font-bold">✓</span> Custom branding settings</li>
+                <li className="flex gap-3"><span className="text-indigo-600 font-bold">✓</span> No-code website builder</li>
+                <li className="flex gap-3"><span className="text-indigo-600 font-bold">✓</span> Built-in facility blog module</li>
+                <li className="flex gap-3"><span className="text-indigo-600 font-bold">✓</span> Advanced financial intelligence & churn analytics</li>
+                <li className="flex gap-3"><span className="text-indigo-600 font-bold">✓</span> Dedicated account support</li>
+                
+                {/* Excluded */}
+                <li className="flex gap-3 text-gray-400 opacity-70"><span className="text-gray-300 font-bold">✗</span> Multiple locations / branch sync</li>
               </ul>
-              <Link href="/onboarding" className="w-full bg-emerald-500 text-white font-bold px-6 py-3 rounded-xl hover:bg-emerald-400 transition text-center block">Start 14-Day Free Trial</Link>
+              <Link href="/onboarding" className="w-full bg-indigo-600 text-white font-bold px-6 py-3 rounded-xl hover:bg-indigo-700 transition shadow-md shadow-indigo-200 text-center block">Start Free Trial</Link>
             </div>
 
             {/* Apex Network Plan */}
-            <div className="relative bg-gray-900 rounded-3xl border border-gray-800 p-8 shadow-xl flex flex-col">
-              <h3 className="text-xl font-bold text-white mb-2">Apex Network Plan</h3>
-              <p className="text-sm text-gray-400 mb-6">For multi-location chains</p>
+            <div className="relative bg-white rounded-3xl border border-gray-200 p-8 shadow-sm flex flex-col hover:border-indigo-200 hover:shadow-md transition-all">
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Apex Network Plan</h3>
+              <p className="text-sm text-gray-500 mb-6 min-h-[40px]">For gym chains and serious multi-location fitness businesses</p>
               <div className="mb-6">
-                <span className="text-4xl font-extrabold text-white">₦400k</span>
-                <span className="text-gray-400 text-sm"> / year</span>
-                <p className="text-emerald-400 text-xs mt-1 font-medium">Equals ₦40k/mo</p>
+                <span className="text-4xl font-extrabold text-gray-900">₦400,000</span>
+                <span className="text-gray-500 text-sm"> / year</span>
               </div>
-              <ul className="space-y-4 mb-8 flex-1 text-sm text-gray-300">
-                <li className="flex gap-3"><span className="text-emerald-400">✓</span> Unlimited Active Members</li>
-                <li className="flex gap-3"><span className="text-emerald-400">✓</span> Multi-location branch management</li>
-                <li className="flex gap-3"><span className="text-emerald-400">✓</span> Global multi-gym roster sync</li>
-                <li className="flex gap-3"><span className="text-emerald-400">✓</span> Unlimited staff seats</li>
+              <ul className="space-y-4 mb-8 flex-1 text-sm text-gray-600">
+                <li className="flex gap-3"><span className="text-indigo-600 font-bold">✓</span> Unlimited members</li>
+                <li className="flex gap-3"><span className="text-indigo-600 font-bold">✓</span> Unlimited trainers</li>
+                <li className="flex gap-3"><span className="text-indigo-600 font-bold">✓</span> Everything in Scale-Up</li>
+                <li className="flex gap-3"><span className="text-indigo-600 font-bold">✓</span> Multiple gym locations (Branch sync across Wuse 2, Gwarinpa, etc.)</li>
+                <li className="flex gap-3"><span className="text-indigo-600 font-bold">✓</span> Multi-tenant management overview</li>
+                <li className="flex gap-3"><span className="text-indigo-600 font-bold">✓</span> Custom domain mapping support (yourgym.com)</li>
+                <li className="flex gap-3"><span className="text-indigo-600 font-bold">✓</span> API access</li>
+                <li className="flex gap-3"><span className="text-indigo-600 font-bold">✓</span> 99.9% Uptime SLA guarantee</li>
+                <li className="flex gap-3"><span className="text-indigo-600 font-bold">✓</span> Phone & WhatsApp support</li>
               </ul>
-              <Link href="/onboarding" className="w-full bg-gray-800 text-white font-bold px-6 py-3 rounded-xl hover:bg-gray-700 transition text-center block">Talk to Sales</Link>
+              <Link href="/onboarding" className="w-full bg-gray-900 text-white font-bold px-6 py-3 rounded-xl hover:bg-gray-800 transition text-center block">Talk to Sales</Link>
             </div>
           </div>
         </div>
