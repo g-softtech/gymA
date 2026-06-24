@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { getAuthSession } from "@/lib/auth";
 import { normalizeDomain } from "@/lib/tenant";
 import { addDomainToVercel, removeDomainFromVercel } from "@/lib/vercel";
-import { canUseCustomDomain } from "@/lib/feature-gates";
+import { verifyTenantEntitlement } from "@/lib/tenant";
 
 // Validate domain format (e.g. powergym.com or app.powergym.com)
 const isValidDomain = (domain: string) => {
@@ -15,7 +15,7 @@ const isValidDomain = (domain: string) => {
 export async function POST(req: NextRequest) {
   try {
     const session = await getAuthSession();
-    if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "SUPERADMIN")) {
+    if (!session?.user || !session.user.tenantId || (session.user.role !== "ADMIN" && session.user.role !== "SUPERADMIN")) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -24,9 +24,8 @@ export async function POST(req: NextRequest) {
       include: { settings: true },
     });
 
-    if (!tenant || !canUseCustomDomain(tenant.settings?.subscriptionPlan)) {
-      return NextResponse.json({ error: "Feature requires PRO or ENTERPRISE plan" }, { status: 403 });
-    }
+    const entitlementCheck = await verifyTenantEntitlement(session.user.tenantId, "hasCustomDomain");
+    if (entitlementCheck) return entitlementCheck;
 
     const { domain } = await req.json();
     if (!domain) {
@@ -82,7 +81,7 @@ export async function POST(req: NextRequest) {
 export async function GET(req: NextRequest) {
   try {
     const session = await getAuthSession();
-    if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "SUPERADMIN")) {
+    if (!session?.user || !session.user.tenantId || (session.user.role !== "ADMIN" && session.user.role !== "SUPERADMIN")) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -91,9 +90,8 @@ export async function GET(req: NextRequest) {
       include: { tenant: true },
     });
 
-    if (settings && !canUseCustomDomain(settings.subscriptionPlan)) {
-      return NextResponse.json({ error: "Feature requires PRO or ENTERPRISE plan" }, { status: 403 });
-    }
+    const entitlementCheck = await verifyTenantEntitlement(session.user.tenantId, "hasCustomDomain");
+    if (entitlementCheck) return entitlementCheck;
 
     if (!settings?.customDomain) {
       return NextResponse.json({ data: null });
@@ -109,7 +107,7 @@ export async function GET(req: NextRequest) {
 export async function DELETE(req: NextRequest) {
   try {
     const session = await getAuthSession();
-    if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "SUPERADMIN")) {
+    if (!session?.user || !session.user.tenantId || (session.user.role !== "ADMIN" && session.user.role !== "SUPERADMIN")) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -125,9 +123,8 @@ export async function DELETE(req: NextRequest) {
       include: { tenant: true },
     });
 
-    if (settings && !canUseCustomDomain(settings.subscriptionPlan)) {
-      return NextResponse.json({ error: "Feature requires PRO or ENTERPRISE plan" }, { status: 403 });
-    }
+    const entitlementCheck = await verifyTenantEntitlement(session.user.tenantId, "hasCustomDomain");
+    if (entitlementCheck) return entitlementCheck;
 
     if (settings?.customDomain !== normalized) {
       return NextResponse.json({ error: "Domain ownership mismatch" }, { status: 403 });
