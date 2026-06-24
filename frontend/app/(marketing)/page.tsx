@@ -2,14 +2,16 @@ import Link from "next/link";
 
 export default function HomePage() {
   const features = [
-    { icon: "👥", title: "Member Management", desc: "Track memberships, subscriptions, attendance, and payments in one place." },
-    { icon: "🏋️", title: "Trainer Module", desc: "Trainers manage clients, bookings, workout plans, and progress tracking." },
-    { icon: "💳", title: "Paystack Payments", desc: "Seamless Nigerian payment integration. Accept cards, bank transfers, and USSD." },
-    { icon: "🤖", title: "AI Fitness Coach", desc: "Google Gemini generates personalised workout and Nigerian meal plans for members." },
-    { icon: "🥗", title: "Nutrition Planner", desc: "60+ Nigerian foods database with calorie tracking and macro breakdowns." },
-    { icon: "🏅", title: "Community & Challenges", desc: "Social feed, fitness challenges, leaderboards, and achievement badges." },
-    { icon: "📊", title: "Revenue Analytics", desc: "Real-time revenue charts, subscription tracking, and financial reports." },
-    { icon: "📱", title: "Multi-Tenant SaaS", desc: "Run multiple gym locations under one platform with complete data isolation." },
+    { icon: "🔒", title: "Leakproof Access Control", desc: "Tracking strict plan expiration dates automatically." },
+    { icon: "💰", title: "Integrated Cash & Digital Revenue Ledgers", desc: "Consolidated multi-gateway billing management." },
+    { icon: "🏋️", title: "Trainer Deployment Portal", desc: "Assign and manage trainers, schedules, and clients." },
+    { icon: "📝", title: "Built-in Gym Blog Management Feed", desc: "Publish news, updates, and articles directly to your members." },
+    { icon: "🌐", title: "White-Label No-Code Website Configuration", desc: "Launch a custom branded domain in seconds." },
+    { icon: "🤖", title: "Interactive AI Fitness Coach", desc: "24/7 personalized Gemini workouts." },
+    { icon: "🥗", title: "Dynamic Nutrition & Meal Tracking", desc: "Log calories and macros with regional African foods." },
+    { icon: "📅", title: "Class & Trainer Booking Calendars", desc: "Seamlessly reserve slots with favorite instructors." },
+    { icon: "📈", title: "Personal Milestone Progress Loggers", desc: "Track weight, body fat, and strength gains." },
+    { icon: "📲", title: "Frictionless QR Code Attendance Generation", desc: "One-tap check-in directly at the front desk." },
   ];
 
   const stats = [
@@ -82,7 +84,7 @@ export default function HomePage() {
               <div 
                 className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=1470&auto=format&fit=crop')] bg-cover bg-center"
               />
-              <div className="absolute inset-0 bg-slate-950/40 backdrop-blur-[1px]"></div>
+              <div className="absolute inset-0 bg-slate-950/50 backdrop-blur-[1px]"></div>
               
               {/* Floating UI Layer */}
               <div className="relative p-6 sm:p-12">
@@ -125,9 +127,9 @@ export default function HomePage() {
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         {/* Revenue Card */}
                         <div className="bg-gray-800/50 border border-gray-700/50 rounded-xl p-5">
-                          <p className="text-sm text-gray-400 mb-1">Monthly Revenue</p>
+                          <p className="text-sm text-gray-400 mb-1">Revenue (Active)</p>
                           <div className="flex items-end justify-between">
-                            <p className="text-2xl font-bold text-white">₦1,240,000</p>
+                            <p className="text-2xl font-bold text-white">₦1,420,000</p>
                             <span className="inline-flex items-center gap-1 bg-emerald-500/20 text-emerald-400 text-xs font-bold px-2 py-1 rounded-md">
                               +12% <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" /></svg>
                             </span>
@@ -137,12 +139,12 @@ export default function HomePage() {
                         {/* Members Card */}
                         <div className="bg-gray-800/50 border border-gray-700/50 rounded-xl p-5">
                           <div className="flex justify-between items-center mb-1">
-                            <p className="text-sm text-gray-400">Active Members</p>
-                            <span className="text-xs text-indigo-400 font-medium">Enterprise Tier</span>
+                            <p className="text-sm text-gray-400">Total Members</p>
+                            <span className="text-xs text-indigo-400 font-medium">Active Subscriptions: 468</span>
                           </div>
-                          <p className="text-2xl font-bold text-white mb-2">482 <span className="text-gray-500 text-lg">/ 500</span></p>
+                          <p className="text-2xl font-bold text-white mb-2">482</p>
                           <div className="w-full bg-gray-700 rounded-full h-1.5 overflow-hidden">
-                            <div className="bg-gradient-to-r from-indigo-500 to-purple-500 h-1.5 rounded-full" style={{ width: '96%' }}></div>
+                            <div className="bg-gradient-to-r from-indigo-500 to-purple-500 h-1.5 rounded-full" style={{ width: '97%' }}></div>
                           </div>
                         </div>
                       </div>
@@ -152,17 +154,15 @@ export default function HomePage() {
                         <p className="text-sm font-bold text-gray-300 mb-4 border-b border-gray-700 pb-2">Live Activity Feed</p>
                         <div className="space-y-4">
                           <div className="flex items-start gap-3">
-                            <div className="w-8 h-8 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center flex-shrink-0 text-sm">👤</div>
+                            <div className="w-8 h-8 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center flex-shrink-0 text-sm">📲</div>
                             <div>
-                              <p className="text-sm text-gray-200">Oluwaseun checked in <span className="text-gray-500">(Wuse 2)</span></p>
-                              <p className="text-xs text-gray-500 mt-0.5">2 mins ago</p>
+                              <p className="text-sm font-medium text-blue-300">Live Alert: QR Check-in verified at main desk 1 min ago.</p>
                             </div>
                           </div>
                           <div className="flex items-start gap-3">
-                            <div className="w-8 h-8 rounded-full bg-purple-500/20 text-purple-400 flex items-center justify-center flex-shrink-0 text-sm">💳</div>
+                            <div className="w-8 h-8 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center flex-shrink-0 text-sm">👤</div>
                             <div>
-                              <p className="text-sm text-gray-200">Paystack Renewal: <span className="font-bold text-white">₦30,000</span></p>
-                              <p className="text-xs text-gray-500 mt-0.5">15 mins ago</p>
+                              <p className="text-sm text-gray-200">Member: Awodiya • Plan: Gold Pro • Status: <span className="text-emerald-400 font-bold">Active</span> • Expires: 23 Jul 2026</p>
                             </div>
                           </div>
                         </div>
@@ -336,9 +336,9 @@ export default function HomePage() {
               </div>
               <ul className="space-y-4 mb-8 flex-1 text-sm text-gray-300">
                 <li className="flex gap-3"><span className="text-emerald-400">✓</span> Up to 50 Active Members</li>
-                <li className="flex gap-3"><span className="text-emerald-400">✓</span> QR Code Check-ins</li>
-                <li className="flex gap-3"><span className="text-emerald-400">✓</span> Manual Member Tracking</li>
-                <li className="flex gap-3"><span className="text-emerald-400">✓</span> Basic Class Scheduling</li>
+                <li className="flex gap-3"><span className="text-emerald-400">✓</span> Manual payment logging</li>
+                <li className="flex gap-3"><span className="text-emerald-400">✓</span> Class scheduling</li>
+                <li className="flex gap-3"><span className="text-emerald-400">✓</span> QR attendance desk tracking</li>
               </ul>
               <Link href="/onboarding" className="w-full bg-gray-800 text-white font-bold px-6 py-3 rounded-xl hover:bg-gray-700 transition text-center block">Start 14-Day Free Trial</Link>
             </div>
@@ -354,9 +354,9 @@ export default function HomePage() {
               </div>
               <ul className="space-y-4 mb-8 flex-1 text-sm text-gray-300">
                 <li className="flex gap-3"><span className="text-emerald-400">✓</span> Up to 150 Active Members</li>
-                <li className="flex gap-3"><span className="text-emerald-400">✓</span> Automated Paystack/Flutterwave</li>
-                <li className="flex gap-3"><span className="text-emerald-400">✓</span> Custom Web Builder</li>
-                <li className="flex gap-3"><span className="text-emerald-400">✓</span> Basic AI Trainer Chat</li>
+                <li className="flex gap-3"><span className="text-emerald-400">✓</span> Paystack/Flutterwave automation</li>
+                <li className="flex gap-3"><span className="text-emerald-400">✓</span> No-code web builder</li>
+                <li className="flex gap-3"><span className="text-emerald-400">✓</span> Basic AI Trainer chat</li>
               </ul>
               <Link href="/onboarding" className="w-full bg-gray-800 text-white font-bold px-6 py-3 rounded-xl hover:bg-gray-700 transition text-center block">Start 14-Day Free Trial</Link>
             </div>
@@ -375,9 +375,10 @@ export default function HomePage() {
               </div>
               <ul className="space-y-4 mb-8 flex-1 text-sm text-gray-300">
                 <li className="flex gap-3"><span className="text-emerald-400">✓</span> Up to 400 Active Members</li>
-                <li className="flex gap-3"><span className="text-emerald-400">✓</span> Full Gemini AI Workout/Nutrition</li>
-                <li className="flex gap-3"><span className="text-emerald-400">✓</span> Custom Domains & White-labeling</li>
-                <li className="flex gap-3"><span className="text-emerald-400">✓</span> Live Leaderboards & Gym Blog</li>
+                <li className="flex gap-3"><span className="text-emerald-400">✓</span> Custom domain routing</li>
+                <li className="flex gap-3"><span className="text-emerald-400">✓</span> Complete Gemini AI planners</li>
+                <li className="flex gap-3"><span className="text-emerald-400">✓</span> Leaderboards & achievements</li>
+                <li className="flex gap-3"><span className="text-emerald-400">✓</span> Gym blog dashboard</li>
               </ul>
               <Link href="/onboarding" className="w-full bg-emerald-500 text-white font-bold px-6 py-3 rounded-xl hover:bg-emerald-400 transition text-center block">Start 14-Day Free Trial</Link>
             </div>
@@ -393,9 +394,9 @@ export default function HomePage() {
               </div>
               <ul className="space-y-4 mb-8 flex-1 text-sm text-gray-300">
                 <li className="flex gap-3"><span className="text-emerald-400">✓</span> Unlimited Active Members</li>
-                <li className="flex gap-3"><span className="text-emerald-400">✓</span> Multi-Branch / Location Management</li>
-                <li className="flex gap-3"><span className="text-emerald-400">✓</span> Global Roster Synchronization</li>
-                <li className="flex gap-3"><span className="text-emerald-400">✓</span> Unlimited Trainer Seats</li>
+                <li className="flex gap-3"><span className="text-emerald-400">✓</span> Multi-location branch management</li>
+                <li className="flex gap-3"><span className="text-emerald-400">✓</span> Global multi-gym roster sync</li>
+                <li className="flex gap-3"><span className="text-emerald-400">✓</span> Unlimited staff seats</li>
               </ul>
               <Link href="/onboarding" className="w-full bg-gray-800 text-white font-bold px-6 py-3 rounded-xl hover:bg-gray-700 transition text-center block">Talk to Sales</Link>
             </div>
