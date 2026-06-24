@@ -3,6 +3,7 @@ import { getAuthSession } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { getUserAccessContext } from "@/lib/access-control";
 import Link from "next/link";
+import SuperadminMobileNav from "@/components/admin/SuperadminMobileNav";
 
 export default async function SuperAdminLayout({
   children,
@@ -39,7 +40,7 @@ export default async function SuperAdminLayout({
   return (
     <div className="min-h-screen bg-[#0a0a0f] text-white flex">
       {/* Sidebar */}
-      <aside className="w-60 border-r border-white/5 flex flex-col shrink-0">
+      <aside className="hidden md:flex w-60 border-r border-white/5 flex-col shrink-0">
         {/* Brand */}
         <div className="px-6 py-5 border-b border-white/5">
           <div className="flex items-center gap-3">
@@ -93,9 +94,12 @@ export default async function SuperAdminLayout({
       </aside>
 
       {/* Main */}
-      <main className="flex-1 overflow-y-auto">
+      <main className="flex-1 overflow-y-auto pb-20 md:pb-0 min-w-0">
         {children}
       </main>
+
+      {/* Mobile Nav */}
+      <SuperadminMobileNav />
     </div>
   );
 }

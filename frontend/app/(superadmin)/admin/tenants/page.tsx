@@ -44,7 +44,7 @@ export default async function SuperAdminTenantsPage() {
   return (
     <div className="p-8">
       {/* Header */}
-      <div className="mb-8 flex items-center justify-between">
+      <div className="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-white">Gyms</h1>
           <p className="text-slate-400 text-sm mt-1">

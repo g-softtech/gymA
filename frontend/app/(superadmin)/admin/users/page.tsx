@@ -62,7 +62,7 @@ export default async function SuperAdminUsersPage({
       </div>
 
       {/* Filters */}
-      <form method="GET" className="flex flex-wrap gap-3 mb-6">
+      <form method="GET" className="flex flex-col sm:flex-row sm:flex-wrap gap-3 mb-6">
         {/* Gym filter */}
         <select
           name="tenantId"
