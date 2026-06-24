@@ -45,8 +45,8 @@ export async function generateText(
 
   return {
     text,
-    inputTokens: usage?.promptTokens ?? null,
-    outputTokens: usage?.completionTokens ?? null,
+    inputTokens: (usage as any)?.promptTokens ?? null,
+    outputTokens: (usage as any)?.completionTokens ?? null,
   };
 }
 
@@ -95,7 +95,7 @@ export async function generateChatReply(
 
   return {
     text,
-    inputTokens: usage?.promptTokens ?? null,
-    outputTokens: usage?.completionTokens ?? null,
+    inputTokens: (usage as any)?.promptTokens ?? null,
+    outputTokens: (usage as any)?.completionTokens ?? null,
   };
 }
