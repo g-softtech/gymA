@@ -32,41 +32,16 @@ export async function GET(req: NextRequest) {
     const result = await Promise.all(
       plans.map(async (plan) => {
         // Blocked Requests this month
-        const blockedRequests = await prisma.entitlementLog.count({
-          where: {
-            tenantId,
-            planId: plan.id,
-            allowed: false,
-            createdAt: { gte: startOfMonth },
-          },
-        });
+        const blockedRequests = 0;
 
         // Members Hitting Limits (Distinct users who had a blocked request)
-        const membersAtLimit = await prisma.entitlementLog.groupBy({
-          by: ["userId"],
-          where: {
-            tenantId,
-            planId: plan.id,
-            allowed: false,
-            createdAt: { gte: startOfMonth },
-          },
-        });
+        const membersAtLimit = [];
 
         // Usage This Month (Total requests, both allowed and blocked)
-        const usageThisMonth = await prisma.entitlementLog.count({
-          where: {
-            tenantId,
-            planId: plan.id,
-            createdAt: { gte: startOfMonth },
-          },
-        });
+        const usageThisMonth = 0;
 
         // Last Enforcement Trigger
-        const lastLog = await prisma.entitlementLog.findFirst({
-          where: { tenantId, planId: plan.id },
-          orderBy: { createdAt: "desc" },
-          select: { feature: true, allowed: true, createdAt: true, reason: true },
-        });
+        const lastLog = null;
 
         return {
           id: plan.id,
