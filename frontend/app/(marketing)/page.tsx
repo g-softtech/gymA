@@ -228,7 +228,7 @@ export default function HomePage() {
                   Our AI coach generates personalised workout plans and Nigerian meal plans — featuring Jollof Rice, Egusi Soup, Suya, Moin Moin, and 60+ local foods with precise macro breakdowns.
                 </p>
                 <Link
-                  href="/gym/cortexfit/dashboard/member/ai"
+                  href="/onboarding"
                   className="inline-flex bg-white text-indigo-700 font-bold px-6 py-3 rounded-xl hover:bg-indigo-50 transition"
                 >
                   Try AI Coach →
