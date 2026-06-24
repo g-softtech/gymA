@@ -41,9 +41,6 @@ export async function generateText(
     model: google(GEMINI_MODEL),
     system: options?.systemInstruction,
     prompt: prompt,
-    maxTokens: options?.maxOutputTokens ?? 2048,
-    temperature: 0.7,
-    topP: 0.95,
   });
 
   return {
@@ -94,9 +91,6 @@ export async function generateChatReply(
     model: google(GEMINI_MODEL),
     system: systemInstruction,
     messages: formattedMessages,
-    maxTokens: 1024,
-    temperature: 0.8,
-    topP: 0.95,
   });
 
   return {
