@@ -11,6 +11,7 @@ export interface TenantContext {
   tenantId: string;
   userId: string;
   role: string;
+  tenantStatus?: string;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -27,20 +28,21 @@ export async function getTenantContext(): Promise<TenantContext | null> {
   const session = await getAuthSession();
   if (!session?.user?.id) return null;
 
-  const { id: userId, role, tenantId } = session.user as {
+  const { id: userId, role, tenantId, tenantStatus } = session.user as {
     id: string;
     role: string;
     tenantId?: string;
+    tenantStatus?: string;
   };
 
   // SUPERADMIN may operate without a tenantId
   if (role === "SUPERADMIN") {
-    return { tenantId: tenantId ?? "", userId, role };
+    return { tenantId: tenantId ?? "", userId, role, tenantStatus };
   }
 
   if (!tenantId) return null;
 
-  return { tenantId, userId, role };
+  return { tenantId, userId, role, tenantStatus };
 }
 
 /**
@@ -56,15 +58,16 @@ export function getTenantContextFromSession(
     id: string;
     role: string;
     tenantId?: string;
+    tenantStatus?: string;
   };
 
   if (user.role === "SUPERADMIN") {
-    return { tenantId: user.tenantId ?? "", userId: user.id, role: user.role };
+    return { tenantId: user.tenantId ?? "", userId: user.id, role: user.role, tenantStatus: user.tenantStatus };
   }
 
   if (!user.tenantId) return null;
 
-  return { tenantId: user.tenantId, userId: user.id, role: user.role };
+  return { tenantId: user.tenantId, userId: user.id, role: user.role, tenantStatus: user.tenantStatus };
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -82,6 +85,12 @@ export function requireRole(
   if (!ctx) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+
+  // Globally block non-APPROVED tenants from APIs unless SUPERADMIN
+  if (ctx.role !== "SUPERADMIN" && ctx.tenantStatus !== "APPROVED") {
+    return NextResponse.json({ error: "Tenant is not approved for API access." }, { status: 403 });
+  }
+
   if (!allowedRoles.includes(ctx.role)) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
@@ -123,9 +132,42 @@ export function assertTenantOwner(
   }
   // SUPERADMIN can access any tenant
   if (ctx.role === "SUPERADMIN") return null;
+
+  // Globally block non-APPROVED tenants from APIs
+  if (ctx.tenantStatus !== "APPROVED") {
+    return NextResponse.json({ error: "Tenant is not approved for API access." }, { status: 403 });
+  }
+
   if (ctx.tenantId !== resourceTenantId) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
+  return null;
+}
+
+/**
+ * Asserts that the specified tenant is APPROVED.
+ * Blocks API access if the tenant is PENDING, SUSPENDED, or REJECTED.
+ * SUPERADMIN bypasses this check.
+ */
+export async function assertTenantApproved(
+  ctx: TenantContext | null,
+  tenantId: string
+): Promise<NextResponse | null> {
+  if (!ctx) return unauthorized();
+  if (ctx.role === "SUPERADMIN") return null;
+
+  const tenant = await prisma.tenant.findUnique({
+    where: { id: tenantId },
+    select: { status: true }
+  });
+
+  if (!tenant || tenant.status !== "APPROVED") {
+    return NextResponse.json(
+      { error: "Tenant is not approved for API access." }, 
+      { status: 403 }
+    );
+  }
+
   return null;
 }
 
@@ -142,6 +184,9 @@ export async function assertMemberBelongsToTenant(
   memberId: string
 ): Promise<NextResponse | null> {
   if (!ctx) return unauthorized();
+  if (ctx.role !== "SUPERADMIN" && ctx.tenantStatus !== "APPROVED") {
+    return NextResponse.json({ error: "Tenant is not approved for API access." }, { status: 403 });
+  }
 
   const memberProfile = await prisma.memberProfile.findUnique({
     where: { id: memberId },
@@ -165,6 +210,9 @@ export async function assertTrainerBelongsToTenant(
   trainerId: string
 ): Promise<NextResponse | null> {
   if (!ctx) return unauthorized();
+  if (ctx.role !== "SUPERADMIN" && ctx.tenantStatus !== "APPROVED") {
+    return NextResponse.json({ error: "Tenant is not approved for API access." }, { status: 403 });
+  }
 
   const trainerProfile = await prisma.trainerProfile.findUnique({
     where: { id: trainerId },
@@ -188,6 +236,9 @@ export async function assertPlanBelongsToTenant(
   planId: string
 ): Promise<NextResponse | null> {
   if (!ctx) return unauthorized();
+  if (ctx.role !== "SUPERADMIN" && ctx.tenantStatus !== "APPROVED") {
+    return NextResponse.json({ error: "Tenant is not approved for API access." }, { status: 403 });
+  }
 
   const plan = await prisma.membershipPlan.findUnique({
     where: { id: planId },
@@ -213,6 +264,9 @@ export async function assertUserCanManageMember(
   memberId: string
 ): Promise<NextResponse | null> {
   if (!ctx) return unauthorized();
+  if (ctx.role !== "SUPERADMIN" && ctx.tenantStatus !== "APPROVED") {
+    return NextResponse.json({ error: "Tenant is not approved for API access." }, { status: 403 });
+  }
 
   const memberProfile = await prisma.memberProfile.findUnique({
     where: { id: memberId },

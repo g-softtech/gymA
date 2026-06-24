@@ -133,7 +133,7 @@ export const authOptions: NextAuthOptions = {
           id: true,
           role: true,
           tenantId: true,
-          tenant: { select: { slug: true } },
+          tenant: { select: { slug: true, status: true } },
         },
       });
 
@@ -156,6 +156,7 @@ export const authOptions: NextAuthOptions = {
       token.role = dbUser.role;
       token.tenantId = dbUser.tenantId ?? undefined;
       token.tenantSlug = dbUser.tenant?.slug ?? null;
+      token.tenantStatus = dbUser.tenant?.status ?? null;
 
       console.log(`${TRACE} └─ FINAL TOKEN (after hydration):`);
       console.log(`${TRACE}    token.id        = ${token.id}`);
@@ -184,6 +185,7 @@ export const authOptions: NextAuthOptions = {
         session.user.role = token.role as string;
         session.user.tenantId = token.tenantId as string | undefined;
         session.user.tenantSlug = token.tenantSlug as string | null | undefined;
+        session.user.tenantStatus = token.tenantStatus as string | null | undefined;
       }
 
       console.log(`${TRACE} └─ OUTGOING session.user:`);

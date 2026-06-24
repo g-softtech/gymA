@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { getAuthSession } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import TenantActionButtons from "./components/TenantActionButtons";
 
 export default async function SuperAdminTenantsPage() {
   const session = await getAuthSession();
@@ -31,6 +32,13 @@ export default async function SuperAdminTenantsPage() {
     STARTER: "bg-blue-900/60 text-blue-300 border-blue-700",
     PROFESSIONAL: "bg-violet-900/60 text-violet-300 border-violet-700",
     ENTERPRISE: "bg-amber-900/60 text-amber-300 border-amber-700",
+  };
+
+  const statusColors: Record<string, string> = {
+    PENDING: "bg-amber-500/10 text-amber-400 border-amber-500/20",
+    APPROVED: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
+    REJECTED: "bg-red-500/10 text-red-400 border-red-500/20",
+    SUSPENDED: "bg-rose-500/10 text-rose-400 border-rose-500/20",
   };
 
   return (
@@ -144,25 +152,20 @@ export default async function SuperAdminTenantsPage() {
                     <span className="text-slate-400">{tenant._count.membershipPlans}</span>
                   </td>
 
-                  {/* Active status */}
+                  {/* Status */}
                   <td className="px-6 py-4">
                     <span
-                      className={`inline-flex items-center gap-1.5 text-xs font-medium ${
-                        tenant.isActive ? "text-emerald-400" : "text-red-400"
-                      }`}
+                      className={`text-[11px] font-bold px-2.5 py-1 rounded-full border ${statusColors[tenant.status] ?? "bg-slate-700 text-slate-300 border-slate-600"}`}
                     >
-                      <span
-                        className={`w-1.5 h-1.5 rounded-full ${
-                          tenant.isActive ? "bg-emerald-400" : "bg-red-400"
-                        }`}
-                      />
-                      {tenant.isActive ? "Active" : "Suspended"}
+                      {tenant.status}
                     </span>
                   </td>
 
                   {/* Actions */}
                   <td className="px-6 py-4">
-                    <Link
+                    <div className="flex items-center gap-4">
+                      <TenantActionButtons tenantId={tenant.id} currentStatus={tenant.status} />
+                      <Link
                       href={`/gym/${tenant.slug}/dashboard/admin`}
                       target="_blank"
                       className="text-xs text-indigo-400 hover:text-indigo-300 transition-colors font-medium"
@@ -170,6 +173,7 @@ export default async function SuperAdminTenantsPage() {
                     >
                       View →
                     </Link>
+                    </div>
                   </td>
                 </tr>
               ))}

@@ -4,8 +4,8 @@ import { prisma } from "@/lib/prisma";
 import { notFound, redirect } from "next/navigation";
 import { getAuthSession } from "@/lib/auth";
 import { getUserAccessContext } from "@/lib/access-control";
-import Link from "next/link";
 import AdminLockoutGuard from "@/components/admin/AdminLockoutGuard";
+import PendingApprovalScreen from "@/components/admin/PendingApprovalScreen";
 import { MobileNav } from "@/components/MobileNav";
 import { SidebarNav } from "@/components/SidebarNav";
 
@@ -58,6 +58,12 @@ export default async function DashboardLayout({
     include: { settings: true },
   });
   if (!tenant) notFound();
+
+  // Waitlist Lock
+  if (tenant.status !== "APPROVED" && ctx.role !== "SUPERADMIN") {
+    const brandName = tenant.settings?.brandName || tenant.name;
+    return <PendingApprovalScreen brandName={brandName} slug={slug} status={tenant.status} />;
+  }
 
   const role = session.user.role;
   const isAdmin = role === "ADMIN" || role === "SUPERADMIN";
