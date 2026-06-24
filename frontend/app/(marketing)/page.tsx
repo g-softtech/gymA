@@ -161,7 +161,7 @@ export default function HomePage() {
                           <div className="flex items-start gap-3">
                             <div className="w-8 h-8 rounded-full bg-purple-500/20 text-purple-400 flex items-center justify-center flex-shrink-0 text-sm">💳</div>
                             <div>
-                              <p className="text-sm text-gray-200">Paystack Renewal: <span className="font-bold text-white">₦35,000</span></p>
+                              <p className="text-sm text-gray-200">Paystack Renewal: <span className="font-bold text-white">₦30,000</span></p>
                               <p className="text-xs text-gray-500 mt-0.5">15 mins ago</p>
                             </div>
                           </div>
@@ -314,56 +314,90 @@ export default function HomePage() {
 
       {/* Pricing Section */}
       <section id="pricing" className="py-24 px-6 bg-white border-t border-gray-100">
-        <div className="max-w-5xl mx-auto">
+        <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-extrabold text-gray-900 mb-4">
               Simple, transparent pricing
             </h2>
             <p className="text-xl text-gray-500 max-w-2xl mx-auto">
-              Everything you need to scale your fitness business, all in one plan.
+              Built for gyms of all sizes. Billed annually to give you 2 months free.
             </p>
           </div>
           
-          <div className="max-w-md mx-auto relative group">
-            {/* Glow behind card */}
-            <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-3xl blur opacity-25 group-hover:opacity-40 transition duration-1000"></div>
-            
-            <div className="relative bg-gray-900 rounded-3xl border border-gray-800 p-8 shadow-2xl flex flex-col text-center">
-              <div className="inline-block mx-auto bg-indigo-500/20 text-indigo-300 font-semibold px-4 py-1.5 rounded-full text-sm mb-6 border border-indigo-500/30">
-                Scale-Up Enterprise Plan
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {/* Starter Plan */}
+            <div className="relative bg-gray-900 rounded-3xl border border-gray-800 p-8 shadow-xl flex flex-col">
+              <h3 className="text-xl font-bold text-white mb-2">Starter Plan</h3>
+              <p className="text-sm text-gray-400 mb-6">Perfect for small studios</p>
+              <div className="mb-6">
+                <span className="text-4xl font-extrabold text-white">₦100k</span>
+                <span className="text-gray-400 text-sm"> / year</span>
+                <p className="text-emerald-400 text-xs mt-1 font-medium">Equals ₦10k/mo</p>
               </div>
-              
-              <div className="mb-8">
-                <span className="text-5xl font-extrabold text-white">₦35,000</span>
-                <span className="text-gray-400 font-medium"> / month</span>
-              </div>
-              
-              <ul className="space-y-4 mb-10 text-left">
-                {[
-                  "Up to 500 Active Members & Access Control",
-                  "Automated Paystack & Flutterwave Renewals",
-                  "24/7 Unlimited Gemini AI Coaching Suite",
-                  "Full White-Label Page Builder & Custom Domains",
-                  "Frictionless Expiring QR Code Check-ins"
-                ].map((feature, i) => (
-                  <li key={i} className="flex items-center gap-3 text-gray-300">
-                    <div className="flex-shrink-0 w-5 h-5 rounded-full bg-emerald-500/20 flex items-center justify-center border border-emerald-500/30">
-                      <svg className="w-3 h-3 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                      </svg>
-                    </div>
-                    <span>{feature}</span>
-                  </li>
-                ))}
+              <ul className="space-y-4 mb-8 flex-1 text-sm text-gray-300">
+                <li className="flex gap-3"><span className="text-emerald-400">✓</span> Up to 50 Active Members</li>
+                <li className="flex gap-3"><span className="text-emerald-400">✓</span> QR Code Check-ins</li>
+                <li className="flex gap-3"><span className="text-emerald-400">✓</span> Manual Member Tracking</li>
+                <li className="flex gap-3"><span className="text-emerald-400">✓</span> Basic Class Scheduling</li>
               </ul>
-              
-              <Link
-                href="/onboarding"
-                className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold px-8 py-4 rounded-xl hover:from-indigo-500 hover:to-purple-500 transition shadow-lg shadow-indigo-500/25 block"
-              >
-                Start 14-Day Free Trial
-              </Link>
-              <p className="text-gray-500 text-xs mt-4">Cancel anytime. No hidden fees.</p>
+              <Link href="/onboarding" className="w-full bg-gray-800 text-white font-bold px-6 py-3 rounded-xl hover:bg-gray-700 transition text-center block">Start 14-Day Free Trial</Link>
+            </div>
+
+            {/* Growth Plan */}
+            <div className="relative bg-gray-900 rounded-3xl border border-gray-800 p-8 shadow-xl flex flex-col">
+              <h3 className="text-xl font-bold text-white mb-2">Growth Plan</h3>
+              <p className="text-sm text-gray-400 mb-6">For growing fitness centers</p>
+              <div className="mb-6">
+                <span className="text-4xl font-extrabold text-white">₦200k</span>
+                <span className="text-gray-400 text-sm"> / year</span>
+                <p className="text-emerald-400 text-xs mt-1 font-medium">Equals ₦20k/mo</p>
+              </div>
+              <ul className="space-y-4 mb-8 flex-1 text-sm text-gray-300">
+                <li className="flex gap-3"><span className="text-emerald-400">✓</span> Up to 150 Active Members</li>
+                <li className="flex gap-3"><span className="text-emerald-400">✓</span> Automated Paystack/Flutterwave</li>
+                <li className="flex gap-3"><span className="text-emerald-400">✓</span> Custom Web Builder</li>
+                <li className="flex gap-3"><span className="text-emerald-400">✓</span> Basic AI Trainer Chat</li>
+              </ul>
+              <Link href="/onboarding" className="w-full bg-gray-800 text-white font-bold px-6 py-3 rounded-xl hover:bg-gray-700 transition text-center block">Start 14-Day Free Trial</Link>
+            </div>
+
+            {/* Scale-Up Plan (Most Popular) */}
+            <div className="relative bg-gray-900 rounded-3xl border-2 border-emerald-500 p-8 shadow-2xl shadow-emerald-500/20 flex flex-col transform md:-translate-y-4">
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-emerald-500 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">
+                Most Popular
+              </div>
+              <h3 className="text-xl font-bold text-white mb-2">Scale-Up Plan</h3>
+              <p className="text-sm text-gray-400 mb-6">The ultimate gym OS</p>
+              <div className="mb-6">
+                <span className="text-4xl font-extrabold text-white">₦300k</span>
+                <span className="text-gray-400 text-sm"> / year</span>
+                <p className="text-emerald-400 text-xs mt-1 font-medium">Equals ₦30k/mo</p>
+              </div>
+              <ul className="space-y-4 mb-8 flex-1 text-sm text-gray-300">
+                <li className="flex gap-3"><span className="text-emerald-400">✓</span> Up to 400 Active Members</li>
+                <li className="flex gap-3"><span className="text-emerald-400">✓</span> Full Gemini AI Workout/Nutrition</li>
+                <li className="flex gap-3"><span className="text-emerald-400">✓</span> Custom Domains & White-labeling</li>
+                <li className="flex gap-3"><span className="text-emerald-400">✓</span> Live Leaderboards & Gym Blog</li>
+              </ul>
+              <Link href="/onboarding" className="w-full bg-emerald-500 text-white font-bold px-6 py-3 rounded-xl hover:bg-emerald-400 transition text-center block">Start 14-Day Free Trial</Link>
+            </div>
+
+            {/* Apex Network Plan */}
+            <div className="relative bg-gray-900 rounded-3xl border border-gray-800 p-8 shadow-xl flex flex-col">
+              <h3 className="text-xl font-bold text-white mb-2">Apex Network Plan</h3>
+              <p className="text-sm text-gray-400 mb-6">For multi-location chains</p>
+              <div className="mb-6">
+                <span className="text-4xl font-extrabold text-white">₦400k</span>
+                <span className="text-gray-400 text-sm"> / year</span>
+                <p className="text-emerald-400 text-xs mt-1 font-medium">Equals ₦40k/mo</p>
+              </div>
+              <ul className="space-y-4 mb-8 flex-1 text-sm text-gray-300">
+                <li className="flex gap-3"><span className="text-emerald-400">✓</span> Unlimited Active Members</li>
+                <li className="flex gap-3"><span className="text-emerald-400">✓</span> Multi-Branch / Location Management</li>
+                <li className="flex gap-3"><span className="text-emerald-400">✓</span> Global Roster Synchronization</li>
+                <li className="flex gap-3"><span className="text-emerald-400">✓</span> Unlimited Trainer Seats</li>
+              </ul>
+              <Link href="/onboarding" className="w-full bg-gray-800 text-white font-bold px-6 py-3 rounded-xl hover:bg-gray-700 transition text-center block">Talk to Sales</Link>
             </div>
           </div>
         </div>
