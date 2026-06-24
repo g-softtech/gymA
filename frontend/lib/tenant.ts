@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import type { Session } from "next-auth";
 import { getAuthSession } from "./auth";
 import { prisma } from "./prisma";
+import { TENANT_PLAN_LIMITS, TenantLimits } from "./tenant-entitlements";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -342,4 +343,65 @@ export async function getTenantSettings(tenantId: string) {
   return prisma.tenantSettings.findUnique({
     where: { tenantId },
   });
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Phase 20: Tenant SaaS Entitlement Enforcement
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Asserts that the given tenant is allowed to use a specific feature or has not
+ * exceeded a numeric threshold, based on their active SaaS plan.
+ */
+export async function verifyTenantEntitlement(
+  tenantId: string,
+  feature: keyof TenantLimits
+): Promise<NextResponse | null> {
+  const tenant = await prisma.tenant.findUnique({
+    where: { id: tenantId },
+    select: { plan: true }
+  });
+
+  if (!tenant) {
+    return NextResponse.json({ error: "Tenant not found" }, { status: 404 });
+  }
+
+  const limits = TENANT_PLAN_LIMITS[tenant.plan];
+
+  // Boolean Feature Check
+  if (typeof limits[feature] === "boolean") {
+    if (!limits[feature]) {
+      return NextResponse.json(
+        { error: `This feature is locked on the ${tenant.plan} plan. Please upgrade.` },
+        { status: 403 }
+      );
+    }
+    return null;
+  }
+
+  // Threshold / Numeric Check
+  if (typeof limits[feature] === "number") {
+    const limit = limits[feature] as number;
+    
+    let currentCount = 0;
+    if (feature === "maxMembers") {
+      currentCount = await prisma.memberProfile.count({
+        where: { user: { tenantId } }
+      });
+    } else if (feature === "maxTrainers") {
+      currentCount = await prisma.trainerProfile.count({
+        where: { user: { tenantId } }
+      });
+    }
+
+    if (currentCount >= limit) {
+      return NextResponse.json(
+        { error: `Limit exceeded. Your ${tenant.plan} plan allows up to ${limit} ${feature === "maxMembers" ? "members" : "trainers"}. Please upgrade.` },
+        { status: 403 }
+      );
+    }
+    return null;
+  }
+
+  return null;
 }
