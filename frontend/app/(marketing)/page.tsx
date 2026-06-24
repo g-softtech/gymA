@@ -341,6 +341,9 @@ export default function HomePage() {
                 <li className="flex gap-3"><span className="text-indigo-600 font-bold">✓</span> Basic attendance tracking (QR Check-in)</li>
                 <li className="flex gap-3"><span className="text-indigo-600 font-bold">✓</span> Member dashboard view</li>
                 <li className="flex gap-3"><span className="text-indigo-600 font-bold">✓</span> Email support</li>
+                <li className="flex gap-3"><span className="text-indigo-600 font-bold">✓</span> Custom branding settings</li>
+                <li className="flex gap-3"><span className="text-indigo-600 font-bold">✓</span> No-code website builder</li>
+                <li className="flex gap-3"><span className="text-indigo-600 font-bold">✓</span> Built-in facility blog module</li>
                 
                 {/* Excluded */}
                 <li className="flex gap-3 text-gray-400 opacity-70"><span className="text-gray-300 font-bold">✗</span> AI Coach suites</li>
@@ -393,9 +396,6 @@ export default function HomePage() {
                 <li className="flex gap-3"><span className="text-indigo-600 font-bold">✓</span> Up to 400 members</li>
                 <li className="flex gap-3"><span className="text-indigo-600 font-bold">✓</span> Unlimited trainers</li>
                 <li className="flex gap-3"><span className="text-indigo-600 font-bold">✓</span> Everything in Professional</li>
-                <li className="flex gap-3"><span className="text-indigo-600 font-bold">✓</span> Custom branding settings</li>
-                <li className="flex gap-3"><span className="text-indigo-600 font-bold">✓</span> No-code website builder</li>
-                <li className="flex gap-3"><span className="text-indigo-600 font-bold">✓</span> Built-in facility blog module</li>
                 <li className="flex gap-3"><span className="text-indigo-600 font-bold">✓</span> Advanced financial intelligence & churn analytics</li>
                 <li className="flex gap-3"><span className="text-indigo-600 font-bold">✓</span> Dedicated account support</li>
                 
