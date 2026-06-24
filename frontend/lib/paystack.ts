@@ -8,6 +8,7 @@ export async function initializePaystackTransaction(data: {
   reference: string;
   currency: "NGN" | "USD";
   callback_url?: string;
+  metadata?: any;
 }) {
   if (!PAYSTACK_SECRET_KEY) {
     throw new Error("PAYSTACK_SECRET_KEY is not configured");
