@@ -12,9 +12,10 @@
  */
 
 import { generateText as vercelGenerateText, generateObject as vercelGenerateObject } from "ai";
-import { google } from "@ai-sdk/google";
+import { createGoogleGenerativeAI } from "@ai-sdk/google";
 
 const apiKey = process.env.GOOGLE_API_KEY ?? "";
+const googleProvider = createGoogleGenerativeAI({ apiKey });
 
 if (!apiKey && process.env.NODE_ENV === "production") {
   console.error("[gemini] GOOGLE_API_KEY is not set — AI features will fail");
@@ -38,7 +39,7 @@ export async function generateText(
   options?: { systemInstruction?: string; maxOutputTokens?: number; responseMimeType?: string }
 ): Promise<GeminiResult> {
   const { text, usage } = await vercelGenerateText({
-    model: google(GEMINI_MODEL),
+    model: googleProvider(GEMINI_MODEL),
     system: options?.systemInstruction,
     prompt: prompt,
   });
@@ -88,7 +89,7 @@ export async function generateChatReply(
   }));
 
   const { text, usage } = await vercelGenerateText({
-    model: google(GEMINI_MODEL),
+    model: googleProvider(GEMINI_MODEL),
     system: systemInstruction,
     messages: formattedMessages,
   });

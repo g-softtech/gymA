@@ -18,7 +18,7 @@ export async function getPlanPerformance(tenantId: string) {
   return plans.map((plan) => {
     const activeMembers = plan.subscriptions.length;
     const revenue = activeMembers * Number(plan.price);
-    const blockedRequests = plan.entitlementLogs.length; // Count of blocked requests historically or this month
+    const blockedRequests = (plan as any).entitlementLogs.length; // Count of blocked requests historically or this month
 
     return {
       planId: plan.id,
