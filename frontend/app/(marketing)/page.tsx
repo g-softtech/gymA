@@ -75,57 +75,100 @@ export default function HomePage() {
           </div>
           <p className="text-indigo-300 text-sm mt-6">No credit card required · Set up in 5 minutes</p>
 
-          {/* Hero Section Mockup (MacBook/iPad simulation) */}
-          <div className="mt-16 mx-auto max-w-4xl relative group">
-            {/* Glow effect */}
-            <div className="absolute -inset-1 bg-gradient-to-r from-emerald-400 to-indigo-500 rounded-2xl blur opacity-30 group-hover:opacity-50 transition duration-1000"></div>
-            
-            <div className="relative bg-gray-900 rounded-2xl border border-gray-800 shadow-2xl overflow-hidden aspect-[16/9] flex flex-col">
-              {/* Browser/Device Header */}
-              <div className="bg-gray-800/80 px-4 py-3 flex items-center gap-2 border-b border-gray-700/50 backdrop-blur-sm">
-                <div className="flex gap-1.5">
-                  <div className="w-3 h-3 rounded-full bg-red-500/80"></div>
-                  <div className="w-3 h-3 rounded-full bg-yellow-500/80"></div>
-                  <div className="w-3 h-3 rounded-full bg-green-500/80"></div>
-                </div>
-                <div className="mx-auto bg-gray-900/50 rounded-md px-3 py-1 text-xs text-gray-400 font-mono border border-gray-700/50">
-                  admin.cortexfit.app
-                </div>
-              </div>
+          {/* Hero Section Mockup (Software Meets Steel Concept) */}
+          <div className="mt-16 mx-auto max-w-5xl relative group px-4 sm:px-0">
+            {/* Background Image Layer */}
+            <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-gray-800">
+              <div 
+                className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=1470&auto=format&fit=crop')] bg-cover bg-center"
+              />
+              <div className="absolute inset-0 bg-slate-950/40 backdrop-blur-[1px]"></div>
               
-              {/* Dashboard Content Mockup */}
-              <div className="flex-1 p-6 grid grid-cols-12 gap-6 relative overflow-hidden bg-gray-900">
-                {/* Sidebar */}
-                <div className="col-span-3 space-y-4">
-                  <div className="h-8 w-24 bg-indigo-500/20 rounded-md mb-8 border border-indigo-500/30"></div>
-                  {[...Array(5)].map((_, i) => (
-                    <div key={i} className={`h-4 rounded-md ${i === 0 ? 'bg-indigo-500/40 w-full' : 'bg-gray-800 w-3/4'}`}></div>
-                  ))}
-                </div>
-                {/* Main Content */}
-                <div className="col-span-9 space-y-6">
-                  {/* Top nav */}
-                  <div className="flex justify-between items-center mb-4">
-                    <div className="h-6 w-32 bg-gray-800 rounded-md"></div>
-                    <div className="flex gap-3">
-                      <div className="h-8 w-8 rounded-full bg-gray-800"></div>
-                      <div className="h-8 w-8 rounded-full bg-emerald-500/20 border border-emerald-500/30"></div>
+              {/* Floating UI Layer */}
+              <div className="relative p-6 sm:p-12">
+                <div className="bg-gray-900/80 backdrop-blur-xl rounded-2xl border border-gray-700/50 shadow-2xl overflow-hidden flex flex-col">
+                  {/* Browser Header */}
+                  <div className="bg-gray-800/60 px-4 py-3 flex items-center gap-2 border-b border-gray-700/50">
+                    <div className="flex gap-1.5">
+                      <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                      <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+                      <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                    </div>
+                    <div className="mx-auto bg-gray-900/50 rounded-md px-3 py-1 text-xs text-gray-400 font-mono border border-gray-700/50">
+                      admin.cortexfit.app
                     </div>
                   </div>
-                  {/* Chart Area */}
-                  <div className="h-40 rounded-xl bg-gradient-to-br from-indigo-900/40 to-purple-900/40 border border-indigo-500/20 p-4 flex items-end gap-2">
-                    {[40, 70, 45, 90, 65, 100, 80].map((h, i) => (
-                      <div key={i} className="w-full bg-indigo-500/50 rounded-t-sm" style={{ height: `${h}%` }}></div>
-                    ))}
-                  </div>
-                  {/* Metrics Cards */}
-                  <div className="grid grid-cols-3 gap-4">
-                    {[...Array(3)].map((_, i) => (
-                      <div key={i} className="h-24 rounded-xl bg-gray-800/50 border border-gray-700/50 p-4 flex flex-col justify-between">
-                        <div className="h-3 w-16 bg-gray-700 rounded"></div>
-                        <div className="h-6 w-24 bg-gray-600 rounded"></div>
+                  
+                  {/* High-Density Data Dashboard */}
+                  <div className="p-6 grid grid-cols-1 md:grid-cols-12 gap-6 text-left">
+                    {/* Sidebar */}
+                    <div className="hidden md:block col-span-3 space-y-3">
+                      <div className="h-8 w-24 bg-indigo-500/20 rounded-md mb-6 border border-indigo-500/30"></div>
+                      {['Overview', 'Members', 'Finances', 'Schedule', 'Settings'].map((item, i) => (
+                        <div key={i} className={`flex items-center gap-3 px-3 py-2 rounded-lg ${i === 0 ? 'bg-indigo-500/20 text-indigo-300' : 'text-gray-400 hover:text-gray-200 hover:bg-white/5'}`}>
+                          <div className={`w-4 h-4 rounded ${i===0?'bg-indigo-400':'bg-gray-500'}`}></div>
+                          <span className="text-sm font-medium">{item}</span>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Main Content */}
+                    <div className="col-span-1 md:col-span-9 space-y-6">
+                      <div className="flex justify-between items-end">
+                        <div>
+                          <h2 className="text-xl font-bold text-white">Dashboard Overview</h2>
+                          <p className="text-sm text-gray-400">Welcome back, Superadmin</p>
+                        </div>
                       </div>
-                    ))}
+
+                      {/* Top Metrics */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        {/* Revenue Card */}
+                        <div className="bg-gray-800/50 border border-gray-700/50 rounded-xl p-5">
+                          <p className="text-sm text-gray-400 mb-1">Monthly Revenue</p>
+                          <div className="flex items-end justify-between">
+                            <p className="text-2xl font-bold text-white">₦1,240,000</p>
+                            <span className="inline-flex items-center gap-1 bg-emerald-500/20 text-emerald-400 text-xs font-bold px-2 py-1 rounded-md">
+                              +12% <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" /></svg>
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Members Card */}
+                        <div className="bg-gray-800/50 border border-gray-700/50 rounded-xl p-5">
+                          <div className="flex justify-between items-center mb-1">
+                            <p className="text-sm text-gray-400">Active Members</p>
+                            <span className="text-xs text-indigo-400 font-medium">Enterprise Tier</span>
+                          </div>
+                          <p className="text-2xl font-bold text-white mb-2">482 <span className="text-gray-500 text-lg">/ 500</span></p>
+                          <div className="w-full bg-gray-700 rounded-full h-1.5 overflow-hidden">
+                            <div className="bg-gradient-to-r from-indigo-500 to-purple-500 h-1.5 rounded-full" style={{ width: '96%' }}></div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Activity Feed */}
+                      <div className="bg-gray-800/50 border border-gray-700/50 rounded-xl p-5">
+                        <p className="text-sm font-bold text-gray-300 mb-4 border-b border-gray-700 pb-2">Live Activity Feed</p>
+                        <div className="space-y-4">
+                          <div className="flex items-start gap-3">
+                            <div className="w-8 h-8 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center flex-shrink-0 text-sm">👤</div>
+                            <div>
+                              <p className="text-sm text-gray-200">Oluwaseun checked in <span className="text-gray-500">(Wuse 2)</span></p>
+                              <p className="text-xs text-gray-500 mt-0.5">2 mins ago</p>
+                            </div>
+                          </div>
+                          <div className="flex items-start gap-3">
+                            <div className="w-8 h-8 rounded-full bg-purple-500/20 text-purple-400 flex items-center justify-center flex-shrink-0 text-sm">💳</div>
+                            <div>
+                              <p className="text-sm text-gray-200">Paystack Renewal: <span className="font-bold text-white">₦35,000</span></p>
+                              <p className="text-xs text-gray-500 mt-0.5">15 mins ago</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                    </div>
                   </div>
                 </div>
               </div>
@@ -297,11 +340,11 @@ export default function HomePage() {
               
               <ul className="space-y-4 mb-10 text-left">
                 {[
-                  "Up to 500 Active Members",
-                  "Paystack & Flutterwave Automation",
-                  "Unlimited Gemini AI Coaching",
-                  "Custom Domain & Branding Builder",
-                  "Dynamic QR Access Control"
+                  "Up to 500 Active Members & Access Control",
+                  "Automated Paystack & Flutterwave Renewals",
+                  "24/7 Unlimited Gemini AI Coaching Suite",
+                  "Full White-Label Page Builder & Custom Domains",
+                  "Frictionless Expiring QR Code Check-ins"
                 ].map((feature, i) => (
                   <li key={i} className="flex items-center gap-3 text-gray-300">
                     <div className="flex-shrink-0 w-5 h-5 rounded-full bg-emerald-500/20 flex items-center justify-center border border-emerald-500/30">
