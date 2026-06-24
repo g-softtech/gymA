@@ -9,7 +9,12 @@ const globalForPrisma = globalThis as unknown as {
 };
 
 // Initialize the pg pool and Prisma adapter, caching them in dev
-const pool = globalForPrisma.pool ?? new Pool({ connectionString: process.env.DATABASE_URL });
+const pool = globalForPrisma.pool ?? new Pool({ 
+  connectionString: process.env.DATABASE_URL,
+  max: 10,                 // Strictly cap connections per serverless instance lambda
+  idleTimeoutMillis: 30000, // Drop idle connections quickly
+  connectionTimeoutMillis: 2000
+});
 const adapter = globalForPrisma.adapter ?? new PrismaPg(pool);
 
 const prismaClientSingleton = () => {

@@ -159,6 +159,8 @@ model User {
   challengeEntries ChallengeEntry[] @relation("UserChallenges")
   badges           Badge[]          @relation("UserBadges")
   entitlementLogs  EntitlementLog[]
+
+  @@index([tenantId, role])
 }
 
 model Account {
@@ -249,6 +251,8 @@ model MembershipPlan {
   entitlements  Json           @default("{}")
   subscriptions Subscription[]
   entitlementLogs EntitlementLog[]
+
+  @@index([tenantId])
 }
 
 model Subscription {
@@ -781,6 +785,9 @@ model Transaction {
 
   tenant          Tenant        @relation(fields: [tenantId], references: [id])
   member          MemberProfile @relation(fields: [memberId], references: [id])
+
+  @@index([tenantId, createdAt])
+  @@index([memberId])
 }
 
 model PaymentEvent {

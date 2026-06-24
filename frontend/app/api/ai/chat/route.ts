@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+export const maxDuration = 60;
 import { getAuthSession } from "@/lib/auth";
 import { getTenantContextFromSession, noTenantContext } from "@/lib/tenant";
 import { checkAiRateLimit } from "@/lib/ratelimit";

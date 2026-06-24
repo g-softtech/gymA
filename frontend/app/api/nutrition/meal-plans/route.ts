@@ -69,7 +69,8 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    await prisma.mealPlan.delete({ where: { id: planId } });
+    const deleteResult = await prisma.mealPlan.deleteMany({ where: { id: planId, tenantId: ctx.tenantId } });
+    if (deleteResult.count === 0) return NextResponse.json({ error: "Record not found or unauthorized" }, { status: 404 });
     return NextResponse.json({ success: true });
   } catch (err) {
     console.error(err);

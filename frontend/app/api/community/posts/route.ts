@@ -112,7 +112,8 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    await prisma.post.delete({ where: { id: postId } });
+    const deleteResult = await prisma.post.deleteMany({ where: { id: postId, tenantId: ctx.tenantId } });
+    if (deleteResult.count === 0) return NextResponse.json({ error: "Record not found or unauthorized" }, { status: 404 });
     return NextResponse.json({ success: true });
   } catch (err) {
     console.error(err);

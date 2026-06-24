@@ -14,21 +14,27 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Password must be at least 8 characters" }, { status: 400 });
     }
 
-    const emailLower = email.toLowerCase().trim();
+    const originalCleanEmail = email.toLowerCase().trim();
+    const trialAbuseLookupString = originalCleanEmail.replace(/\+[^@]+/, "");
 
-    // Check if user already exists
-    const existingUser = await prisma.user.findUnique({
-      where: { email: emailLower },
+    // Query your database check using the normalized lookup string
+    const potentialAbuseEvent = await prisma.user.findFirst({
+      where: {
+        email: {
+          startsWith: trialAbuseLookupString.split('@')[0],
+          endsWith: trialAbuseLookupString.split('@')[1]
+        }
+      }
     });
 
-    if (existingUser) {
-      if (!existingUser.password) {
+    if (potentialAbuseEvent) {
+      if (!potentialAbuseEvent.password) {
         return NextResponse.json(
           { error: "Account exists with Google Sign-In. Please sign in with Google." },
           { status: 400 }
         );
       }
-      return NextResponse.json({ error: "Email already registered" }, { status: 400 });
+      return NextResponse.json({ error: "An account linked to this base inbox already exists." }, { status: 400 });
     }
 
     // Hash password
@@ -38,7 +44,7 @@ export async function POST(req: NextRequest) {
     await prisma.user.create({
       data: {
         name,
-        email: emailLower,
+        email: originalCleanEmail,
         password: hashedPassword,
         // Optional: you could assign them a default tenant if applicable,
         // or leave tenantId null so they can create/join a gym later.

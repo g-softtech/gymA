@@ -90,9 +90,7 @@ export async function PATCH(
         ? null
         : existing.publishedAt;
 
-    const updated = await prisma.blogPost.update({
-      where: { id: postId },
-      data: {
+    const updateResult = await prisma.blogPost.updateMany({ where: { id: postId, tenantId: ctx.tenantId }, data: {
         ...(title !== undefined && { title: title.trim() }),
         ...(excerpt !== undefined && { excerpt: excerpt?.trim() ?? null }),
         ...(content !== undefined && { content: content.trim() }),
@@ -102,7 +100,7 @@ export async function PATCH(
       },
     });
 
-    return NextResponse.json(updated);
+    return NextResponse.json({ success: true });
   } catch (err) {
     console.error("[PATCH /api/blog/[postId]]", err);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
@@ -132,7 +130,8 @@ export async function DELETE(
       return NextResponse.json({ error: "Post not found" }, { status: 404 });
     }
 
-    await prisma.blogPost.delete({ where: { id: postId } });
+    const deleteResult = await prisma.blogPost.deleteMany({ where: { id: postId, tenantId: ctx.tenantId } });
+    if (deleteResult.count === 0) return NextResponse.json({ error: "Record not found or unauthorized" }, { status: 404 });
     return NextResponse.json({ success: true });
   } catch (err) {
     console.error("[DELETE /api/blog/[postId]]", err);

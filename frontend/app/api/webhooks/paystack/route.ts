@@ -119,12 +119,23 @@ async function processChargeSuccess(reference: string) {
 }
 
 async function processRefund(reference: string, refundedAmountKobo: number) {
-  await prisma.transaction.updateMany({
-    where: { reference },
-    data: {
-      status: "REFUNDED",
-      refundedAmount: refundedAmountKobo / 100,
-      refundedAt: new Date()
+  await prisma.$transaction(async (tx) => {
+    // 1. Mark transaction state as refunded
+    const transaction = await tx.transaction.update({
+      where: { reference },
+      data: { status: "REFUNDED", refundedAmount: refundedAmountKobo / 100 }
+    });
+
+    // 2. Cascade revocation to prevent access leak
+    if (transaction.itemType === "MEMBERSHIP") {
+      await tx.subscription.updateMany({
+        where: { 
+          memberId: transaction.memberId, 
+          tenantId: transaction.tenantId,
+          status: "ACTIVE" 
+        },
+        data: { status: "CANCELLED" }
+      });
     }
   });
 }

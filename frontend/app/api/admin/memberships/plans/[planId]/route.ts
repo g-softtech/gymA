@@ -24,8 +24,8 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ planId
       return NextResponse.json({ error: "Plan not found" }, { status: 404 });
     }
 
-    const plan = await prisma.membershipPlan.update({
-      where: { id: planId },
+    const updateResult = await prisma.membershipPlan.updateMany({
+      where: { id: planId, tenantId },
       data: {
         name: body.name !== undefined ? body.name : existing.name,
         description: body.description !== undefined ? body.description : existing.description,
@@ -38,7 +38,11 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ planId
       }
     });
 
-    return NextResponse.json({ message: "Plan updated", plan });
+    if (updateResult.count === 0) {
+      return NextResponse.json({ error: "Record not found or unauthorized" }, { status: 404 });
+    }
+
+    return NextResponse.json({ message: "Plan updated" });
   } catch (error) {
     console.error("PATCH /api/admin/memberships/plans/[planId] error:", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
@@ -67,10 +71,14 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ planI
     }
 
     // Rather than hard delete, soft delete (disable) to preserve historical data
-    await prisma.membershipPlan.update({
-      where: { id: planId },
+    const disableResult = await prisma.membershipPlan.updateMany({
+      where: { id: planId, tenantId },
       data: { isActive: false }
     });
+
+    if (disableResult.count === 0) {
+      return NextResponse.json({ error: "Record not found or unauthorized" }, { status: 404 });
+    }
 
     return NextResponse.json({ message: "Plan disabled successfully" });
   } catch (error) {
