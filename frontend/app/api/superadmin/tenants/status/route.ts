@@ -51,7 +51,7 @@ export async function PATCH(req: Request) {
                 "Content-Type": "application/json"
               },
               body: JSON.stringify({
-                from: "Cortex Systems <noreply@thecortexsystems.com>",
+                from: "CortexFit <onboarding@resend.dev>",
                 to: ownerEmail,
                 subject: "Your Smart Gym Dashboard is Ready! 🎉",
                 html: `
