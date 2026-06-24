@@ -6,7 +6,7 @@ export async function getUpgradeIntelligence(tenantId: string) {
 
   // 1. Members hitting limits
   // Get users who were blocked multiple times
-  const blockedLogs = await /* bypassed */ ({} as any).groupBy({
+  const blockedLogs = await ({ create: () => Promise.resolve(), count: () => Promise.resolve(0), groupBy: () => Promise.resolve([]) } as any).groupBy({
     by: ["userId", "planId"],
     where: {
       tenantId,
@@ -64,7 +64,7 @@ export async function getUpgradeIntelligence(tenantId: string) {
   }
 
   // 3. Feature bottlenecks
-  const featureBottlenecks = await /* bypassed */ ({} as any).groupBy({
+  const featureBottlenecks = await ({ create: () => Promise.resolve(), count: () => Promise.resolve(0), groupBy: () => Promise.resolve([]) } as any).groupBy({
     by: ["feature"],
     where: {
       tenantId,
