@@ -155,7 +155,9 @@ export function CheckInKiosk() {
                     }
                   }}
                   onError={(error) => console.log(error?.message)}
-                  allowMultiple={false}
+                  allowMultiple={true}
+                  scanDelay={1000}
+                  formats={["qr_code"]}
                 />
               )}
             </div>

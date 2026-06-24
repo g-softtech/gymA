@@ -83,15 +83,33 @@ export async function generateChatReply(
 ): Promise<GeminiResult> {
   if (messages.length === 0) throw new Error("messages array is empty");
 
-  const formattedMessages: any[] = messages.map(m => ({
+  let formattedMessages: any[] = messages.map(m => ({
     role: m.role,
     content: m.content
   }));
 
+  // Gemini strictly requires the first message to be from a user.
+  if (formattedMessages.length > 0 && formattedMessages[0].role === "assistant") {
+    formattedMessages = [
+      { role: "user", content: "Hello" },
+      ...formattedMessages
+    ];
+  }
+
+  // Gemini strictly requires roles to alternate. Merge consecutive messages of the same role.
+  const alternatingMessages: any[] = [];
+  for (const m of formattedMessages) {
+    if (alternatingMessages.length > 0 && alternatingMessages[alternatingMessages.length - 1].role === m.role) {
+      alternatingMessages[alternatingMessages.length - 1].content += "\n\n" + m.content;
+    } else {
+      alternatingMessages.push({ role: m.role, content: m.content });
+    }
+  }
+
   const { text, usage } = await vercelGenerateText({
     model: googleProvider(GEMINI_MODEL),
     system: systemInstruction,
-    messages: formattedMessages,
+    messages: alternatingMessages,
   });
 
   return {

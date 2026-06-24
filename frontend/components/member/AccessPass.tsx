@@ -86,7 +86,7 @@ export function AccessPass() {
                     <QRCodeSVG 
                       value={token} 
                       size={200}
-                      level="L"
+                      level="M"
                       includeMargin={true}
                     />
                   </div>
