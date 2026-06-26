@@ -112,29 +112,30 @@ enum TenantPlan {
 }
 
 model Tenant {
-  id              String           @id @default(cuid())
-  name            String
-  slug            String           @unique
+  id               String            @id @default(cuid())
+  name             String
+  slug             String            @unique
   // ── SaaS billing ──────────────────────────────────────────────────────────
-  plan            TenantPlan       @default(FREE)
-  trialEndsAt     DateTime?
-  billingEndsAt   DateTime?
-  planStartedAt   DateTime?
-  isActive        Boolean          @default(true)
-  status          TenantStatus     @default(PENDING)
+  plan             TenantPlan        @default(FREE)
+  trialEndsAt      DateTime?
+  billingEndsAt    DateTime?
+  planStartedAt    DateTime?
+  isActive         Boolean           @default(true)
+  status           TenantStatus      @default(PENDING)
   // ── Relations ────────────────────────────────────────────────────────────
-  users           User[]
-  membershipPlans MembershipPlan[]
-  notifications   Notification[]
-  messages        Message[]
-  settings        TenantSettings?
-  blogPosts       BlogPost[]
-  saasInvoices    SaaSInvoice[]
-  classSessions   ClassSession[]
-  transactions    Transaction[]
-  attendances     Attendance[]
-  entitlementLogs EntitlementLog[]
+  users            User[]
+  membershipPlans  MembershipPlan[]
+  notifications    Notification[]
+  messages         Message[]
+  settings         TenantSettings?
+  blogPosts        BlogPost[]
+  saasInvoices     SaaSInvoice[]
+  classSessions    ClassSession[]
+  transactions     Transaction[]
+  attendances      Attendance[]
+  entitlementLogs  EntitlementLog[]
   attendanceEvents AttendanceEvent[]
+  receipts         Receipt[]
 }
 
 model User {
@@ -143,7 +144,7 @@ model User {
   email            String?          @unique
   emailVerified    DateTime?
   image            String?
-  password         String?          // bcrypt hash — null for OAuth users
+  password         String? // bcrypt hash — null for OAuth users
   role             Role             @default(MEMBER)
   tenantId         String?
   tenant           Tenant?          @relation(fields: [tenantId], references: [id])
@@ -198,13 +199,13 @@ model VerificationToken {
 }
 
 model MemberProfile {
-  id              String           @id @default(cuid())
-  userId          String           @unique
-  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-  weightKg        Float?
-  heightCm        Float?
-  fitnessGoals    String[]
-  lastQrNonce     String?
+  id               String    @id @default(cuid())
+  userId           String    @unique
+  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  weightKg         Float?
+  heightCm         Float?
+  fitnessGoals     String[]
+  lastQrNonce      String?
   qrNonceExpiresAt DateTime?
 
   subscriptions   Subscription[]
@@ -215,58 +216,59 @@ model MemberProfile {
   mealPlans       MealPlan[]
   foodLogs        FoodLog[]
   transactions    Transaction[]
+  receipts        Receipt[]
 }
 
 model TrainerProfile {
-  id            String        @id @default(cuid())
-  userId            String           @unique
-  user              User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-  specialties   String[]
-  availability  Json
-  bio           String?
-  hourlyRate    Decimal?      @db.Decimal(10, 2)
+  id                String         @id @default(cuid())
+  userId            String         @unique
+  user              User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  specialties       String[]
+  availability      Json
+  bio               String?
+  hourlyRate        Decimal?       @db.Decimal(10, 2)
   // ── Phase 6/13: Public website visibility ───────────────────────────────────
-  showOnWebsite Boolean       @default(false)
-  publicPhotoUrl String?
-  title         String?       // e.g. Head Coach, Yoga Instructor
+  showOnWebsite     Boolean        @default(false)
+  publicPhotoUrl    String?
+  title             String? // e.g. Head Coach, Yoga Instructor
   yearsOfExperience Int?
-  bookings      Booking[]
-  workoutPlans  WorkoutPlan[]
-  classSessions ClassSession[]
+  bookings          Booking[]
+  workoutPlans      WorkoutPlan[]
+  classSessions     ClassSession[]
 }
 
 model MembershipPlan {
-  id            String         @id @default(cuid())
-  tenantId      String
-  tenant        Tenant         @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  name          String
-  price         Decimal        @db.Decimal(10, 2)
-  currency      Currency       @default(NGN)
-  isActive      Boolean        @default(true)
-  durationDays  Int
+  id              String           @id @default(cuid())
+  tenantId        String
+  tenant          Tenant           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  name            String
+  price           Decimal          @db.Decimal(10, 2)
+  currency        Currency         @default(NGN)
+  isActive        Boolean          @default(true)
+  durationDays    Int
   // ── Phase 6: Public plans page enhancements ───────────────────────────────
-  featured      Boolean        @default(false)
-  description   String?
-  features      String[]
-  entitlements  Json           @default("{}")
-  subscriptions Subscription[]
+  featured        Boolean          @default(false)
+  description     String?
+  features        String[]
+  entitlements    Json             @default("{}")
+  subscriptions   Subscription[]
   entitlementLogs EntitlementLog[]
 
   @@index([tenantId])
 }
 
 model Subscription {
-  id               String             @id @default(cuid())
+  id               String           @id @default(cuid())
   memberId         String
-  member           MemberProfile      @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  member           MemberProfile    @relation(fields: [memberId], references: [id], onDelete: Cascade)
   planId           String
-  plan             MembershipPlan     @relation(fields: [planId], references: [id], onDelete: Cascade)
+  plan             MembershipPlan   @relation(fields: [planId], references: [id], onDelete: Cascade)
   // ✅ Phase 2: tenant isolation — non-nullable after Migration B backfill
   tenantId         String
-  startDate        DateTime           @default(now())
+  startDate        DateTime         @default(now())
   endDate          DateTime
   status           MembershipStatus @default(PENDING_PAYMENT)
-  paymentGatewayId String?
+  paymentGatewayId String?          @unique
 
   @@index([tenantId, status])
 }
@@ -289,57 +291,57 @@ model WorkoutPlan {
 }
 
 model ClassSession {
-  id            String          @id @default(cuid())
-  tenantId      String
-  tenant        Tenant          @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  title         String
-  description   String?
-  instructorId  String?         
-  instructor    TrainerProfile? @relation(fields: [instructorId], references: [id])
-  startTime     DateTime
-  durationMins  Int             @default(60)
-  capacity      Int
-  price         Decimal?        @db.Decimal(10, 2)
-  imageUrl      String?
-  bookings      Booking[]
-  createdAt     DateTime        @default(now())
-  updatedAt     DateTime        @updatedAt
+  id           String          @id @default(cuid())
+  tenantId     String
+  tenant       Tenant          @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  title        String
+  description  String?
+  instructorId String?
+  instructor   TrainerProfile? @relation(fields: [instructorId], references: [id])
+  startTime    DateTime
+  durationMins Int             @default(60)
+  capacity     Int
+  price        Decimal?        @db.Decimal(10, 2)
+  imageUrl     String?
+  bookings     Booking[]
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
 
   @@index([tenantId, startTime])
 }
 
 model Booking {
-  id             String          @id @default(cuid())
-  tenantId       String
-  memberId       String
-  member         MemberProfile   @relation(fields: [memberId], references: [id], onDelete: Cascade)
-  
+  id       String        @id @default(cuid())
+  tenantId String
+  memberId String
+  member   MemberProfile @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
   // -- 1-on-1 Booking Fields --
-  trainerId      String?
-  trainer        TrainerProfile? @relation(fields: [trainerId], references: [id], onDelete: Cascade)
-  
+  trainerId String?
+  trainer   TrainerProfile? @relation(fields: [trainerId], references: [id], onDelete: Cascade)
+
   // -- Group Class Booking Fields --
   classSessionId String?
-  classSession   ClassSession?   @relation(fields: [classSessionId], references: [id], onDelete: Cascade)
+  classSession   ClassSession? @relation(fields: [classSessionId], references: [id], onDelete: Cascade)
 
   // -- Shared Context --
-  date           DateTime
-  durationMins   Int             @default(60)
-  sessionType    SessionType     @default(PHYSICAL)
-  status         BookingStatus   @default(PENDING)
-  notes          String?
-  meetingLink    String?
-  
+  date         DateTime
+  durationMins Int           @default(60)
+  sessionType  SessionType   @default(PHYSICAL)
+  status       BookingStatus @default(PENDING)
+  notes        String?
+  meetingLink  String?
+
   // -- Phase 15 Payments --
   paymentRequired  Boolean       @default(false)
   paymentStatus    PaymentStatus @default(PENDING)
   paymentAmount    Decimal?      @db.Decimal(10, 2)
   paymentExpiresAt DateTime?
-  
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
 
-  attendances    Attendance[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  attendances Attendance[]
 
   @@index([trainerId, date])
   @@index([classSessionId])
@@ -371,39 +373,39 @@ enum AttendanceType {
 }
 
 model Attendance {
-  id             String    @id @default(cuid())
-  tenantId       String
-  memberId       String
-  bookingId      String?   
-  
-  checkInTime    DateTime  @default(now())
-  checkOutTime   DateTime?
-  
-  method         CheckInMethod
-  status         AttendanceStatus @default(PRESENT)
-  type           AttendanceType
+  id        String  @id @default(cuid())
+  tenantId  String
+  memberId  String
+  bookingId String?
 
-  tenant         Tenant        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  member         MemberProfile @relation(fields: [memberId], references: [id], onDelete: Cascade)
-  booking        Booking?      @relation(fields: [bookingId], references: [id], onDelete: SetNull)
-  events         AttendanceEvent[]
+  checkInTime  DateTime  @default(now())
+  checkOutTime DateTime?
+
+  method CheckInMethod
+  status AttendanceStatus @default(PRESENT)
+  type   AttendanceType
+
+  tenant  Tenant            @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  member  MemberProfile     @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  booking Booking?          @relation(fields: [bookingId], references: [id], onDelete: SetNull)
+  events  AttendanceEvent[]
 
   @@unique([bookingId, memberId])
   @@index([tenantId, checkInTime])
 }
 
 model AttendanceEvent {
-  id             String    @id @default(cuid())
-  attendanceId   String?
-  tenantId       String
-  memberId       String
-  eventType      String    // e.g., "CHECK_IN_SUCCESS", "MEMBERSHIP_OVERRIDE", "DENIED_EXPIRED"
-  overrideType   String?   // e.g., "EMERGENCY_ACCESS", "PROMOTIONAL_ACCESS", "STAFF_TESTING"
-  timestamp      DateTime  @default(now())
-  notes          String?
+  id           String   @id @default(cuid())
+  attendanceId String?
+  tenantId     String
+  memberId     String
+  eventType    String // e.g., "CHECK_IN_SUCCESS", "MEMBERSHIP_OVERRIDE", "DENIED_EXPIRED"
+  overrideType String? // e.g., "EMERGENCY_ACCESS", "PROMOTIONAL_ACCESS", "STAFF_TESTING"
+  timestamp    DateTime @default(now())
+  notes        String?
 
-  tenant         Tenant        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  attendance     Attendance?   @relation(fields: [attendanceId], references: [id], onDelete: SetNull)
+  tenant     Tenant      @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  attendance Attendance? @relation(fields: [attendanceId], references: [id], onDelete: SetNull)
 }
 
 model ProgressRecord {
@@ -450,7 +452,7 @@ model MealPlan {
 model FoodLog {
   id        String        @id @default(cuid())
   memberId  String
-  member        MemberProfile @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  member    MemberProfile @relation(fields: [memberId], references: [id], onDelete: Cascade)
   // ✅ Phase 2: tenant isolation — non-nullable after Migration B backfill
   tenantId  String
   date      DateTime      @default(now())
@@ -527,7 +529,7 @@ model ChallengeEntry {
   challengeId String
   challenge   Challenge @relation(fields: [challengeId], references: [id], onDelete: Cascade)
   userId      String
-  user      User      @relation("UserChallenges", fields: [userId], references: [id], onDelete: Cascade)
+  user        User      @relation("UserChallenges", fields: [userId], references: [id], onDelete: Cascade)
   progress    Int       @default(0)
   completed   Boolean   @default(false)
   joinedAt    DateTime  @default(now())
@@ -584,26 +586,26 @@ model Notification {
 // ─────────────────────────────────────────────────────────────────────────────
 
 model TenantSettings {
-  id              String  @id @default(cuid())
-  tenantId        String  @unique
-  tenant          Tenant  @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  id              String   @id @default(cuid())
+  tenantId        String   @unique
+  tenant          Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   defaultCurrency Currency @default(NGN)
 
   // ── Branding ──────────────────────────────────────────────────────────────
-  logoUrl         String?
-  faviconUrl      String?
-  primaryColor    String? // e.g. "#6366F1"
-  secondaryColor  String?
-  accentColor     String?
-  fontFamily      String? // e.g. "Inter"
-  darkMode        Boolean @default(false)
+  logoUrl           String?
+  faviconUrl        String?
+  primaryColor      String? // e.g. "#6366F1"
+  secondaryColor    String?
+  accentColor       String?
+  fontFamily        String? // e.g. "Inter"
+  darkMode          Boolean @default(false)
   brandName         String?
   whiteLabelEnabled Boolean @default(false)
 
   // ── Domain ────────────────────────────────────────────────────────────────
-  customDomain    String? @unique
-  subdomain       String? @unique
-  domainVerified  Boolean @default(false)
+  customDomain      String?   @unique
+  subdomain         String?   @unique
+  domainVerified    Boolean   @default(false)
   verificationToken String? // Stores Vercel TXT challenge
   dnsVerifiedAt     DateTime? // Audit trail for verification
 
@@ -616,35 +618,35 @@ model TenantSettings {
   paystackEmailToken       String?
 
   // ── Business Info ─────────────────────────────────────────────────────────
-  tagline         String?
-  description     String? @db.Text
-  phone           String?
-  email           String?
-  address         String?
-  city            String?
-  state           String?
-  country         String? @default("Nigeria")
-  mapEmbedUrl     String?
+  tagline     String?
+  description String? @db.Text
+  phone       String?
+  email       String?
+  address     String?
+  city        String?
+  state       String?
+  country     String? @default("Nigeria")
+  mapEmbedUrl String?
 
   // ── Social Links ──────────────────────────────────────────────────────────
-  instagramUrl    String?
-  facebookUrl     String?
-  twitterUrl      String?
-  tiktokUrl       String?
-  whatsappNumber  String?
-  youtubeUrl      String?
+  instagramUrl   String?
+  facebookUrl    String?
+  twitterUrl     String?
+  tiktokUrl      String?
+  whatsappNumber String?
+  youtubeUrl     String?
 
   // ── Marketing CMS (JSON blobs, one per section) ───────────────────────────
-  heroData        Json?  // { headline, subheadline, ctaText, ctaUrl, bgImageUrl, overlayOpacity }
-  aboutData       Json?  // { story, mission, vision, teamImageUrl, foundedYear, highlights[] }
-  servicesData    Json?  // [{ icon, title, description, imageUrl }]
-  galleryData     Json?  // [{ imageUrl, caption, category }]
-  testimonialData Json?  // [{ name, role, quote, avatarUrl, rating }]
-  contactData     Json?  // { formEnabled, successMessage }
-  featuresData    Json?  // [{ icon, title, description }]
-  statsData       Json?  // [{ value, label }]
-  openingHours    Json?  // { monday: { open, close }, tuesday: ... }
-  homepageLayout  Json?  // Array of section IDs e.g. ["hero", "stats", "gallery", ...]
+  heroData        Json? // { headline, subheadline, ctaText, ctaUrl, bgImageUrl, overlayOpacity }
+  aboutData       Json? // { story, mission, vision, teamImageUrl, foundedYear, highlights[] }
+  servicesData    Json? // [{ icon, title, description, imageUrl }]
+  galleryData     Json? // [{ imageUrl, caption, category }]
+  testimonialData Json? // [{ name, role, quote, avatarUrl, rating }]
+  contactData     Json? // { formEnabled, successMessage }
+  featuresData    Json? // [{ icon, title, description }]
+  statsData       Json? // [{ value, label }]
+  openingHours    Json? // { monday: { open, close }, tuesday: ... }
+  homepageLayout  Json? // Array of section IDs e.g. ["hero", "stats", "gallery", ...]
 
   // ── SEO ───────────────────────────────────────────────────────────────────
   metaTitle         String?
@@ -652,24 +654,24 @@ model TenantSettings {
   ogImageUrl        String?
   googleAnalyticsId String?
 
-  updatedAt       DateTime @updatedAt
+  updatedAt DateTime @updatedAt
 }
 
 model BlogPost {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
   tenantId    String
-  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  tenant      Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   authorId    String
   title       String
   slug        String
   excerpt     String?
-  content     String   @db.Text
+  content     String    @db.Text
   coverImage  String?
   tags        String[]
-  published   Boolean  @default(false)
+  published   Boolean   @default(false)
   publishedAt DateTime?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
   @@unique([tenantId, slug])
   @@index([tenantId, published, publishedAt])
@@ -687,17 +689,17 @@ enum AiFeature {
 }
 
 model AiLog {
-  id        String    @id @default(cuid())
-  tenantId  String
-  userId    String
-  feature   AiFeature
-  model     String    @default("gemini-2.0-flash")
+  id           String    @id @default(cuid())
+  tenantId     String
+  userId       String
+  feature      AiFeature
+  model        String    @default("gemini-2.0-flash")
   // Approximate token counts (filled in when available from API response)
   inputTokens  Int?
   outputTokens Int?
   // Whether the call succeeded or was rejected (e.g. parse failure)
-  success   Boolean   @default(true)
-  createdAt DateTime  @default(now())
+  success      Boolean   @default(true)
+  createdAt    DateTime  @default(now())
 
   @@index([tenantId, createdAt])
   @@index([userId, createdAt])
@@ -709,27 +711,27 @@ model AiLog {
 // ─────────────────────────────────────────────────────────────────────────────
 
 model ActionRegistry {
-  id          String   @id @default(cuid())
-  tenantId    String
-  actionType  String   // WIN_BACK_OFFER, PRICE_INCREASE, etc.
-  targetId    String   // memberId, trainerId, etc.
-  context     String
-  status      String   @default("PENDING") // PENDING, APPROVED, REJECTED, EXECUTED, EXPIRED
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  executedAt  DateTime?
+  id         String    @id @default(cuid())
+  tenantId   String
+  actionType String // WIN_BACK_OFFER, PRICE_INCREASE, etc.
+  targetId   String // memberId, trainerId, etc.
+  context    String
+  status     String    @default("PENDING") // PENDING, APPROVED, REJECTED, EXECUTED, EXPIRED
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  executedAt DateTime?
 
-  feedback    ActionFeedback?
+  feedback ActionFeedback?
 }
 
 model ActionFeedback {
-  id           String   @id @default(cuid())
-  actionId     String   @unique
+  id           String         @id @default(cuid())
+  actionId     String         @unique
   action       ActionRegistry @relation(fields: [actionId], references: [id], onDelete: Cascade)
   beforeMetric Float
   afterMetric  Float?
   delta        Float?
-  success      Boolean  @default(false)
+  success      Boolean        @default(false)
   measuredAt   DateTime?
 }
 
@@ -761,44 +763,45 @@ model BillingEvent {
 
 // ── Phase 15 Payments & Revenue ──────────────────────────────────────────────
 model Transaction {
-  id              String        @id @default(cuid())
-  tenantId        String
-  memberId        String
-  
-  // IMMUTABLE SNAPSHOT DATA
-  itemName        String
-  itemType        PaymentType
-  amount          Decimal       @db.Decimal(10, 2)
-  currency        Currency
-  
-  status          PaymentStatus @default(PENDING)
-  reference       String        @unique // Paystack Reference
-  metadata        Json?         
-  
-  // REFUND ARCHITECTURE
-  refundedAmount  Decimal?      @db.Decimal(10, 2)
-  refundReason    String?
-  refundedAt      DateTime?
-  
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
+  id       String @id @default(cuid())
+  tenantId String
+  memberId String
 
-  tenant          Tenant        @relation(fields: [tenantId], references: [id])
-  member          MemberProfile @relation(fields: [memberId], references: [id])
+  // IMMUTABLE SNAPSHOT DATA
+  itemName String
+  itemType PaymentType
+  amount   Decimal     @db.Decimal(10, 2)
+  currency Currency
+
+  status    PaymentStatus @default(PENDING)
+  reference String        @unique // Paystack Reference
+  metadata  Json?
+
+  // REFUND ARCHITECTURE
+  refundedAmount Decimal?  @db.Decimal(10, 2)
+  refundReason   String?
+  refundedAt     DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  tenant  Tenant        @relation(fields: [tenantId], references: [id])
+  member  MemberProfile @relation(fields: [memberId], references: [id])
+  receipt Receipt?
 
   @@index([tenantId, createdAt])
   @@index([memberId])
 }
 
 model PaymentEvent {
-  id          String   @id @default(cuid())
-  eventKey    String   @unique 
+  id          String    @id @default(cuid())
+  eventKey    String    @unique
   reference   String?
   eventType   String
   payload     Json
-  processed   Boolean  @default(false)
+  processed   Boolean   @default(false)
   processedAt DateTime?
-  createdAt   DateTime @default(now())
+  createdAt   DateTime  @default(now())
 }
 
 model EntitlementLog {
@@ -806,18 +809,49 @@ model EntitlementLog {
   tenantId  String
   userId    String
   planId    String?
-  feature   String   // e.g. "MAX_CLASSES_PER_MONTH", "AI_ACCESS"
-  allowed   Boolean  // true = allowed, false = blocked
-  reason    String?  // e.g. "Limit reached (4)"
+  feature   String // e.g. "MAX_CLASSES_PER_MONTH", "AI_ACCESS"
+  allowed   Boolean // true = allowed, false = blocked
+  reason    String? // e.g. "Limit reached (4)"
   quantity  Int      @default(1)
   metadata  Json?
   createdAt DateTime @default(now())
 
-  tenant    Tenant          @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  user      User            @relation(fields: [userId], references: [id], onDelete: Cascade)
-  plan      MembershipPlan? @relation(fields: [planId], references: [id], onDelete: SetNull)
+  tenant Tenant          @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  user   User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan   MembershipPlan? @relation(fields: [planId], references: [id], onDelete: SetNull)
 
   @@index([tenantId, planId])
   @@index([tenantId, feature, allowed])
   @@index([createdAt])
+}
+
+// ── Phase 17 Receipts ────────────────────────────────────────────────────────
+
+model ReceiptSequence {
+  id        String @id @default(cuid())
+  tenantId  String
+  yearMonth String // format: "YYYYMM"
+  lastValue Int    @default(0)
+
+  @@unique([tenantId, yearMonth])
+}
+
+model Receipt {
+  id            String    @id @default(cuid())
+  transactionId String    @unique
+  receiptNumber String    @unique
+  tenantId      String
+  memberId      String
+  sentAt        DateTime?
+  status        String    @default("PENDING") // PENDING, SENT, FAILED
+  metadata      Json?
+
+  transaction Transaction   @relation(fields: [transactionId], references: [id], onDelete: Cascade)
+  tenant      Tenant        @relation(fields: [tenantId], references: [id])
+  member      MemberProfile @relation(fields: [memberId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([tenantId])
 }

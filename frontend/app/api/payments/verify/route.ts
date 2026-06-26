@@ -1,8 +1,6 @@
-
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
 import { getAuthSession } from "@/lib/auth";
-import { getTenantContextFromSession, noTenantContext, assertPlanBelongsToTenant } from "@/lib/tenant";
+import { fulfillPayment } from "@/lib/paymentFulfillment";
 
 export async function POST(req: NextRequest) {
   try {
@@ -11,19 +9,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { reference, planId, tenantSlug } = await req.json();
+    const { reference } = await req.json();
 
-    if (!reference || !planId || !tenantSlug) {
+    if (!reference) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
-    // ✅ Phase 9C: Enforce cross-tenant security — prevent paying for another gym's plan
-    const ctx = getTenantContextFromSession(session);
-    if (!ctx?.tenantId) return noTenantContext();
-    
-    const planErr = await assertPlanBelongsToTenant(ctx, planId);
-    if (planErr) return planErr;
-
+    // Call Paystack REST API to verify payment (Authoritative check for client route)
     const paystackRes = await fetch(
       `https://api.paystack.co/transaction/verify/${encodeURIComponent(reference)}`,
       {
@@ -39,44 +31,16 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Payment verification failed" }, { status: 400 });
     }
 
-    const plan = await prisma.membershipPlan.findUnique({
-      where: { id: planId },
-      include: { tenant: true },
+    // Call our robust, idempotent fulfillment service
+    const fulfillResult = await fulfillPayment(reference, {
+      amountKobo: paystackData.data.amount,
+      currency: paystackData.data.currency,
+      rawResponse: paystackData.data,
     });
 
-    if (!plan || plan.tenant.slug !== tenantSlug) {
-      return NextResponse.json({ error: "Plan not found" }, { status: 404 });
-    }
-
-    let memberProfile = await prisma.memberProfile.findUnique({
-      where: { userId: session.user.id },
-    });
-
-    if (!memberProfile) {
-      memberProfile = await prisma.memberProfile.create({
-        data: { userId: session.user.id, fitnessGoals: [] },
-      });
-    }
-
-    const startDate = new Date();
-    const endDate = new Date();
-    endDate.setDate(endDate.getDate() + plan.durationDays);
-
-    await prisma.subscription.create({
-      data: {
-        memberId: memberProfile.id,
-        planId: plan.id,
-        tenantId: plan.tenantId, // ✅ from verified plan record, not from client
-        startDate,
-        endDate,
-        status: "ACTIVE",
-        paymentGatewayId: reference,
-      },
-    });
-
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true, ...fulfillResult });
   } catch (err) {
     console.error("Payment verification error:", err);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json({ error: "Internal server error or validation failure" }, { status: 500 });
   }
 }

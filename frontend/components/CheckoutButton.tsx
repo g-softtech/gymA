@@ -1,6 +1,6 @@
 "use client";
 
-import { usePaystackPayment } from "react-paystack";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 interface CheckoutButtonProps {
@@ -13,81 +13,79 @@ interface CheckoutButtonProps {
 }
 
 export default function CheckoutButton({
-  email,
   amount,
-  planName,
   planId,
   tenantSlug,
-  userId,
 }: CheckoutButtonProps) {
   const router = useRouter();
+  const [loading, setLoading] = useState(false);
 
-  const config = {
-    reference: `gym_${planId}_${new Date().getTime()}`,
-    email,
-    amount: amount * 100, // Paystack uses kobo
-    publicKey: process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY || "",
-    metadata: {
-      /**
-       * custom_fields are forwarded to Paystack webhook events.
-       * The webhook handler (/api/payments/webhook) reads plan_id and user_id
-       * to activate the subscription server-to-server — reliable even if the
-       * browser closes before the onSuccess callback fires.
-       */
-      custom_fields: [
-        { display_name: "Plan", variable_name: "plan_name", value: planName },
-        { display_name: "Plan ID", variable_name: "plan_id", value: planId },
-        { display_name: "User ID", variable_name: "user_id", value: userId },
-      ],
-    },
-  };
-
-  const initializePayment = usePaystackPayment(config);
-
-  /**
-   * onSuccess is the client-side fast path.
-   * Even if this fails, the Paystack webhook will eventually activate
-   * the subscription server-to-server.
-   */
-  const onSuccess = async (reference: { reference: string }) => {
+  const handlePayment = async () => {
+    setLoading(true);
     try {
-      const res = await fetch("/api/payments/verify", {
+      // 1. Initialize server-side to prevent price tampering and create PENDING Transaction
+      const initRes = await fetch("/api/payments/initialize", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          reference: reference.reference,
-          planId,
-          tenantSlug,
-        }),
+        body: JSON.stringify({ itemType: "MEMBERSHIP", itemId: planId }),
       });
+      const data = await initRes.json();
 
-      if (res.ok) {
-        router.push(`/gym/${tenantSlug}/dashboard/member?welcome=1`);
-      } else {
-        // Subscription will be activated by webhook — inform user and redirect
-        router.push(
-          `/gym/${tenantSlug}/dashboard/member?notice=payment_processing`
-        );
+      if (!initRes.ok || !data.accessCode) {
+        alert("Failed to initialize payment");
+        setLoading(false);
+        return;
       }
-    } catch {
-      // Same — webhook will handle it
-      router.push(
-        `/gym/${tenantSlug}/dashboard/member?notice=payment_processing`
-      );
+
+      // 2. Open Paystack Popup using access_code
+      const paystack = new (window as any).PaystackPop();
+      paystack.newTransaction({
+        key: process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY || "",
+        access_code: data.accessCode,
+        onSuccess: async (transaction: any) => {
+          // 3. Verify server-side
+          try {
+            const verifyRes = await fetch("/api/payments/verify", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                reference: transaction.reference,
+                planId, // kept for backward compatibility, but fulfillment relies on reference
+                tenantSlug,
+              }),
+            });
+
+            if (verifyRes.ok) {
+              router.push(`/gym/${tenantSlug}/dashboard/member?welcome=1`);
+            } else {
+              router.push(`/gym/${tenantSlug}/dashboard/member?notice=payment_processing`);
+            }
+          } catch {
+            router.push(`/gym/${tenantSlug}/dashboard/member?notice=payment_processing`);
+          }
+        },
+        onCancel: () => {
+          setLoading(false);
+        },
+      });
+    } catch (err) {
+      console.error(err);
+      alert("An error occurred starting payment.");
+      setLoading(false);
     }
   };
 
-  const onClose = () => {
-    // User closed the popup without completing payment — do nothing
-  };
-
   return (
-    <button
-      id="paystack-checkout-btn"
-      onClick={() => initializePayment({ onSuccess, onClose })}
-      className="w-full bg-green-600 hover:bg-green-700 active:scale-[0.98] text-white font-bold py-3.5 px-4 rounded-xl transition-all duration-150 mt-2 shadow-md hover:shadow-lg"
-    >
-      Pay ₦{amount.toLocaleString()} with Paystack
-    </button>
+    <>
+      <script src="https://js.paystack.co/v1/inline.js" async></script>
+      <button
+        id="paystack-checkout-btn"
+        disabled={loading}
+        onClick={handlePayment}
+        className="w-full bg-green-600 hover:bg-green-700 active:scale-[0.98] disabled:opacity-70 text-white font-bold py-3.5 px-4 rounded-xl transition-all duration-150 mt-2 shadow-md hover:shadow-lg"
+      >
+        {loading ? "Starting secure checkout..." : `Pay ₦${amount.toLocaleString()} securely`}
+      </button>
+    </>
   );
 }
