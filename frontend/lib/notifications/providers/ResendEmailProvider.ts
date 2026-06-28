@@ -21,7 +21,7 @@ export class ResendEmailProvider implements IEmailProvider {
     }
 
     const { error } = await this.resend.emails.send({
-      from: "CortexFit Admin <notifications@cortexfit.com>", // Ensure domain is verified in Resend
+      from: process.env.EMAIL_FROM_ADDRESS || "CortexFit Admin <onboarding@resend.dev>", // Fallback to Resend's test domain
       to,
       subject,
       html,

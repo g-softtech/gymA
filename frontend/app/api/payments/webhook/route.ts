@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
 import { fulfillPayment } from "@/lib/paymentFulfillment";
+import { handlePaystackWebhook } from "@/lib/billing/handler";
+import { prisma } from "@/lib/prisma";
 
 /**
  * POST /api/payments/webhook
@@ -45,17 +47,31 @@ export async function POST(req: NextRequest) {
   // ── 4. Handle charge.success ───────────────────────────────────────────────
   if (event.event === "charge.success") {
     try {
-      const customFields = event.data.metadata?.custom_fields ?? [];
-      const paymentType = customFields.find((f: any) => f.variable_name === "payment_type")?.value;
+      const reference = event.data.reference;
 
-      if (paymentType === "saas") {
-        console.warn("[webhook] Received saas payment in member webhook. This should be handled by /api/billing/webhook.");
+      // Determine routing via DB lookup (source of truth)
+      const saasInvoice = await prisma.saaSInvoice.findUnique({
+        where: { reference },
+      });
+
+      if (saasInvoice) {
+        console.log(`[webhook] Reference ${reference} matches SaaS invoice. Routing to Platform billing handler.`);
+        await handlePaystackWebhook(event, saasInvoice);
       } else {
-        await fulfillPayment(event.data.reference, {
-          amountKobo: event.data.amount,
-          currency: event.data.currency,
-          rawResponse: event.data,
+        const transaction = await prisma.transaction.findUnique({
+          where: { reference },
         });
+
+        if (transaction) {
+          console.log(`[webhook] Reference ${reference} matches Transaction. Routing to Member billing handler.`);
+          await fulfillPayment(reference, {
+            amountKobo: event.data.amount,
+            currency: event.data.currency,
+            rawResponse: event.data,
+          });
+        } else {
+          console.warn(`[webhook] Unrecognized reference: ${reference}. Ignoring event.`);
+        }
       }
     } catch (err) {
       // Log the error but still return 200 so Paystack doesn't retry

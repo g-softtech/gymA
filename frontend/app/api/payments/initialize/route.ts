@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { getAuthSession } from "@/lib/auth";
 import { initializePaystackTransaction } from "@/lib/paystack";
 import { Prisma } from "@prisma/client";
+import { RENEWAL_WINDOW_DAYS } from "@/lib/billing/pricingConfig";
 
 export async function POST(req: Request) {
   try {
@@ -42,8 +43,42 @@ export async function POST(req: Request) {
         where: { id: itemId }
       });
       if (!plan || plan.tenantId !== tenantId || !plan.isActive) {
-        return NextResponse.json({ error: "Invalid membership plan" }, { status: 400 });
+        return NextResponse.json({ error: "Invalid or inactive membership plan" }, { status: 400 });
       }
+
+      // Check current subscription for upgrade/downgrade logic
+      const currentActiveSub = await prisma.subscription.findFirst({
+        where: {
+          memberId: memberProfile.id,
+          tenantId,
+          status: "ACTIVE",
+          endDate: { gt: new Date() },
+        },
+        include: { plan: true },
+        orderBy: { endDate: "desc" },
+      });
+
+      if (currentActiveSub) {
+        const activePlanPrice = Number(currentActiveSub.plan.price);
+        const targetPlanPrice = Number(plan.price);
+        const isUpgrade = targetPlanPrice > activePlanPrice;
+        const isDowngrade = targetPlanPrice < activePlanPrice;
+        const isLateral = !isUpgrade && !isDowngrade && plan.id !== currentActiveSub.planId;
+        const isSamePlan = plan.id === currentActiveSub.planId;
+
+        if (isDowngrade) {
+          return NextResponse.json({ error: "Downgrades are not allowed via this flow" }, { status: 400 });
+        }
+
+        if (isSamePlan || isLateral) {
+          // Only allow if near expiry
+          const daysLeft = (new Date(currentActiveSub.endDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24);
+          if (daysLeft > RENEWAL_WINDOW_DAYS) {
+            return NextResponse.json({ error: "Plan renewal/lateral move not allowed until near expiry" }, { status: 400 });
+          }
+        }
+      }
+
       amountStr = plan.price.toString();
       currency = plan.currency as "NGN" | "USD";
       itemName = `Membership: ${plan.name}`;

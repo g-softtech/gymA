@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useBranding } from "@/components/TenantThemeProvider";
+import type { PlatformPlanConfig } from "@/lib/billing/pricingConfig";
 
 type PlanInfo = {
   subscriptionPlan: string;
@@ -14,10 +15,11 @@ export default function BillingManagerClient() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [status, setStatus] = useState<PlanInfo | null>(null);
+  const [plans, setPlans] = useState<PlatformPlanConfig[]>([]);
   const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchStatus();
+    Promise.all([fetchStatus(), fetchPlans()]).finally(() => setLoading(false));
   }, []);
 
   const fetchStatus = async () => {
@@ -28,8 +30,17 @@ export default function BillingManagerClient() {
       setStatus(json.data);
     } catch (e: any) {
       setError(e.message);
-    } finally {
-      setLoading(false);
+    }
+  };
+
+  const fetchPlans = async () => {
+    try {
+      const res = await fetch("/api/billing/plans");
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || "Failed to fetch plans");
+      setPlans(json.data);
+    } catch (e: any) {
+      setError(e.message);
     }
   };
 
@@ -55,35 +66,6 @@ export default function BillingManagerClient() {
       setCheckoutLoading(null);
     }
   };
-
-  const plans = [
-    {
-      name: "FREE",
-      price: "₦0",
-      description: "Basic gym management",
-      features: ["Up to 50 members", "Basic analytics", "Standard support"],
-      isCurrent: status?.subscriptionPlan === "FREE",
-      priceId: null,
-    },
-    {
-      name: "PRO",
-      price: "₦49,000/mo",
-      description: "For growing gyms",
-      features: ["Custom Domain", "Up to 500 members", "Basic branding"],
-      isCurrent: status?.subscriptionPlan === "PRO",
-      priceId: "PRO_PRICE_ID", // Will be mapped securely on backend or we pass the alias and backend resolves. 
-      // Wait, the API expects priceId. The user said: "Do NOT assume Stripe products exist — use environment variables for Price IDs."
-      // Since client doesn't know env variables unless they are NEXT_PUBLIC_, I will pass the plan alias ("PRO") to the API instead! 
-    },
-    {
-      name: "ENTERPRISE",
-      price: "₦199,000/mo",
-      description: "Full white-label SaaS experience",
-      features: ["White-Label Mode", "Unlimited members", "Multiple Domains"],
-      isCurrent: status?.subscriptionPlan === "ENTERPRISE",
-      priceId: "ENTERPRISE_PRICE_ID",
-    },
-  ];
 
   if (loading) return <div className="p-8 text-center text-gray-500 animate-pulse">Loading billing state...</div>;
 
@@ -131,19 +113,24 @@ export default function BillingManagerClient() {
 
       {/* Plans Comparison */}
       <div className="grid md:grid-cols-3 gap-6">
-        {plans.map((plan) => (
+        {plans.map((plan) => {
+          const isCurrent = status?.subscriptionPlan === plan.code;
+          return (
           <div 
-            key={plan.name} 
-            className={`bg-white rounded-3xl p-8 border-2 transition-all ${plan.isCurrent ? "border-indigo-600 shadow-xl shadow-indigo-100" : "border-gray-100 hover:border-gray-200 shadow-sm"}`}
+            key={plan.code} 
+            className={`bg-white rounded-3xl p-8 border-2 transition-all ${isCurrent ? "border-indigo-600 shadow-xl shadow-indigo-100" : "border-gray-100 hover:border-gray-200 shadow-sm"}`}
           >
-            {plan.isCurrent && (
+            {isCurrent && (
               <div className="inline-block px-3 py-1 bg-indigo-100 text-indigo-700 text-xs font-bold rounded-full mb-4">
                 CURRENT PLAN
               </div>
             )}
             <h3 className="text-xl font-bold text-gray-900">{plan.name}</h3>
             <div className="mt-2 flex items-baseline gap-1">
-              <span className="text-3xl font-black text-gray-900">{plan.price}</span>
+              <span className="text-3xl font-black text-gray-900">
+                {plan.amountNGN === 0 ? "Free" : `₦${plan.amountNGN.toLocaleString()}`}
+              </span>
+              <span className="text-sm text-gray-500">/{plan.interval}</span>
             </div>
             <p className="mt-2 text-sm text-gray-500 h-10">{plan.description}</p>
             
@@ -159,17 +146,17 @@ export default function BillingManagerClient() {
             </ul>
 
             <div className="mt-8">
-              {plan.isCurrent ? (
+              {isCurrent ? (
                 <button disabled className="w-full py-3 rounded-xl bg-gray-100 text-gray-400 font-bold text-sm cursor-not-allowed">
                   Current Plan
                 </button>
-              ) : plan.name === "FREE" ? (
+              ) : plan.code === "FREE" ? (
                 <button disabled className="w-full py-3 rounded-xl border-2 border-gray-200 text-gray-400 font-bold text-sm cursor-not-allowed">
                   Downgrade Support Coming Soon
                 </button>
               ) : (
                 <button 
-                  onClick={() => handleUpgrade(plan.name, plan.name)}
+                  onClick={() => handleUpgrade(plan.code, plan.name)}
                   disabled={!!checkoutLoading}
                   className="w-full py-3 rounded-xl text-white font-bold text-sm hover:opacity-90 transition-all shadow-lg"
                   style={{ background: primaryColor || "linear-gradient(135deg, #6366F1, #8B5CF6)" }}
@@ -179,7 +166,7 @@ export default function BillingManagerClient() {
               )}
             </div>
           </div>
-        ))}
+        )})}
       </div>
     </div>
   );

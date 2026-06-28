@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import { sendEmail } from "@/lib/email/emailService";
 
+import { EXPIRY_WARNING_DAYS } from "@/lib/billing/pricingConfig";
+
 // Helper to check if we already sent a notification today
 async function hasSentNotificationToday(userId: string, titlePrefix: string) {
   const yesterday = new Date();
@@ -20,15 +22,15 @@ async function hasSentNotificationToday(userId: string, titlePrefix: string) {
 
 export async function processExpiringSubscriptions() {
   const now = new Date();
-  const threeDaysFromNow = new Date();
-  threeDaysFromNow.setDate(now.getDate() + 3);
+  const warningDate = new Date();
+  warningDate.setDate(now.getDate() + EXPIRY_WARNING_DAYS);
 
-  // Find subscriptions expiring in <= 3 days that are still ACTIVE
+  // Find subscriptions expiring in <= EXPIRY_WARNING_DAYS that are still ACTIVE
   const expiringSoon = await prisma.subscription.findMany({
     where: {
       status: "ACTIVE",
       endDate: {
-        lte: threeDaysFromNow,
+        lte: warningDate,
         gt: now, // Not expired yet
       },
     },

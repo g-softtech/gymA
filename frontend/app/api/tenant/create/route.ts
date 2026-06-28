@@ -7,7 +7,7 @@ import { BackgroundTaskRunner } from "@/lib/backgroundTaskRunner";
 import { adminNotificationService } from "@/lib/notifications/AdminNotificationService";
 import { NewTenantSignupPayload } from "@/lib/notifications/types";
 import crypto from "crypto";
-
+import { TRIAL_DURATION_DAYS } from "@/lib/billing/pricingConfig";
 /**
  * POST /api/tenant/create
  *
@@ -62,9 +62,9 @@ export async function POST(req: Request) {
     // ── Atomic tenant creation + user promotion ──────────────────────────────
     // Use a transaction so the tenant row and user update either both succeed or both roll back.
     const { tenant } = await prisma.$transaction(async (tx) => {
-      // Create the tenant with 14-day free trial
+      // Create the tenant with configured free trial
       const trialEndsAt = new Date();
-      trialEndsAt.setDate(trialEndsAt.getDate() + 14);
+      trialEndsAt.setDate(trialEndsAt.getDate() + TRIAL_DURATION_DAYS);
       
       const tenant = await tx.tenant.create({
         data: { 

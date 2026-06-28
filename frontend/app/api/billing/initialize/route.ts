@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthSession } from "@/lib/auth";
+import { PLATFORM_PLANS, PlatformPlanCode } from "@/lib/billing/pricingConfig";
+import { prisma } from "@/lib/prisma";
 
 export async function POST(req: NextRequest) {
   try {
@@ -16,16 +18,30 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Plan code is required" }, { status: 400 });
     }
 
-    let paystackPlan = null;
-    if (planCode === "PRO") paystackPlan = process.env.PAYSTACK_PLAN_PRO;
-    if (planCode === "ENTERPRISE") paystackPlan = process.env.PAYSTACK_PLAN_ENTERPRISE;
-
-    if (!paystackPlan) {
+    const platformPlan = PLATFORM_PLANS[planCode as PlatformPlanCode];
+    if (!platformPlan) {
       return NextResponse.json({ error: "Invalid plan selected" }, { status: 400 });
+    }
+
+    if (platformPlan.amountNGN <= 0) {
+      return NextResponse.json({ error: "Free plans do not require payment" }, { status: 400 });
     }
 
     const host = req.headers.get("host") || "localhost:3000";
     const protocol = host.includes("localhost") ? "http" : "https";
+    
+    // Generate a unique reference so our webhook can handle atomic provisioning
+    const reference = `PLATFORM_${planCode}_${tenantId}_${Date.now()}`;
+
+    // Create a pending invoice in the DB to serve as the source of truth
+    await prisma.saaSInvoice.create({
+      data: {
+        tenantId,
+        amount: platformPlan.amountNGN,
+        status: "pending",
+        reference,
+      }
+    });
 
     // Call Paystack Initialize API
     const response = await fetch("https://api.paystack.co/transaction/initialize", {
@@ -36,11 +52,13 @@ export async function POST(req: NextRequest) {
       },
       body: JSON.stringify({
         email: session.user.email,
-        amount: 10000, // Paystack requires amount in Kobo, but if a plan is passed, the plan's amount overrides this. It's safe to pass a placeholder or exact value.
-        plan: paystackPlan,
+        amount: platformPlan.amountNGN * 100, // strictly enforce config price (in kobo)
         currency: "NGN",
+        reference,
+        // Metadata is no longer relied upon for routing or security
         metadata: {
           tenantId: tenantId,
+          planCode: platformPlan.code,
         },
         callback_url: `${protocol}://${host}/dashboard/admin/billing?success=true`,
       }),
@@ -52,7 +70,7 @@ export async function POST(req: NextRequest) {
       throw new Error(data.message || "Paystack initialization failed");
     }
 
-    // RETURN ONLY authorization_url. Database is NOT modified.
+    // RETURN ONLY authorization_url.
     return NextResponse.json({ authorization_url: data.data.authorization_url });
   } catch (error: any) {
     console.error("[PAYSTACK_INIT]", error);

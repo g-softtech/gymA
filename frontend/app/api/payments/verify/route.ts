@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
       rawResponse: paystackData.data,
     });
 
-    return NextResponse.json({ success: true, ...fulfillResult });
+    return NextResponse.json(fulfillResult);
   } catch (err) {
     console.error("Payment verification error:", err);
     return NextResponse.json({ error: "Internal server error or validation failure" }, { status: 500 });

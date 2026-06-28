@@ -25,6 +25,7 @@ enum MembershipStatus {
   SUSPENDED
   CANCELLED
   PENDING_PAYMENT
+  REPLACED
 }
 
 enum PaymentStatus {
@@ -136,6 +137,7 @@ model Tenant {
   entitlementLogs  EntitlementLog[]
   attendanceEvents AttendanceEvent[]
   receipts         Receipt[]
+  subscriptions    Subscription[]
 }
 
 model User {
@@ -265,6 +267,7 @@ model Subscription {
   plan             MembershipPlan   @relation(fields: [planId], references: [id], onDelete: Cascade)
   // ✅ Phase 2: tenant isolation — non-nullable after Migration B backfill
   tenantId         String
+  tenant           Tenant           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   startDate        DateTime         @default(now())
   endDate          DateTime
   status           MembershipStatus @default(PENDING_PAYMENT)
@@ -853,5 +856,32 @@ model Receipt {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  @@index([tenantId])
+}
+
+enum AdminNotificationType {
+  NEW_TENANT_SIGNUP
+}
+
+enum AdminNotificationStatus {
+  QUEUED
+  SENDING
+  SENT
+  FAILED
+}
+
+model AdminNotificationLog {
+  id             String                  @id @default(cuid())
+  idempotencyKey String                  @unique
+  type           AdminNotificationType
+  status         AdminNotificationStatus @default(QUEUED)
+  recipients     String
+  payload        Json
+  error          String?
+  tenantId       String?
+  createdAt      DateTime                @default(now())
+  updatedAt      DateTime                @updatedAt
+
+  @@index([status])
   @@index([tenantId])
 }

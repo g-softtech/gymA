@@ -1,67 +1,43 @@
 import Link from "next/link";
+import { PLATFORM_PLANS } from "@/lib/billing/pricingConfig";
 
 export default function PricingPage() {
   const plans = [
     {
-      name: "Starter",
-      price: "₦15,000",
-      period: "/month",
-      desc: "Perfect for small gyms just getting started",
+      name: PLATFORM_PLANS.FREE.name,
+      price: "₦0",
+      period: `/${PLATFORM_PLANS.FREE.interval}`,
+      desc: PLATFORM_PLANS.FREE.description,
       color: "border-gray-200",
       buttonStyle: "border-2 border-indigo-600 text-indigo-600 hover:bg-indigo-50",
-      features: [
-        "Up to 50 members",
-        "1 trainer account",
-        "Member management",
-        "Paystack payments",
-        "Basic attendance tracking",
-        "Member dashboard",
-        "Email support",
-      ],
+      features: PLATFORM_PLANS.FREE.features,
       notIncluded: ["AI Coach", "Community features", "Advanced analytics", "Multiple locations"],
+      code: PLATFORM_PLANS.FREE.code,
+      badge: null,
     },
     {
-      name: "Professional",
-      price: "₦35,000",
-      period: "/month",
-      desc: "For growing gyms that need more power",
+      name: PLATFORM_PLANS.PRO.name,
+      price: `₦${PLATFORM_PLANS.PRO.amountNGN.toLocaleString()}`,
+      period: `/${PLATFORM_PLANS.PRO.interval}`,
+      desc: PLATFORM_PLANS.PRO.description,
       color: "border-indigo-500 ring-2 ring-indigo-500",
       buttonStyle: "bg-indigo-600 text-white hover:bg-indigo-700",
       badge: "Most Popular",
-      features: [
-        "Up to 250 members",
-        "5 trainer accounts",
-        "Everything in Starter",
-        "AI Fitness Coach",
-        "AI Nutrition Coach (Nigerian foods)",
-        "Progress tracking & analytics",
-        "Community & challenges",
-        "Trainer booking system",
-        "Revenue reports",
-        "Priority support",
-      ],
+      features: PLATFORM_PLANS.PRO.features,
       notIncluded: ["Multiple locations"],
+      code: PLATFORM_PLANS.PRO.code,
     },
     {
-      name: "Enterprise",
-      price: "₦80,000",
-      period: "/month",
-      desc: "For gym chains and serious fitness businesses",
+      name: PLATFORM_PLANS.ENTERPRISE.name,
+      price: `₦${PLATFORM_PLANS.ENTERPRISE.amountNGN.toLocaleString()}`,
+      period: `/${PLATFORM_PLANS.ENTERPRISE.interval}`,
+      desc: PLATFORM_PLANS.ENTERPRISE.description,
       color: "border-gray-200",
       buttonStyle: "border-2 border-indigo-600 text-indigo-600 hover:bg-indigo-50",
-      features: [
-        "Unlimited members",
-        "Unlimited trainers",
-        "Everything in Professional",
-        "Multiple gym locations",
-        "Multi-tenant management",
-        "Custom branding",
-        "API access",
-        "Dedicated account manager",
-        "SLA guarantee (99.9% uptime)",
-        "Phone & WhatsApp support",
-      ],
+      features: PLATFORM_PLANS.ENTERPRISE.features,
       notIncluded: [],
+      code: PLATFORM_PLANS.ENTERPRISE.code,
+      badge: null,
     },
   ];
 
@@ -105,7 +81,7 @@ export default function PricingPage() {
                 </div>
 
                 <Link
-                  href={`/onboarding?plan=${plan.name.toLowerCase()}`}
+                  href={`/onboarding?plan=${plan.code.toLowerCase()}`}
                   className={`block w-full text-center font-bold py-3 rounded-xl transition mb-6 text-sm ${plan.buttonStyle}`}
                 >
                   Get Started

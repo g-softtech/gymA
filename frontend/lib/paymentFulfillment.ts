@@ -90,7 +90,7 @@ export async function fulfillPayment(reference: string, gatewayData: {
         where: { id: transaction.memberId },
       });
 
-      // c. Calculate dates (Option A logic: extend from existing active sub)
+      // c. Find existing active subscription
       const currentActiveSub = await tx.subscription.findFirst({
         where: {
           memberId: memberProfile.id,
@@ -102,14 +102,30 @@ export async function fulfillPayment(reference: string, gatewayData: {
       });
 
       let startDate = new Date();
+      let endDate = new Date();
+
       if (currentActiveSub) {
-        startDate = new Date(currentActiveSub.endDate);
+        // Is it a renewal or an upgrade? 
+        // If it's the exact same plan, it's a renewal. We extend the end date.
+        if (currentActiveSub.planId === plan.id) {
+          startDate = new Date(currentActiveSub.endDate);
+        } else {
+          // It's an upgrade or lateral move mid-cycle. 
+          // Start immediately, no proration (fresh cycle).
+          startDate = new Date();
+        }
+
+        // Mark the old subscription as REPLACED to preserve history safely.
+        await tx.subscription.update({
+          where: { id: currentActiveSub.id },
+          data: { status: "REPLACED" },
+        });
       }
 
-      const endDate = new Date(startDate);
+      endDate = new Date(startDate);
       endDate.setDate(endDate.getDate() + plan.durationDays);
 
-      // d. Create Subscription (Idempotency: we are inside a transaction, and status check protects us)
+      // d. Create NEW Subscription 
       await tx.subscription.create({
         data: {
           memberId: memberProfile.id,
@@ -128,7 +144,7 @@ export async function fulfillPayment(reference: string, gatewayData: {
             tenantId: transaction.tenantId,
             userId: transaction.memberId,
             type: "PAYMENT",
-            title: "Subscription Activated 🎉",
+            title: currentActiveSub?.planId === plan.id ? "Subscription Renewed 🎉" : "Subscription Upgraded 🎉",
             message: `Your ${plan.name} membership is now active until ${endDate.toLocaleDateString("en-NG", { day: "numeric", month: "long", year: "numeric" })}.`,
           },
         });
@@ -155,7 +171,7 @@ export async function fulfillPayment(reference: string, gatewayData: {
             transactionId: transaction.id,
             tenantId: transaction.tenantId,
             tenantName: tenant?.name || "CortexFit Gym",
-            tenantEmail: tenant?.email || "support@cortexfit.com",
+            tenantEmail: "support@cortexfit.com",
             memberId: transaction.memberId,
             memberName: fulfillmentStatus.memberName || "Member",
             memberEmail: fulfillmentStatus.memberEmail || "",
