@@ -13,6 +13,14 @@ export const env = {
     return emails.split(",").map(e => e.trim()).filter(Boolean);
   },
 
+  get PLATFORM_SUPERADMIN_EMAIL(): string | undefined {
+    return process.env.PLATFORM_SUPERADMIN_EMAIL;
+  },
+
+  get PLATFORM_SUPERADMIN_PASSWORD(): string | undefined {
+    return process.env.PLATFORM_SUPERADMIN_PASSWORD;
+  },
+
   get NEXT_PUBLIC_APP_URL(): string {
     const url = process.env.NEXT_PUBLIC_APP_URL;
     if (!url) {
