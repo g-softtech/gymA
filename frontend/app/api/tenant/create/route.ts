@@ -1,7 +1,12 @@
 import { NextResponse } from "next/server";
 import { getAuthSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { Prisma } from "@prisma/client";
+import { Prisma, AdminNotificationType } from "@prisma/client";
+import { logger } from "@/lib/logger";
+import { BackgroundTaskRunner } from "@/lib/backgroundTaskRunner";
+import { adminNotificationService } from "@/lib/notifications/AdminNotificationService";
+import { NewTenantSignupPayload } from "@/lib/notifications/types";
+import crypto from "crypto";
 
 /**
  * POST /api/tenant/create
@@ -10,21 +15,24 @@ import { Prisma } from "@prisma/client";
  *   1. Sets the creator's role to ADMIN (was previously missing — critical bug fix)
  *   2. Creates a default TenantSettings record so the CMS editors never receive null
  *   3. Handles slug collisions gracefully (P2002 → 409 instead of 500)
+ *   4. Dispatches an async notification to SuperAdmins.
  */
 export async function POST(req: Request) {
+  const correlationId = crypto.randomUUID();
+  const logCtx = { correlationId };
+
   try {
     const session = await getAuthSession();
 
-    const TRACE = `[FORENSIC:tenant-create][${Date.now()}]`;
-    console.log(`${TRACE} ┌─ POST /api/tenant/create`);
-    console.log(`${TRACE} │  session present  = ${!!session?.user?.id}`);
-    console.log(`${TRACE} │  user.id          = ${session?.user?.id ?? "undefined"}`);
-    console.log(`${TRACE} │  user.email       = ${session?.user?.email ?? "undefined"}`);
-    console.log(`${TRACE} │  user.role        = ${(session?.user as any)?.role ?? "undefined"}`);
-    console.log(`${TRACE} │  user.tenantId    = ${(session?.user as any)?.tenantId ?? "undefined"}`);
+    logger.info("┌─ POST /api/tenant/create", { 
+      ...logCtx, 
+      sessionPresent: !!session?.user?.id,
+      userId: session?.user?.id,
+      userEmail: session?.user?.email 
+    });
 
     if (!session?.user?.id || !session.user.email) {
-      console.log(`${TRACE} └─ DENY: no session`);
+      logger.warn("└─ DENY: no session", logCtx);
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -69,7 +77,6 @@ export async function POST(req: Request) {
       });
 
       // ✅ FIX 1: Promote the creator to ADMIN of the new gym.
-      // Previously, tenantId was set but role stayed "MEMBER" — blocking dashboard access.
       await tx.user.update({
         where: { id: session.user!.id },
         data: {
@@ -78,8 +85,7 @@ export async function POST(req: Request) {
         },
       });
 
-      // ✅ FIX 2: Auto-create TenantSettings with sensible defaults so the CMS editors
-      // never receive null on first load, and the public gym page renders something meaningful.
+      // ✅ FIX 2: Auto-create TenantSettings with sensible defaults
       await tx.tenantSettings.create({
         data: {
           tenantId: tenant.id,
@@ -95,8 +101,31 @@ export async function POST(req: Request) {
       return { tenant };
     });
 
-    console.log(`[FORENSIC:tenant-create] │  DB WRITE SUCCESS: tenant.id=${tenant.id} tenant.slug=${tenant.slug}`);
-    console.log(`[FORENSIC:tenant-create] └─ RESPONSE 201: returning slug=${tenant.slug} to client (client will router.push to /gym/${tenant.slug}/dashboard/admin)`);
+    logger.info(`│  DB WRITE SUCCESS: tenant.id=${tenant.id} tenant.slug=${tenant.slug}`, logCtx);
+
+    // ✅ FIX 4: Asynchronous Notification via WaitUntil
+    const payload: NewTenantSignupPayload = {
+      gymName: tenant.name,
+      ownerName: session.user.name || "Unknown",
+      ownerEmail: session.user.email,
+      plan: tenant.plan, // Dynamically pulled from persisted tenant
+      timestamp: new Date().toISOString(), // UTC ISO format
+    };
+
+    BackgroundTaskRunner.execute(
+      "NewTenantAdminNotification",
+      correlationId,
+      async () => {
+        await adminNotificationService.sendNotification(
+          AdminNotificationType.NEW_TENANT_SIGNUP,
+          payload,
+          tenant.id,
+          correlationId
+        );
+      }
+    );
+
+    logger.info(`└─ RESPONSE 201: returning slug=${tenant.slug} to client`, logCtx);
 
     return NextResponse.json(
       {
@@ -110,12 +139,11 @@ export async function POST(req: Request) {
       { status: 201 }
     );
   } catch (error) {
-    // ✅ FIX 3: Catch unique-constraint violations (slug already taken) and return
-    // a user-friendly 409 instead of a raw 500.
     if (
       error instanceof Prisma.PrismaClientKnownRequestError &&
       error.code === "P2002"
     ) {
+      logger.warn("A gym with a similar name already exists (Slug collision).", logCtx);
       return NextResponse.json(
         {
           error:
@@ -125,7 +153,7 @@ export async function POST(req: Request) {
       );
     }
 
-    console.error("[POST /api/tenant/create]", error);
+    logger.error("Internal Server Error in /api/tenant/create", error, logCtx);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }
