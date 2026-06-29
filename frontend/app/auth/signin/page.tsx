@@ -139,10 +139,10 @@ export default function SignInPage() {
   };
 
   const inputClass =
-    "w-full px-4 py-3 rounded-xl border border-white/10 bg-white/5 text-white placeholder-white/40 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/60 transition";
+    "w-full px-4 py-3 rounded-xl border border-border bg-background text-foreground placeholder-muted-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/60 transition";
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-950 via-indigo-950 to-gray-950 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-background text-foreground px-4">
       {/* Animated background orbs */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
         <div className="absolute top-1/4 -left-32 w-96 h-96 bg-indigo-600/20 rounded-full blur-3xl animate-pulse" />
@@ -157,20 +157,20 @@ export default function SignInPage() {
           ) : (
             <div 
               className="inline-flex items-center justify-center w-14 h-14 rounded-2xl mb-4 shadow-lg shadow-indigo-500/30 text-white font-bold"
-              style={branding ? { background: `linear-gradient(135deg, ${branding.primaryColor}, ${branding.secondaryColor})` } : { background: "linear-gradient(to bottom right, #6366f1, #9333ea)" }}
+              style={branding ? { background: `linear-gradient(135deg, ${branding.primaryColor}, ${branding.secondaryColor})` } : { background: "linear-gradient(to bottom right, var(--primary), var(--secondary))" }}
             >
               <span className="text-2xl">{branding?.brandName ? branding.brandName[0] : "💪"}</span>
             </div>
           )}
-          <h1 className="text-2xl font-black text-white">{branding?.brandName || "CortexFit"}</h1>
-          <p className="text-white/50 text-sm mt-1">Smart Gym Management Platform</p>
+          <h1 className="text-2xl font-black text-foreground">{branding?.brandName || "CortexFit"}</h1>
+          <p className="text-muted-foreground text-sm mt-1">Smart Gym Management Platform</p>
         </div>
 
         {/* Card */}
-        <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8 shadow-2xl">
+        <div className="bg-card/50 backdrop-blur-xl border border-border rounded-3xl p-8 shadow-2xl">
 
           {/* Tabs */}
-          <div className="flex bg-white/5 rounded-xl p-1 mb-6">
+          <div className="flex bg-muted rounded-xl p-1 mb-6">
             {(["signin", "register"] as const).map((t) => (
               <button
                 key={t}
@@ -178,8 +178,8 @@ export default function SignInPage() {
                 onClick={() => { setTab(t); setMessage(null); }}
                 className={`flex-1 py-2 text-sm font-semibold rounded-lg transition-all ${
                   tab === t
-                    ? "bg-indigo-600 text-white shadow-sm"
-                    : "text-white/50 hover:text-white"
+                    ? "bg-background text-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
                 }`}
               >
                 {t === "signin" ? "Sign In" : "Create Account"}
@@ -205,7 +205,7 @@ export default function SignInPage() {
                 id="google-signin-btn"
                 onClick={handleGoogleSignIn}
                 disabled={googleLoading}
-                className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl bg-white text-gray-800 font-semibold text-sm hover:bg-gray-50 transition-all hover:shadow-lg disabled:opacity-60 mb-4"
+                className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl bg-card border border-border text-foreground font-semibold text-sm hover:bg-accent transition-all hover:shadow-lg disabled:opacity-60 mb-4"
               >
                 <svg className="w-5 h-5" viewBox="0 0 24 24">
                   <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -218,9 +218,9 @@ export default function SignInPage() {
 
               {/* Divider */}
               <div className="flex items-center gap-3 mb-4">
-                <div className="flex-1 h-px bg-white/10" />
-                <span className="text-white/30 text-xs">or</span>
-                <div className="flex-1 h-px bg-white/10" />
+                <div className="flex-1 h-px bg-border" />
+                <span className="text-muted-foreground text-xs">or</span>
+                <div className="flex-1 h-px bg-border" />
               </div>
 
               {/* Credentials form */}
@@ -249,7 +249,7 @@ export default function SignInPage() {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-white/50 hover:text-white"
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-muted-foreground hover:text-foreground"
                   >
                     {showPassword ? <EyeSlashIcon className="w-5 h-5" /> : <EyeIcon className="w-5 h-5" />}
                   </button>
@@ -258,7 +258,7 @@ export default function SignInPage() {
                   id="signin-submit-btn"
                   type="submit"
                   disabled={loading}
-                  className="w-full py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold text-sm hover:opacity-90 hover:shadow-lg hover:shadow-indigo-500/30 transition-all disabled:opacity-60"
+                  className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-bold text-sm hover:opacity-90 hover:shadow-lg hover:shadow-primary/30 transition-all disabled:opacity-60"
                 >
                   {loading ? "Signing in…" : "Sign In →"}
                 </button>
@@ -301,7 +301,7 @@ export default function SignInPage() {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-white/50 hover:text-white"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-muted-foreground hover:text-foreground"
                 >
                   {showPassword ? <EyeSlashIcon className="w-5 h-5" /> : <EyeIcon className="w-5 h-5" />}
                 </button>
@@ -320,7 +320,7 @@ export default function SignInPage() {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-white/50 hover:text-white"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-muted-foreground hover:text-foreground"
                 >
                   {showPassword ? <EyeSlashIcon className="w-5 h-5" /> : <EyeIcon className="w-5 h-5" />}
                 </button>
@@ -329,7 +329,7 @@ export default function SignInPage() {
                 id="register-submit-btn"
                 type="submit"
                 disabled={loading}
-                className="w-full py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold text-sm hover:opacity-90 hover:shadow-lg hover:shadow-indigo-500/30 transition-all disabled:opacity-60"
+                className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-bold text-sm hover:opacity-90 hover:shadow-lg hover:shadow-primary/30 transition-all disabled:opacity-60"
               >
                 {loading ? "Creating account…" : "Create Account →"}
               </button>
@@ -338,7 +338,7 @@ export default function SignInPage() {
 
           {/* Footer links */}
           <div className="mt-6 text-center">
-            <Link href="/" className="text-xs text-white/30 hover:text-white/60 transition">
+            <Link href="/" className="text-xs text-muted-foreground hover:text-foreground transition">
               ← Back to home
             </Link>
           </div>
@@ -346,7 +346,7 @@ export default function SignInPage() {
 
         {/* Privacy note */}
         {!branding?.whiteLabelEnabled && (
-          <p className="text-center text-white/20 text-xs mt-4">
+          <p className="text-center text-muted-foreground text-xs mt-4">
             By signing in, you agree to CortexFit&apos;s Terms of Service and Privacy Policy.
           </p>
         )}

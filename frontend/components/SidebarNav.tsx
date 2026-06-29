@@ -70,13 +70,9 @@ export function SidebarNav({
 
   return (
     <aside
-      className="hidden md:flex w-56 flex-col shrink-0"
-      style={{
-        background: branding.sidebarBg,
-        borderRight: `1px solid ${branding.sidebarBorder}`,
-      }}
+      className="hidden md:flex w-56 flex-col shrink-0 bg-card border-r border-border"
     >
-      <div className="px-5 py-5" style={{ borderBottom: `1px solid ${branding.sidebarBorder}` }}>
+      <div className="px-5 py-5 border-b border-border">
         {branding.logoUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={branding.logoUrl} alt={branding.brandName} className="h-8 w-auto object-contain mb-1" />
@@ -88,7 +84,7 @@ export function SidebarNav({
             >
               {branding.brandName[0]}
             </div>
-            <p className="font-bold text-sm truncate" style={{ color: branding.textPrimary }}>
+            <p className="font-bold text-sm truncate text-foreground">
               {branding.brandName}
             </p>
           </div>
@@ -105,10 +101,9 @@ export function SidebarNav({
             <Link
               key={link.href}
               href={link.href}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors`}
+              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${isActive ? "bg-primary/10" : "hover:bg-accent"}`}
               style={{
-                color: isActive ? branding.primaryColor : branding.textMuted,
-                backgroundColor: isActive ? (branding.darkMode ? "rgba(255,255,255,0.1)" : "#f3f4f6") : "transparent"
+                color: isActive ? branding.primaryColor : undefined,
               }}
             >
               <span className="text-base">{link.icon}</span>
@@ -120,20 +115,18 @@ export function SidebarNav({
 
       {/* DUAL ROLE TOGGLE */}
       {(role === "TRAINER" || role === "ADMIN" || role === "SUPERADMIN") && (
-        <div className="px-3 py-2" style={{ borderTop: `1px solid ${branding.sidebarBorder}` }}>
+        <div className="px-3 py-2 border-t border-border">
           {currentContext !== "MEMBER" ? (
             <Link
               href={`/gym/${slug}/dashboard/member`}
-              className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold transition-colors w-full"
-              style={{ color: branding.primaryColor, backgroundColor: branding.darkMode ? "rgba(255,255,255,0.05)" : "#f8fafc" }}
+              className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold transition-colors w-full bg-accent hover:bg-accent/80 text-foreground"
             >
               <span>👤</span> Switch to Member View
             </Link>
           ) : (
             <Link
               href={`/gym/${slug}/dashboard/${role === "TRAINER" ? "trainer" : "admin"}`}
-              className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold transition-colors w-full"
-              style={{ color: branding.primaryColor, backgroundColor: branding.darkMode ? "rgba(255,255,255,0.05)" : "#f8fafc" }}
+              className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold transition-colors w-full bg-accent hover:bg-accent/80 text-foreground"
             >
               <span>{role === "TRAINER" ? "🏋️" : "👑"}</span> Switch to {role === "TRAINER" ? "Trainer" : "Admin"} View
             </Link>
@@ -141,7 +134,7 @@ export function SidebarNav({
         </div>
       )}
 
-      <div className="px-4 py-4" style={{ borderTop: `1px solid ${branding.sidebarBorder}` }}>
+      <div className="px-4 py-4 border-t border-border">
         <div className="flex items-center gap-2">
           <div
             className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold uppercase text-white shrink-0"
@@ -150,10 +143,10 @@ export function SidebarNav({
             {user.name?.[0] ?? user.email?.[0] ?? "?"}
           </div>
           <div className="min-w-0">
-            <p className="text-xs font-medium truncate" style={{ color: branding.textPrimary }}>
+            <p className="text-xs font-medium truncate text-foreground">
               {user.name ?? "User"}
             </p>
-            <p className="text-xs truncate" style={{ color: branding.textMuted }}>
+            <p className="text-xs truncate text-muted-foreground">
               {user.email}
             </p>
           </div>
@@ -161,8 +154,7 @@ export function SidebarNav({
         <div className="flex items-center justify-between w-full mt-3">
           <a
             href={`/api/auth/signout?callbackUrl=/gym/${slug}`}
-            className="text-xs hover:underline"
-            style={{ color: branding.darkMode ? "#6b7280" : "#ef4444" }}
+            className="text-xs hover:underline text-destructive"
           >
             Sign out
           </a>

@@ -78,7 +78,7 @@ export function MobileNav({ slug, role, adminLinks, trainerLinks, memberLinks, p
 
   return (
     <>
-      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 pb-safe z-50 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-background border-t border-border pb-safe z-50 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
         <div className="flex justify-around items-center h-16 px-2">
           {bottomLinks.map((link) => {
             const isActive = pathname === link.href;
@@ -87,7 +87,7 @@ export function MobileNav({ slug, role, adminLinks, trainerLinks, memberLinks, p
                 key={link.href}
                 href={link.href}
                 className={`flex flex-col items-center justify-center w-full h-full space-y-1 transition-colors ${
-                  isActive ? "text-indigo-600 font-bold" : "text-gray-500 font-medium hover:text-gray-900"
+                  isActive ? "font-bold" : "text-muted-foreground font-medium hover:text-foreground"
                 }`}
                 style={isActive ? { color: primaryColor } : {}}
               >
@@ -100,7 +100,7 @@ export function MobileNav({ slug, role, adminLinks, trainerLinks, memberLinks, p
           <button
             onClick={() => setMoreOpen(!moreOpen)}
             className={`flex flex-col items-center justify-center w-full h-full space-y-1 transition-colors ${
-              moreOpen ? "text-indigo-600 font-bold" : "text-gray-500 font-medium hover:text-gray-900"
+              moreOpen ? "font-bold" : "text-muted-foreground font-medium hover:text-foreground"
             }`}
             style={moreOpen ? { color: primaryColor } : {}}
           >
@@ -114,32 +114,32 @@ export function MobileNav({ slug, role, adminLinks, trainerLinks, memberLinks, p
       {moreOpen && (
         <div className="md:hidden fixed inset-0 z-40 bg-black/50" onClick={() => setMoreOpen(false)}>
           <div 
-            className="absolute bottom-16 left-0 right-0 bg-white rounded-t-2xl shadow-2xl p-4 max-h-[70vh] overflow-y-auto"
+            className="absolute bottom-16 left-0 right-0 bg-card border-t border-border rounded-t-2xl shadow-2xl p-4 max-h-[70vh] overflow-y-auto"
             onClick={e => e.stopPropagation()}
           >
-            <div className="w-12 h-1 bg-gray-200 rounded-full mx-auto mb-4" />
+            <div className="w-12 h-1 bg-muted rounded-full mx-auto mb-4" />
             <div className="space-y-2">
               {moreLinks.map(link => (
                 <Link
                   key={link.href}
                   href={link.href}
                   onClick={() => setMoreOpen(false)}
-                  className="flex items-center gap-4 px-4 py-3 rounded-xl hover:bg-gray-50 transition"
+                  className="flex items-center gap-4 px-4 py-3 rounded-xl hover:bg-accent transition"
                 >
                   <span className="text-2xl">{link.icon}</span>
-                  <span className="font-semibold text-gray-900">{link.label}</span>
+                  <span className="font-semibold text-foreground">{link.label}</span>
                 </Link>
               ))}
 
               {/* DUAL ROLE TOGGLE */}
               {(role === "TRAINER" || role === "ADMIN" || role === "SUPERADMIN") && (
                 <>
-                  <div className="my-2 border-t border-gray-100" />
+                  <div className="my-2 border-t border-border" />
                   {currentContext !== "MEMBER" ? (
                     <Link
                       href={`/gym/${slug}/dashboard/member`}
                       onClick={() => setMoreOpen(false)}
-                      className="flex items-center gap-4 px-4 py-3 rounded-xl bg-indigo-50 text-indigo-700 hover:bg-indigo-100 transition"
+                      className="flex items-center gap-4 px-4 py-3 rounded-xl bg-primary/10 text-primary hover:bg-primary/20 transition"
                     >
                       <span className="text-2xl">👤</span>
                       <span className="font-semibold">Switch to Member View</span>
@@ -148,7 +148,7 @@ export function MobileNav({ slug, role, adminLinks, trainerLinks, memberLinks, p
                     <Link
                       href={`/gym/${slug}/dashboard/${role === "TRAINER" ? "trainer" : "admin"}`}
                       onClick={() => setMoreOpen(false)}
-                      className="flex items-center gap-4 px-4 py-3 rounded-xl bg-indigo-50 text-indigo-700 hover:bg-indigo-100 transition"
+                      className="flex items-center gap-4 px-4 py-3 rounded-xl bg-primary/10 text-primary hover:bg-primary/20 transition"
                     >
                       <span className="text-2xl">{role === "TRAINER" ? "🏋️" : "👑"}</span>
                       <span className="font-semibold">Switch to {role === "TRAINER" ? "Trainer" : "Admin"} View</span>
@@ -157,10 +157,10 @@ export function MobileNav({ slug, role, adminLinks, trainerLinks, memberLinks, p
                 </>
               )}
             </div>
-            <div className="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between px-4">
+            <div className="mt-4 pt-4 border-t border-border flex items-center justify-between px-4">
               <a
                 href={`/api/auth/signout?callbackUrl=/gym/${slug}`}
-                className="flex items-center gap-4 py-3 rounded-xl hover:bg-red-50 text-red-600 transition"
+                className="flex items-center gap-4 py-3 px-4 rounded-xl hover:bg-destructive/10 text-destructive transition"
               >
                 <span className="text-2xl">🚪</span>
                 <span className="font-semibold">Sign out</span>
