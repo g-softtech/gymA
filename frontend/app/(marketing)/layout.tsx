@@ -4,15 +4,15 @@ import { ThemeToggle } from "@/components/ui/ThemeToggle";
 
 export default function MarketingLayout({ children }: { children: ReactNode }) {
   return (
-    <div className="min-h-screen flex flex-col bg-white">
+    <div className="min-h-screen flex flex-col bg-background text-foreground">
       {/* Navbar */}
-      <header className="sticky top-0 z-50 bg-white border-b border-gray-100 shadow-sm">
+      <header className="sticky top-0 z-50 bg-background border-b border-border shadow-sm">
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
             <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
               <span className="text-white text-sm font-bold">SG</span>
             </div>
-            <span className="font-bold text-gray-900 text-lg">CortexFit</span>
+            <span className="font-bold text-foreground text-lg">CortexFit</span>
           </Link>
 
           <nav className="hidden md:flex items-center gap-8">
@@ -26,7 +26,7 @@ export default function MarketingLayout({ children }: { children: ReactNode }) {
               <Link
                 key={link.href}
                 href={link.href}
-                className="text-sm font-medium text-gray-600 hover:text-indigo-600 transition-colors"
+                className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
               >
                 {link.label}
               </Link>
@@ -37,13 +37,13 @@ export default function MarketingLayout({ children }: { children: ReactNode }) {
             <ThemeToggle />
             <Link
               href="/auth/signin?callbackUrl=/dashboard"
-              className="text-sm font-semibold text-gray-700 hover:text-indigo-600 transition"
+              className="text-sm font-semibold text-foreground hover:text-primary transition"
             >
               Sign In
             </Link>
             <Link
               href="/onboarding"
-              className="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-4 py-2 rounded-lg transition ml-2 shadow-sm"
+              className="bg-primary hover:opacity-90 text-primary-foreground text-sm font-semibold px-4 py-2 rounded-lg transition ml-2 shadow-sm"
             >
               Register Gym
             </Link>

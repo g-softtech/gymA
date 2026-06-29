@@ -143,7 +143,7 @@ export default async function GymPublicPage({
 
   return (
     <TenantThemeProvider settings={s}>
-      <div className="min-h-screen bg-white" style={{ fontFamily: s?.fontFamily ? `'${s.fontFamily}', system-ui, sans-serif` : undefined }}>
+      <div className="min-h-screen bg-background text-foreground" style={{ fontFamily: s?.fontFamily ? `'${s.fontFamily}', system-ui, sans-serif` : undefined }}>
 
         {/* ── Nav ────────────────────────────────────────────────────────────── */}
         <nav
@@ -163,7 +163,7 @@ export default async function GymPublicPage({
                   >
                     {tenant.name[0]}
                   </div>
-                  <span className="font-bold text-gray-900 text-lg">{tenant.name}</span>
+                  <span className="font-bold text-foreground text-lg">{tenant.name}</span>
                 </>
               )}
             </div>
@@ -896,8 +896,8 @@ export default async function GymPublicPage({
 
             {/* ── Contact Form ─────────────────────────────────────────────── */}
             <div className="mt-14">
-              <h3 className="text-2xl font-black text-gray-900 mb-2">Send Us a Message</h3>
-              <p className="text-gray-500 text-sm mb-6">
+              <h3 className="text-2xl font-black text-foreground mb-2">Send Us a Message</h3>
+              <p className="text-muted-foreground text-sm mb-6">
                 Have a question about membership or services? We&apos;d love to hear from you.
               </p>
               <ContactForm slug={slug} primaryColor={primary} />
