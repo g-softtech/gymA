@@ -5,7 +5,21 @@ import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 
 export function ThemeToggle() {
+  const [mounted, setMounted] = React.useState(false);
   const { theme, setTheme } = useTheme();
+
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return (
+      <button
+        className="relative inline-flex h-9 w-9 items-center justify-center rounded-md border border-border bg-background shadow-sm opacity-50 cursor-default"
+        aria-hidden="true"
+      />
+    );
+  }
 
   return (
     <button
