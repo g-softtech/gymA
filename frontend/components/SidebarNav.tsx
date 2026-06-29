@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { ThemeToggle } from "@/components/ui/ThemeToggle";
 
 interface NavLink {
   href: string;
@@ -157,13 +158,16 @@ export function SidebarNav({
             </p>
           </div>
         </div>
-        <a
-          href={`/api/auth/signout?callbackUrl=/gym/${slug}`}
-          className="block mt-3 text-xs hover:underline"
-          style={{ color: branding.darkMode ? "#6b7280" : "#ef4444" }}
-        >
-          Sign out
-        </a>
+        <div className="flex items-center justify-between w-full mt-3">
+          <a
+            href={`/api/auth/signout?callbackUrl=/gym/${slug}`}
+            className="text-xs hover:underline"
+            style={{ color: branding.darkMode ? "#6b7280" : "#ef4444" }}
+          >
+            Sign out
+          </a>
+          <ThemeToggle />
+        </div>
       </div>
     </aside>
   );

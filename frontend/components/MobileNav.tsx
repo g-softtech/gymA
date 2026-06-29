@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
+import { ThemeToggle } from "@/components/ui/ThemeToggle";
 
 interface NavLink {
   href: string;
@@ -156,14 +157,15 @@ export function MobileNav({ slug, role, adminLinks, trainerLinks, memberLinks, p
                 </>
               )}
             </div>
-            <div className="mt-4 pt-4 border-t border-gray-100">
+            <div className="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between px-4">
               <a
                 href={`/api/auth/signout?callbackUrl=/gym/${slug}`}
-                className="flex items-center gap-4 px-4 py-3 rounded-xl hover:bg-red-50 text-red-600 transition"
+                className="flex items-center gap-4 py-3 rounded-xl hover:bg-red-50 text-red-600 transition"
               >
                 <span className="text-2xl">🚪</span>
                 <span className="font-semibold">Sign out</span>
               </a>
+              <ThemeToggle />
             </div>
           </div>
         </div>
