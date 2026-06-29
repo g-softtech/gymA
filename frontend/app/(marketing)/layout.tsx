@@ -1,5 +1,6 @@
 import { ReactNode } from "react";
 import Link from "next/link";
+import { ThemeToggle } from "@/components/ui/ThemeToggle";
 
 export default function MarketingLayout({ children }: { children: ReactNode }) {
   return (
@@ -33,6 +34,7 @@ export default function MarketingLayout({ children }: { children: ReactNode }) {
           </nav>
 
           <div className="flex items-center gap-3">
+            <ThemeToggle />
             <Link
               href="/auth/signin?callbackUrl=/dashboard"
               className="text-sm font-semibold text-gray-700 hover:text-indigo-600 transition"
