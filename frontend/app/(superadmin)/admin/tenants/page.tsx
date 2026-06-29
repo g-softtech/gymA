@@ -54,7 +54,7 @@ export default async function SuperAdminTenantsPage() {
       </div>
 
       {/* Table */}
-      <div className="bg-white/[0.03] border border-white/5 rounded-xl overflow-hidden">
+      <div className="bg-card text-card-foreground/[0.03] border border-white/5 rounded-xl overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
@@ -86,7 +86,7 @@ export default async function SuperAdminTenantsPage() {
               {tenants.map((tenant) => (
                 <tr
                   key={tenant.id}
-                  className="hover:bg-white/[0.02] transition-colors"
+                  className="hover:bg-card text-card-foreground/[0.02] transition-colors"
                 >
                   {/* Gym name + avatar */}
                   <td className="px-6 py-4">

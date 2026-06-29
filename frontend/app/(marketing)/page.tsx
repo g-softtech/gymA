@@ -190,22 +190,22 @@ export default function HomePage() {
       </section>
 
       {/* Features */}
-      <section id="features" className="py-24 px-6 bg-gray-50">
+      <section id="features" className="py-24 px-6 bg-muted">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-extrabold text-gray-900 mb-4">
+            <h2 className="text-4xl font-extrabold text-foreground mb-4">
               Everything your gym needs
             </h2>
-            <p className="text-xl text-gray-500 max-w-2xl mx-auto">
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               From member check-ins to AI-powered coaching — CortexFit has every feature a modern African gym needs to thrive.
             </p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {features.map((f) => (
-              <div key={f.title} className="bg-white rounded-2xl p-6 border border-gray-100 hover:shadow-md hover:border-indigo-200 transition-all">
+              <div key={f.title} className="bg-card text-card-foreground rounded-2xl p-6 border border-border hover:shadow-md hover:border-indigo-200 transition-all">
                 <div className="text-3xl mb-4">{f.icon}</div>
-                <h3 className="font-bold text-gray-900 mb-2">{f.title}</h3>
-                <p className="text-sm text-gray-500 leading-relaxed">{f.desc}</p>
+                <h3 className="font-bold text-foreground mb-2">{f.title}</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">{f.desc}</p>
               </div>
             ))}
           </div>
@@ -213,7 +213,7 @@ export default function HomePage() {
       </section>
 
       {/* AI section */}
-      <section id="ai" className="py-24 px-6 bg-white">
+      <section id="ai" className="py-24 px-6 bg-background">
         <div className="max-w-5xl mx-auto">
           <div className="bg-gradient-to-br from-indigo-900 to-purple-900 rounded-3xl p-10 text-white">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-12 items-center">
@@ -288,22 +288,22 @@ export default function HomePage() {
       </section>
 
       {/* Testimonials */}
-      <section className="py-24 px-6 bg-gray-50">
+      <section className="py-24 px-6 bg-muted">
         <div className="max-w-5xl mx-auto">
-          <h2 className="text-4xl font-extrabold text-gray-900 text-center mb-16">
+          <h2 className="text-4xl font-extrabold text-foreground text-center mb-16">
             Loved by gym owners across Nigeria
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
             {testimonials.map((t) => (
-              <div key={t.name} className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
-                <p className="text-gray-600 text-sm leading-relaxed mb-6">&ldquo;{t.text}&rdquo;</p>
+              <div key={t.name} className="bg-card text-card-foreground rounded-2xl p-6 border border-border shadow-sm">
+                <p className="text-muted-foreground text-sm leading-relaxed mb-6">&ldquo;{t.text}&rdquo;</p>
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold">
+                  <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold">
                     {t.avatar}
                   </div>
                   <div>
-                    <p className="font-semibold text-gray-900 text-sm">{t.name}</p>
-                    <p className="text-xs text-gray-400">{t.role}</p>
+                    <p className="font-semibold text-foreground text-sm">{t.name}</p>
+                    <p className="text-xs text-muted-foreground">{t.role}</p>
                   </div>
                 </div>
               </div>
@@ -313,27 +313,27 @@ export default function HomePage() {
       </section>
 
       {/* Pricing Section */}
-      <section id="pricing" className="py-24 px-6 bg-white border-t border-gray-100">
+      <section id="pricing" className="py-24 px-6 bg-background border-t border-border">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-extrabold text-gray-900 mb-4">
+            <h2 className="text-4xl font-extrabold text-foreground mb-4">
               Simple, transparent pricing
             </h2>
-            <p className="text-xl text-gray-500 max-w-2xl mx-auto">
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               Built for gyms of all sizes. Billed annually to give you 2 months free.
             </p>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 xl:gap-6">
             {/* Starter Plan */}
-            <div className="relative bg-white rounded-3xl border border-gray-200 p-8 shadow-sm flex flex-col hover:border-indigo-200 hover:shadow-md transition-all">
-              <h3 className="text-xl font-bold text-gray-900 mb-2">Starter Plan</h3>
-              <p className="text-sm text-gray-500 mb-6 min-h-[40px]">Perfect for small gyms just getting started</p>
+            <div className="relative bg-card text-card-foreground rounded-3xl border border-border p-8 shadow-sm flex flex-col hover:border-indigo-200 hover:shadow-md transition-all">
+              <h3 className="text-xl font-bold text-foreground mb-2">Starter Plan</h3>
+              <p className="text-sm text-muted-foreground mb-6 min-h-[40px]">Perfect for small gyms just getting started</p>
               <div className="mb-6">
-                <span className="text-4xl font-extrabold text-gray-900">₦100,000</span>
-                <span className="text-gray-500 text-sm"> / year</span>
+                <span className="text-4xl font-extrabold text-foreground">₦100,000</span>
+                <span className="text-muted-foreground text-sm"> / year</span>
               </div>
-              <ul className="space-y-4 mb-8 flex-1 text-sm text-gray-600">
+              <ul className="space-y-4 mb-8 flex-1 text-sm text-muted-foreground">
                 <li className="flex gap-3"><span className="text-indigo-600 font-bold">✓</span> Up to 50 members</li>
                 <li className="flex gap-3"><span className="text-indigo-600 font-bold">✓</span> 1 trainer account</li>
                 <li className="flex gap-3"><span className="text-indigo-600 font-bold">✓</span> Member management</li>
@@ -355,14 +355,14 @@ export default function HomePage() {
             </div>
 
             {/* Professional Plan */}
-            <div className="relative bg-white rounded-3xl border border-gray-200 p-8 shadow-sm flex flex-col hover:border-indigo-200 hover:shadow-md transition-all">
-              <h3 className="text-xl font-bold text-gray-900 mb-2">Professional Plan</h3>
-              <p className="text-sm text-gray-500 mb-6 min-h-[40px]">For growing gyms that need more power</p>
+            <div className="relative bg-card text-card-foreground rounded-3xl border border-border p-8 shadow-sm flex flex-col hover:border-indigo-200 hover:shadow-md transition-all">
+              <h3 className="text-xl font-bold text-foreground mb-2">Professional Plan</h3>
+              <p className="text-sm text-muted-foreground mb-6 min-h-[40px]">For growing gyms that need more power</p>
               <div className="mb-6">
-                <span className="text-4xl font-extrabold text-gray-900">₦200,000</span>
-                <span className="text-gray-500 text-sm"> / year</span>
+                <span className="text-4xl font-extrabold text-foreground">₦200,000</span>
+                <span className="text-muted-foreground text-sm"> / year</span>
               </div>
-              <ul className="space-y-4 mb-8 flex-1 text-sm text-gray-600">
+              <ul className="space-y-4 mb-8 flex-1 text-sm text-muted-foreground">
                 <li className="flex gap-3"><span className="text-indigo-600 font-bold">✓</span> Up to 150 members</li>
                 <li className="flex gap-3"><span className="text-indigo-600 font-bold">✓</span> 5 trainer accounts</li>
                 <li className="flex gap-3"><span className="text-indigo-600 font-bold">✓</span> Everything in Starter</li>
@@ -382,17 +382,17 @@ export default function HomePage() {
             </div>
 
             {/* Scale-Up Plan (Most Popular) */}
-            <div className="relative bg-white rounded-3xl border-2 border-indigo-600 p-8 shadow-xl shadow-indigo-100 flex flex-col transform md:-translate-y-2">
-              <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-indigo-600 text-white text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-wider shadow-sm">
+            <div className="relative bg-card text-card-foreground rounded-3xl border-2 border-primary p-8 shadow-xl shadow-primary/20 flex flex-col transform md:-translate-y-2">
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-primary text-primary-foreground text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-wider shadow-sm">
                 Most Popular
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">Scale-Up Plan</h3>
-              <p className="text-sm text-gray-500 mb-6 min-h-[40px]">For elite gyms scaling their digital tracking</p>
+              <h3 className="text-xl font-bold text-foreground mb-2">Scale-Up Plan</h3>
+              <p className="text-sm text-muted-foreground mb-6 min-h-[40px]">For elite gyms scaling their digital tracking</p>
               <div className="mb-6">
-                <span className="text-4xl font-extrabold text-gray-900">₦300,000</span>
-                <span className="text-gray-500 text-sm"> / year</span>
+                <span className="text-4xl font-extrabold text-foreground">₦300,000</span>
+                <span className="text-muted-foreground text-sm"> / year</span>
               </div>
-              <ul className="space-y-4 mb-8 flex-1 text-sm text-gray-600">
+              <ul className="space-y-4 mb-8 flex-1 text-sm text-muted-foreground">
                 <li className="flex gap-3"><span className="text-indigo-600 font-bold">✓</span> Up to 400 members</li>
                 <li className="flex gap-3"><span className="text-indigo-600 font-bold">✓</span> Unlimited trainers</li>
                 <li className="flex gap-3"><span className="text-indigo-600 font-bold">✓</span> Everything in Professional</li>
@@ -406,14 +406,14 @@ export default function HomePage() {
             </div>
 
             {/* Apex Network Plan */}
-            <div className="relative bg-white rounded-3xl border border-gray-200 p-8 shadow-sm flex flex-col hover:border-indigo-200 hover:shadow-md transition-all">
-              <h3 className="text-xl font-bold text-gray-900 mb-2">Apex Network Plan</h3>
-              <p className="text-sm text-gray-500 mb-6 min-h-[40px]">For gym chains and serious multi-location fitness businesses</p>
+            <div className="relative bg-card text-card-foreground rounded-3xl border border-border p-8 shadow-sm flex flex-col hover:border-indigo-200 hover:shadow-md transition-all">
+              <h3 className="text-xl font-bold text-foreground mb-2">Apex Network Plan</h3>
+              <p className="text-sm text-muted-foreground mb-6 min-h-[40px]">For gym chains and serious multi-location fitness businesses</p>
               <div className="mb-6">
-                <span className="text-4xl font-extrabold text-gray-900">₦400,000</span>
-                <span className="text-gray-500 text-sm"> / year</span>
+                <span className="text-4xl font-extrabold text-foreground">₦400,000</span>
+                <span className="text-muted-foreground text-sm"> / year</span>
               </div>
-              <ul className="space-y-4 mb-8 flex-1 text-sm text-gray-600">
+              <ul className="space-y-4 mb-8 flex-1 text-sm text-muted-foreground">
                 <li className="flex gap-3"><span className="text-indigo-600 font-bold">✓</span> Unlimited members</li>
                 <li className="flex gap-3"><span className="text-indigo-600 font-bold">✓</span> Unlimited trainers</li>
                 <li className="flex gap-3"><span className="text-indigo-600 font-bold">✓</span> Everything in Scale-Up</li>

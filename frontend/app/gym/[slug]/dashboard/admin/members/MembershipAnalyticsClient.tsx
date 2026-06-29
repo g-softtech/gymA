@@ -27,7 +27,7 @@ export default function MembershipAnalyticsClient() {
   }, []);
 
   if (loading) {
-    return <div className="animate-pulse bg-gray-100 rounded-xl h-48 w-full"></div>;
+    return <div className="animate-pulse bg-muted rounded-xl h-48 w-full"></div>;
   }
 
   if (error || !data) {
@@ -37,34 +37,34 @@ export default function MembershipAnalyticsClient() {
   return (
     <div className="space-y-6 mb-8">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm flex items-center justify-between">
+        <div className="bg-card text-card-foreground p-6 rounded-xl border border-border shadow-sm flex items-center justify-between">
           <div>
-            <p className="text-sm font-medium text-gray-500">Active Members</p>
-            <h3 className="text-3xl font-bold text-gray-900 mt-1">{data.activeMembers}</h3>
+            <p className="text-sm font-medium text-muted-foreground">Active Members</p>
+            <h3 className="text-3xl font-bold text-foreground mt-1">{data.activeMembers}</h3>
           </div>
           <div className="p-3 bg-indigo-50 text-indigo-600 rounded-lg text-2xl">👥</div>
         </div>
         
-        <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm flex items-center justify-between">
+        <div className="bg-card text-card-foreground p-6 rounded-xl border border-border shadow-sm flex items-center justify-between">
           <div>
-            <p className="text-sm font-medium text-gray-500">New This Month</p>
-            <h3 className="text-3xl font-bold text-gray-900 mt-1">{data.newMembersThisMonth}</h3>
+            <p className="text-sm font-medium text-muted-foreground">New This Month</p>
+            <h3 className="text-3xl font-bold text-foreground mt-1">{data.newMembersThisMonth}</h3>
           </div>
           <div className="p-3 bg-green-50 text-green-600 rounded-lg text-2xl">📈</div>
         </div>
 
-        <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm flex items-center justify-between">
+        <div className="bg-card text-card-foreground p-6 rounded-xl border border-border shadow-sm flex items-center justify-between">
           <div>
-            <p className="text-sm font-medium text-gray-500">Retention Rate</p>
-            <h3 className="text-3xl font-bold text-gray-900 mt-1">{data.retentionRate}%</h3>
+            <p className="text-sm font-medium text-muted-foreground">Retention Rate</p>
+            <h3 className="text-3xl font-bold text-foreground mt-1">{data.retentionRate}%</h3>
           </div>
           <div className="p-3 bg-purple-50 text-purple-600 rounded-lg text-2xl">❤️</div>
         </div>
       </div>
 
       {data.membersByPlan && data.membersByPlan.length > 0 && (
-        <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
-          <h3 className="text-lg font-bold text-gray-900 mb-6">Members by Plan</h3>
+        <div className="bg-card text-card-foreground p-6 rounded-xl border border-border shadow-sm">
+          <h3 className="text-lg font-bold text-foreground mb-6">Members by Plan</h3>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
@@ -82,7 +82,9 @@ export default function MembershipAnalyticsClient() {
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                   ))}
                 </Pie>
-                <Tooltip />
+                <Tooltip
+                  contentStyle={{ borderRadius: "12px", border: "1px solid var(--border)", backgroundColor: "var(--card)", color: "var(--foreground)", fontSize: "12px" }}
+                />
                 <Legend />
               </PieChart>
             </ResponsiveContainer>

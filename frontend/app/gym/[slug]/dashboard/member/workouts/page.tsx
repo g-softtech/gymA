@@ -30,16 +30,16 @@ export default async function MemberWorkoutsPage({
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">My Workout Plans</h1>
-        <p className="text-gray-500 mt-1">
+        <h1 className="text-2xl font-bold text-foreground">My Workout Plans</h1>
+        <p className="text-muted-foreground mt-1">
           {workouts.length} plan{workouts.length !== 1 ? "s" : ""} assigned to you
         </p>
       </div>
 
       {workouts.length === 0 ? (
-        <div className="bg-white rounded-xl border border-gray-100 p-12 text-center text-gray-400">
+        <div className="bg-card text-card-foreground rounded-xl border border-border p-12 text-center text-muted-foreground">
           <p className="text-4xl mb-3">💪</p>
-          <p className="font-medium text-gray-600">No workout plans yet</p>
+          <p className="font-medium text-muted-foreground">No workout plans yet</p>
           <p className="text-sm mt-1">Your trainer will assign workout plans here</p>
         </div>
       ) : (
@@ -50,11 +50,11 @@ export default async function MemberWorkoutsPage({
               exercises: { name: string; sets: number; reps: string; rest: string }[];
             }[];
             return (
-              <div key={w.id} className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
+              <div key={w.id} className="bg-card text-card-foreground rounded-xl border border-border shadow-sm p-6">
                 <div className="flex justify-between items-start mb-4">
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-900">{w.title}</h3>
-                    <p className="text-sm text-gray-500 mt-0.5">
+                    <h3 className="text-lg font-semibold text-foreground">{w.title}</h3>
+                    <p className="text-sm text-muted-foreground mt-0.5">
                       {w.trainer
                         ? `Assigned by ${w.trainer.user.name ?? "Your Trainer"}`
                         : "Self-assigned"}
@@ -80,15 +80,15 @@ export default async function MemberWorkoutsPage({
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                   {routines.map((r, i) => (
-                    <div key={i} className="bg-gray-50 rounded-lg p-4">
+                    <div key={i} className="bg-muted rounded-lg p-4">
                       <p className="text-xs font-bold text-indigo-600 uppercase tracking-wide mb-3">
                         {r.day}
                       </p>
                       <ul className="space-y-2">
                         {r.exercises.map((ex, j) => (
                           <li key={j} className="text-sm">
-                            <p className="font-medium text-gray-800">{ex.name}</p>
-                            <p className="text-xs text-gray-500 mt-0.5">
+                            <p className="font-medium text-foreground">{ex.name}</p>
+                            <p className="text-xs text-muted-foreground mt-0.5">
                               {ex.sets} sets &times; {ex.reps} reps &middot; {ex.rest} rest
                             </p>
                           </li>

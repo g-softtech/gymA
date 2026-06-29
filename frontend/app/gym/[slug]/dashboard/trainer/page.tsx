@@ -56,8 +56,8 @@ export default async function TrainerDashboardPage({
   return (
     <div className="max-w-5xl mx-auto space-y-8">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Trainer Dashboard</h1>
-        <p className="text-gray-500 mt-1">
+        <h1 className="text-2xl font-bold text-foreground">Trainer Dashboard</h1>
+        <p className="text-muted-foreground mt-1">
           Welcome back, {session!.user.name ?? session!.user.email}
         </p>
       </div>
@@ -65,10 +65,10 @@ export default async function TrainerDashboardPage({
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { label: "Upcoming Sessions", value: upcomingBookings.length, icon: "📅", color: "bg-indigo-50 text-indigo-700" },
-          { label: "Pending Approvals", value: pendingBookings.length, icon: "⏳", color: "bg-yellow-50 text-yellow-700" },
-          { label: "Total Clients", value: clientIds.size, icon: "👥", color: "bg-green-50 text-green-700" },
-          { label: "Completed Sessions", value: completedBookings.length, icon: "✅", color: "bg-purple-50 text-purple-700" },
+          { label: "Upcoming Sessions", value: upcomingBookings.length, icon: "📅", color: "bg-primary/10 text-primary" },
+          { label: "Pending Approvals", value: pendingBookings.length, icon: "⏳", color: "bg-warning/10 text-warning" },
+          { label: "Total Clients", value: clientIds.size, icon: "👥", color: "bg-success/10 text-success" },
+          { label: "Completed Sessions", value: completedBookings.length, icon: "✅", color: "bg-secondary/10 text-secondary" },
         ].map((s) => (
           <div key={s.label} className={`rounded-xl p-5 ${s.color}`}>
             <div className="text-2xl mb-2">{s.icon}</div>
@@ -86,12 +86,12 @@ export default async function TrainerDashboardPage({
           </h2>
           <div className="space-y-2">
             {pendingBookings.slice(0, 3).map((b: BookingWithMember) => (
-              <div key={b.id} className="flex justify-between items-center bg-white rounded-lg px-4 py-3 border border-yellow-100">
+              <div key={b.id} className="flex justify-between items-center bg-card text-card-foreground rounded-lg px-4 py-3 border border-yellow-100">
                 <div>
-                  <p className="font-medium text-gray-900">
+                  <p className="font-medium text-foreground">
                     {b.member.user.name ?? b.member.user.email}
                   </p>
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm text-muted-foreground">
                     {new Date(b.date).toLocaleDateString("en-NG", {
                       weekday: "short", month: "short", day: "numeric",
                     })}{" "}
@@ -115,9 +115,9 @@ export default async function TrainerDashboardPage({
       )}
 
       {/* Upcoming sessions */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100">
-        <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
-          <h2 className="text-lg font-semibold text-gray-900">Upcoming Sessions</h2>
+      <div className="bg-card text-card-foreground rounded-xl shadow-sm border border-border">
+        <div className="px-6 py-4 border-b border-border flex justify-between items-center">
+          <h2 className="text-lg font-semibold text-foreground">Upcoming Sessions</h2>
           <Link
             href={`/gym/${slug}/dashboard/trainer/schedule`}
             className="text-sm text-indigo-600 hover:underline"
@@ -125,32 +125,32 @@ export default async function TrainerDashboardPage({
             View Schedule →
           </Link>
         </div>
-        <div className="divide-y divide-gray-50">
+        <div className="divide-y divide-border">
           {upcomingBookings.length === 0 ? (
-            <p className="px-6 py-8 text-center text-gray-400">No upcoming sessions.</p>
+            <p className="px-6 py-8 text-center text-muted-foreground">No upcoming sessions.</p>
           ) : (
             upcomingBookings.slice(0, 5).map((b: BookingWithMember) => (
               <div key={b.id} className="px-6 py-4 flex justify-between items-center">
                 <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-sm font-bold uppercase">
+                  <div className="w-9 h-9 rounded-full bg-primary/10 text-primary flex items-center justify-center text-sm font-bold uppercase">
                     {b.member.user.name?.[0] ?? "?"}
                   </div>
                   <div>
-                    <p className="font-medium text-gray-900">
+                    <p className="font-medium text-foreground">
                       {b.member.user.name ?? b.member.user.email}
                     </p>
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-muted-foreground">
                       {b.durationMins} min · {b.sessionType}
                     </p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-sm font-medium text-gray-900">
+                  <p className="text-sm font-medium text-foreground">
                     {new Date(b.date).toLocaleDateString("en-NG", {
                       weekday: "short", month: "short", day: "numeric",
                     })}
                   </p>
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-muted-foreground">
                     {new Date(b.date).toLocaleTimeString("en-NG", {
                       hour: "2-digit", minute: "2-digit",
                     })}
@@ -175,10 +175,10 @@ export default async function TrainerDashboardPage({
           <Link
             key={item.href}
             href={item.href}
-            className="bg-white rounded-xl border border-gray-100 p-4 text-center hover:shadow-md hover:border-indigo-200 transition-all"
+            className="bg-card text-card-foreground rounded-xl border border-border p-4 text-center hover:shadow-md hover:border-indigo-200 transition-all"
           >
             <div className="text-2xl mb-1">{item.icon}</div>
-            <p className="text-xs font-semibold text-gray-700">{item.label}</p>
+            <p className="text-xs font-semibold text-foreground">{item.label}</p>
           </Link>
         ))}
       </div>

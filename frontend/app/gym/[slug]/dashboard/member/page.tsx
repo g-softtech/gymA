@@ -77,16 +77,16 @@ export default async function MemberDashboardPage({
 
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">
+          <h1 className="text-2xl font-bold text-foreground">
             Welcome back, {session.user.name?.split(" ")[0] ?? "there"}!
           </h1>
-          <p className="text-gray-500 mt-1">Here is your fitness overview.</p>
+          <p className="text-muted-foreground mt-1">Here is your fitness overview.</p>
         </div>
         <div className="flex items-center gap-3">
           {unreadMessages > 0 && (
             <Link
               href={`/gym/${slug}/dashboard/member/messages`}
-              className="flex items-center gap-2 bg-indigo-50 text-indigo-700 px-4 py-2.5 rounded-xl text-sm font-bold hover:bg-indigo-100 transition"
+              className="flex items-center gap-2 bg-primary/10 text-primary px-4 py-2.5 rounded-xl text-sm font-bold hover:bg-indigo-100 transition"
             >
               💬 {unreadMessages}
             </Link>
@@ -96,30 +96,30 @@ export default async function MemberDashboardPage({
       </div>
 
       {/* Membership status */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Membership Status</h2>
+      <div className="bg-card text-card-foreground rounded-xl shadow-sm border border-border p-6">
+        <h2 className="text-lg font-semibold text-foreground mb-4">Membership Status</h2>
         {activeSub ? (
           <div className="space-y-3">
             <div className="flex justify-between">
-              <span className="text-gray-500">Plan</span>
-              <span className="font-medium text-gray-900">{activeSub.plan.name}</span>
+              <span className="text-muted-foreground">Plan</span>
+              <span className="font-medium text-foreground">{activeSub.plan.name}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-500">Status</span>
+              <span className="text-muted-foreground">Status</span>
               <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
                 Active
               </span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-500">Expires</span>
-              <span className="font-medium text-gray-900">
+              <span className="text-muted-foreground">Expires</span>
+              <span className="font-medium text-foreground">
                 {new Date(activeSub.endDate).toLocaleDateString("en-NG", {
                   year: "numeric", month: "long", day: "numeric",
                 })}
               </span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-500">Days Left</span>
+              <span className="text-muted-foreground">Days Left</span>
               <span className={`font-bold ${daysLeft! <= 7 ? "text-red-500" : "text-green-600"}`}>
                 {daysLeft} day{daysLeft !== 1 ? "s" : ""}
               </span>
@@ -133,7 +133,7 @@ export default async function MemberDashboardPage({
           </div>
         ) : (
           <div className="text-center py-6">
-            <p className="text-gray-500 mb-4">You have no active membership plan.</p>
+            <p className="text-muted-foreground mb-4">You have no active membership plan.</p>
             <Link
               href={`/gym/${slug}#plans`}
               className="inline-block bg-indigo-600 text-white px-5 py-2 rounded-lg font-semibold hover:bg-indigo-700 transition"
@@ -155,39 +155,39 @@ export default async function MemberDashboardPage({
           <Link
             key={s.label}
             href={`/gym/${slug}/dashboard/${s.href}`}
-            className="bg-white rounded-xl border border-gray-100 shadow-sm p-5 text-center hover:shadow-md hover:border-indigo-200 transition-all"
+            className="bg-card text-card-foreground rounded-xl border border-border shadow-sm p-5 text-center hover:shadow-md hover:border-indigo-200 transition-all"
           >
             <div className="text-3xl mb-2">{s.icon}</div>
-            <div className="text-2xl font-bold text-gray-900">{s.value}</div>
-            <div className="text-sm text-gray-500 mt-0.5">{s.label}</div>
+            <div className="text-2xl font-bold text-foreground">{s.value}</div>
+            <div className="text-sm text-muted-foreground mt-0.5">{s.label}</div>
           </Link>
         ))}
       </div>
 
       {/* Upcoming bookings */}
       {memberProfile?.bookings && memberProfile.bookings.length > 0 && (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100">
-          <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
-            <h2 className="text-base font-semibold text-gray-900">Upcoming Sessions</h2>
+        <div className="bg-card text-card-foreground rounded-xl shadow-sm border border-border">
+          <div className="px-6 py-4 border-b border-border flex justify-between items-center">
+            <h2 className="text-base font-semibold text-foreground">Upcoming Sessions</h2>
             <Link href={`/gym/${slug}/dashboard/member/bookings`} className="text-sm text-indigo-600 hover:underline">
               View all →
             </Link>
           </div>
-          <div className="divide-y divide-gray-50">
+          <div className="divide-y divide-border">
             {memberProfile.bookings.map((b) => (
               <div key={b.id} className="px-6 py-4 flex justify-between items-center">
                 <div>
-                  <p className="font-medium text-gray-900">
+                  <p className="font-medium text-foreground">
                     {b.classSessionId ? `Class: ${b.classSession?.title}` : `Session with ${b.trainer?.user.name ?? "Trainer"}`}
                   </p>
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm text-muted-foreground">
                     {new Date(b.date).toLocaleDateString("en-NG", { weekday: "short", month: "short", day: "numeric" })}
                     {" "}&mdash;{" "}
                     {new Date(b.date).toLocaleTimeString("en-NG", { hour: "2-digit", minute: "2-digit" })}
                   </p>
                 </div>
                 <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                  b.status === "CONFIRMED" ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700"
+                  b.status === "CONFIRMED" ? "bg-success/10 text-success" : "bg-warning/10 text-warning"
                 }`}>
                   {b.status}
                 </span>
@@ -199,19 +199,19 @@ export default async function MemberDashboardPage({
 
       {/* Recent workouts */}
       {memberProfile?.workouts && memberProfile.workouts.length > 0 && (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100">
-          <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
-            <h2 className="text-base font-semibold text-gray-900">Recent Workout Plans</h2>
+        <div className="bg-card text-card-foreground rounded-xl shadow-sm border border-border">
+          <div className="px-6 py-4 border-b border-border flex justify-between items-center">
+            <h2 className="text-base font-semibold text-foreground">Recent Workout Plans</h2>
             <Link href={`/gym/${slug}/dashboard/member/workouts`} className="text-sm text-indigo-600 hover:underline">
               View all →
             </Link>
           </div>
-          <div className="divide-y divide-gray-50">
+          <div className="divide-y divide-border">
             {memberProfile.workouts.map((w) => (
               <div key={w.id} className="px-6 py-4 flex justify-between items-center">
                 <div>
-                  <p className="font-medium text-gray-900">{w.title}</p>
-                  <p className="text-sm text-gray-500">
+                  <p className="font-medium text-foreground">{w.title}</p>
+                  <p className="text-sm text-muted-foreground">
                     {new Date(w.createdAt).toLocaleDateString("en-NG", { month: "short", day: "numeric", year: "numeric" })}
                   </p>
                 </div>
@@ -224,7 +224,7 @@ export default async function MemberDashboardPage({
         </div>
       )}
       {/* Sticky Bottom Actions for Mobile */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 md:hidden shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] z-40">
+      <div className="fixed bottom-0 left-0 right-0 bg-card text-card-foreground border-t border-border p-4 md:hidden shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] z-40">
         <div className="flex gap-3">
           <Link
             href={`/gym/${slug}/dashboard/member/bookings/new`}
@@ -234,7 +234,7 @@ export default async function MemberDashboardPage({
           </Link>
           <Link
             href={`/gym/${slug}/dashboard/member/profile`}
-            className="flex-1 bg-gray-100 text-gray-900 text-center py-3 rounded-xl font-bold min-h-[44px]"
+            className="flex-1 bg-muted text-foreground text-center py-3 rounded-xl font-bold min-h-[44px]"
           >
             Profile
           </Link>

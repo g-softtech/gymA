@@ -79,10 +79,10 @@ export default function BookTrainerClient({ tenantId, memberId, trainers }: Prop
 
   if (success) {
     return (
-      <div className="bg-white p-12 rounded-2xl border border-green-100 text-center shadow-sm max-w-2xl mx-auto mt-12">
+      <div className="bg-card text-card-foreground p-12 rounded-2xl border border-green-100 text-center shadow-sm max-w-2xl mx-auto mt-12">
         <div className="text-6xl mb-6">✅</div>
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Booking Requested!</h2>
-        <p className="text-gray-500 mb-8">
+        <h2 className="text-2xl font-bold text-foreground mb-2">Booking Requested!</h2>
+        <p className="text-muted-foreground mb-8">
           Your session with {selectedTrainer?.name} on {format(selectedDate, "MMMM do, yyyy")} at {selectedTime} has been submitted and is currently <span className="font-bold text-yellow-600">PENDING</span> approval.
         </p>
         <button 
@@ -97,11 +97,11 @@ export default function BookTrainerClient({ tenantId, memberId, trainers }: Prop
 
   if (selectedTrainer) {
     return (
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-200 bg-gray-50 flex items-center gap-4">
+      <div className="bg-card text-card-foreground rounded-2xl shadow-sm border border-border overflow-hidden">
+        <div className="px-6 py-4 border-b border-border bg-muted flex items-center gap-4">
           <button 
             onClick={() => { setSelectedTrainer(null); setError(""); }}
-            className="p-2 hover:bg-gray-200 rounded-full transition"
+            className="p-2 hover:bg-muted rounded-full transition"
           >
             &larr; Back
           </button>
@@ -111,15 +111,15 @@ export default function BookTrainerClient({ tenantId, memberId, trainers }: Prop
             ) : selectedTrainer.name[0]}
           </div>
           <div>
-            <h2 className="font-bold text-gray-900">{selectedTrainer.name}</h2>
-            <p className="text-sm text-gray-500">{selectedTrainer.title || "Personal Trainer"}</p>
+            <h2 className="font-bold text-foreground">{selectedTrainer.name}</h2>
+            <p className="text-sm text-muted-foreground">{selectedTrainer.title || "Personal Trainer"}</p>
           </div>
         </div>
 
         <div className="p-6 md:p-8 grid grid-cols-1 lg:grid-cols-2 gap-12">
           {/* Calendar Selector */}
           <div>
-            <h3 className="text-sm font-bold uppercase tracking-wider text-gray-500 mb-4">Select Date</h3>
+            <h3 className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-4">Select Date</h3>
             <div className="grid grid-cols-7 gap-2">
               {days.map((d) => {
                 const isSelected = format(d, "yyyy-MM-dd") === format(selectedDate, "yyyy-MM-dd");
@@ -128,7 +128,7 @@ export default function BookTrainerClient({ tenantId, memberId, trainers }: Prop
                     key={d.toISOString()}
                     onClick={() => { setSelectedDate(d); setSelectedTime(null); setError(""); }}
                     className={`flex flex-col items-center justify-center p-2 rounded-lg border transition ${
-                      isSelected ? "bg-indigo-600 text-white border-indigo-600" : "bg-white text-gray-700 border-gray-200 hover:border-indigo-300"
+                      isSelected ? "bg-indigo-600 text-white border-indigo-600" : "bg-card text-card-foreground text-foreground border-border hover:border-indigo-300"
                     }`}
                   >
                     <span className="text-[10px] uppercase font-bold">{format(d, "EEE")}</span>
@@ -141,7 +141,7 @@ export default function BookTrainerClient({ tenantId, memberId, trainers }: Prop
 
           {/* Time Slots */}
           <div>
-            <h3 className="text-sm font-bold uppercase tracking-wider text-gray-500 mb-4">
+            <h3 className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-4">
               Available Times on {format(selectedDate, "MMM do")}
             </h3>
             
@@ -153,7 +153,7 @@ export default function BookTrainerClient({ tenantId, memberId, trainers }: Prop
                     key={time}
                     onClick={() => { setSelectedTime(time); setError(""); }}
                     className={`py-2 px-1 text-sm font-semibold rounded-lg border transition ${
-                      isSelected ? "bg-indigo-50 border-indigo-600 text-indigo-700 ring-1 ring-indigo-600" : "bg-white border-gray-200 text-gray-700 hover:border-indigo-300"
+                      isSelected ? "bg-indigo-50 border-indigo-600 text-indigo-700 ring-1 ring-indigo-600" : "bg-card text-card-foreground border-border text-foreground hover:border-indigo-300"
                     }`}
                   >
                     {time}
@@ -163,7 +163,7 @@ export default function BookTrainerClient({ tenantId, memberId, trainers }: Prop
             </div>
 
             {error && (
-              <div className="mt-6 p-4 bg-red-50 text-red-600 rounded-lg border border-red-100 text-sm font-medium">
+              <div className="mt-6 p-4 bg-destructive/10 text-destructive rounded-lg border border-red-100 text-sm font-medium">
                 🚨 {error}
               </div>
             )}
@@ -175,7 +175,7 @@ export default function BookTrainerClient({ tenantId, memberId, trainers }: Prop
             >
               {loading ? "Requesting Booking..." : `Request Session (₦${selectedTrainer.hourlyRate})`}
             </button>
-            <p className="text-xs text-center text-gray-400 mt-3">
+            <p className="text-xs text-center text-muted-foreground mt-3">
               Sessions require trainer approval. Standard 1-hour duration.
             </p>
           </div>
@@ -187,38 +187,38 @@ export default function BookTrainerClient({ tenantId, memberId, trainers }: Prop
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {trainers.length === 0 ? (
-        <div className="col-span-full py-12 text-center text-gray-500 bg-white rounded-xl border border-gray-100">
+        <div className="col-span-full py-12 text-center text-muted-foreground bg-card text-card-foreground rounded-xl border border-border">
           No trainers are currently available to book.
         </div>
       ) : (
         trainers.map((trainer) => (
-          <div key={trainer.id} className="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition">
-            <div className="aspect-video bg-gray-100 relative">
+          <div key={trainer.id} className="bg-card text-card-foreground rounded-2xl border border-border overflow-hidden shadow-sm hover:shadow-md transition">
+            <div className="aspect-video bg-muted relative">
               {trainer.publicPhotoUrl ? (
                 <img src={trainer.publicPhotoUrl} alt={trainer.name} className="w-full h-full object-cover" />
               ) : (
-                <div className="w-full h-full flex items-center justify-center text-gray-300">
+                <div className="w-full h-full flex items-center justify-center text-muted-foreground">
                   <svg className="w-16 h-16" fill="currentColor" viewBox="0 0 24 24"><path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
                 </div>
               )}
-              <div className="absolute top-3 right-3 bg-white/90 backdrop-blur px-2.5 py-1 rounded-full text-xs font-bold text-gray-900 shadow-sm">
+              <div className="absolute top-3 right-3 bg-card text-card-foreground/90 backdrop-blur px-2.5 py-1 rounded-full text-xs font-bold text-foreground shadow-sm">
                 ₦{trainer.hourlyRate}/hr
               </div>
             </div>
             
             <div className="p-5">
-              <h3 className="font-bold text-lg text-gray-900">{trainer.name}</h3>
+              <h3 className="font-bold text-lg text-foreground">{trainer.name}</h3>
               <p className="text-sm text-indigo-600 font-medium mb-3">{trainer.title || "Personal Trainer"}</p>
               
               <div className="flex flex-wrap gap-1.5 mb-4">
                 {trainer.specialties.map(spec => (
-                  <span key={spec} className="px-2 py-0.5 bg-gray-100 text-gray-600 text-[10px] font-bold uppercase rounded">
+                  <span key={spec} className="px-2 py-0.5 bg-muted text-muted-foreground text-[10px] font-bold uppercase rounded">
                     {spec}
                   </span>
                 ))}
               </div>
               
-              <p className="text-sm text-gray-500 line-clamp-2 mb-6">
+              <p className="text-sm text-muted-foreground line-clamp-2 mb-6">
                 {trainer.bio || "No bio provided."}
               </p>
               

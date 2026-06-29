@@ -79,21 +79,21 @@ export default async function LeaderboardPage({
           ← Community
         </Link>
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Leaderboard</h1>
-          <p className="text-gray-500 mt-1">Top performers at {tenant.name}</p>
+          <h1 className="text-2xl font-bold text-foreground">Leaderboard</h1>
+          <p className="text-muted-foreground mt-1">Top performers at {tenant.name}</p>
         </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
         {/* Attendance leaderboard */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100">
-          <div className="px-6 py-4 border-b border-gray-100">
-            <h2 className="text-base font-semibold text-gray-900">📅 Most Visits</h2>
-            <p className="text-xs text-gray-400 mt-0.5">All-time attendance</p>
+        <div className="bg-card text-card-foreground rounded-xl shadow-sm border border-border">
+          <div className="px-6 py-4 border-b border-border">
+            <h2 className="text-base font-semibold text-foreground">📅 Most Visits</h2>
+            <p className="text-xs text-muted-foreground mt-0.5">All-time attendance</p>
           </div>
-          <div className="divide-y divide-gray-50">
+          <div className="divide-y divide-border">
             {attendanceLeaderboard.length === 0 ? (
-              <p className="px-6 py-8 text-center text-gray-400 text-sm">No data yet.</p>
+              <p className="px-6 py-8 text-center text-muted-foreground text-sm">No data yet.</p>
             ) : (
               attendanceLeaderboard.map((entry) => (
                 <div
@@ -102,18 +102,18 @@ export default async function LeaderboardPage({
                 >
                   <span className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${
                     entry.rank === 1 ? "bg-yellow-400 text-white" :
-                    entry.rank === 2 ? "bg-gray-300 text-gray-700" :
+                    entry.rank === 2 ? "bg-gray-300 text-foreground" :
                     entry.rank === 3 ? "bg-orange-300 text-white" :
-                    "bg-gray-100 text-gray-500"
+                    "bg-muted text-muted-foreground"
                   }`}>
                     {entry.rank}
                   </span>
                   <div className="flex-1 min-w-0">
-                    <p className={`text-sm font-medium truncate ${entry.isMe ? "text-indigo-700" : "text-gray-900"}`}>
+                    <p className={`text-sm font-medium truncate ${entry.isMe ? "text-indigo-700" : "text-foreground"}`}>
                       {entry.name} {entry.isMe && "(You)"}
                     </p>
                   </div>
-                  <span className="text-sm font-bold text-gray-900">{entry.score}</span>
+                  <span className="text-sm font-bold text-foreground">{entry.score}</span>
                 </div>
               ))
             )}
@@ -121,14 +121,14 @@ export default async function LeaderboardPage({
         </div>
 
         {/* Badge leaderboard */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100">
-          <div className="px-6 py-4 border-b border-gray-100">
-            <h2 className="text-base font-semibold text-gray-900">🏅 Most Badges</h2>
-            <p className="text-xs text-gray-400 mt-0.5">Achievement leaders</p>
+        <div className="bg-card text-card-foreground rounded-xl shadow-sm border border-border">
+          <div className="px-6 py-4 border-b border-border">
+            <h2 className="text-base font-semibold text-foreground">🏅 Most Badges</h2>
+            <p className="text-xs text-muted-foreground mt-0.5">Achievement leaders</p>
           </div>
-          <div className="divide-y divide-gray-50">
+          <div className="divide-y divide-border">
             {badgeLeaderboard.length === 0 ? (
-              <p className="px-6 py-8 text-center text-gray-400 text-sm">No badges earned yet.</p>
+              <p className="px-6 py-8 text-center text-muted-foreground text-sm">No badges earned yet.</p>
             ) : (
               badgeLeaderboard.map((entry) => (
                 <div
@@ -137,18 +137,18 @@ export default async function LeaderboardPage({
                 >
                   <span className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${
                     entry.rank === 1 ? "bg-yellow-400 text-white" :
-                    entry.rank === 2 ? "bg-gray-300 text-gray-700" :
+                    entry.rank === 2 ? "bg-gray-300 text-foreground" :
                     entry.rank === 3 ? "bg-orange-300 text-white" :
-                    "bg-gray-100 text-gray-500"
+                    "bg-muted text-muted-foreground"
                   }`}>
                     {entry.rank}
                   </span>
                   <div className="flex-1 min-w-0">
-                    <p className={`text-sm font-medium truncate ${entry.isMe ? "text-indigo-700" : "text-gray-900"}`}>
+                    <p className={`text-sm font-medium truncate ${entry.isMe ? "text-indigo-700" : "text-foreground"}`}>
                       {entry.name} {entry.isMe && "(You)"}
                     </p>
                   </div>
-                  <span className="text-sm font-bold text-gray-900">{entry.score} 🏅</span>
+                  <span className="text-sm font-bold text-foreground">{entry.score} 🏅</span>
                 </div>
               ))
             )}

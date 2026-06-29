@@ -86,8 +86,8 @@ export default async function MemberMessagesPage({
   return (
     <div className="max-w-5xl mx-auto space-y-4">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Messages</h1>
-        <p className="text-gray-500 mt-1">Chat with your trainers</p>
+        <h1 className="text-2xl font-bold text-foreground">Messages</h1>
+        <p className="text-muted-foreground mt-1">Chat with your trainers</p>
       </div>
       <MessagingPanel
         currentUserId={session.user.id}

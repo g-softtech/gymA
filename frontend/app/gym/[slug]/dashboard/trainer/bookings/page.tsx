@@ -42,17 +42,17 @@ export default async function TrainerBookingsPage({
   return (
     <div className="max-w-5xl mx-auto space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Bookings</h1>
-        <p className="text-gray-500 mt-1">Review and manage all session requests</p>
+        <h1 className="text-2xl font-bold text-foreground">Bookings</h1>
+        <p className="text-muted-foreground mt-1">Review and manage all session requests</p>
       </div>
 
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { label: "Pending", value: pending.length, color: "bg-yellow-50 text-yellow-700", icon: "⏳" },
-          { label: "Confirmed", value: confirmed.length, color: "bg-green-50 text-green-700", icon: "✅" },
-          { label: "Completed", value: completed.length, color: "bg-indigo-50 text-indigo-700", icon: "🏆" },
-          { label: "Cancelled", value: cancelled.length, color: "bg-red-50 text-red-700", icon: "❌" },
+          { label: "Pending", value: pending.length, color: "bg-warning/10 text-warning", icon: "⏳" },
+          { label: "Confirmed", value: confirmed.length, color: "bg-success/10 text-success", icon: "✅" },
+          { label: "Completed", value: completed.length, color: "bg-primary/10 text-primary", icon: "🏆" },
+          { label: "Cancelled", value: cancelled.length, color: "bg-destructive/10 text-destructive", icon: "❌" },
         ].map((s) => (
           <div key={s.label} className={`rounded-xl p-5 ${s.color}`}>
             <div className="text-2xl mb-2">{s.icon}</div>

@@ -58,8 +58,8 @@ export default function EntitlementsAuditPage() {
           <span className="text-2xl">🛡️</span>
         </div>
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Entitlements Audit</h1>
-          <p className="text-gray-500">Monitor limits, blocked requests, and engine telemetry across plans.</p>
+          <h1 className="text-2xl font-bold text-foreground">Entitlements Audit</h1>
+          <p className="text-muted-foreground">Monitor limits, blocked requests, and engine telemetry across plans.</p>
         </div>
       </div>
 
@@ -67,46 +67,46 @@ export default function EntitlementsAuditPage() {
 
       <div className="grid grid-cols-1 gap-6">
         {data.map((plan) => (
-          <div key={plan.id} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-            <div className="px-6 py-4 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
-              <h2 className="text-lg font-semibold text-gray-900">{plan.name}</h2>
+          <div key={plan.id} className="bg-card text-card-foreground rounded-xl shadow-sm border border-border overflow-hidden">
+            <div className="px-6 py-4 border-b border-border bg-muted flex justify-between items-center">
+              <h2 className="text-lg font-semibold text-foreground">{plan.name}</h2>
               <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
                 {plan.subscribers} Subscribers
               </span>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 divide-y lg:divide-y-0 lg:divide-x border-b border-gray-200">
+            <div className="grid grid-cols-1 lg:grid-cols-3 divide-y lg:divide-y-0 lg:divide-x border-b border-border">
               <div className="p-6">
-                <div className="flex items-center text-sm font-medium text-gray-500 mb-4">
+                <div className="flex items-center text-sm font-medium text-muted-foreground mb-4">
                   <span className="mr-2">📊</span>
                   Usage This Month
                 </div>
-                <div className="text-3xl font-bold text-gray-900">{plan.usageThisMonth}</div>
-                <div className="text-sm text-gray-500 mt-1">Total engine evaluations</div>
+                <div className="text-3xl font-bold text-foreground">{plan.usageThisMonth}</div>
+                <div className="text-sm text-muted-foreground mt-1">Total engine evaluations</div>
               </div>
 
               <div className="p-6">
-                <div className="flex items-center text-sm font-medium text-gray-500 mb-4">
+                <div className="flex items-center text-sm font-medium text-muted-foreground mb-4">
                   <span className="mr-2">⚠️</span>
                   Members at Limit
                 </div>
-                <div className="text-3xl font-bold text-gray-900">{plan.membersAtLimit}</div>
-                <div className="text-sm text-gray-500 mt-1">Distinct users blocked</div>
+                <div className="text-3xl font-bold text-foreground">{plan.membersAtLimit}</div>
+                <div className="text-sm text-muted-foreground mt-1">Distinct users blocked</div>
               </div>
 
               <div className="p-6">
-                <div className="flex items-center text-sm font-medium text-gray-500 mb-4">
+                <div className="flex items-center text-sm font-medium text-muted-foreground mb-4">
                   <span className="mr-2">🚨</span>
                   Blocked Requests
                 </div>
-                <div className="text-3xl font-bold text-gray-900">{plan.blockedRequests}</div>
-                <div className="text-sm text-gray-500 mt-1">Rejected entitlement requests</div>
+                <div className="text-3xl font-bold text-foreground">{plan.blockedRequests}</div>
+                <div className="text-sm text-muted-foreground mt-1">Rejected entitlement requests</div>
               </div>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2">
-              <div className="p-6 border-b lg:border-b-0 lg:border-r border-gray-200">
-                <h3 className="text-sm font-medium text-gray-900 mb-4">Entitlements Configuration</h3>
+              <div className="p-6 border-b lg:border-b-0 lg:border-r border-border">
+                <h3 className="text-sm font-medium text-foreground mb-4">Entitlements Configuration</h3>
                 <div className="bg-gray-900 rounded-lg p-4 overflow-x-auto">
                   <pre className="text-xs text-green-400 font-mono">
                     {JSON.stringify(plan.entitlements, null, 2)}
@@ -115,11 +115,11 @@ export default function EntitlementsAuditPage() {
               </div>
 
               <div className="p-6">
-                <h3 className="text-sm font-medium text-gray-900 mb-4">Last Enforcement Trigger</h3>
+                <h3 className="text-sm font-medium text-foreground mb-4">Last Enforcement Trigger</h3>
                 {plan.lastTrigger ? (
-                  <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                  <div className="bg-muted rounded-lg p-4 border border-border">
                     <div className="flex justify-between items-start mb-2">
-                      <span className="font-mono text-sm font-semibold text-gray-900">
+                      <span className="font-mono text-sm font-semibold text-foreground">
                         {plan.lastTrigger.feature}
                       </span>
                       {plan.lastTrigger.allowed ? (
@@ -132,13 +132,13 @@ export default function EntitlementsAuditPage() {
                         </span>
                       )}
                     </div>
-                    <p className="text-sm text-gray-600 mb-2">{plan.lastTrigger.reason || "No reason recorded"}</p>
-                    <p className="text-xs text-gray-400">
+                    <p className="text-sm text-muted-foreground mb-2">{plan.lastTrigger.reason || "No reason recorded"}</p>
+                    <p className="text-xs text-muted-foreground">
                       {new Date(plan.lastTrigger.createdAt).toLocaleString()}
                     </p>
                   </div>
                 ) : (
-                  <div className="flex flex-col justify-center items-center h-full text-gray-400 py-8">
+                  <div className="flex flex-col justify-center items-center h-full text-muted-foreground py-8">
                     <span className="text-3xl mb-2 opacity-50">✅</span>
                     <span className="text-sm">No telemetry recorded yet</span>
                   </div>
@@ -148,10 +148,10 @@ export default function EntitlementsAuditPage() {
           </div>
         ))}
         {data.length === 0 && (
-          <div className="text-center py-12 bg-white rounded-xl shadow-sm border border-gray-200">
+          <div className="text-center py-12 bg-card text-card-foreground rounded-xl shadow-sm border border-border">
             <span className="text-5xl mx-auto mb-4 opacity-50 block">👥</span>
-            <h3 className="text-lg font-medium text-gray-900">No Plans Found</h3>
-            <p className="text-gray-500 mt-2">Create membership plans to see entitlement telemetry.</p>
+            <h3 className="text-lg font-medium text-foreground">No Plans Found</h3>
+            <p className="text-muted-foreground mt-2">Create membership plans to see entitlement telemetry.</p>
           </div>
         )}
       </div>

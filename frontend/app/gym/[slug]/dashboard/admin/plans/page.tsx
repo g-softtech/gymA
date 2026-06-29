@@ -33,8 +33,8 @@ export default async function ManagePlansPage({
   return (
     <div className="max-w-3xl mx-auto space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Membership Plans</h1>
-        <p className="text-gray-500 mt-1">Create and manage plans for {tenant.name}</p>
+        <h1 className="text-2xl font-bold text-foreground">Membership Plans</h1>
+        <p className="text-muted-foreground mt-1">Create and manage plans for {tenant.name}</p>
       </div>
       <PlanManager tenantId={tenant.id} slug={slug} initialPlans={tenant.membershipPlans} />
     </div>

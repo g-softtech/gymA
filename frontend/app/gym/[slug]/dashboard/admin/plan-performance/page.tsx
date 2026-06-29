@@ -48,32 +48,32 @@ export default function PlanPerformancePage() {
           <span className="text-2xl">📋</span>
         </div>
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Plan Performance Dashboard</h1>
-          <p className="text-gray-500">Analyze how your membership plans are performing in revenue and restrictions.</p>
+          <h1 className="text-2xl font-bold text-foreground">Plan Performance Dashboard</h1>
+          <p className="text-muted-foreground">Analyze how your membership plans are performing in revenue and restrictions.</p>
         </div>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+      <div className="bg-card text-card-foreground rounded-xl shadow-sm border border-border overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+          <table className="min-w-full divide-y divide-border">
+            <thead className="bg-muted">
               <tr>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                   Plan Name
                 </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                   <div className="flex items-center">
                     <span className="mr-1">👥</span>
                     Active Members
                   </div>
                 </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                   <div className="flex items-center">
                     <span className="mr-1">📈</span>
                     MRR (Revenue)
                   </div>
                 </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                   <div className="flex items-center">
                     <span className="mr-1">🚨</span>
                     Blocked Requests
@@ -81,14 +81,14 @@ export default function PlanPerformancePage() {
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="bg-card text-card-foreground divide-y divide-border">
               {data.map((plan) => (
-                <tr key={plan.planId} className="hover:bg-gray-50 transition-colors">
+                <tr key={plan.planId} className="hover:bg-muted transition-colors">
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">{plan.planName}</div>
+                    <div className="text-sm font-medium text-foreground">{plan.planName}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900 font-semibold">{plan.activeMembers}</div>
+                    <div className="text-sm text-foreground font-semibold">{plan.activeMembers}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm font-semibold text-green-600">
@@ -97,7 +97,7 @@ export default function PlanPerformancePage() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
-                      <span className={`text-sm font-bold ${plan.blockedRequests > 10 ? 'text-rose-600' : 'text-gray-900'}`}>
+                      <span className={`text-sm font-bold ${plan.blockedRequests > 10 ? 'text-rose-600' : 'text-foreground'}`}>
                         {plan.blockedRequests}
                       </span>
                       {plan.blockedRequests > 50 && (
@@ -111,7 +111,7 @@ export default function PlanPerformancePage() {
               ))}
               {data.length === 0 && (
                 <tr>
-                  <td colSpan={4} className="px-6 py-12 text-center text-gray-500">
+                  <td colSpan={4} className="px-6 py-12 text-center text-muted-foreground">
                     No active membership plans found.
                   </td>
                 </tr>

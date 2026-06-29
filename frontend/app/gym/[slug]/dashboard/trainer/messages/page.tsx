@@ -93,8 +93,8 @@ export default async function TrainerMessagesPage({
   return (
     <div className="max-w-5xl mx-auto space-y-4">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Messages</h1>
-        <p className="text-gray-500 mt-1">Communicate with your clients</p>
+        <h1 className="text-2xl font-bold text-foreground">Messages</h1>
+        <p className="text-muted-foreground mt-1">Communicate with your clients</p>
       </div>
       <MessagingPanel
         currentUserId={session.user.id}

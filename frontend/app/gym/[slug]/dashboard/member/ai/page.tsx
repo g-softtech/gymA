@@ -29,7 +29,7 @@ export default async function AIHubPage({
       description: "Generate a personalised workout plan based on your goals, fitness level, and available equipment.",
       icon: "💪",
       color: "bg-indigo-50 border-indigo-200 hover:border-indigo-400",
-      iconBg: "bg-indigo-100 text-indigo-700",
+      iconBg: "bg-primary/10 text-primary",
       badge: memberProfile?.workouts.find((w) => w.isAiGenerated) ? "Used" : null,
     },
     {
@@ -38,7 +38,7 @@ export default async function AIHubPage({
       description: "Get a personalised Nigerian meal plan tailored to your calorie needs, diet goal, and local food preferences.",
       icon: "🥗",
       color: "bg-green-50 border-green-200 hover:border-green-400",
-      iconBg: "bg-green-100 text-green-700",
+      iconBg: "bg-success/10 text-success",
       badge: memberProfile?.mealPlans.find((m) => m.isAiGenerated) ? "Used" : null,
     },
     {
@@ -64,8 +64,8 @@ export default async function AIHubPage({
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">AI Fitness Assistant</h1>
-        <p className="text-gray-500 mt-1">
+        <h1 className="text-2xl font-bold text-foreground">AI Fitness Assistant</h1>
+        <p className="text-muted-foreground mt-1">
           Powered by Google Gemini AI — your personal coach available 24/7
         </p>
       </div>
@@ -91,18 +91,18 @@ export default async function AIHubPage({
           <Link
             key={f.href}
             href={`/gym/${slug}/dashboard/member/${f.href}`}
-            className={`relative bg-white rounded-2xl border-2 p-6 transition-all ${f.color}`}
+            className={`relative bg-card text-card-foreground rounded-2xl border-2 p-6 transition-all ${f.color}`}
           >
             {f.badge && (
-              <span className="absolute top-4 right-4 text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium">
+              <span className="absolute top-4 right-4 text-xs bg-success/10 text-success px-2 py-0.5 rounded-full font-medium">
                 {f.badge}
               </span>
             )}
             <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-2xl mb-4 ${f.iconBg}`}>
               {f.icon}
             </div>
-            <h3 className="font-bold text-gray-900 mb-2">{f.title}</h3>
-            <p className="text-sm text-gray-500 leading-relaxed">{f.description}</p>
+            <h3 className="font-bold text-foreground mb-2">{f.title}</h3>
+            <p className="text-sm text-muted-foreground leading-relaxed">{f.description}</p>
           </Link>
         ))}
       </div>

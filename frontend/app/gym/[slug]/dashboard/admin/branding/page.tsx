@@ -34,8 +34,8 @@ export default async function BrandingPage({ params }: { params: Promise<{ slug:
   return (
     <div className="max-w-4xl mx-auto">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">White-Label Branding</h1>
-        <p className="text-gray-500 text-sm mt-1">
+        <h1 className="text-2xl font-bold text-foreground">White-Label Branding</h1>
+        <p className="text-muted-foreground text-sm mt-1">
           Customize how your gym looks to your members. Make the platform truly yours.
         </p>
       </div>

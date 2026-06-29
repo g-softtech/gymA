@@ -63,8 +63,8 @@ export default function BlogAdminListPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Blog</h1>
-          <p className="text-gray-500 text-sm mt-1">
+          <h1 className="text-2xl font-bold text-foreground">Blog</h1>
+          <p className="text-muted-foreground text-sm mt-1">
             {posts.length} post{posts.length !== 1 ? "s" : ""} · {published.length} published · {drafts.length} draft{drafts.length !== 1 ? "s" : ""}
           </p>
         </div>
@@ -78,14 +78,14 @@ export default function BlogAdminListPage() {
       </div>
 
       {loading && (
-        <div className="flex items-center justify-center h-48 text-gray-400 text-sm">Loading…</div>
+        <div className="flex items-center justify-center h-48 text-muted-foreground text-sm">Loading…</div>
       )}
 
       {!loading && posts.length === 0 && (
-        <div className="text-center py-20 bg-white rounded-2xl border border-gray-100 shadow-sm">
+        <div className="text-center py-20 bg-card text-card-foreground rounded-2xl border border-border shadow-sm">
           <p className="text-4xl mb-4">📝</p>
-          <h2 className="text-lg font-semibold text-gray-900 mb-2">No blog posts yet</h2>
-          <p className="text-gray-500 text-sm mb-6">
+          <h2 className="text-lg font-semibold text-foreground mb-2">No blog posts yet</h2>
+          <p className="text-muted-foreground text-sm mb-6">
             Share fitness tips, member stories, and gym news to improve your SEO.
           </p>
           <Link
@@ -102,7 +102,7 @@ export default function BlogAdminListPage() {
           {posts.map((post) => (
             <div
               key={post.id}
-              className="flex items-start gap-4 bg-white border border-gray-100 rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow"
+              className="flex items-start gap-4 bg-card text-card-foreground border border-border rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow"
             >
               {/* Cover thumbnail */}
               {post.coverImage ? (
@@ -131,16 +131,16 @@ export default function BlogAdminListPage() {
                     {post.published ? "Published" : "Draft"}
                   </span>
                   {post.tags.slice(0, 3).map((tag) => (
-                    <span key={tag} className="text-[11px] px-2 py-0.5 bg-gray-100 text-gray-500 rounded-full">
+                    <span key={tag} className="text-[11px] px-2 py-0.5 bg-muted text-muted-foreground rounded-full">
                       {tag}
                     </span>
                   ))}
                 </div>
-                <h3 className="font-semibold text-gray-900 truncate">{post.title}</h3>
+                <h3 className="font-semibold text-foreground truncate">{post.title}</h3>
                 {post.excerpt && (
-                  <p className="text-gray-400 text-xs mt-0.5 line-clamp-1">{post.excerpt}</p>
+                  <p className="text-muted-foreground text-xs mt-0.5 line-clamp-1">{post.excerpt}</p>
                 )}
-                <p className="text-gray-400 text-xs mt-1.5">
+                <p className="text-muted-foreground text-xs mt-1.5">
                   {post.published && post.publishedAt
                     ? `Published ${new Date(post.publishedAt).toLocaleDateString("en-NG", { month: "short", day: "numeric", year: "numeric" })}`
                     : `Updated ${new Date(post.updatedAt).toLocaleDateString("en-NG", { month: "short", day: "numeric" })}`}
@@ -152,7 +152,7 @@ export default function BlogAdminListPage() {
                 <Link
                   href={`/gym/${slug}/dashboard/admin/blog/${post.id}`}
                   id={`edit-post-${post.id}`}
-                  className="px-3 py-1.5 text-xs font-medium text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                  className="px-3 py-1.5 text-xs font-medium text-muted-foreground border border-border rounded-lg hover:bg-muted transition-colors"
                 >
                   Edit
                 </Link>

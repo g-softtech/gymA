@@ -85,8 +85,8 @@ export default async function WebsiteHubPage({
   return (
     <div className="max-w-3xl">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">Website & Branding</h1>
-        <p className="text-gray-500 text-sm mt-1">
+        <h1 className="text-2xl font-bold text-foreground">Website & Branding</h1>
+        <p className="text-muted-foreground text-sm mt-1">
           Customize your gym&apos;s public profile and brand identity.
         </p>
       </div>
@@ -117,20 +117,20 @@ export default async function WebsiteHubPage({
             key={s.href}
             href={s.href}
             id={s.id}
-            className="flex items-center gap-4 p-5 bg-white border border-gray-100 rounded-xl shadow-sm hover:shadow-md hover:border-indigo-200 transition-all group"
+            className="flex items-center gap-4 p-5 bg-card text-card-foreground border border-border rounded-xl shadow-sm hover:shadow-md hover:border-indigo-200 transition-all group"
           >
             <div className="w-12 h-12 rounded-xl bg-indigo-50 flex items-center justify-center text-2xl shrink-0 group-hover:bg-indigo-100 transition-colors">
               {s.icon}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="font-semibold text-gray-900">{s.title}</p>
-              <p className="text-sm text-gray-500 mt-0.5">{s.desc}</p>
+              <p className="font-semibold text-foreground">{s.title}</p>
+              <p className="text-sm text-muted-foreground mt-0.5">{s.desc}</p>
             </div>
             <div className="flex items-center gap-3 shrink-0">
               <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${s.badgeColor}`}>
                 {s.badge}
               </span>
-              <span className="text-gray-300 group-hover:text-indigo-500 transition-colors text-lg">→</span>
+              <span className="text-muted-foreground group-hover:text-indigo-500 transition-colors text-lg">→</span>
             </div>
           </Link>
         ))}

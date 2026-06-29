@@ -51,14 +51,14 @@ export default async function TrainerClientsPage({
   return (
     <div className="max-w-5xl mx-auto space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">My Clients</h1>
-        <p className="text-gray-500 mt-1">{clients.length} client{clients.length !== 1 ? "s" : ""} total</p>
+        <h1 className="text-2xl font-bold text-foreground">My Clients</h1>
+        <p className="text-muted-foreground mt-1">{clients.length} client{clients.length !== 1 ? "s" : ""} total</p>
       </div>
 
       {clients.length === 0 ? (
-        <div className="bg-white rounded-xl border border-gray-100 p-12 text-center text-gray-400">
+        <div className="bg-card text-card-foreground rounded-xl border border-border p-12 text-center text-muted-foreground">
           <p className="text-4xl mb-3">👥</p>
-          <p className="font-medium text-gray-600">No clients yet</p>
+          <p className="font-medium text-muted-foreground">No clients yet</p>
           <p className="text-sm mt-1">Clients will appear here once they book sessions with you</p>
         </div>
       ) : (
@@ -73,28 +73,28 @@ export default async function TrainerClientsPage({
             const workoutCount = b.member.workouts.length;
 
             return (
-              <div key={b.memberId} className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
+              <div key={b.memberId} className="bg-card text-card-foreground rounded-xl border border-border shadow-sm p-6">
                 <div className="flex items-center gap-4 mb-4">
-                  <div className="w-12 h-12 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-lg font-bold uppercase">
+                  <div className="w-12 h-12 rounded-full bg-primary/10 text-primary flex items-center justify-center text-lg font-bold uppercase">
                     {b.member.user.name?.[0] ?? b.member.user.email?.[0] ?? "?"}
                   </div>
                   <div>
-                    <p className="font-semibold text-gray-900">{b.member.user.name ?? "—"}</p>
-                    <p className="text-sm text-gray-500">{b.member.user.email}</p>
+                    <p className="font-semibold text-foreground">{b.member.user.name ?? "—"}</p>
+                    <p className="text-sm text-muted-foreground">{b.member.user.email}</p>
                   </div>
                 </div>
                 <div className="grid grid-cols-3 gap-3 mb-4">
-                  <div className="bg-gray-50 rounded-lg p-3 text-center">
-                    <p className="text-lg font-bold text-gray-900">{totalSessions}</p>
-                    <p className="text-xs text-gray-500">Sessions</p>
+                  <div className="bg-muted rounded-lg p-3 text-center">
+                    <p className="text-lg font-bold text-foreground">{totalSessions}</p>
+                    <p className="text-xs text-muted-foreground">Sessions</p>
                   </div>
-                  <div className="bg-gray-50 rounded-lg p-3 text-center">
+                  <div className="bg-muted rounded-lg p-3 text-center">
                     <p className="text-lg font-bold text-green-600">{completedSessions}</p>
-                    <p className="text-xs text-gray-500">Completed</p>
+                    <p className="text-xs text-muted-foreground">Completed</p>
                   </div>
-                  <div className="bg-gray-50 rounded-lg p-3 text-center">
+                  <div className="bg-muted rounded-lg p-3 text-center">
                     <p className="text-lg font-bold text-indigo-600">{workoutCount}</p>
-                    <p className="text-xs text-gray-500">Workouts</p>
+                    <p className="text-xs text-muted-foreground">Workouts</p>
                   </div>
                 </div>
                 <Link

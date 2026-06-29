@@ -103,14 +103,14 @@ export default function SocialLinksPage() {
   const filledCount = Object.values(social).filter(Boolean).length;
 
   if (loading) {
-    return <div className="flex items-center justify-center h-48 text-gray-400 text-sm">Loading…</div>;
+    return <div className="flex items-center justify-center h-48 text-muted-foreground text-sm">Loading…</div>;
   }
 
   return (
     <div className="max-w-2xl">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">Social Media</h1>
-        <p className="text-gray-500 text-sm mt-1">
+        <h1 className="text-2xl font-bold text-foreground">Social Media</h1>
+        <p className="text-muted-foreground text-sm mt-1">
           Add links to your gym&apos;s social profiles. They&apos;ll appear on your public page.
         </p>
       </div>
@@ -131,12 +131,12 @@ export default function SocialLinksPage() {
       </div>
 
       <form onSubmit={handleSave} className="space-y-4">
-        <div className="bg-white border border-gray-100 rounded-xl shadow-sm overflow-hidden divide-y divide-gray-50">
+        <div className="bg-card text-card-foreground border border-border rounded-xl shadow-sm overflow-hidden divide-y divide-border">
           {SOCIAL_FIELDS.map(({ key, label, icon, placeholder }) => (
             <div key={key} className="flex items-center gap-4 px-5 py-4">
               <span className="text-2xl shrink-0">{icon}</span>
               <div className="flex-1 min-w-0">
-                <label htmlFor={`social-${key}`} className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor={`social-${key}`} className="block text-sm font-medium text-foreground mb-1">
                   {label}
                 </label>
                 <input
@@ -145,7 +145,7 @@ export default function SocialLinksPage() {
                   value={social[key] ?? ""}
                   onChange={(e) => setSocial((s) => ({ ...s, [key]: e.target.value }))}
                   placeholder={placeholder}
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 />
               </div>
               {social[key] && (

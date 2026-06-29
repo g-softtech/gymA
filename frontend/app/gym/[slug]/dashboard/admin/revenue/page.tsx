@@ -68,17 +68,17 @@ export default async function RevenuePage({
   return (
     <div className="max-w-6xl mx-auto space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Revenue & Analytics</h1>
-        <p className="text-gray-500 mt-1">Financial overview for {tenant.name}</p>
+        <h1 className="text-2xl font-bold text-foreground">Revenue & Analytics</h1>
+        <p className="text-muted-foreground mt-1">Financial overview for {tenant.name}</p>
       </div>
 
       {/* Summary cards: Horizontal scroll on mobile, grid on tablet+ */}
       <div className="flex overflow-x-auto pb-2 md:pb-0 md:grid md:grid-cols-2 lg:grid-cols-4 gap-4 snap-x">
         {[
-          { label: "Total Revenue", value: `₦${totalRevenue.toLocaleString()}`, icon: "💰", color: "bg-green-50 text-green-700" },
-          { label: "Active Revenue", value: `₦${activeRevenue.toLocaleString()}`, icon: "✅", color: "bg-indigo-50 text-indigo-700" },
-          { label: "Total Subscriptions", value: subscriptions.length, icon: "📋", color: "bg-yellow-50 text-yellow-700" },
-          { label: "Active Plans", value: Object.keys(byPlan).length, icon: "📦", color: "bg-purple-50 text-purple-700" },
+          { label: "Total Revenue", value: `₦${totalRevenue.toLocaleString()}`, icon: "💰", color: "bg-success/10 text-success" },
+          { label: "Active Revenue", value: `₦${activeRevenue.toLocaleString()}`, icon: "✅", color: "bg-primary/10 text-primary" },
+          { label: "Total Subscriptions", value: subscriptions.length, icon: "📋", color: "bg-warning/10 text-warning" },
+          { label: "Active Plans", value: Object.keys(byPlan).length, icon: "📦", color: "bg-secondary/10 text-secondary" },
         ].map((s) => (
           <div key={s.label} className={`min-w-[200px] md:min-w-0 flex-shrink-0 snap-start rounded-xl p-5 ${s.color}`}>
             <div className="text-2xl mb-2">{s.icon}</div>
@@ -91,31 +91,31 @@ export default async function RevenuePage({
       <RevenueCharts monthlyData={monthlyData} planData={planData} />
 
       {/* All subscriptions table */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100">
-        <div className="px-6 py-4 border-b border-gray-100">
-          <h2 className="text-base font-semibold text-gray-900">All Transactions</h2>
+      <div className="bg-card text-card-foreground rounded-xl shadow-sm border border-border">
+        <div className="px-6 py-4 border-b border-border">
+          <h2 className="text-base font-semibold text-foreground">All Transactions</h2>
         </div>
         
         {/* Mobile View: Cards */}
-        <div className="md:hidden divide-y divide-gray-50">
+        <div className="md:hidden divide-y divide-border">
           {subscriptions.length === 0 ? (
-            <p className="p-6 text-center text-gray-400">No transactions yet.</p>
+            <p className="p-6 text-center text-muted-foreground">No transactions yet.</p>
           ) : (
             subscriptions.slice().reverse().map((s) => (
               <div key={s.id} className="p-4 space-y-2">
                 <div className="flex justify-between items-start">
                   <div>
-                    <div className="font-medium text-gray-900">{s.plan.name}</div>
-                    <div className="text-sm text-gray-500">
+                    <div className="font-medium text-foreground">{s.plan.name}</div>
+                    <div className="text-sm text-muted-foreground">
                       {new Date(s.startDate).toLocaleDateString("en-NG", { month: "short", day: "numeric", year: "numeric" })}
                     </div>
                   </div>
                   <div className="text-right">
-                    <div className="font-bold text-gray-900">₦{Number(s.plan.price).toLocaleString()}</div>
+                    <div className="font-bold text-foreground">₦{Number(s.plan.price).toLocaleString()}</div>
                     <span className={`inline-block mt-1 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
-                      s.status === "ACTIVE" ? "bg-green-100 text-green-700" :
-                      s.status === "CANCELLED" ? "bg-red-100 text-red-600" :
-                      "bg-gray-100 text-gray-500"
+                      s.status === "ACTIVE" ? "bg-success/10 text-success" :
+                      s.status === "CANCELLED" ? "bg-destructive/10 text-destructive" :
+                      "bg-muted text-muted-foreground"
                     }`}>
                       {s.status}
                     </span>
@@ -130,7 +130,7 @@ export default async function RevenuePage({
         <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="bg-gray-50 text-left text-gray-500 text-xs uppercase tracking-wide border-b border-gray-100">
+              <tr className="bg-muted text-left text-muted-foreground text-xs uppercase tracking-wide border-b border-border">
                 <th className="px-6 py-3 font-medium">Plan</th>
                 <th className="px-6 py-3 font-medium">Amount</th>
                 <th className="px-6 py-3 font-medium">Status</th>
@@ -138,29 +138,29 @@ export default async function RevenuePage({
                 <th className="px-6 py-3 font-medium">Expires</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-50">
+            <tbody className="divide-y divide-border">
               {subscriptions.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-6 py-10 text-center text-gray-400">No transactions yet.</td>
+                  <td colSpan={5} className="px-6 py-10 text-center text-muted-foreground">No transactions yet.</td>
                 </tr>
               ) : (
                 subscriptions.slice().reverse().map((s) => (
-                  <tr key={s.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 font-medium text-gray-900">{s.plan.name}</td>
-                    <td className="px-6 py-4 text-gray-700">₦{Number(s.plan.price).toLocaleString()}</td>
+                  <tr key={s.id} className="hover:bg-muted">
+                    <td className="px-6 py-4 font-medium text-foreground">{s.plan.name}</td>
+                    <td className="px-6 py-4 text-foreground">₦{Number(s.plan.price).toLocaleString()}</td>
                     <td className="px-6 py-4">
                       <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
-                        s.status === "ACTIVE" ? "bg-green-100 text-green-700" :
-                        s.status === "CANCELLED" ? "bg-red-100 text-red-600" :
-                        "bg-gray-100 text-gray-500"
+                        s.status === "ACTIVE" ? "bg-success/10 text-success" :
+                        s.status === "CANCELLED" ? "bg-destructive/10 text-destructive" :
+                        "bg-muted text-muted-foreground"
                       }`}>
                         {s.status}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-gray-500">
+                    <td className="px-6 py-4 text-muted-foreground">
                       {new Date(s.startDate).toLocaleDateString("en-NG", { year: "numeric", month: "short", day: "numeric" })}
                     </td>
-                    <td className="px-6 py-4 text-gray-500">
+                    <td className="px-6 py-4 text-muted-foreground">
                       {new Date(s.endDate).toLocaleDateString("en-NG", { year: "numeric", month: "short", day: "numeric" })}
                     </td>
                   </tr>

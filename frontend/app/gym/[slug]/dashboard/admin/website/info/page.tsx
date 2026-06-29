@@ -82,7 +82,7 @@ export default function BusinessInfoPage() {
     opts?: { placeholder?: string; type?: string; multiline?: boolean }
   ) => (
     <div key={key}>
-      <label htmlFor={`field-${key}`} className="block text-sm font-medium text-gray-700 mb-1.5">
+      <label htmlFor={`field-${key}`} className="block text-sm font-medium text-foreground mb-1.5">
         {label}
       </label>
       {opts?.multiline ? (
@@ -92,7 +92,7 @@ export default function BusinessInfoPage() {
           value={(info[key] as string) ?? ""}
           onChange={(e) => setInfo((s) => ({ ...s, [key]: e.target.value }))}
           placeholder={opts.placeholder}
-          className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+          className="w-full border border-border rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
         />
       ) : (
         <input
@@ -101,29 +101,29 @@ export default function BusinessInfoPage() {
           value={(info[key] as string) ?? ""}
           onChange={(e) => setInfo((s) => ({ ...s, [key]: e.target.value }))}
           placeholder={opts?.placeholder}
-          className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          className="w-full border border-border rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
         />
       )}
     </div>
   );
 
   if (loading) {
-    return <div className="flex items-center justify-center h-48 text-gray-400 text-sm">Loading…</div>;
+    return <div className="flex items-center justify-center h-48 text-muted-foreground text-sm">Loading…</div>;
   }
 
   return (
     <div className="max-w-2xl">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">Business Info</h1>
-        <p className="text-gray-500 text-sm mt-1">
+        <h1 className="text-2xl font-bold text-foreground">Business Info</h1>
+        <p className="text-muted-foreground text-sm mt-1">
           This information appears on your public gym page and in member communications.
         </p>
       </div>
 
       <form onSubmit={handleSave} className="space-y-6">
         {/* Identity */}
-        <section className="bg-white border border-gray-100 rounded-xl p-6 shadow-sm space-y-4">
-          <h2 className="font-semibold text-gray-800 text-sm uppercase tracking-wider">Identity</h2>
+        <section className="bg-card text-card-foreground border border-border rounded-xl p-6 shadow-sm space-y-4">
+          <h2 className="font-semibold text-foreground text-sm uppercase tracking-wider">Identity</h2>
           {field("name", "Gym Name", { placeholder: "Iron Forge Fitness" })}
           {field("tagline", "Tagline", { placeholder: "Forge your best self" })}
           {field("description", "About / Description", {
@@ -133,8 +133,8 @@ export default function BusinessInfoPage() {
         </section>
 
         {/* Contact */}
-        <section className="bg-white border border-gray-100 rounded-xl p-6 shadow-sm space-y-4">
-          <h2 className="font-semibold text-gray-800 text-sm uppercase tracking-wider">Contact</h2>
+        <section className="bg-card text-card-foreground border border-border rounded-xl p-6 shadow-sm space-y-4">
+          <h2 className="font-semibold text-foreground text-sm uppercase tracking-wider">Contact</h2>
           <div className="grid grid-cols-2 gap-4">
             {field("phone", "Phone Number", { placeholder: "+234 801 234 5678" })}
             {field("email", "Email Address", { type: "email", placeholder: "info@yourgym.com" })}
@@ -142,8 +142,8 @@ export default function BusinessInfoPage() {
         </section>
 
         {/* Location */}
-        <section className="bg-white border border-gray-100 rounded-xl p-6 shadow-sm space-y-4">
-          <h2 className="font-semibold text-gray-800 text-sm uppercase tracking-wider">Location</h2>
+        <section className="bg-card text-card-foreground border border-border rounded-xl p-6 shadow-sm space-y-4">
+          <h2 className="font-semibold text-foreground text-sm uppercase tracking-wider">Location</h2>
           {field("address", "Street Address", { placeholder: "12 Fitness Avenue, Victoria Island" })}
           <div className="grid grid-cols-2 gap-4">
             {field("city", "City", { placeholder: "Lagos" })}
@@ -156,15 +156,15 @@ export default function BusinessInfoPage() {
         </section>
 
         {/* Opening Hours */}
-        <section className="bg-white border border-gray-100 rounded-xl p-6 shadow-sm space-y-4">
-          <h2 className="font-semibold text-gray-800 text-sm uppercase tracking-wider">Opening Hours</h2>
+        <section className="bg-card text-card-foreground border border-border rounded-xl p-6 shadow-sm space-y-4">
+          <h2 className="font-semibold text-foreground text-sm uppercase tracking-wider">Opening Hours</h2>
           <div className="space-y-3">
             {DAYS.map((day) => (
               <div key={day} className="flex items-center gap-3">
                 <div className="w-24 shrink-0">
-                  <span className="text-sm font-medium text-gray-700 capitalize">{day}</span>
+                  <span className="text-sm font-medium text-foreground capitalize">{day}</span>
                 </div>
-                <label className="flex items-center gap-1.5 text-sm text-gray-500 cursor-pointer">
+                <label className="flex items-center gap-1.5 text-sm text-muted-foreground cursor-pointer">
                   <input
                     id={`closed-${day}`}
                     type="checkbox"
@@ -172,7 +172,7 @@ export default function BusinessInfoPage() {
                     onChange={(e) =>
                       setHours((h) => ({ ...h, [day]: { ...h[day], closed: e.target.checked } }))
                     }
-                    className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                    className="rounded border-border text-indigo-600 focus:ring-indigo-500"
                   />
                   Closed
                 </label>
@@ -185,9 +185,9 @@ export default function BusinessInfoPage() {
                       onChange={(e) =>
                         setHours((h) => ({ ...h, [day]: { ...h[day], open: e.target.value } }))
                       }
-                      className="border border-gray-200 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      className="border border-border rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
                     />
-                    <span className="text-gray-400 text-sm">–</span>
+                    <span className="text-muted-foreground text-sm">–</span>
                     <input
                       id={`close-${day}`}
                       type="time"
@@ -195,12 +195,12 @@ export default function BusinessInfoPage() {
                       onChange={(e) =>
                         setHours((h) => ({ ...h, [day]: { ...h[day], close: e.target.value } }))
                       }
-                      className="border border-gray-200 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      className="border border-border rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
                     />
                   </>
                 )}
                 {hours[day]?.closed && (
-                  <span className="text-gray-400 text-sm italic">Closed all day</span>
+                  <span className="text-muted-foreground text-sm italic">Closed all day</span>
                 )}
               </div>
             ))}

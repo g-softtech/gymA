@@ -58,7 +58,7 @@ export default function UpgradeIntelligenceClient() {
         </div>
       </div>
 
-      <div className="bg-white rounded-lg border border-indigo-100 overflow-hidden">
+      <div className="bg-card text-card-foreground rounded-lg border border-indigo-100 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-indigo-50">
             <thead className="bg-indigo-50/50">
@@ -75,11 +75,11 @@ export default function UpgradeIntelligenceClient() {
               {data.candidatesDetails.map((opp) => (
                 <tr key={opp.userId} className="hover:bg-indigo-50/30 transition-colors">
                   <td className="px-6 py-4">
-                    <div className="text-sm font-medium text-gray-900">{opp.userName || "Unknown"}</div>
-                    <div className="text-xs text-gray-500">{opp.userEmail}</div>
+                    <div className="text-sm font-medium text-foreground">{opp.userName || "Unknown"}</div>
+                    <div className="text-xs text-muted-foreground">{opp.userEmail}</div>
                   </td>
                   <td className="px-6 py-4">
-                    <span className="text-sm text-gray-700 font-medium">{opp.currentPlanName}</span>
+                    <span className="text-sm text-foreground font-medium">{opp.currentPlanName}</span>
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex flex-wrap gap-1">

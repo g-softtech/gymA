@@ -68,7 +68,7 @@ export default async function SuperAdminUsersPage({
           name="tenantId"
           defaultValue={filterTenantId ?? ""}
           id="filter-gym"
-          className="bg-white/[0.05] border border-white/10 rounded-lg px-3 py-2 text-sm text-slate-300 focus:outline-none focus:ring-1 focus:ring-indigo-500 cursor-pointer"
+          className="bg-card text-card-foreground/[0.05] border border-white/10 rounded-lg px-3 py-2 text-sm text-slate-300 focus:outline-none focus:ring-1 focus:ring-indigo-500 cursor-pointer"
         >
           <option value="">All Gyms</option>
           {tenants.map((t) => (
@@ -83,7 +83,7 @@ export default async function SuperAdminUsersPage({
           name="role"
           defaultValue={filterRole ?? ""}
           id="filter-role"
-          className="bg-white/[0.05] border border-white/10 rounded-lg px-3 py-2 text-sm text-slate-300 focus:outline-none focus:ring-1 focus:ring-indigo-500 cursor-pointer"
+          className="bg-card text-card-foreground/[0.05] border border-white/10 rounded-lg px-3 py-2 text-sm text-slate-300 focus:outline-none focus:ring-1 focus:ring-indigo-500 cursor-pointer"
         >
           <option value="">All Roles</option>
           {roles.map((r) => (
@@ -102,14 +102,14 @@ export default async function SuperAdminUsersPage({
         </button>
         <a
           href="/admin/users"
-          className="text-sm text-slate-500 hover:text-slate-300 px-4 py-2 rounded-lg border border-white/5 hover:bg-white/5 transition-all"
+          className="text-sm text-slate-500 hover:text-slate-300 px-4 py-2 rounded-lg border border-white/5 hover:bg-card text-card-foreground/5 transition-all"
         >
           Clear
         </a>
       </form>
 
       {/* Table */}
-      <div className="bg-white/[0.03] border border-white/5 rounded-xl overflow-hidden">
+      <div className="bg-card text-card-foreground/[0.03] border border-white/5 rounded-xl overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
@@ -132,7 +132,7 @@ export default async function SuperAdminUsersPage({
               {users.map((user) => (
                 <tr
                   key={user.id}
-                  className="hover:bg-white/[0.02] transition-colors"
+                  className="hover:bg-card text-card-foreground/[0.02] transition-colors"
                 >
                   {/* Avatar + name */}
                   <td className="px-6 py-3.5">

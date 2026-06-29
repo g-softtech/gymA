@@ -56,16 +56,16 @@ export default async function MemberAttendancePage({
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Attendance History</h1>
-        <p className="text-gray-500 mt-1">Track your gym visit consistency</p>
+        <h1 className="text-2xl font-bold text-foreground">Attendance History</h1>
+        <p className="text-muted-foreground mt-1">Track your gym visit consistency</p>
       </div>
 
       {/* Stats */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {[
-          { label: "Total Visits", value: records.length, icon: "📋", color: "bg-indigo-50 text-indigo-700" },
-          { label: "This Month", value: thisMonth, icon: "📅", color: "bg-blue-50 text-blue-700" },
-          { label: "This Week", value: thisWeek, icon: "📆", color: "bg-green-50 text-green-700" },
+          { label: "Total Visits", value: records.length, icon: "📋", color: "bg-primary/10 text-primary" },
+          { label: "This Month", value: thisMonth, icon: "📅", color: "bg-primary/10 text-primary" },
+          { label: "This Week", value: thisWeek, icon: "📆", color: "bg-success/10 text-success" },
           { label: "Day Streak", value: streak, icon: "🔥", color: "bg-orange-50 text-orange-700" },
         ].map((s) => (
           <div key={s.label} className={`rounded-xl p-5 ${s.color}`}>
@@ -77,29 +77,29 @@ export default async function MemberAttendancePage({
       </div>
 
       {/* Records */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100">
-        <div className="px-6 py-4 border-b border-gray-100">
-          <h2 className="text-base font-semibold text-gray-900">Visit Log</h2>
+      <div className="bg-card text-card-foreground rounded-xl shadow-sm border border-border">
+        <div className="px-6 py-4 border-b border-border">
+          <h2 className="text-base font-semibold text-foreground">Visit Log</h2>
         </div>
-        <div className="divide-y divide-gray-50">
+        <div className="divide-y divide-border">
           {records.length === 0 ? (
-            <p className="px-6 py-10 text-center text-gray-400">No attendance records yet.</p>
+            <p className="px-6 py-10 text-center text-muted-foreground">No attendance records yet.</p>
           ) : (
             records.map((r) => (
               <div key={r.id} className="px-6 py-4 flex justify-between items-center">
                 <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 bg-green-100 text-green-700 rounded-full flex items-center justify-center text-base">
+                  <div className="w-9 h-9 bg-success/10 text-success rounded-full flex items-center justify-center text-base">
                     ✅
                   </div>
                   <div>
-                    <p className="font-medium text-gray-900">
+                    <p className="font-medium text-foreground">
                       {new Date(r.checkInTime).toLocaleDateString("en-NG", {
                         weekday: "long", year: "numeric", month: "long", day: "numeric",
                       })}
                     </p>
                   </div>
                 </div>
-                <p className="text-sm text-gray-400">
+                <p className="text-sm text-muted-foreground">
                   {new Date(r.checkInTime).toLocaleTimeString("en-NG", {
                     hour: "2-digit", minute: "2-digit",
                   })}

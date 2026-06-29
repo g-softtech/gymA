@@ -75,16 +75,16 @@ export default async function AttendancePage({
   return (
     <div className="max-w-6xl mx-auto space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Attendance Tracking</h1>
-        <p className="text-gray-500 mt-1">Monitor and record member check-ins</p>
+        <h1 className="text-2xl font-bold text-foreground">Attendance Tracking</h1>
+        <p className="text-muted-foreground mt-1">Monitor and record member check-ins</p>
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { label: "Today", value: todayCount, icon: "📅", color: "bg-blue-50 text-blue-700" },
-          { label: "This Week", value: weekCount, icon: "📆", color: "bg-indigo-50 text-indigo-700" },
-          { label: "Total Records", value: recentAttendance.length, icon: "📋", color: "bg-green-50 text-green-700" },
-          { label: "Active Members", value: members.length, icon: "👥", color: "bg-purple-50 text-purple-700" },
+          { label: "Today", value: todayCount, icon: "📅", color: "bg-primary/10 text-primary" },
+          { label: "This Week", value: weekCount, icon: "📆", color: "bg-primary/10 text-primary" },
+          { label: "Total Records", value: recentAttendance.length, icon: "📋", color: "bg-success/10 text-success" },
+          { label: "Active Members", value: members.length, icon: "👥", color: "bg-secondary/10 text-secondary" },
         ].map((s) => (
           <div key={s.label} className={`rounded-xl p-5 ${s.color}`}>
             <div className="text-2xl mb-2">{s.icon}</div>

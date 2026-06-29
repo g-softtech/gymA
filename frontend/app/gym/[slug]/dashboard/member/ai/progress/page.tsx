@@ -25,8 +25,8 @@ export default async function AIProgressPage({
   return (
     <div className="max-w-3xl mx-auto space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">AI Progress Analyzer</h1>
-        <p className="text-gray-500 mt-1">
+        <h1 className="text-2xl font-bold text-foreground">AI Progress Analyzer</h1>
+        <p className="text-muted-foreground mt-1">
           Get AI-powered insights into your fitness journey
         </p>
       </div>

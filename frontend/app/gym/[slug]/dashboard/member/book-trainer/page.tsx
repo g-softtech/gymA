@@ -51,8 +51,8 @@ export default async function BookTrainerPage({
     <div className="max-w-6xl mx-auto space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Book a Trainer</h1>
-          <p className="text-gray-500 mt-1">Browse our expert trainers and schedule your next 1-on-1 session.</p>
+          <h1 className="text-2xl font-bold text-foreground">Book a Trainer</h1>
+          <p className="text-muted-foreground mt-1">Browse our expert trainers and schedule your next 1-on-1 session.</p>
         </div>
       </div>
 

@@ -85,22 +85,22 @@ export default function MembershipsPage({ params }: { params: { slug: string } }
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {plans.map(plan => (
-          <div key={plan.id} className={`p-6 border rounded-lg shadow-sm ${!plan.isActive ? 'opacity-50' : 'bg-white'}`}>
+          <div key={plan.id} className={`p-6 border rounded-lg shadow-sm ${!plan.isActive ? 'opacity-50' : 'bg-card text-card-foreground'}`}>
             <h3 className="text-xl font-semibold mb-2">{plan.name} {plan.featured && '⭐'}</h3>
-            <p className="text-gray-600 mb-4 h-12 overflow-hidden">{plan.description}</p>
+            <p className="text-muted-foreground mb-4 h-12 overflow-hidden">{plan.description}</p>
             <div className="text-2xl font-bold mb-4">{plan.currency} {plan.price}</div>
-            <div className="text-sm text-gray-500 mb-4">Duration: {plan.durationDays} days</div>
+            <div className="text-sm text-muted-foreground mb-4">Duration: {plan.durationDays} days</div>
             
             <button
               onClick={() => toggleActive(plan.id, plan.isActive)}
-              className={`w-full py-2 rounded-md ${plan.isActive ? 'bg-red-50 text-red-600 hover:bg-red-100' : 'bg-green-50 text-green-600 hover:bg-green-100'}`}
+              className={`w-full py-2 rounded-md ${plan.isActive ? 'bg-destructive/10 text-destructive hover:bg-red-100' : 'bg-green-50 text-green-600 hover:bg-green-100'}`}
             >
               {plan.isActive ? "Disable Plan" : "Enable Plan"}
             </button>
           </div>
         ))}
         {plans.length === 0 && (
-          <div className="col-span-full text-center py-12 text-gray-500 bg-gray-50 rounded-lg">
+          <div className="col-span-full text-center py-12 text-muted-foreground bg-muted rounded-lg">
             No membership plans found. Create one to get started.
           </div>
         )}
@@ -108,7 +108,7 @@ export default function MembershipsPage({ params }: { params: { slug: string } }
 
       {showModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full max-h-[90vh] overflow-y-auto">
+          <div className="bg-card text-card-foreground rounded-lg p-6 max-w-md w-full max-h-[90vh] overflow-y-auto">
             <h2 className="text-xl font-bold mb-4">Create Membership Plan</h2>
             <form onSubmit={handleSave} className="space-y-4">
               <div>
@@ -145,7 +145,7 @@ export default function MembershipsPage({ params }: { params: { slug: string } }
                 <label htmlFor="featured" className="text-sm font-medium">Highlight as Featured Plan</label>
               </div>
               <div className="flex gap-4 pt-4 border-t">
-                <button type="button" onClick={() => setShowModal(false)} className="flex-1 py-2 border rounded-md hover:bg-gray-50">Cancel</button>
+                <button type="button" onClick={() => setShowModal(false)} className="flex-1 py-2 border rounded-md hover:bg-muted">Cancel</button>
                 <button type="submit" disabled={submitting} className="flex-1 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50">Save Plan</button>
               </div>
             </form>

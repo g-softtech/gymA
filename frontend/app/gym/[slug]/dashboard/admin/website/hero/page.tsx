@@ -92,10 +92,10 @@ export default function HeroEditorPage() {
     opts?: { placeholder?: string; type?: string; hint?: string; multiline?: boolean }
   ) => (
     <div key={key}>
-      <label htmlFor={`field-${key}`} className="block text-sm font-medium text-gray-700 mb-1">
+      <label htmlFor={`field-${key}`} className="block text-sm font-medium text-foreground mb-1">
         {label}
       </label>
-      {opts?.hint && <p className="text-xs text-gray-400 mb-1.5">{opts.hint}</p>}
+      {opts?.hint && <p className="text-xs text-muted-foreground mb-1.5">{opts.hint}</p>}
       {opts?.multiline ? (
         <textarea
           id={`field-${key}`}
@@ -103,7 +103,7 @@ export default function HeroEditorPage() {
           value={(hero[key] as string) ?? ""}
           onChange={(e) => setHero((h) => ({ ...h, [key]: e.target.value }))}
           placeholder={opts.placeholder}
-          className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+          className="w-full border border-border rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
         />
       ) : (
         <input
@@ -118,28 +118,28 @@ export default function HeroEditorPage() {
           step={opts?.type === "number" ? "0.05" : undefined}
           min={opts?.type === "number" ? "0" : undefined}
           max={opts?.type === "number" ? "1" : undefined}
-          className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          className="w-full border border-border rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
         />
       )}
     </div>
   );
 
   if (loading) {
-    return <div className="flex items-center justify-center h-48 text-gray-400 text-sm">Loading…</div>;
+    return <div className="flex items-center justify-center h-48 text-muted-foreground text-sm">Loading…</div>;
   }
 
   return (
     <div className="max-w-2xl">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">Hero Section</h1>
-        <p className="text-gray-500 text-sm mt-1">
+        <h1 className="text-2xl font-bold text-foreground">Hero Section</h1>
+        <p className="text-muted-foreground text-sm mt-1">
           Customize the first thing visitors see on your public gym page.
         </p>
       </div>
 
       {/* Live preview */}
       <div
-        className="rounded-2xl overflow-hidden mb-8 shadow-lg border border-gray-100"
+        className="rounded-2xl overflow-hidden mb-8 shadow-lg border border-border"
         style={{ minHeight: 180 }}
       >
         <div
@@ -167,7 +167,7 @@ export default function HeroEditorPage() {
             <p className="text-white/80 text-sm mb-4">
               {hero.subheadline || "Your subheadline or tagline goes here"}
             </p>
-            <span className="inline-block px-5 py-2 bg-white/20 border border-white/30 text-white text-sm font-semibold rounded-xl backdrop-blur-sm">
+            <span className="inline-block px-5 py-2 bg-card text-card-foreground/20 border border-white/30 text-white text-sm font-semibold rounded-xl backdrop-blur-sm">
               {hero.ctaText || "Get Started Today"} →
             </span>
           </div>
@@ -175,8 +175,8 @@ export default function HeroEditorPage() {
       </div>
 
       <form onSubmit={handleSave} className="space-y-6">
-        <section className="bg-white border border-gray-100 rounded-xl p-6 shadow-sm space-y-4">
-          <h2 className="font-semibold text-gray-800 text-sm uppercase tracking-wider">Copy</h2>
+        <section className="bg-card text-card-foreground border border-border rounded-xl p-6 shadow-sm space-y-4">
+          <h2 className="font-semibold text-foreground text-sm uppercase tracking-wider">Copy</h2>
           {field("headline", "Main Headline", {
             placeholder: "Forge Your Best Self",
             hint: "The large bold text at the top of the hero section.",
@@ -190,17 +190,17 @@ export default function HeroEditorPage() {
           })}
         </section>
 
-        <section className="bg-white border border-gray-100 rounded-xl p-6 shadow-sm space-y-4">
-          <h2 className="font-semibold text-gray-800 text-sm uppercase tracking-wider">Background</h2>
+        <section className="bg-card text-card-foreground border border-border rounded-xl p-6 shadow-sm space-y-4">
+          <h2 className="font-semibold text-foreground text-sm uppercase tracking-wider">Background</h2>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-foreground mb-1">
               Background Image
             </label>
-            <p className="text-xs text-gray-400 mb-3">
+            <p className="text-xs text-muted-foreground mb-3">
               Upload an image to use as the hero background. Leave blank to use a gradient background from your brand colors.
             </p>
             <div className="flex items-center gap-4">
-              <label className="relative cursor-pointer bg-white px-4 py-2 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50">
+              <label className="relative cursor-pointer bg-card text-card-foreground px-4 py-2 border border-border rounded-lg shadow-sm text-sm font-medium text-foreground hover:bg-muted">
                 <span>{uploadingImage ? "Uploading..." : "Upload Image (Max 4.5MB)"}</span>
                 <input
                   type="file"
@@ -226,10 +226,10 @@ export default function HeroEditorPage() {
           </div>
           {hero.bgImageUrl && (
             <div>
-              <label htmlFor="field-overlayOpacity" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="field-overlayOpacity" className="block text-sm font-medium text-foreground mb-1">
                 Dark Overlay Strength
               </label>
-              <p className="text-xs text-gray-400 mb-1.5">
+              <p className="text-xs text-muted-foreground mb-1.5">
                 Controls how dark the overlay is over your background image. 0 = fully transparent, 1 = fully black.
               </p>
               <input
@@ -244,9 +244,9 @@ export default function HeroEditorPage() {
                 }
                 className="w-full accent-indigo-600"
               />
-              <div className="flex justify-between text-xs text-gray-400 mt-1">
+              <div className="flex justify-between text-xs text-muted-foreground mt-1">
                 <span>Lighter</span>
-                <span className="font-medium text-gray-600">{((hero.overlayOpacity ?? 0.55) * 100).toFixed(0)}%</span>
+                <span className="font-medium text-muted-foreground">{((hero.overlayOpacity ?? 0.55) * 100).toFixed(0)}%</span>
                 <span>Darker</span>
               </div>
             </div>

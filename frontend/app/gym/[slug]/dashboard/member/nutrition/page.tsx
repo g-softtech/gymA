@@ -56,8 +56,8 @@ export default async function NutritionPage({
     <div className="max-w-5xl mx-auto space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Nutrition & Meal Planner</h1>
-          <p className="text-gray-500 mt-1">Track your diet and manage your meal plans</p>
+          <h1 className="text-2xl font-bold text-foreground">Nutrition & Meal Planner</h1>
+          <p className="text-muted-foreground mt-1">Track your diet and manage your meal plans</p>
         </div>
         <Link
           href={`/gym/${slug}/dashboard/member/nutrition/log`}
@@ -72,15 +72,15 @@ export default async function NutritionPage({
         <div className={`rounded-xl p-5 ${bmiCategory.bg} border border-opacity-20`}>
           <div className="flex justify-between items-center">
             <div>
-              <p className="text-sm font-medium text-gray-600">Your BMI</p>
+              <p className="text-sm font-medium text-muted-foreground">Your BMI</p>
               <p className={`text-4xl font-extrabold mt-1 ${bmiCategory.color}`}>{bmi}</p>
               <p className={`text-sm font-semibold mt-1 ${bmiCategory.color}`}>
                 {bmiCategory.label}
               </p>
             </div>
-            <div className="text-right text-sm text-gray-500 space-y-1">
-              <p>Weight: <span className="font-medium text-gray-900">{profile?.weightKg}kg</span></p>
-              <p>Height: <span className="font-medium text-gray-900">{profile?.heightCm}cm</span></p>
+            <div className="text-right text-sm text-muted-foreground space-y-1">
+              <p>Weight: <span className="font-medium text-foreground">{profile?.weightKg}kg</span></p>
+              <p>Height: <span className="font-medium text-foreground">{profile?.heightCm}cm</span></p>
             </div>
           </div>
           <div className="mt-4 grid grid-cols-4 gap-2 text-xs text-center">
@@ -108,9 +108,9 @@ export default async function NutritionPage({
       )}
 
       {/* Today's summary */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+      <div className="bg-card text-card-foreground rounded-xl shadow-sm border border-border p-6">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-semibold text-gray-900">Today&apos;s Intake</h2>
+          <h2 className="text-lg font-semibold text-foreground">Today&apos;s Intake</h2>
           <Link
             href={`/gym/${slug}/dashboard/member/nutrition/log`}
             className="text-sm text-indigo-600 hover:underline"
@@ -127,13 +127,13 @@ export default async function NutritionPage({
           ].map((s) => (
             <div key={s.label} className={`${s.bg} rounded-xl p-4 text-center`}>
               <p className={`text-2xl font-bold ${s.color}`}>{s.value}</p>
-              <p className="text-xs text-gray-500 mt-0.5">{s.unit}</p>
-              <p className="text-xs font-medium text-gray-600 mt-1">{s.label}</p>
+              <p className="text-xs text-muted-foreground mt-0.5">{s.unit}</p>
+              <p className="text-xs font-medium text-muted-foreground mt-1">{s.label}</p>
             </div>
           ))}
         </div>
         {todayLogs.length === 0 && (
-          <p className="text-center text-gray-400 text-sm mt-4">
+          <p className="text-center text-muted-foreground text-sm mt-4">
             No food logged today.{" "}
             <Link href={`/gym/${slug}/dashboard/member/nutrition/log`} className="text-indigo-600 hover:underline">
               Log your first meal
@@ -143,9 +143,9 @@ export default async function NutritionPage({
       </div>
 
       {/* Meal Plans */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100">
-        <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
-          <h2 className="text-lg font-semibold text-gray-900">My Meal Plans</h2>
+      <div className="bg-card text-card-foreground rounded-xl shadow-sm border border-border">
+        <div className="px-6 py-4 border-b border-border flex justify-between items-center">
+          <h2 className="text-lg font-semibold text-foreground">My Meal Plans</h2>
           <Link
             href={`/gym/${slug}/dashboard/member/nutrition/plans`}
             className="text-sm text-indigo-600 hover:underline"
@@ -153,10 +153,10 @@ export default async function NutritionPage({
             View all →
           </Link>
         </div>
-        <div className="divide-y divide-gray-50">
+        <div className="divide-y divide-border">
           {(memberProfile?.mealPlans ?? []).length === 0 ? (
             <div className="px-6 py-10 text-center">
-              <p className="text-gray-400 mb-3">No meal plans yet.</p>
+              <p className="text-muted-foreground mb-3">No meal plans yet.</p>
               <Link
                 href={`/gym/${slug}/dashboard/member/nutrition/plans`}
                 className="text-sm bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition font-medium"
@@ -168,8 +168,8 @@ export default async function NutritionPage({
             memberProfile?.mealPlans.map((p) => (
               <div key={p.id} className="px-6 py-4 flex justify-between items-center">
                 <div>
-                  <p className="font-medium text-gray-900">{p.title}</p>
-                  <p className="text-sm text-gray-500">
+                  <p className="font-medium text-foreground">{p.title}</p>
+                  <p className="text-sm text-muted-foreground">
                     {p.totalCalories} kcal · {p.goal.replace(/_/g, " ")}
                   </p>
                 </div>
@@ -179,7 +179,7 @@ export default async function NutritionPage({
                       🤖 AI
                     </span>
                   )}
-                  <span className="text-xs text-gray-400">
+                  <span className="text-xs text-muted-foreground">
                     {new Date(p.createdAt).toLocaleDateString("en-NG", {
                       month: "short", day: "numeric",
                     })}
@@ -201,11 +201,11 @@ export default async function NutritionPage({
           <Link
             key={item.href}
             href={`/gym/${slug}/dashboard/member/${item.href}`}
-            className="bg-white rounded-xl border border-gray-100 p-5 hover:shadow-md hover:border-indigo-200 transition-all"
+            className="bg-card text-card-foreground rounded-xl border border-border p-5 hover:shadow-md hover:border-indigo-200 transition-all"
           >
             <div className="text-3xl mb-2">{item.icon}</div>
-            <p className="font-semibold text-gray-900 text-sm">{item.label}</p>
-            <p className="text-xs text-gray-500 mt-0.5">{item.desc}</p>
+            <p className="font-semibold text-foreground text-sm">{item.label}</p>
+            <p className="text-xs text-muted-foreground mt-0.5">{item.desc}</p>
           </Link>
         ))}
       </div>

@@ -55,25 +55,25 @@ export default async function MemberBillingPage({
   return (
     <div className="max-w-4xl mx-auto space-y-8">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">Manage Subscription</h1>
-        <p className="mt-2 text-gray-600">View your current plan and explore upgrades.</p>
+        <h1 className="text-3xl font-bold text-foreground">Manage Subscription</h1>
+        <p className="mt-2 text-muted-foreground">View your current plan and explore upgrades.</p>
       </div>
 
       {/* Current Subscription Status */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+      <div className="bg-card text-card-foreground rounded-2xl shadow-sm border border-border p-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <p className="text-sm font-medium text-gray-500">Current Plan</p>
+            <p className="text-sm font-medium text-muted-foreground">Current Plan</p>
             <div className="flex items-center gap-3 mt-1">
-              <h2 className="text-2xl font-black text-gray-900">
+              <h2 className="text-2xl font-black text-foreground">
                 {currentActiveSub ? currentActiveSub.plan.name : "None"}
               </h2>
-              <span className={`px-2.5 py-1 text-xs font-bold rounded-full ${currentActiveSub ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-600"}`}>
+              <span className={`px-2.5 py-1 text-xs font-bold rounded-full ${currentActiveSub ? "bg-success/10 text-success" : "bg-muted text-muted-foreground"}`}>
                 {currentActiveSub ? "ACTIVE" : "INACTIVE"}
               </span>
             </div>
             {currentActiveSub && (
-              <p className="text-sm text-gray-500 mt-2">
+              <p className="text-sm text-muted-foreground mt-2">
                 Expires on: {new Date(currentActiveSub.endDate).toLocaleDateString()}
               </p>
             )}
@@ -83,7 +83,7 @@ export default async function MemberBillingPage({
 
       {/* Available Plans for Upgrade */}
       <div>
-        <h2 className="text-xl font-bold text-gray-900 mb-4">Available Plans</h2>
+        <h2 className="text-xl font-bold text-foreground mb-4">Available Plans</h2>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {availablePlans.map((plan) => {
             const planPrice = Number(plan.price);
@@ -105,42 +105,42 @@ export default async function MemberBillingPage({
             return (
               <div 
                 key={plan.id} 
-                className={`bg-white rounded-2xl p-6 border-2 transition-all ${isCurrent ? "border-indigo-600 shadow-md shadow-indigo-100" : "border-gray-100 hover:border-gray-200 shadow-sm"}`}
+                className={`bg-card text-card-foreground rounded-2xl p-6 border-2 transition-all ${isCurrent ? "border-indigo-600 shadow-md shadow-indigo-100" : "border-border hover:border-border shadow-sm"}`}
               >
                 {isCurrent && (
-                  <div className="inline-block px-3 py-1 bg-indigo-100 text-indigo-700 text-xs font-bold rounded-full mb-4">
+                  <div className="inline-block px-3 py-1 bg-primary/10 text-primary text-xs font-bold rounded-full mb-4">
                     CURRENT PLAN
                   </div>
                 )}
-                <h3 className="text-lg font-bold text-gray-900">{plan.name}</h3>
+                <h3 className="text-lg font-bold text-foreground">{plan.name}</h3>
                 <div className="mt-2 flex items-baseline gap-1">
-                  <span className="text-2xl font-black text-gray-900">₦{planPrice.toLocaleString()}</span>
-                  <span className="text-sm text-gray-500">/{plan.durationDays} days</span>
+                  <span className="text-2xl font-black text-foreground">₦{planPrice.toLocaleString()}</span>
+                  <span className="text-sm text-muted-foreground">/{plan.durationDays} days</span>
                 </div>
                 
                 {/* Features List (Truncated for simplicity, ideally we use getEntitlementFeatures here) */}
                 <ul className="mt-4 space-y-2 mb-6">
                   {(plan.features as string[])?.slice(0, 3).map((f, i) => (
-                    <li key={i} className="flex items-start gap-2 text-sm text-gray-600">
+                    <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
                       <span className="text-green-500 shrink-0">✓</span> {f}
                     </li>
                   ))}
                   {((plan.features as string[])?.length > 3) && (
-                    <li className="text-xs text-gray-400 italic">...and more</li>
+                    <li className="text-xs text-muted-foreground italic">...and more</li>
                   )}
                 </ul>
 
                 <div className="mt-auto pt-4">
                   {isCurrent && !canRenew ? (
-                    <button disabled className="w-full py-2.5 rounded-lg bg-gray-100 text-gray-400 font-bold text-sm cursor-not-allowed">
+                    <button disabled className="w-full py-2.5 rounded-lg bg-muted text-muted-foreground font-bold text-sm cursor-not-allowed">
                       Active Plan
                     </button>
                   ) : isDowngrade ? (
-                    <button disabled className="w-full py-2.5 rounded-lg border-2 border-gray-200 text-gray-400 font-bold text-sm cursor-not-allowed">
+                    <button disabled className="w-full py-2.5 rounded-lg border-2 border-border text-muted-foreground font-bold text-sm cursor-not-allowed">
                       Downgrade Unavailable
                     </button>
                   ) : isLateral && !canRenew ? (
-                    <button disabled className="w-full py-2.5 rounded-lg border-2 border-gray-200 text-gray-400 font-bold text-sm cursor-not-allowed">
+                    <button disabled className="w-full py-2.5 rounded-lg border-2 border-border text-muted-foreground font-bold text-sm cursor-not-allowed">
                       Lateral Move Blocked
                     </button>
                   ) : (

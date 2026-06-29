@@ -153,7 +153,7 @@ export function DomainManagerClient({
     <div className="space-y-6">
       {/* Toast Notifications */}
       {error && (
-        <div className="p-4 bg-red-50 text-red-700 rounded-xl border border-red-200 text-sm font-medium">
+        <div className="p-4 bg-destructive/10 text-destructive rounded-xl border border-red-200 text-sm font-medium">
           {error}
         </div>
       )}
@@ -165,9 +165,9 @@ export function DomainManagerClient({
 
       {/* STATE 1: No Domain */}
       {!data.customDomain && (
-        <form onSubmit={handleAddDomain} className="p-6 bg-white border border-gray-200 rounded-2xl shadow-sm">
-          <h2 className="text-lg font-semibold text-gray-900 mb-2">Connect a Domain</h2>
-          <p className="text-gray-500 text-sm mb-5">
+        <form onSubmit={handleAddDomain} className="p-6 bg-card text-card-foreground border border-border rounded-2xl shadow-sm">
+          <h2 className="text-lg font-semibold text-foreground mb-2">Connect a Domain</h2>
+          <p className="text-muted-foreground text-sm mb-5">
             Enter the exact domain you want to use (e.g., powergym.com or app.powergym.com). Do not include http:// or www.
           </p>
           <div className="flex gap-3">
@@ -177,7 +177,7 @@ export function DomainManagerClient({
               value={inputDomain}
               onChange={(e) => setInputDomain(e.target.value)}
               placeholder="powergym.com"
-              className="flex-1 px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+              className="flex-1 px-4 py-2 bg-muted border border-border rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
               disabled={loading}
             />
             <button
@@ -193,47 +193,47 @@ export function DomainManagerClient({
 
       {/* STATE 2: Pending DNS Instructions */}
       {data.customDomain && !data.domainVerified && (
-        <div className="p-6 bg-white border border-amber-200 rounded-2xl shadow-sm">
+        <div className="p-6 bg-card text-card-foreground border border-amber-200 rounded-2xl shadow-sm">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+              <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
                 Pending Verification
                 <span className="bg-amber-100 text-amber-700 px-2 py-0.5 rounded text-xs font-bold uppercase tracking-wider">
                   Pending
                 </span>
               </h2>
-              <p className="text-gray-500 text-sm mt-1">
-                Please add the following DNS records to your domain provider (GoDaddy, Namecheap, Route53, etc.) for <strong className="text-gray-900">{data.customDomain}</strong>.
+              <p className="text-muted-foreground text-sm mt-1">
+                Please add the following DNS records to your domain provider (GoDaddy, Namecheap, Route53, etc.) for <strong className="text-foreground">{data.customDomain}</strong>.
               </p>
             </div>
           </div>
 
-          <div className="overflow-hidden rounded-xl border border-gray-200 mb-6">
+          <div className="overflow-hidden rounded-xl border border-border mb-6">
             <table className="w-full text-left text-sm">
-              <thead className="bg-gray-50 border-b border-gray-200">
+              <thead className="bg-muted border-b border-border">
                 <tr>
-                  <th className="px-4 py-3 font-semibold text-gray-700">Type</th>
-                  <th className="px-4 py-3 font-semibold text-gray-700">Name / Host</th>
-                  <th className="px-4 py-3 font-semibold text-gray-700">Value / Target</th>
+                  <th className="px-4 py-3 font-semibold text-foreground">Type</th>
+                  <th className="px-4 py-3 font-semibold text-foreground">Name / Host</th>
+                  <th className="px-4 py-3 font-semibold text-foreground">Value / Target</th>
                   <th className="px-4 py-3"></th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y divide-border">
                 {/* A Record */}
-                <tr className="bg-white">
-                  <td className="px-4 py-3 font-mono text-gray-600">A</td>
-                  <td className="px-4 py-3 font-mono text-gray-600">@</td>
-                  <td className="px-4 py-3 font-mono text-gray-900 font-medium">76.76.21.21</td>
+                <tr className="bg-card text-card-foreground">
+                  <td className="px-4 py-3 font-mono text-muted-foreground">A</td>
+                  <td className="px-4 py-3 font-mono text-muted-foreground">@</td>
+                  <td className="px-4 py-3 font-mono text-foreground font-medium">76.76.21.21</td>
                   <td className="px-4 py-3 text-right">
                     <button onClick={() => copyToClipboard("76.76.21.21")} className="text-indigo-600 hover:text-indigo-800 text-xs font-semibold">Copy</button>
                   </td>
                 </tr>
                 {/* CNAME if it's a subdomain (e.g., app.powergym.com) - we just show standard A record above, but Vercel requires TXT for verification sometimes */}
                 {data.verificationToken && (
-                  <tr className="bg-white">
-                    <td className="px-4 py-3 font-mono text-gray-600">TXT</td>
-                    <td className="px-4 py-3 font-mono text-gray-600">_vercel</td>
-                    <td className="px-4 py-3 font-mono text-gray-900 font-medium truncate max-w-[200px]">{data.verificationToken}</td>
+                  <tr className="bg-card text-card-foreground">
+                    <td className="px-4 py-3 font-mono text-muted-foreground">TXT</td>
+                    <td className="px-4 py-3 font-mono text-muted-foreground">_vercel</td>
+                    <td className="px-4 py-3 font-mono text-foreground font-medium truncate max-w-[200px]">{data.verificationToken}</td>
                     <td className="px-4 py-3 text-right">
                       <button onClick={() => copyToClipboard(data.verificationToken!)} className="text-indigo-600 hover:text-indigo-800 text-xs font-semibold">Copy</button>
                     </td>
@@ -251,7 +251,7 @@ export function DomainManagerClient({
             >
               {loading ? "Checking..." : "Verify DNS Now"}
             </button>
-            <span className="text-xs text-gray-500">
+            <span className="text-xs text-muted-foreground">
               We are also checking automatically every 15 seconds.
             </span>
           </div>
@@ -294,7 +294,7 @@ export function DomainManagerClient({
 
       {/* STATE 4: Danger Zone */}
       {data.customDomain && (
-        <div className="p-6 bg-white border border-red-100 rounded-2xl shadow-sm mt-8">
+        <div className="p-6 bg-card text-card-foreground border border-red-100 rounded-2xl shadow-sm mt-8">
           <h2 className="text-base font-semibold text-red-900 mb-1">Danger Zone</h2>
           <p className="text-red-500 text-sm mb-4">
             Removing this domain will instantly detach it from your gym. Visitors to this domain will see a 404 page.
@@ -302,7 +302,7 @@ export function DomainManagerClient({
           <button
             onClick={handleRemove}
             disabled={loading}
-            className="px-4 py-2 bg-red-50 text-red-700 border border-red-200 text-sm font-semibold rounded-xl hover:bg-red-100 disabled:opacity-50 transition-colors"
+            className="px-4 py-2 bg-destructive/10 text-destructive border border-red-200 text-sm font-semibold rounded-xl hover:bg-red-100 disabled:opacity-50 transition-colors"
           >
             {loading ? "Removing..." : "Remove Domain"}
           </button>

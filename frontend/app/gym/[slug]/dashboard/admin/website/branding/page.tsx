@@ -62,16 +62,16 @@ function ImageUploader({
 
   return (
     <div className="space-y-2">
-      <label className="block text-sm font-medium text-gray-700">{label}</label>
+      <label className="block text-sm font-medium text-foreground">{label}</label>
 
-      <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center bg-gray-50/50 p-4 rounded-xl border border-gray-100">
+      <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center bg-muted/50 p-4 rounded-xl border border-border">
         {value ? (
-          <div className="relative w-16 h-16 rounded-lg border border-gray-200 overflow-hidden bg-white flex items-center justify-center shrink-0 shadow-sm">
+          <div className="relative w-16 h-16 rounded-lg border border-border overflow-hidden bg-card text-card-foreground flex items-center justify-center shrink-0 shadow-sm">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={value} alt="preview" className="max-w-full max-h-full object-contain p-1" />
           </div>
         ) : (
-          <div className="w-16 h-16 rounded-lg border border-gray-200 border-dashed bg-white flex items-center justify-center shrink-0 text-xs text-gray-400">
+          <div className="w-16 h-16 rounded-lg border border-border border-dashed bg-card text-card-foreground flex items-center justify-center shrink-0 text-xs text-muted-foreground">
             None
           </div>
         )}
@@ -83,14 +83,14 @@ function ImageUploader({
               accept="image/*"
               onChange={handleFileChange}
               disabled={uploading}
-              className="block w-full text-sm text-gray-500
+              className="block w-full text-sm text-muted-foreground
                 file:mr-4 file:py-2 file:px-4
                 file:rounded-full file:border-0
                 file:text-sm file:font-semibold
                 file:bg-indigo-50 file:text-indigo-700
                 hover:file:bg-indigo-100 disabled:opacity-50 transition-colors cursor-pointer"
             />
-            <p className="text-xs text-gray-400 mt-1.5">{uploading ? "Uploading..." : recommended}</p>
+            <p className="text-xs text-muted-foreground mt-1.5">{uploading ? "Uploading..." : recommended}</p>
             {error && <p className="text-xs text-red-500 mt-1">{error}</p>}
           </div>
 
@@ -101,7 +101,7 @@ function ImageUploader({
               value={value ?? ""}
               onChange={(e) => onChange(e.target.value)}
               placeholder="Or paste an existing URL here..."
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent placeholder:text-gray-400"
+              className="w-full border border-border rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent placeholder:text-muted-foreground"
             />
           </div>
         </div>
@@ -159,7 +159,7 @@ export default function BrandingPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-48 text-gray-400 text-sm">
+      <div className="flex items-center justify-center h-48 text-muted-foreground text-sm">
         Loading settings…
       </div>
     );
@@ -168,8 +168,8 @@ export default function BrandingPage() {
   return (
     <div className="max-w-4xl">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">Branding</h1>
-        <p className="text-gray-500 text-sm mt-1">
+        <h1 className="text-2xl font-bold text-foreground">Branding</h1>
+        <p className="text-muted-foreground text-sm mt-1">
           Customize your gym&apos;s visual identity across the dashboard and public website.
         </p>
       </div>
@@ -179,8 +179,8 @@ export default function BrandingPage() {
         <form onSubmit={handleSave} className="lg:col-span-3 space-y-6">
 
           {/* Logo */}
-          <section className="bg-white border border-gray-100 rounded-xl p-6 shadow-sm space-y-6">
-            <h2 className="font-semibold text-gray-800 text-sm uppercase tracking-wider">Logo & Favicon</h2>
+          <section className="bg-card text-card-foreground border border-border rounded-xl p-6 shadow-sm space-y-6">
+            <h2 className="font-semibold text-foreground text-sm uppercase tracking-wider">Logo & Favicon</h2>
             
             <ImageUploader
               label="Logo"
@@ -198,8 +198,8 @@ export default function BrandingPage() {
           </section>
 
           {/* Colors */}
-          <section className="bg-white border border-gray-100 rounded-xl p-6 shadow-sm space-y-4">
-            <h2 className="font-semibold text-gray-800 text-sm uppercase tracking-wider">Brand Colors</h2>
+          <section className="bg-card text-card-foreground border border-border rounded-xl p-6 shadow-sm space-y-4">
+            <h2 className="font-semibold text-foreground text-sm uppercase tracking-wider">Brand Colors</h2>
 
             <div className="grid grid-cols-3 gap-4">
               {[
@@ -208,21 +208,21 @@ export default function BrandingPage() {
                 { key: "accentColor", label: "Accent" },
               ].map(({ key, label }) => (
                 <div key={key}>
-                  <label className="block text-xs font-medium text-gray-600 mb-2">{label}</label>
+                  <label className="block text-xs font-medium text-muted-foreground mb-2">{label}</label>
                   <div className="flex items-center gap-2">
                     <input
                       id={`color-${key}`}
                       type="color"
                       value={(settings as Record<string, string>)[key] ?? "#6366F1"}
                       onChange={(e) => setSettings((s) => ({ ...s, [key]: e.target.value }))}
-                      className="w-10 h-10 rounded-lg border border-gray-200 cursor-pointer p-0.5"
+                      className="w-10 h-10 rounded-lg border border-border cursor-pointer p-0.5"
                     />
                     <input
                       type="text"
                       value={(settings as Record<string, string>)[key] ?? ""}
                       onChange={(e) => setSettings((s) => ({ ...s, [key]: e.target.value }))}
                       placeholder="#6366F1"
-                      className="flex-1 border border-gray-200 rounded-lg px-2 py-2 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      className="flex-1 border border-border rounded-lg px-2 py-2 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500"
                     />
                   </div>
                 </div>
@@ -231,15 +231,15 @@ export default function BrandingPage() {
           </section>
 
           {/* Typography */}
-          <section className="bg-white border border-gray-100 rounded-xl p-6 shadow-sm space-y-4">
-            <h2 className="font-semibold text-gray-800 text-sm uppercase tracking-wider">Typography</h2>
+          <section className="bg-card text-card-foreground border border-border rounded-xl p-6 shadow-sm space-y-4">
+            <h2 className="font-semibold text-foreground text-sm uppercase tracking-wider">Typography</h2>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Font Family</label>
+              <label className="block text-sm font-medium text-foreground mb-1.5">Font Family</label>
               <select
                 id="font-family-select"
                 value={settings.fontFamily ?? "Inter"}
                 onChange={(e) => setSettings((s) => ({ ...s, fontFamily: e.target.value }))}
-                className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white"
+                className="w-full border border-border rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-card text-card-foreground"
               >
                 {FONT_OPTIONS.map((f) => (
                   <option key={f} value={f}>{f}</option>
@@ -248,19 +248,19 @@ export default function BrandingPage() {
             </div>
             <div className="flex items-center justify-between py-2">
               <div>
-                <p className="text-sm font-medium text-gray-700">Dark Mode</p>
-                <p className="text-xs text-gray-400">Apply dark theme to the dashboard</p>
+                <p className="text-sm font-medium text-foreground">Dark Mode</p>
+                <p className="text-xs text-muted-foreground">Apply dark theme to the dashboard</p>
               </div>
               <button
                 id="dark-mode-toggle"
                 type="button"
                 onClick={() => setSettings((s) => ({ ...s, darkMode: !s.darkMode }))}
                 className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                  settings.darkMode ? "bg-indigo-600" : "bg-gray-200"
+                  settings.darkMode ? "bg-indigo-600" : "bg-muted"
                 }`}
               >
                 <span
-                  className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${
+                  className={`inline-block h-4 w-4 transform rounded-full bg-card text-card-foreground shadow transition-transform ${
                     settings.darkMode ? "translate-x-6" : "translate-x-1"
                   }`}
                 />
@@ -282,9 +282,9 @@ export default function BrandingPage() {
         {/* Live Preview */}
         <div className="lg:col-span-2">
           <div className="sticky top-6">
-            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Live Preview</p>
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">Live Preview</p>
             <div
-              className="rounded-2xl overflow-hidden shadow-xl border border-gray-100"
+              className="rounded-2xl overflow-hidden shadow-xl border border-border"
               style={{ fontFamily: settings.fontFamily ?? "Inter" }}
             >
               {/* Sidebar preview */}
@@ -345,7 +345,7 @@ export default function BrandingPage() {
                 </div>
               </div>
             </div>
-            <p className="text-xs text-gray-400 text-center mt-2">
+            <p className="text-xs text-muted-foreground text-center mt-2">
               Preview updates as you type
             </p>
           </div>

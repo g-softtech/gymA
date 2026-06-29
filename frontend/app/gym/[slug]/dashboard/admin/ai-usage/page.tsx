@@ -51,13 +51,13 @@ export default function AiUsagePage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-black text-gray-900">AI Usage Analytics</h1>
-          <p className="text-gray-500 text-sm mt-1">
+          <h1 className="text-2xl font-black text-foreground">AI Usage Analytics</h1>
+          <p className="text-muted-foreground text-sm mt-1">
             Monitor AI feature usage and estimated Google Gemini API costs
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-sm text-gray-500">Last</span>
+          <span className="text-sm text-muted-foreground">Last</span>
           {[7, 14, 30, 60, 90].map((d) => (
             <button
               key={d}
@@ -66,7 +66,7 @@ export default function AiUsagePage() {
               className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition-all ${
                 days === d
                   ? "bg-indigo-600 text-white shadow-sm"
-                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                  : "bg-muted text-muted-foreground hover:bg-muted"
               }`}
             >
               {d}d
@@ -80,7 +80,7 @@ export default function AiUsagePage() {
           <div className="w-8 h-8 border-3 border-indigo-600 border-t-transparent rounded-full animate-spin" />
         </div>
       ) : !data ? (
-        <p className="text-center text-gray-400 py-16">Failed to load AI usage data.</p>
+        <p className="text-center text-muted-foreground py-16">Failed to load AI usage data.</p>
       ) : (
         <>
           {/* Summary Cards */}
@@ -117,7 +117,7 @@ export default function AiUsagePage() {
             ].map((card) => (
               <div
                 key={card.label}
-                className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm"
+                className="bg-card text-card-foreground rounded-2xl p-5 border border-border shadow-sm"
               >
                 <div
                   className="w-10 h-10 rounded-xl flex items-center justify-center text-xl mb-3"
@@ -125,9 +125,9 @@ export default function AiUsagePage() {
                 >
                   {card.icon}
                 </div>
-                <p className="text-2xl font-black text-gray-900">{card.value}</p>
-                <p className="text-xs font-semibold text-gray-500 mt-0.5">{card.label}</p>
-                <p className="text-xs text-gray-400 mt-0.5">{card.sub}</p>
+                <p className="text-2xl font-black text-foreground">{card.value}</p>
+                <p className="text-xs font-semibold text-muted-foreground mt-0.5">{card.label}</p>
+                <p className="text-xs text-muted-foreground mt-0.5">{card.sub}</p>
               </div>
             ))}
           </div>
@@ -135,10 +135,10 @@ export default function AiUsagePage() {
           {/* By Feature + Top Users */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Feature breakdown */}
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-              <h2 className="font-bold text-gray-900 mb-4">Usage by Feature</h2>
+            <div className="bg-card text-card-foreground rounded-2xl border border-border shadow-sm p-6">
+              <h2 className="font-bold text-foreground mb-4">Usage by Feature</h2>
               {data.byFeature.length === 0 ? (
-                <p className="text-sm text-gray-400 text-center py-8">No AI calls recorded yet.</p>
+                <p className="text-sm text-muted-foreground text-center py-8">No AI calls recorded yet.</p>
               ) : (
                 <div className="space-y-4">
                   {data.byFeature.map((f) => {
@@ -155,21 +155,21 @@ export default function AiUsagePage() {
                         <div className="flex items-center justify-between mb-1">
                           <div className="flex items-center gap-2">
                             <span>{meta.icon}</span>
-                            <span className="text-sm font-semibold text-gray-700">
+                            <span className="text-sm font-semibold text-foreground">
                               {meta.label}
                             </span>
                           </div>
-                          <span className="text-sm font-bold text-gray-900">
+                          <span className="text-sm font-bold text-foreground">
                             {f.callCount} calls
                           </span>
                         </div>
-                        <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                        <div className="h-2 bg-muted rounded-full overflow-hidden">
                           <div
                             className="h-full rounded-full transition-all duration-500"
                             style={{ width: `${pct}%`, background: meta.color }}
                           />
                         </div>
-                        <p className="text-xs text-gray-400 mt-0.5">
+                        <p className="text-xs text-muted-foreground mt-0.5">
                           {(f.inputTokens / 1000).toFixed(1)}k in /{" "}
                           {(f.outputTokens / 1000).toFixed(1)}k out
                         </p>
@@ -181,10 +181,10 @@ export default function AiUsagePage() {
             </div>
 
             {/* Top users */}
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-              <h2 className="font-bold text-gray-900 mb-4">Top Users by AI Calls</h2>
+            <div className="bg-card text-card-foreground rounded-2xl border border-border shadow-sm p-6">
+              <h2 className="font-bold text-foreground mb-4">Top Users by AI Calls</h2>
               {data.topUsers.length === 0 ? (
-                <p className="text-sm text-gray-400 text-center py-8">No data yet.</p>
+                <p className="text-sm text-muted-foreground text-center py-8">No data yet.</p>
               ) : (
                 <div className="space-y-3">
                   {data.topUsers.map((user, i) => (
@@ -193,7 +193,7 @@ export default function AiUsagePage() {
                       id={`ai-user-row-${user.userId}`}
                       className="flex items-center gap-3"
                     >
-                      <span className="w-6 text-center text-xs font-bold text-gray-400">
+                      <span className="w-6 text-center text-xs font-bold text-muted-foreground">
                         {i + 1}
                       </span>
                       <div
@@ -203,10 +203,10 @@ export default function AiUsagePage() {
                         {(user.name || user.email || "?")[0]}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-gray-900 truncate">
+                        <p className="text-sm font-semibold text-foreground truncate">
                           {user.name || "Unnamed User"}
                         </p>
-                        <p className="text-xs text-gray-400 truncate">{user.email}</p>
+                        <p className="text-xs text-muted-foreground truncate">{user.email}</p>
                       </div>
                       <span className="text-sm font-bold text-indigo-600">
                         {user.callCount}
@@ -220,8 +220,8 @@ export default function AiUsagePage() {
 
           {/* Daily Sparkline */}
           {data.dailyBreakdown.length > 0 && (
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-              <h2 className="font-bold text-gray-900 mb-6">
+            <div className="bg-card text-card-foreground rounded-2xl border border-border shadow-sm p-6">
+              <h2 className="font-bold text-foreground mb-6">
                 Daily AI Calls — Last {days} Days
               </h2>
               <div className="flex items-end gap-1 h-28">
@@ -248,7 +248,7 @@ export default function AiUsagePage() {
                   );
                 })}
               </div>
-              <div className="flex justify-between text-xs text-gray-400 mt-2">
+              <div className="flex justify-between text-xs text-muted-foreground mt-2">
                 <span>
                   {new Date(data.dailyBreakdown[0]?.date ?? "").toLocaleDateString("en-NG", {
                     month: "short",
@@ -265,10 +265,10 @@ export default function AiUsagePage() {
           )}
 
           {data.summary.totalCalls === 0 && (
-            <div className="text-center py-16 bg-white rounded-2xl border border-gray-100">
+            <div className="text-center py-16 bg-card text-card-foreground rounded-2xl border border-border">
               <div className="text-5xl mb-4">🤖</div>
-              <p className="font-bold text-gray-900">No AI usage recorded yet</p>
-              <p className="text-gray-500 text-sm mt-1">
+              <p className="font-bold text-foreground">No AI usage recorded yet</p>
+              <p className="text-muted-foreground text-sm mt-1">
                 Members will appear here once they use the AI coach features.
               </p>
             </div>

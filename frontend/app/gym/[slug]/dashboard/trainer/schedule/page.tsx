@@ -34,8 +34,8 @@ export default async function TrainerSchedulePage({
   return (
     <div className="max-w-5xl mx-auto space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">My Schedule</h1>
-        <p className="text-gray-500 mt-1">Manage your availability and upcoming sessions</p>
+        <h1 className="text-2xl font-bold text-foreground">My Schedule</h1>
+        <p className="text-muted-foreground mt-1">Manage your availability and upcoming sessions</p>
       </div>
       <ScheduleManager
         trainerId={trainerProfile.id}

@@ -74,19 +74,19 @@ export default async function CommunityPage({
     <div className="max-w-3xl mx-auto space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Community</h1>
-          <p className="text-gray-500 mt-1">Connect with fellow gym members</p>
+          <h1 className="text-2xl font-bold text-foreground">Community</h1>
+          <p className="text-muted-foreground mt-1">Connect with fellow gym members</p>
         </div>
         <div className="flex gap-3">
           <Link
             href={`/gym/${slug}/dashboard/member/community/challenges`}
-            className="text-sm border border-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:border-indigo-400 transition font-medium"
+            className="text-sm border border-border text-foreground px-4 py-2 rounded-lg hover:border-indigo-400 transition font-medium"
           >
             🏆 Challenges
           </Link>
           <Link
             href={`/gym/${slug}/dashboard/member/community/leaderboard`}
-            className="text-sm border border-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:border-indigo-400 transition font-medium"
+            className="text-sm border border-border text-foreground px-4 py-2 rounded-lg hover:border-indigo-400 transition font-medium"
           >
             📊 Leaderboard
           </Link>
@@ -95,8 +95,8 @@ export default async function CommunityPage({
 
       {/* Badges row */}
       {allBadges.length > 0 && (
-        <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4">
-          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">
+        <div className="bg-card text-card-foreground rounded-xl border border-border shadow-sm p-4">
+          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3">
             Your Badges
           </p>
           <div className="flex flex-wrap gap-2">
@@ -134,18 +134,18 @@ export default async function CommunityPage({
 }
 
 const BADGE_META: Record<string, { label: string; icon: string; color: string }> = {
-  FIRST_CHECKIN: { label: "First Check-in", icon: "✅", color: "bg-green-100 text-green-700" },
+  FIRST_CHECKIN: { label: "First Check-in", icon: "✅", color: "bg-success/10 text-success" },
   STREAK_7: { label: "7-Day Streak", icon: "🔥", color: "bg-orange-100 text-orange-700" },
-  STREAK_30: { label: "30-Day Streak", icon: "⚡", color: "bg-yellow-100 text-yellow-700" },
-  FIRST_BOOKING: { label: "First Booking", icon: "📅", color: "bg-blue-100 text-blue-700" },
-  FIRST_WORKOUT: { label: "First Workout", icon: "💪", color: "bg-indigo-100 text-indigo-700" },
+  STREAK_30: { label: "30-Day Streak", icon: "⚡", color: "bg-warning/10 text-warning" },
+  FIRST_BOOKING: { label: "First Booking", icon: "📅", color: "bg-primary/10 text-primary" },
+  FIRST_WORKOUT: { label: "First Workout", icon: "💪", color: "bg-primary/10 text-primary" },
   CHALLENGE_COMPLETE: { label: "Challenge Champ", icon: "🏆", color: "bg-purple-100 text-purple-700" },
   COMMUNITY_STAR: { label: "Community Star", icon: "⭐", color: "bg-pink-100 text-pink-700" },
   WEIGHT_GOAL: { label: "Weight Goal", icon: "🎯", color: "bg-teal-100 text-teal-700" },
 };
 
 function BadgeChip({ type }: { type: string }) {
-  const meta = BADGE_META[type] ?? { label: type, icon: "🏅", color: "bg-gray-100 text-gray-600" };
+  const meta = BADGE_META[type] ?? { label: type, icon: "🏅", color: "bg-muted text-muted-foreground" };
   return (
     <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium ${meta.color}`}>
       <span>{meta.icon}</span>

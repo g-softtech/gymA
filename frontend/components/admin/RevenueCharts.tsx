@@ -40,12 +40,12 @@ export default function RevenueCharts({ monthlyData, planData }: Props) {
                   <stop offset="95%" stopColor="#6366F1" stopOpacity={0} />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-              <XAxis dataKey="month" tick={{ fontSize: 11, fill: "#9ca3af" }} axisLine={false} tickLine={false} />
-              <YAxis tickFormatter={formatNaira} tick={{ fontSize: 11, fill: "#9ca3af" }} axisLine={false} tickLine={false} width={55} />
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+              <XAxis dataKey="month" tick={{ fontSize: 11, fill: "var(--muted-foreground)" }} axisLine={false} tickLine={false} />
+              <YAxis tickFormatter={formatNaira} tick={{ fontSize: 11, fill: "var(--muted-foreground)" }} axisLine={false} tickLine={false} width={55} />
               <Tooltip
                 formatter={(val: any) => [`₦${Number(val).toLocaleString()}`, "Revenue"]}
-                contentStyle={{ borderRadius: "12px", border: "1px solid #e5e7eb", fontSize: "12px" }}
+                contentStyle={{ borderRadius: "12px", border: "1px solid var(--border)", backgroundColor: "var(--card)", color: "var(--foreground)", fontSize: "12px" }}
               />
               <Area
                 type="monotone"
@@ -69,15 +69,15 @@ export default function RevenueCharts({ monthlyData, planData }: Props) {
           <div className="h-52">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={planData} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" vertical={false} />
-                <XAxis dataKey="name" tick={{ fontSize: 11, fill: "#9ca3af" }} axisLine={false} tickLine={false} />
-                <YAxis tickFormatter={formatNaira} tick={{ fontSize: 11, fill: "#9ca3af" }} axisLine={false} tickLine={false} width={55} />
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
+                <XAxis dataKey="name" tick={{ fontSize: 11, fill: "var(--muted-foreground)" }} axisLine={false} tickLine={false} />
+                <YAxis tickFormatter={formatNaira} tick={{ fontSize: 11, fill: "var(--muted-foreground)" }} axisLine={false} tickLine={false} width={55} />
                 <Tooltip
                   formatter={(val: any, name: any) => [
                     name === "revenue" ? `₦${Number(val).toLocaleString()}` : val,
                     name === "revenue" ? "Revenue" : "Subscribers",
                   ]}
-                  contentStyle={{ borderRadius: "12px", border: "1px solid #e5e7eb", fontSize: "12px" }}
+                  contentStyle={{ borderRadius: "12px", border: "1px solid var(--border)", backgroundColor: "var(--card)", color: "var(--foreground)", fontSize: "12px" }}
                 />
                 <Legend wrapperStyle={{ fontSize: "12px" }} />
                 <Bar dataKey="revenue" name="Revenue" fill="#6366F1" radius={[6, 6, 0, 0]} />

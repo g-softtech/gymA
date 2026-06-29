@@ -61,18 +61,18 @@ export default async function AdminMembersPage({
   return (
     <div className="max-w-6xl mx-auto space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Members</h1>
-        <p className="text-gray-500 mt-1">{members.length} registered member{members.length !== 1 ? "s" : ""}</p>
+        <h1 className="text-2xl font-bold text-foreground">Members</h1>
+        <p className="text-muted-foreground mt-1">{members.length} registered member{members.length !== 1 ? "s" : ""}</p>
       </div>
 
       <MembershipAnalyticsClient />
       <UpgradeIntelligenceClient />
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100">
+      <div className="bg-card text-card-foreground rounded-xl shadow-sm border border-border">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="bg-gray-50 text-left text-gray-500 text-xs uppercase tracking-wide border-b border-gray-100">
+              <tr className="bg-muted text-left text-muted-foreground text-xs uppercase tracking-wide border-b border-border">
                 <th className="px-6 py-3 font-medium">Name</th>
                 <th className="px-6 py-3 font-medium">Email</th>
                 <th className="px-6 py-3 font-medium">Plan</th>
@@ -81,10 +81,10 @@ export default async function AdminMembersPage({
                 <th className="px-6 py-3 font-medium">Expires</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-50">
+            <tbody className="divide-y divide-border">
               {members.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-12 text-center text-gray-400">
+                  <td colSpan={6} className="px-6 py-12 text-center text-muted-foreground">
                     No members yet. Members join by purchasing a plan.
                   </td>
                 </tr>
@@ -94,37 +94,37 @@ export default async function AdminMembersPage({
                   const isActive = sub?.status === "ACTIVE" && new Date(sub.endDate) > new Date();
                   const isExpired = sub && new Date(sub.endDate) < new Date();
                   return (
-                    <tr key={user.id} className="hover:bg-gray-50 transition-colors">
+                    <tr key={user.id} className="hover:bg-muted transition-colors">
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-xs font-bold uppercase">
+                          <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold uppercase">
                             {user.name?.[0] ?? user.email?.[0] ?? "?"}
                           </div>
                           <div>
-                            <span className="font-medium text-gray-900">{user.name ?? "—"}</span>
-                            {user.role === "TRAINER" && <span className="ml-2 px-2 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-700 uppercase">Trainer</span>}
+                            <span className="font-medium text-foreground">{user.name ?? "—"}</span>
+                            {user.role === "TRAINER" && <span className="ml-2 px-2 py-0.5 rounded text-[10px] font-bold bg-primary/10 text-primary uppercase">Trainer</span>}
                             {user.role === "ADMIN" && <span className="ml-2 px-2 py-0.5 rounded text-[10px] font-bold bg-purple-100 text-purple-700 uppercase">Admin</span>}
                           </div>
                         </div>
                       </td>
-                      <td className="px-6 py-4 text-gray-500">{user.email ?? "—"}</td>
-                      <td className="px-6 py-4 text-gray-700">
+                      <td className="px-6 py-4 text-muted-foreground">{user.email ?? "—"}</td>
+                      <td className="px-6 py-4 text-foreground">
                         {sub?.plan?.name ?? (
-                          <span className="text-gray-400 italic">No plan</span>
+                          <span className="text-muted-foreground italic">No plan</span>
                         )}
                       </td>
                       <td className="px-6 py-4">
                         {!sub ? (
-                          <span className="px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-500">No plan</span>
+                          <span className="px-2 py-1 rounded-full text-xs font-medium bg-muted text-muted-foreground">No plan</span>
                         ) : isExpired ? (
-                          <span className="px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-600">Expired</span>
+                          <span className="px-2 py-1 rounded-full text-xs font-medium bg-destructive/10 text-destructive">Expired</span>
                         ) : isActive ? (
-                          <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">Active</span>
+                          <span className="px-2 py-1 rounded-full text-xs font-medium bg-success/10 text-success">Active</span>
                         ) : (
-                          <span className="px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-700">{sub.status}</span>
+                          <span className="px-2 py-1 rounded-full text-xs font-medium bg-warning/10 text-warning">{sub.status}</span>
                         )}
                       </td>
-                      <td className="px-6 py-4 text-gray-500">
+                      <td className="px-6 py-4 text-muted-foreground">
                         {sub
                           ? new Date(sub.startDate).toLocaleDateString("en-NG", {
                               year: "numeric",
@@ -133,7 +133,7 @@ export default async function AdminMembersPage({
                             })
                           : "—"}
                       </td>
-                      <td className="px-6 py-4 text-gray-500">
+                      <td className="px-6 py-4 text-muted-foreground">
                         {sub
                           ? new Date(sub.endDate).toLocaleDateString("en-NG", {
                               year: "numeric",

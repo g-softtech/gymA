@@ -37,8 +37,8 @@ Be encouraging, specific, and practical. Keep responses concise and actionable.`
   return (
     <div className="max-w-3xl mx-auto space-y-4">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">AI Chat Coach</h1>
-        <p className="text-gray-500 mt-1">
+        <h1 className="text-2xl font-bold text-foreground">AI Chat Coach</h1>
+        <p className="text-muted-foreground mt-1">
           Ask your AI coach anything about fitness, nutrition, or recovery
         </p>
       </div>

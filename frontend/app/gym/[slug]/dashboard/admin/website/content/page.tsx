@@ -113,25 +113,25 @@ export default function ContentEditorPage() {
     { id: "gallery", label: "Gallery", icon: "🖼️" },
   ];
 
-  const inputCls = "w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500";
+  const inputCls = "w-full border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500";
   const removeBtnCls = "shrink-0 w-7 h-7 flex items-center justify-center rounded-lg bg-red-50 text-red-400 hover:bg-red-100 hover:text-red-600 text-sm font-bold transition-colors";
   const addBtnCls = "flex items-center gap-1.5 text-sm text-indigo-600 hover:text-indigo-800 font-medium transition-colors mt-2";
 
   if (loading) {
-    return <div className="flex items-center justify-center h-48 text-gray-400 text-sm">Loading…</div>;
+    return <div className="flex items-center justify-center h-48 text-muted-foreground text-sm">Loading…</div>;
   }
 
   return (
     <div className="max-w-3xl">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">Page Content</h1>
-        <p className="text-gray-500 text-sm mt-1">
+        <h1 className="text-2xl font-bold text-foreground">Page Content</h1>
+        <p className="text-muted-foreground text-sm mt-1">
           Manage the sections that appear on your public gym page — stats, services, testimonials, and more.
         </p>
       </div>
 
       {/* Tab bar */}
-      <div className="flex gap-1 p-1 bg-gray-100 rounded-xl mb-8 overflow-x-auto">
+      <div className="flex gap-1 p-1 bg-muted rounded-xl mb-8 overflow-x-auto">
         {TABS.map((tab) => (
           <button
             key={tab.id}
@@ -151,16 +151,16 @@ export default function ContentEditorPage() {
 
       {/* ── Layout Builder ── */}
       {activeTab === "layout" && (
-        <div className="bg-white border border-gray-100 rounded-xl p-6 shadow-sm space-y-4">
+        <div className="bg-card text-card-foreground border border-border rounded-xl p-6 shadow-sm space-y-4">
           <div>
-            <h2 className="font-semibold text-gray-800 mb-1">Homepage Layout Builder</h2>
-            <p className="text-xs text-gray-400">Reorder the sections on your public gym website. Drag and drop is supported (use up/down buttons).</p>
+            <h2 className="font-semibold text-foreground mb-1">Homepage Layout Builder</h2>
+            <p className="text-xs text-muted-foreground">Reorder the sections on your public gym website. Drag and drop is supported (use up/down buttons).</p>
           </div>
           <div className="space-y-2">
             {homepageLayout.map((id, index) => {
               const def = DEFAULT_LAYOUT.find(d => d.id === id) || { id, label: id };
               return (
-                <div key={id} className="flex items-center gap-3 bg-gray-50 border border-gray-200 p-3 rounded-lg">
+                <div key={id} className="flex items-center gap-3 bg-muted border border-border p-3 rounded-lg">
                   <div className="flex flex-col gap-1">
                     <button
                       type="button"
@@ -170,7 +170,7 @@ export default function ContentEditorPage() {
                         [newLayout[index - 1], newLayout[index]] = [newLayout[index], newLayout[index - 1]];
                         setHomepageLayout(newLayout);
                       }}
-                      className="text-gray-400 hover:text-indigo-600 disabled:opacity-30"
+                      className="text-muted-foreground hover:text-indigo-600 disabled:opacity-30"
                     >
                       ▲
                     </button>
@@ -182,12 +182,12 @@ export default function ContentEditorPage() {
                         [newLayout[index + 1], newLayout[index]] = [newLayout[index], newLayout[index + 1]];
                         setHomepageLayout(newLayout);
                       }}
-                      className="text-gray-400 hover:text-indigo-600 disabled:opacity-30"
+                      className="text-muted-foreground hover:text-indigo-600 disabled:opacity-30"
                     >
                       ▼
                     </button>
                   </div>
-                  <div className="flex-1 font-medium text-sm text-gray-800">
+                  <div className="flex-1 font-medium text-sm text-foreground">
                     {def.label}
                   </div>
                   <button
@@ -204,15 +204,15 @@ export default function ContentEditorPage() {
             })}
           </div>
           {DEFAULT_LAYOUT.filter(d => !homepageLayout.includes(d.id)).length > 0 && (
-            <div className="pt-4 border-t border-gray-100">
-              <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Available Sections</h3>
+            <div className="pt-4 border-t border-border">
+              <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Available Sections</h3>
               <div className="flex flex-wrap gap-2">
                 {DEFAULT_LAYOUT.filter(d => !homepageLayout.includes(d.id)).map(d => (
                   <button
                     key={d.id}
                     type="button"
                     onClick={() => setHomepageLayout([...homepageLayout, d.id])}
-                    className="text-xs bg-indigo-50 text-indigo-700 px-3 py-1.5 rounded-full hover:bg-indigo-100 font-medium"
+                    className="text-xs bg-primary/10 text-primary px-3 py-1.5 rounded-full hover:bg-indigo-100 font-medium"
                   >
                     + Add {d.label}
                   </button>
@@ -225,10 +225,10 @@ export default function ContentEditorPage() {
 
       {/* ── Stats ── */}
       {activeTab === "stats" && (
-        <div className="bg-white border border-gray-100 rounded-xl p-6 shadow-sm space-y-4">
+        <div className="bg-card text-card-foreground border border-border rounded-xl p-6 shadow-sm space-y-4">
           <div>
-            <h2 className="font-semibold text-gray-800 mb-1">Social Proof Numbers</h2>
-            <p className="text-xs text-gray-400">e.g. &ldquo;500+ Members&rdquo;, &ldquo;10 Expert Trainers&rdquo;. Shown in a bold strip below the hero.</p>
+            <h2 className="font-semibold text-foreground mb-1">Social Proof Numbers</h2>
+            <p className="text-xs text-muted-foreground">e.g. &ldquo;500+ Members&rdquo;, &ldquo;10 Expert Trainers&rdquo;. Shown in a bold strip below the hero.</p>
           </div>
           {stats.map((stat, i) => (
             <div key={i} className="flex gap-3 items-start">
@@ -279,13 +279,13 @@ export default function ContentEditorPage() {
 
       {/* ── Features ── */}
       {activeTab === "features" && (
-        <div className="bg-white border border-gray-100 rounded-xl p-6 shadow-sm space-y-5">
+        <div className="bg-card text-card-foreground border border-border rounded-xl p-6 shadow-sm space-y-5">
           <div>
-            <h2 className="font-semibold text-gray-800 mb-1">Feature Highlights</h2>
-            <p className="text-xs text-gray-400">Short benefits/USPs shown in a grid. E.g. &ldquo;24/7 Access&rdquo;, &ldquo;AI Coach&rdquo;, &ldquo;Modern Equipment&rdquo;.</p>
+            <h2 className="font-semibold text-foreground mb-1">Feature Highlights</h2>
+            <p className="text-xs text-muted-foreground">Short benefits/USPs shown in a grid. E.g. &ldquo;24/7 Access&rdquo;, &ldquo;AI Coach&rdquo;, &ldquo;Modern Equipment&rdquo;.</p>
           </div>
           {features.map((feat, i) => (
-            <div key={i} className="flex gap-3 items-start border-b border-gray-50 pb-4 last:border-0 last:pb-0">
+            <div key={i} className="flex gap-3 items-start border-b border-border pb-4 last:border-0 last:pb-0">
               <div className="flex-1 space-y-2">
                 <div className="grid grid-cols-2 gap-2">
                   <input
@@ -347,13 +347,13 @@ export default function ContentEditorPage() {
 
       {/* ── Activities / Programs ── */}
       {activeTab === "activities" && (
-        <div className="bg-white border border-gray-100 rounded-xl p-6 shadow-sm space-y-5">
+        <div className="bg-card text-card-foreground border border-border rounded-xl p-6 shadow-sm space-y-5">
           <div>
-            <h2 className="font-semibold text-gray-800 mb-1">Activities / Programs</h2>
-            <p className="text-xs text-gray-400">Displayed as cards with optional images. E.g. &ldquo;Strength Training&rdquo;, &ldquo;HIIT Classes&rdquo;.</p>
+            <h2 className="font-semibold text-foreground mb-1">Activities / Programs</h2>
+            <p className="text-xs text-muted-foreground">Displayed as cards with optional images. E.g. &ldquo;Strength Training&rdquo;, &ldquo;HIIT Classes&rdquo;.</p>
           </div>
           {services.map((svc, i) => (
-            <div key={i} className="flex gap-3 items-start border-b border-gray-50 pb-5 last:border-0 last:pb-0">
+            <div key={i} className="flex gap-3 items-start border-b border-border pb-5 last:border-0 last:pb-0">
               <div className="flex-1 space-y-2">
                 <div className="grid grid-cols-2 gap-2">
                   <input
@@ -426,7 +426,7 @@ export default function ContentEditorPage() {
                         }
                       }}
                     />
-                    <div className={`${inputCls} flex items-center text-gray-500 overflow-hidden bg-gray-50`}>
+                    <div className={`${inputCls} flex items-center text-muted-foreground overflow-hidden bg-muted`}>
                       {uploadingImage === `svc-${i}` ? "Uploading..." : svc.imageUrl ? "Image Uploaded ✓" : "Upload Image (Max 4.5MB)"}
                     </div>
                   </div>
@@ -455,13 +455,13 @@ export default function ContentEditorPage() {
 
       {/* ── Testimonials ── */}
       {activeTab === "testimonials" && (
-        <div className="bg-white border border-gray-100 rounded-xl p-6 shadow-sm space-y-5">
+        <div className="bg-card text-card-foreground border border-border rounded-xl p-6 shadow-sm space-y-5">
           <div>
-            <h2 className="font-semibold text-gray-800 mb-1">Member Testimonials</h2>
-            <p className="text-xs text-gray-400">Display social proof quotes from your happiest members.</p>
+            <h2 className="font-semibold text-foreground mb-1">Member Testimonials</h2>
+            <p className="text-xs text-muted-foreground">Display social proof quotes from your happiest members.</p>
           </div>
           {testimonials.map((t, i) => (
-            <div key={i} className="flex gap-3 items-start border-b border-gray-50 pb-5 last:border-0 last:pb-0">
+            <div key={i} className="flex gap-3 items-start border-b border-border pb-5 last:border-0 last:pb-0">
               <div className="flex-1 space-y-2">
                 <div className="grid grid-cols-2 gap-2">
                   <input
@@ -523,7 +523,7 @@ export default function ContentEditorPage() {
                         }
                       }}
                     />
-                    <div className={`${inputCls} flex items-center text-gray-500 overflow-hidden bg-gray-50`}>
+                    <div className={`${inputCls} flex items-center text-muted-foreground overflow-hidden bg-muted`}>
                       {uploadingImage === `test-${i}` ? "Uploading..." : t.avatarUrl ? "Image Uploaded ✓" : "Upload Avatar (Max 4.5MB)"}
                     </div>
                   </div>
@@ -567,13 +567,13 @@ export default function ContentEditorPage() {
 
       {/* ── Gallery ── */}
       {activeTab === "gallery" && (
-        <div className="bg-white border border-gray-100 rounded-xl p-6 shadow-sm space-y-4">
+        <div className="bg-card text-card-foreground border border-border rounded-xl p-6 shadow-sm space-y-4">
           <div>
-            <h2 className="font-semibold text-gray-800 mb-1">Facility Gallery</h2>
-            <p className="text-xs text-gray-400">Upload images of your gym facilities and categorize them.</p>
+            <h2 className="font-semibold text-foreground mb-1">Facility Gallery</h2>
+            <p className="text-xs text-muted-foreground">Upload images of your gym facilities and categorize them.</p>
           </div>
           {gallery.map((item, i) => (
-            <div key={i} className="flex gap-3 items-center border-b border-gray-50 pb-4 last:border-0 last:pb-0">
+            <div key={i} className="flex gap-3 items-center border-b border-border pb-4 last:border-0 last:pb-0">
               <div className="flex-1 grid grid-cols-1 sm:grid-cols-3 gap-2">
                 <div className="relative col-span-1">
                   <input
@@ -598,7 +598,7 @@ export default function ContentEditorPage() {
                       }
                     }}
                   />
-                  <div className={`${inputCls} flex items-center text-gray-500 overflow-hidden bg-gray-50`}>
+                  <div className={`${inputCls} flex items-center text-muted-foreground overflow-hidden bg-muted`}>
                     {uploadingImage === `gal-${i}` ? "Uploading..." : item.imageUrl ? "Image Uploaded ✓" : "Upload Image (Max 4.5MB)"}
                   </div>
                 </div>
@@ -636,7 +636,7 @@ export default function ContentEditorPage() {
                 <img
                   src={item.imageUrl}
                   alt=""
-                  className="w-12 h-12 rounded-lg object-cover shrink-0 border border-gray-100"
+                  className="w-12 h-12 rounded-lg object-cover shrink-0 border border-border"
                 />
               )}
               <button

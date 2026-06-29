@@ -34,8 +34,8 @@ export default async function ChallengesPage({
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Fitness Challenges</h1>
-        <p className="text-gray-500 mt-1">
+        <h1 className="text-2xl font-bold text-foreground">Fitness Challenges</h1>
+        <p className="text-muted-foreground mt-1">
           Join challenges, track progress, compete with fellow members
         </p>
       </div>

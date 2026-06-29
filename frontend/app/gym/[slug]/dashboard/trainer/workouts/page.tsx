@@ -60,8 +60,8 @@ export default async function TrainerWorkoutsPage({
   return (
     <div className="max-w-5xl mx-auto space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Workout Plans</h1>
-        <p className="text-gray-500 mt-1">Create and manage workout plans for your clients</p>
+        <h1 className="text-2xl font-bold text-foreground">Workout Plans</h1>
+        <p className="text-muted-foreground mt-1">Create and manage workout plans for your clients</p>
       </div>
       <WorkoutPlanManager
         trainerId={trainerProfile.id}

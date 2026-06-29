@@ -138,7 +138,7 @@ export default async function SuperAdminOverviewPage() {
         {statCards.map((card) => (
           <div
             key={card.label}
-            className="bg-white/[0.03] border border-white/5 rounded-xl p-5 hover:bg-white/[0.05] transition-colors"
+            className="bg-card text-card-foreground/[0.03] border border-white/5 rounded-xl p-5 hover:bg-card text-card-foreground/[0.05] transition-colors"
           >
             <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${card.color} flex items-center justify-center text-lg mb-3`}>
               {card.icon}
@@ -152,7 +152,7 @@ export default async function SuperAdminOverviewPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Plan Breakdown */}
-        <div className="bg-white/[0.03] border border-white/5 rounded-xl p-6">
+        <div className="bg-card text-card-foreground/[0.03] border border-white/5 rounded-xl p-6">
           <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4">
             Subscription Plans
           </h2>
@@ -176,7 +176,7 @@ export default async function SuperAdminOverviewPage() {
         </div>
 
         {/* Recent Gyms */}
-        <div className="bg-white/[0.03] border border-white/5 rounded-xl p-6">
+        <div className="bg-card text-card-foreground/[0.03] border border-white/5 rounded-xl p-6">
           <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4">
             Recently Added Gyms
           </h2>
@@ -211,7 +211,7 @@ export default async function SuperAdminOverviewPage() {
         </div>
 
         {/* Recent Revenue (Phase 9B.5) */}
-        <div className="bg-white/[0.03] border border-white/5 rounded-xl p-6 lg:col-span-2">
+        <div className="bg-card text-card-foreground/[0.03] border border-white/5 rounded-xl p-6 lg:col-span-2">
           <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4 flex items-center justify-between">
             <span>Recent SaaS Invoices</span>
             <span className="text-xs text-indigo-400 font-medium normal-case">Phase 9B.5</span>
@@ -228,7 +228,7 @@ export default async function SuperAdminOverviewPage() {
               </thead>
               <tbody className="text-sm">
                 {stats.recentInvoices.map((inv) => (
-                  <tr key={inv.id} className="border-b border-white/5 hover:bg-white/[0.02]">
+                  <tr key={inv.id} className="border-b border-white/5 hover:bg-card text-card-foreground/[0.02]">
                     <td className="py-3 px-4 text-slate-300">
                       {new Date(inv.createdAt).toLocaleDateString()}
                     </td>

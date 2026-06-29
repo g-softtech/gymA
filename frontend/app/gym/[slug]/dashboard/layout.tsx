@@ -154,9 +154,8 @@ export default async function DashboardLayout({
       )}
 
       <div
-        className="flex min-h-screen"
+        className="flex min-h-screen bg-background text-foreground"
         style={{
-          background: darkMode ? "#080811" : "#f1f5f9",
           fontFamily: `'${fontFamily}', system-ui, sans-serif`,
           // ✅ Phase 5: CSS custom properties for brand colors — used by child components
           ["--brand-primary" as string]: primaryColor,

@@ -35,33 +35,33 @@ export default function EntitlementAnalyticsClient() {
     fetchData();
   }, []);
 
-  if (loading) return <div className="animate-pulse bg-gray-100 rounded-xl h-48 w-full mb-8" />;
+  if (loading) return <div className="animate-pulse bg-muted rounded-xl h-48 w-full mb-8" />;
   if (!data || data.mostUsedFeatures.length === 0) return null;
 
   return (
     <div className="space-y-6 mb-8">
       {/* KPI Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="bg-rose-50 p-6 rounded-xl border border-rose-100 shadow-sm flex items-center justify-between">
+        <div className="bg-destructive/10 p-6 rounded-xl border border-destructive/20 shadow-sm flex items-center justify-between">
           <div>
-            <p className="text-sm font-medium text-rose-600">Total Blocked Requests</p>
-            <h3 className="text-3xl font-bold text-rose-900 mt-1">{data.blockedRequests}</h3>
+            <p className="text-sm font-medium text-destructive">Total Blocked Requests</p>
+            <h3 className="text-3xl font-bold text-destructive mt-1">{data.blockedRequests}</h3>
           </div>
           <div className="text-3xl">🚨</div>
         </div>
-        <div className="bg-amber-50 p-6 rounded-xl border border-amber-100 shadow-sm flex items-center justify-between">
+        <div className="bg-warning/10 p-6 rounded-xl border border-warning/20 shadow-sm flex items-center justify-between">
           <div>
-            <p className="text-sm font-medium text-amber-600">Users Hitting Limits</p>
-            <h3 className="text-3xl font-bold text-amber-900 mt-1">{data.blockedUsersCount}</h3>
+            <p className="text-sm font-medium text-warning">Users Hitting Limits</p>
+            <h3 className="text-3xl font-bold text-warning mt-1">{data.blockedUsersCount}</h3>
           </div>
           <div className="text-3xl">⚠️</div>
         </div>
       </div>
 
       {/* Most Used Features — Horizontal Bar Chart */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-        <h3 className="text-base font-bold text-gray-900 mb-1">Feature Adoption</h3>
-        <p className="text-xs text-gray-400 mb-6">Percentage of active subscribers using each feature</p>
+      <div className="bg-card text-card-foreground rounded-2xl shadow-sm border border-border p-6">
+        <h3 className="text-base font-bold text-foreground mb-1">Feature Adoption</h3>
+        <p className="text-xs text-muted-foreground mb-6">Percentage of active subscribers using each feature</p>
         <div className="h-64">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
@@ -69,15 +69,15 @@ export default function EntitlementAnalyticsClient() {
               layout="vertical"
               margin={{ top: 5, right: 30, left: 40, bottom: 5 }}
             >
-              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" horizontal={false} />
-              <XAxis type="number" tickFormatter={(val) => `${val}%`} domain={[0, 100]} tick={{ fontSize: 11, fill: "#9ca3af" }} axisLine={false} tickLine={false} />
-              <YAxis dataKey="feature" type="category" tick={{ fontSize: 10, fill: "#6b7280" }} axisLine={false} tickLine={false} width={100} />
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" horizontal={false} />
+              <XAxis type="number" tickFormatter={(val) => `${val}%`} domain={[0, 100]} tick={{ fontSize: 11, fill: "var(--muted-foreground)" }} axisLine={false} tickLine={false} />
+              <YAxis dataKey="feature" type="category" tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} axisLine={false} tickLine={false} width={100} />
               <Tooltip
                 formatter={(val: any, name: any) => [
                   name === "adoptionPercent" ? `${val}%` : val,
                   name === "adoptionPercent" ? "Adoption" : "Distinct Users",
                 ]}
-                contentStyle={{ borderRadius: "12px", border: "1px solid #e5e7eb", fontSize: "12px" }}
+                contentStyle={{ borderRadius: "12px", border: "1px solid var(--border)", backgroundColor: "var(--card)", color: "var(--foreground)", fontSize: "12px" }}
               />
               <Bar dataKey="adoptionPercent" name="Adoption" fill="#8B5CF6" radius={[0, 6, 6, 0]} barSize={24} />
             </BarChart>

@@ -68,18 +68,18 @@ export default async function AdminDashboardPage({
   const totalPlans = tenant.membershipPlans.length;
 
   const stats = [
-    { label: "Total Members", value: totalMembers, color: "bg-indigo-50 text-indigo-700", icon: "👥" },
-    { label: "Active Subscriptions", value: activeSubscriptions, color: "bg-green-50 text-green-700", icon: "✅" },
-    { label: "Revenue (Active)", value: `₦${revenue.toLocaleString()}`, color: "bg-yellow-50 text-yellow-700", icon: "💰" },
-    { label: "Membership Plans", value: totalPlans, color: "bg-purple-50 text-purple-700", icon: "📋" },
+    { label: "Total Members", value: totalMembers, color: "bg-primary/10 text-primary", icon: "👥" },
+    { label: "Active Subscriptions", value: activeSubscriptions, color: "bg-success/10 text-success", icon: "✅" },
+    { label: "Revenue (Active)", value: `₦${revenue.toLocaleString()}`, color: "bg-warning/10 text-warning", icon: "💰" },
+    { label: "Membership Plans", value: totalPlans, color: "bg-secondary/10 text-secondary", icon: "📋" },
   ];
 
   return (
     <div className="max-w-6xl mx-auto space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Admin Dashboard</h1>
-          <p className="text-gray-500 mt-1">{tenant.name} — Management Overview</p>
+          <h1 className="text-2xl font-bold text-foreground">Admin Dashboard</h1>
+          <p className="text-muted-foreground mt-1">{tenant.name} — Management Overview</p>
         </div>
         <Link
           href={`/gym/${slug}/dashboard/admin/plans`}
@@ -99,15 +99,15 @@ export default async function AdminDashboardPage({
         ))}
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100">
-        <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
-          <h2 className="text-lg font-semibold text-gray-900">Members</h2>
-          <span className="text-sm text-gray-500">{totalMembers} total</span>
+      <div className="bg-card text-card-foreground rounded-xl shadow-sm border border-border">
+        <div className="px-6 py-4 border-b border-border flex justify-between items-center">
+          <h2 className="text-lg font-semibold text-foreground">Members</h2>
+          <span className="text-sm text-muted-foreground">{totalMembers} total</span>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="bg-gray-50 text-left text-gray-500 text-xs uppercase tracking-wide">
+              <tr className="bg-muted text-left text-muted-foreground text-xs uppercase tracking-wide">
                 <th className="px-6 py-3 font-medium">Name</th>
                 <th className="px-6 py-3 font-medium">Email</th>
                 <th className="px-6 py-3 font-medium">Plan</th>
@@ -115,10 +115,10 @@ export default async function AdminDashboardPage({
                 <th className="px-6 py-3 font-medium">Expires</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-50">
+            <tbody className="divide-y divide-border">
               {tenant.users.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-6 py-8 text-center text-gray-400">
+                  <td colSpan={5} className="px-6 py-8 text-center text-muted-foreground">
                     No members yet.
                   </td>
                 </tr>
@@ -128,28 +128,28 @@ export default async function AdminDashboardPage({
                   const isActive = sub?.status === "ACTIVE";
                   const isExpired = sub && new Date(sub.endDate) < new Date();
                   return (
-                    <tr key={user.id} className="hover:bg-gray-50 transition-colors">
-                      <td className="px-6 py-4 font-medium text-gray-900">
+                    <tr key={user.id} className="hover:bg-muted transition-colors">
+                      <td className="px-6 py-4 font-medium text-foreground">
                         {user.name ?? "—"}
-                        {user.role === "TRAINER" && <span className="ml-2 px-2 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-700 uppercase">Trainer</span>}
+                        {user.role === "TRAINER" && <span className="ml-2 px-2 py-0.5 rounded text-[10px] font-bold bg-primary/10 text-primary uppercase">Trainer</span>}
                         {user.role === "ADMIN" && <span className="ml-2 px-2 py-0.5 rounded text-[10px] font-bold bg-purple-100 text-purple-700 uppercase">Admin</span>}
                       </td>
-                      <td className="px-6 py-4 text-gray-500">{user.email ?? "—"}</td>
-                      <td className="px-6 py-4 text-gray-700">
-                        {sub?.plan?.name ?? <span className="text-gray-400 italic">No plan</span>}
+                      <td className="px-6 py-4 text-muted-foreground">{user.email ?? "—"}</td>
+                      <td className="px-6 py-4 text-foreground">
+                        {sub?.plan?.name ?? <span className="text-muted-foreground italic">No plan</span>}
                       </td>
                       <td className="px-6 py-4">
                         {!sub ? (
-                          <span className="px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-500">None</span>
+                          <span className="px-2 py-1 rounded-full text-xs font-medium bg-muted text-muted-foreground">None</span>
                         ) : isExpired ? (
-                          <span className="px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-600">Expired</span>
+                          <span className="px-2 py-1 rounded-full text-xs font-medium bg-destructive/10 text-destructive">Expired</span>
                         ) : isActive ? (
-                          <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">Active</span>
+                          <span className="px-2 py-1 rounded-full text-xs font-medium bg-success/10 text-success">Active</span>
                         ) : (
-                          <span className="px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-700">{sub.status}</span>
+                          <span className="px-2 py-1 rounded-full text-xs font-medium bg-warning/10 text-warning">{sub.status}</span>
                         )}
                       </td>
-                      <td className="px-6 py-4 text-gray-500">
+                      <td className="px-6 py-4 text-muted-foreground">
                         {sub
                           ? new Date(sub.endDate).toLocaleDateString("en-NG", {
                               year: "numeric",
@@ -167,16 +167,16 @@ export default async function AdminDashboardPage({
         </div>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100">
-        <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
-          <h2 className="text-lg font-semibold text-gray-900">Membership Plans</h2>
+      <div className="bg-card text-card-foreground rounded-xl shadow-sm border border-border">
+        <div className="px-6 py-4 border-b border-border flex justify-between items-center">
+          <h2 className="text-lg font-semibold text-foreground">Membership Plans</h2>
           <Link href={`/gym/${slug}/dashboard/admin/plans`} className="text-sm text-indigo-600 hover:underline">
             Manage →
           </Link>
         </div>
-        <div className="divide-y divide-gray-50">
+        <div className="divide-y divide-border">
           {tenant.membershipPlans.length === 0 ? (
-            <p className="px-6 py-8 text-center text-gray-400">No plans created yet.</p>
+            <p className="px-6 py-8 text-center text-muted-foreground">No plans created yet.</p>
           ) : (
             tenant.membershipPlans.map((plan: MembershipPlan) => {
               const planSubs = tenant.users.filter(
@@ -187,12 +187,12 @@ export default async function AdminDashboardPage({
               return (
                 <div key={plan.id} className="px-6 py-4 flex justify-between items-center">
                   <div>
-                    <p className="font-medium text-gray-900">{plan.name}</p>
-                    <p className="text-sm text-gray-500">{plan.durationDays} days</p>
+                    <p className="font-medium text-foreground">{plan.name}</p>
+                    <p className="text-sm text-muted-foreground">{plan.durationDays} days</p>
                   </div>
                   <div className="text-right">
-                    <p className="font-semibold text-gray-900">₦{plan.price.toLocaleString()}</p>
-                    <p className="text-xs text-gray-400">
+                    <p className="font-semibold text-foreground">₦{plan.price.toLocaleString()}</p>
+                    <p className="text-xs text-muted-foreground">
                       {planSubs} active subscriber{planSubs !== 1 ? "s" : ""}
                     </p>
                   </div>
