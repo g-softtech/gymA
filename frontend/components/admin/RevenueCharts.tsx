@@ -28,9 +28,9 @@ export default function RevenueCharts({ monthlyData, planData }: Props) {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
       {/* 6-Month Revenue Trend — Area Chart */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-        <h2 className="text-base font-bold text-gray-900 mb-1">Revenue Trend</h2>
-        <p className="text-xs text-gray-400 mb-6">Last 6 months of subscription revenue</p>
+      <div className="bg-card text-card-foreground rounded-2xl shadow-sm border border-border p-6">
+        <h2 className="text-base font-bold text-foreground mb-1">Revenue Trend</h2>
+        <p className="text-xs text-muted-foreground mb-6">Last 6 months of subscription revenue</p>
         <div className="h-52">
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={monthlyData} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
@@ -60,11 +60,11 @@ export default function RevenueCharts({ monthlyData, planData }: Props) {
       </div>
 
       {/* Revenue by Plan — Bar Chart */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-        <h2 className="text-base font-bold text-gray-900 mb-1">Revenue by Plan</h2>
-        <p className="text-xs text-gray-400 mb-6">Total revenue generated per membership plan</p>
+      <div className="bg-card text-card-foreground rounded-2xl shadow-sm border border-border p-6">
+        <h2 className="text-base font-bold text-foreground mb-1">Revenue by Plan</h2>
+        <p className="text-xs text-muted-foreground mb-6">Total revenue generated per membership plan</p>
         {planData.length === 0 ? (
-          <div className="h-52 flex items-center justify-center text-gray-400 text-sm">No data yet.</div>
+          <div className="h-52 flex items-center justify-center text-muted-foreground text-sm">No data yet.</div>
         ) : (
           <div className="h-52">
             <ResponsiveContainer width="100%" height="100%">

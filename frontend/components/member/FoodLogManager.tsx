@@ -157,15 +157,15 @@ export default function FoodLogManager({ memberId, selectedDate, logs: initialLo
   return (
     <div className="space-y-4">
       {/* Date picker + totals */}
-      <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
+      <div className="bg-card text-card-foreground rounded-xl border border-border shadow-sm p-5">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
           <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">Date</label>
+            <label className="block text-xs font-medium text-muted-foreground mb-1">Date</label>
             <input
               type="date"
               value={dateStr}
               onChange={(e) => router.push(`?date=${e.target.value}`)}
-              className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
           </div>
           <button
@@ -186,8 +186,8 @@ export default function FoodLogManager({ memberId, selectedDate, logs: initialLo
           ].map((s) => (
             <div key={s.label} className={`${s.bg} rounded-lg p-3 text-center`}>
               <p className={`text-xl font-bold ${s.color}`}>{s.value}</p>
-              <p className="text-xs text-gray-500">{s.unit}</p>
-              <p className="text-xs font-medium text-gray-600 mt-0.5">{s.label}</p>
+              <p className="text-xs text-muted-foreground">{s.unit}</p>
+              <p className="text-xs font-medium text-muted-foreground mt-0.5">{s.label}</p>
             </div>
           ))}
         </div>
@@ -195,24 +195,24 @@ export default function FoodLogManager({ memberId, selectedDate, logs: initialLo
 
       {/* Add food form */}
       {showForm && (
-        <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5 space-y-4">
-          <h2 className="text-base font-semibold text-gray-900">Log Food</h2>
+        <div className="bg-card text-card-foreground rounded-xl border border-border shadow-sm p-5 space-y-4">
+          <h2 className="text-base font-semibold text-foreground">Log Food</h2>
           {error && <p className="text-sm text-red-600 bg-red-50 px-3 py-2 rounded">{error}</p>}
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">Meal Type</label>
+              <label className="block text-xs font-medium text-muted-foreground mb-1">Meal Type</label>
               <select
                 value={form.mealType}
                 onChange={(e) => setForm({ ...form, mealType: e.target.value })}
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
               >
                 {MEAL_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
               </select>
             </div>
 
             <div className="relative">
-              <label className="block text-xs font-medium text-gray-600 mb-1">Food Name</label>
+              <label className="block text-xs font-medium text-muted-foreground mb-1">Food Name</label>
               <input
                 type="text"
                 placeholder="Search Nigerian foods or type custom..."
@@ -222,18 +222,18 @@ export default function FoodLogManager({ memberId, selectedDate, logs: initialLo
                   setForm({ ...form, foodName: e.target.value });
                   if (!e.target.value) setSelectedFood(null);
                 }}
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
               />
               {searchResults.length > 0 && !selectedFood && (
-                <div className="absolute z-10 w-full bg-white border border-gray-200 rounded-lg shadow-lg mt-1 max-h-40 overflow-y-auto">
+                <div className="absolute z-10 w-full bg-card text-card-foreground border border-border rounded-lg shadow-lg mt-1 max-h-40 overflow-y-auto">
                   {searchResults.map((food) => (
                     <button
                       key={food.name}
                       onClick={() => selectFood(food)}
-                      className="w-full text-left px-3 py-2 hover:bg-indigo-50 text-sm border-b border-gray-50 last:border-0"
+                      className="w-full text-left px-3 py-2 hover:bg-indigo-50 text-sm border-b border-border last:border-0"
                     >
                       <span className="font-medium">{food.name}</span>
-                      <span className="text-gray-400 ml-2 text-xs">
+                      <span className="text-muted-foreground ml-2 text-xs">
                         {food.calories} kcal / {food.unit}
                       </span>
                     </button>
@@ -243,24 +243,24 @@ export default function FoodLogManager({ memberId, selectedDate, logs: initialLo
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">Quantity</label>
+              <label className="block text-xs font-medium text-muted-foreground mb-1">Quantity</label>
               <input
                 type="number"
                 step="0.5"
                 min="0.5"
                 value={form.quantity}
                 onChange={(e) => handleQuantityChange(e.target.value)}
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">Unit</label>
+              <label className="block text-xs font-medium text-muted-foreground mb-1">Unit</label>
               <input
                 type="text"
                 value={form.unit}
                 onChange={(e) => setForm({ ...form, unit: e.target.value })}
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
               />
             </div>
           </div>
@@ -273,13 +273,13 @@ export default function FoodLogManager({ memberId, selectedDate, logs: initialLo
               { key: "fats", label: "Fats (g)" },
             ].map((f) => (
               <div key={f.key}>
-                <label className="block text-xs font-medium text-gray-600 mb-1">{f.label}</label>
+                <label className="block text-xs font-medium text-muted-foreground mb-1">{f.label}</label>
                 <input
                   type="number"
                   step="0.1"
                   value={(form as any)[f.key]}
                   onChange={(e) => setForm({ ...form, [f.key]: e.target.value })}
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 />
               </div>
             ))}
@@ -297,7 +297,7 @@ export default function FoodLogManager({ memberId, selectedDate, logs: initialLo
 
       {/* Logs grouped by meal */}
       {Object.keys(grouped).length === 0 ? (
-        <div className="bg-white rounded-xl border border-gray-100 p-10 text-center text-gray-400">
+        <div className="bg-card text-card-foreground rounded-xl border border-border p-10 text-center text-muted-foreground">
           <p className="text-4xl mb-3">🍽️</p>
           <p className="font-medium">Nothing logged yet for this day</p>
           <p className="text-sm mt-1">Click &quot;+ Add Food&quot; to start tracking</p>
@@ -306,17 +306,17 @@ export default function FoodLogManager({ memberId, selectedDate, logs: initialLo
         Object.entries(grouped).map(([mealType, items]) => {
           const mealCal = items.reduce((s, l) => s + l.calories, 0);
           return (
-            <div key={mealType} className="bg-white rounded-xl shadow-sm border border-gray-100">
-              <div className="px-5 py-3 border-b border-gray-100 flex justify-between items-center">
-                <h3 className="font-semibold text-gray-900">{mealType}</h3>
-                <span className="text-sm text-gray-500">{mealCal} kcal</span>
+            <div key={mealType} className="bg-card text-card-foreground rounded-xl shadow-sm border border-border">
+              <div className="px-5 py-3 border-b border-border flex justify-between items-center">
+                <h3 className="font-semibold text-foreground">{mealType}</h3>
+                <span className="text-sm text-muted-foreground">{mealCal} kcal</span>
               </div>
-              <div className="divide-y divide-gray-50">
+              <div className="divide-y divide-border">
                 {items.map((log) => (
                   <div key={log.id} className="px-5 py-3 flex justify-between items-center">
                     <div>
-                      <p className="text-sm font-medium text-gray-900">{log.foodName}</p>
-                      <p className="text-xs text-gray-400 mt-0.5">
+                      <p className="text-sm font-medium text-foreground">{log.foodName}</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">
                         {log.quantity} {log.unit} · P: {log.protein}g · C: {log.carbs}g · F: {log.fats}g
                       </p>
                     </div>

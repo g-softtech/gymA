@@ -24,7 +24,7 @@ const typeColor: Record<string, string> = {
   PAYMENT: "bg-green-50 border-green-200",
   SUBSCRIPTION_EXPIRY: "bg-yellow-50 border-yellow-200",
   ATTENDANCE: "bg-blue-50 border-blue-200",
-  GENERAL: "bg-gray-50 border-gray-200",
+  GENERAL: "bg-muted border-border",
 };
 
 export default function NotificationsPanel({
@@ -70,7 +70,7 @@ export default function NotificationsPanel({
       )}
 
       {notifications.length === 0 ? (
-        <div className="bg-white rounded-xl border border-gray-100 p-12 text-center text-gray-400">
+        <div className="bg-card text-card-foreground rounded-xl border border-border p-12 text-center text-muted-foreground">
           <p className="text-4xl mb-3">🔔</p>
           <p className="font-medium">No notifications yet</p>
           <p className="text-sm mt-1">Activity like check-ins and payments will appear here</p>
@@ -80,19 +80,19 @@ export default function NotificationsPanel({
           <div
             key={n.id}
             className={`rounded-xl border p-4 flex gap-4 items-start transition-opacity ${
-              typeColor[n.type] ?? "bg-gray-50 border-gray-200"
+              typeColor[n.type] ?? "bg-muted border-border"
             } ${n.read ? "opacity-60" : ""}`}
           >
             <span className="text-2xl mt-0.5">{typeIcon[n.type] ?? "🔔"}</span>
             <div className="flex-1 min-w-0">
               <div className="flex items-center justify-between gap-2">
-                <p className={`font-semibold text-gray-900 text-sm ${!n.read ? "font-bold" : ""}`}>
+                <p className={`font-semibold text-foreground text-sm ${!n.read ? "font-bold" : ""}`}>
                   {n.title}
                   {!n.read && (
                     <span className="ml-2 inline-block w-2 h-2 bg-indigo-500 rounded-full" />
                   )}
                 </p>
-                <span className="text-xs text-gray-400 shrink-0">
+                <span className="text-xs text-muted-foreground shrink-0">
                   {new Date(n.createdAt).toLocaleDateString("en-NG", {
                     month: "short",
                     day: "numeric",
@@ -101,7 +101,7 @@ export default function NotificationsPanel({
                   })}
                 </span>
               </div>
-              <p className="text-sm text-gray-600 mt-0.5">{n.message}</p>
+              <p className="text-sm text-muted-foreground mt-0.5">{n.message}</p>
             </div>
           </div>
         ))

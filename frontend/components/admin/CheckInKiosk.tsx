@@ -141,12 +141,12 @@ export function CheckInKiosk() {
     <div className="grid md:grid-cols-2 gap-8 items-start">
       {/* LEFT COL: Scanner & Search */}
       <div className="space-y-6">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-          <div className="p-4 border-b border-gray-100 bg-gray-50 font-semibold text-gray-800">
+        <div className="bg-card text-card-foreground rounded-xl shadow-sm border border-border overflow-hidden">
+          <div className="p-4 border-b border-border bg-muted font-semibold text-foreground">
             QR Scanner
           </div>
           <div className="p-4">
-            <div className="w-full overflow-hidden rounded-lg border-2 border-dashed border-gray-200 aspect-square relative bg-gray-50 flex items-center justify-center">
+            <div className="w-full overflow-hidden rounded-lg border-2 border-dashed border-border aspect-square relative bg-muted flex items-center justify-center">
               {typeof window !== 'undefined' && (
                 <Scanner 
                   onScan={(result) => {
@@ -164,8 +164,8 @@ export function CheckInKiosk() {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100">
-          <div className="p-4 border-b border-gray-100 bg-gray-50 font-semibold text-gray-800">
+        <div className="bg-card text-card-foreground rounded-xl shadow-sm border border-border">
+          <div className="p-4 border-b border-border bg-muted font-semibold text-foreground">
             Manual Search
           </div>
           <div className="p-4">
@@ -173,7 +173,7 @@ export function CheckInKiosk() {
               <input 
                 type="text" 
                 placeholder="Name or Email..." 
-                className="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500"
+                className="flex-1 rounded-lg border border-border px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500"
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
               />
@@ -187,16 +187,16 @@ export function CheckInKiosk() {
             </form>
 
             {searchResults.length > 0 && (
-              <div className="mt-4 border border-gray-100 rounded-lg divide-y divide-gray-100 max-h-60 overflow-y-auto">
+              <div className="mt-4 border border-border rounded-lg divide-y divide-border max-h-60 overflow-y-auto">
                 {searchResults.map(member => (
-                  <div key={member.id} className="flex justify-between items-center p-3 hover:bg-gray-50">
+                  <div key={member.id} className="flex justify-between items-center p-3 hover:bg-muted">
                     <div>
-                      <p className="font-medium text-gray-900 text-sm">{member.user.name}</p>
-                      <p className="text-xs text-gray-500">{member.user.email}</p>
+                      <p className="font-medium text-foreground text-sm">{member.user.name}</p>
+                      <p className="text-xs text-muted-foreground">{member.user.email}</p>
                     </div>
                     <button 
                       onClick={() => handleManualCheckIn(member.id)}
-                      className="text-xs bg-gray-100 hover:bg-gray-200 text-gray-800 px-3 py-1.5 rounded-md font-medium"
+                      className="text-xs bg-muted hover:bg-muted text-foreground px-3 py-1.5 rounded-md font-medium"
                     >
                       Check In
                     </button>
@@ -209,15 +209,15 @@ export function CheckInKiosk() {
       </div>
 
       {/* RIGHT COL: Status Screen */}
-      <div className="bg-white rounded-xl shadow-md border border-gray-200 min-h-[400px] flex flex-col relative overflow-hidden">
-        <div className="p-4 border-b border-gray-100 bg-gray-900 text-white font-semibold flex justify-between items-center">
+      <div className="bg-card text-card-foreground rounded-xl shadow-md border border-border min-h-[400px] flex flex-col relative overflow-hidden">
+        <div className="p-4 border-b border-border bg-gray-900 text-white font-semibold flex justify-between items-center">
           <span>Check-In Status</span>
           {loading && <span className="animate-pulse text-xs bg-indigo-500 px-2 py-1 rounded">Processing...</span>}
         </div>
         
         <div className="p-8 flex-1 flex flex-col items-center justify-center text-center">
           {!scanResult ? (
-            <div className="text-gray-400">
+            <div className="text-muted-foreground">
               <div className="text-6xl mb-4">📱</div>
               <p>Waiting for scan...</p>
             </div>
@@ -226,8 +226,8 @@ export function CheckInKiosk() {
               <div className="w-24 h-24 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-5xl mx-auto mb-4 border-4 border-green-200">
                 ✓
               </div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-1">Access Granted</h2>
-              <p className="text-lg text-gray-600 mb-6">{scanResult.member?.user.name}</p>
+              <h2 className="text-2xl font-bold text-foreground mb-1">Access Granted</h2>
+              <p className="text-lg text-muted-foreground mb-6">{scanResult.member?.user.name}</p>
               
               {scanResult.upcomingBookings && scanResult.upcomingBookings.length > 0 && (
                 <div className="bg-indigo-50 text-indigo-800 p-4 rounded-lg text-sm text-left w-full max-w-sm">
@@ -243,11 +243,11 @@ export function CheckInKiosk() {
             </div>
           ) : scanResult.blocked ? (
             <div className="animate-in zoom-in duration-300 w-full max-w-sm">
-              <div className="w-24 h-24 bg-red-100 text-red-600 rounded-full flex items-center justify-center text-5xl mx-auto mb-4 border-4 border-red-200">
+              <div className="w-24 h-24 bg-destructive/10 text-destructive rounded-full flex items-center justify-center text-5xl mx-auto mb-4 border-4 border-red-200">
                 ✗
               </div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-1">Access Denied</h2>
-              <p className="text-lg text-gray-600 mb-2">{scanResult.member?.user.name}</p>
+              <h2 className="text-2xl font-bold text-foreground mb-1">Access Denied</h2>
+              <p className="text-lg text-muted-foreground mb-2">{scanResult.member?.user.name}</p>
               <p className="text-red-600 font-medium mb-6 bg-red-50 p-3 rounded-lg border border-red-100">
                 Reason: {scanResult.reason}
               </p>
@@ -261,10 +261,10 @@ export function CheckInKiosk() {
             </div>
           ) : scanResult.error?.includes("RETRY CONNECTION") ? (
             <div className="animate-in zoom-in duration-300">
-              <div className="w-24 h-24 bg-gray-100 text-gray-500 rounded-full flex items-center justify-center text-4xl mx-auto mb-4 border-4 border-gray-200">
+              <div className="w-24 h-24 bg-muted text-muted-foreground rounded-full flex items-center justify-center text-4xl mx-auto mb-4 border-4 border-border">
                 📡
               </div>
-              <h2 className="text-xl font-bold text-gray-900 mb-2">Offline Mode</h2>
+              <h2 className="text-xl font-bold text-foreground mb-2">Offline Mode</h2>
               <button 
                 onClick={() => setScanResult(null)}
                 className="bg-gray-900 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-800 transition shadow-sm"
@@ -277,8 +277,8 @@ export function CheckInKiosk() {
               <div className="w-24 h-24 bg-yellow-100 text-yellow-600 rounded-full flex items-center justify-center text-5xl mx-auto mb-4 border-4 border-yellow-200">
                 !
               </div>
-              <h2 className="text-xl font-bold text-gray-900 mb-2">Error</h2>
-              <p className="text-gray-600 bg-gray-50 p-4 rounded-lg border border-gray-100 max-w-sm mx-auto">
+              <h2 className="text-xl font-bold text-foreground mb-2">Error</h2>
+              <p className="text-muted-foreground bg-muted p-4 rounded-lg border border-border max-w-sm mx-auto">
                 {scanResult.error}
               </p>
             </div>
@@ -289,30 +289,30 @@ export function CheckInKiosk() {
       {/* Override Modal */}
       {showOverrideModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-          <div className="bg-white rounded-xl shadow-2xl max-w-sm w-full overflow-hidden">
+          <div className="bg-card text-card-foreground rounded-xl shadow-2xl max-w-sm w-full overflow-hidden">
             <div className="bg-red-600 p-4">
               <h3 className="text-white font-bold text-lg">Admin Override</h3>
               <p className="text-red-100 text-sm">Bypass membership lock</p>
             </div>
             <div className="p-6 space-y-3">
-              <p className="text-sm text-gray-600 mb-4">
+              <p className="text-sm text-muted-foreground mb-4">
                 Select the reason for overriding the gate. This action will be securely logged to your staff account.
               </p>
               
-              <button onClick={() => submitOverride("EMERGENCY_ACCESS")} className="w-full text-left px-4 py-3 bg-gray-50 hover:bg-red-50 border border-gray-200 hover:border-red-200 rounded-lg font-medium text-gray-800 transition">
+              <button onClick={() => submitOverride("EMERGENCY_ACCESS")} className="w-full text-left px-4 py-3 bg-muted hover:bg-red-50 border border-border hover:border-red-200 rounded-lg font-medium text-foreground transition">
                 🚨 Emergency Access
               </button>
-              <button onClick={() => submitOverride("PROMOTIONAL_ACCESS")} className="w-full text-left px-4 py-3 bg-gray-50 hover:bg-red-50 border border-gray-200 hover:border-red-200 rounded-lg font-medium text-gray-800 transition">
+              <button onClick={() => submitOverride("PROMOTIONAL_ACCESS")} className="w-full text-left px-4 py-3 bg-muted hover:bg-red-50 border border-border hover:border-red-200 rounded-lg font-medium text-foreground transition">
                 🎟️ Promotional / Guest
               </button>
-              <button onClick={() => submitOverride("STAFF_TESTING")} className="w-full text-left px-4 py-3 bg-gray-50 hover:bg-red-50 border border-gray-200 hover:border-red-200 rounded-lg font-medium text-gray-800 transition">
+              <button onClick={() => submitOverride("STAFF_TESTING")} className="w-full text-left px-4 py-3 bg-muted hover:bg-red-50 border border-border hover:border-red-200 rounded-lg font-medium text-foreground transition">
                 🔧 Staff Testing
               </button>
             </div>
-            <div className="p-4 bg-gray-50 border-t border-gray-100 flex justify-end">
+            <div className="p-4 bg-muted border-t border-border flex justify-end">
               <button 
                 onClick={() => setShowOverrideModal(false)}
-                className="px-4 py-2 text-gray-600 font-medium hover:bg-gray-200 rounded-lg transition"
+                className="px-4 py-2 text-muted-foreground font-medium hover:bg-muted rounded-lg transition"
               >
                 Cancel
               </button>

@@ -105,9 +105,9 @@ export default function BookingForm({ tenantId, memberId, trainers }: Props) {
         </div>
       )}
 
-      <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
+      <div className="bg-card text-card-foreground rounded-xl border border-border shadow-sm p-6">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-base font-semibold text-gray-900">Available Trainers</h2>
+          <h2 className="text-base font-semibold text-foreground">Available Trainers</h2>
           {selectedTrainer && (
             <button
               onClick={() => setShowForm(!showForm)}
@@ -119,7 +119,7 @@ export default function BookingForm({ tenantId, memberId, trainers }: Props) {
         </div>
 
         {trainers.length === 0 ? (
-          <p className="text-gray-400 text-center py-6">No trainers available yet.</p>
+          <p className="text-muted-foreground text-center py-6">No trainers available yet.</p>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {trainers.map((t) => {
@@ -139,21 +139,21 @@ export default function BookingForm({ tenantId, memberId, trainers }: Props) {
                   className={`text-left rounded-xl border p-4 transition-all ${
                     selectedTrainer?.id === t.id
                       ? "border-indigo-500 bg-indigo-50"
-                      : "border-gray-200 hover:border-indigo-300 bg-white"
+                      : "border-border hover:border-indigo-300 bg-card text-card-foreground"
                   }`}
                 >
                   <div className="flex items-center gap-3 mb-2">
-                    <div className="w-10 h-10 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold uppercase">
+                    <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold uppercase">
                       {t.name[0]}
                     </div>
                     <div>
-                      <p className="font-semibold text-gray-900">{t.name}</p>
+                      <p className="font-semibold text-foreground">{t.name}</p>
                       {t.hourlyRate && (
-                        <p className="text-xs text-gray-500">₦{t.hourlyRate.toLocaleString()}/hr</p>
+                        <p className="text-xs text-muted-foreground">₦{t.hourlyRate.toLocaleString()}/hr</p>
                       )}
                     </div>
                   </div>
-                  {t.bio && <p className="text-xs text-gray-500 italic mb-2">{t.bio}</p>}
+                  {t.bio && <p className="text-xs text-muted-foreground italic mb-2">{t.bio}</p>}
                   <div className="flex flex-wrap gap-1 mb-2">
                     {t.specialties.map((s) => (
                       <span key={s} className="bg-indigo-50 text-indigo-600 text-xs px-2 py-0.5 rounded-full">{s}</span>
@@ -172,8 +172,8 @@ export default function BookingForm({ tenantId, memberId, trainers }: Props) {
       </div>
 
       {showForm && selectedTrainer && (
-        <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 space-y-4">
-          <h2 className="text-base font-semibold text-gray-900">
+        <div className="bg-card text-card-foreground rounded-xl border border-border shadow-sm p-6 space-y-4">
+          <h2 className="text-base font-semibold text-foreground">
             Book Session with {selectedTrainer.name}
           </h2>
 
@@ -187,27 +187,27 @@ export default function BookingForm({ tenantId, memberId, trainers }: Props) {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">Date</label>
+              <label className="block text-xs font-medium text-muted-foreground mb-1">Date</label>
               <input
                 type="date"
                 value={date}
                 min={new Date().toISOString().split("T")[0]}
                 onChange={(e) => { setDate(e.target.value); setTime(""); setCustomTime(""); }}
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
               />
               {date && selectedDay && (
-                <p className="text-xs text-gray-400 mt-1">{selectedDay}</p>
+                <p className="text-xs text-muted-foreground mt-1">{selectedDay}</p>
               )}
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">Time</label>
+              <label className="block text-xs font-medium text-muted-foreground mb-1">Time</label>
               {availableSlots.length > 0 ? (
                 <>
                   <select
                     value={time}
                     onChange={(e) => setTime(e.target.value)}
-                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   >
                     <option value="">-- Select available slot --</option>
                     {availableSlots.map((slot) => (
@@ -224,7 +224,7 @@ export default function BookingForm({ tenantId, memberId, trainers }: Props) {
                     type="time"
                     value={customTime}
                     onChange={(e) => setCustomTime(e.target.value)}
-                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   />
                   {date && selectedDay && (
                     <p className="text-xs text-yellow-600 mt-1">
@@ -236,11 +236,11 @@ export default function BookingForm({ tenantId, memberId, trainers }: Props) {
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">Duration</label>
+              <label className="block text-xs font-medium text-muted-foreground mb-1">Duration</label>
               <select
                 value={duration}
                 onChange={(e) => setDuration(parseInt(e.target.value))}
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
               >
                 {DURATIONS.map((d) => (
                   <option key={d} value={d}>{d} minutes</option>
@@ -249,11 +249,11 @@ export default function BookingForm({ tenantId, memberId, trainers }: Props) {
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">Session Type</label>
+              <label className="block text-xs font-medium text-muted-foreground mb-1">Session Type</label>
               <select
                 value={sessionType}
                 onChange={(e) => setSessionType(e.target.value)}
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
               >
                 {SESSION_TYPES.map((t) => (
                   <option key={t} value={t}>{t}</option>
@@ -263,23 +263,23 @@ export default function BookingForm({ tenantId, memberId, trainers }: Props) {
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">Notes (optional)</label>
+            <label className="block text-xs font-medium text-muted-foreground mb-1">Notes (optional)</label>
             <textarea
               rows={2}
               placeholder="e.g. I want to focus on upper body strength..."
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
           </div>
 
           {selectedTrainer.hourlyRate && (
-            <div className="bg-gray-50 rounded-lg p-3 text-sm">
-              <span className="text-gray-500">Estimated cost: </span>
-              <span className="font-semibold text-gray-900">
+            <div className="bg-muted rounded-lg p-3 text-sm">
+              <span className="text-muted-foreground">Estimated cost: </span>
+              <span className="font-semibold text-foreground">
                 ₦{((selectedTrainer.hourlyRate / 60) * duration).toLocaleString()}
               </span>
-              <span className="text-gray-400"> ({duration} min)</span>
+              <span className="text-muted-foreground"> ({duration} min)</span>
             </div>
           )}
 

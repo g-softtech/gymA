@@ -32,24 +32,24 @@ export default function MemberBookingsClient({ bookings: initialBookings }: { bo
   return (
     <div className="space-y-8">
       <div>
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Upcoming</h2>
+        <h2 className="text-lg font-semibold text-foreground mb-4">Upcoming</h2>
         {upcoming.length === 0 ? (
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8 text-center text-gray-500">
+          <div className="bg-card text-card-foreground rounded-xl shadow-sm border border-border p-8 text-center text-muted-foreground">
             You have no upcoming sessions.
           </div>
         ) : (
           <div className="space-y-3">
             {upcoming.map(b => (
-              <div key={b.id} className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 flex items-center justify-between">
+              <div key={b.id} className="bg-card text-card-foreground rounded-xl shadow-sm border border-border p-5 flex items-center justify-between">
                 <div>
-                  <h3 className="font-bold text-gray-900">
+                  <h3 className="font-bold text-foreground">
                     {b.classSessionId ? b.classSession.title : "1-on-1 Session"}
                   </h3>
-                  <p className="text-sm text-gray-500 mt-1">
+                  <p className="text-sm text-muted-foreground mt-1">
                     {new Date(b.date).toLocaleString('en-US', { weekday: 'long', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}
                   </p>
-                  <p className="text-sm text-gray-500 mt-0.5 flex items-center gap-2">
-                    <span className="w-5 h-5 rounded-full bg-gray-200 overflow-hidden flex items-center justify-center">
+                  <p className="text-sm text-muted-foreground mt-0.5 flex items-center gap-2">
+                    <span className="w-5 h-5 rounded-full bg-muted overflow-hidden flex items-center justify-center">
                       {b.classSessionId ? (
                         b.classSession.instructor?.user?.image ? <img src={b.classSession.instructor.user.image} alt="" className="w-full h-full object-cover" /> : "👤"
                       ) : (
@@ -61,7 +61,7 @@ export default function MemberBookingsClient({ bookings: initialBookings }: { bo
                 </div>
                 <div className="text-right">
                   <span className={`inline-block mb-3 px-2.5 py-1 rounded-full text-xs font-bold ${
-                    b.status === "CONFIRMED" ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700"
+                    b.status === "CONFIRMED" ? "bg-success/10 text-success" : "bg-warning/10 text-warning"
                   }`}>
                     {b.status}
                   </span>
@@ -79,25 +79,25 @@ export default function MemberBookingsClient({ bookings: initialBookings }: { bo
       </div>
 
       <div>
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Past & Cancelled</h2>
+        <h2 className="text-lg font-semibold text-foreground mb-4">Past & Cancelled</h2>
         {past.length === 0 ? (
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8 text-center text-gray-500">
+          <div className="bg-card text-card-foreground rounded-xl shadow-sm border border-border p-8 text-center text-muted-foreground">
             No history yet.
           </div>
         ) : (
           <div className="space-y-3">
             {past.map(b => (
-              <div key={b.id} className="bg-gray-50 rounded-xl border border-gray-100 p-5 flex items-center justify-between opacity-75">
+              <div key={b.id} className="bg-muted rounded-xl border border-border p-5 flex items-center justify-between opacity-75">
                 <div>
-                  <h3 className="font-medium text-gray-700">
+                  <h3 className="font-medium text-foreground">
                     {b.classSessionId ? b.classSession.title : "1-on-1 Session"}
                   </h3>
-                  <p className="text-sm text-gray-500 mt-1">
+                  <p className="text-sm text-muted-foreground mt-1">
                     {new Date(b.date).toLocaleDateString()}
                   </p>
                 </div>
                 <span className={`px-2 py-1 rounded-md text-xs font-medium ${
-                  b.status === "CANCELLED" ? "bg-red-100 text-red-700" : "bg-gray-200 text-gray-700"
+                  b.status === "CANCELLED" ? "bg-destructive/10 text-destructive" : "bg-muted text-foreground"
                 }`}>
                   {b.status}
                 </span>

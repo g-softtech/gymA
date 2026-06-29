@@ -73,19 +73,19 @@ export default function BlogEditor({ initial, mode }: BlogEditorProps) {
   }
 
   const inputCls =
-    "w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500";
+    "w-full border border-border rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500";
 
   // Very simple markdown-like preview (converts line breaks + basic headings)
   const renderPreview = (text: string) =>
     text
       .split("\n")
       .map((line, i) => {
-        if (line.startsWith("# ")) return <h1 key={i} className="text-3xl font-black text-gray-900 mb-4 mt-6">{line.slice(2)}</h1>;
-        if (line.startsWith("## ")) return <h2 key={i} className="text-2xl font-bold text-gray-900 mb-3 mt-5">{line.slice(3)}</h2>;
-        if (line.startsWith("### ")) return <h3 key={i} className="text-xl font-bold text-gray-800 mb-2 mt-4">{line.slice(4)}</h3>;
-        if (line.startsWith("**") && line.endsWith("**")) return <p key={i} className="font-bold text-gray-900 mb-2">{line.slice(2, -2)}</p>;
+        if (line.startsWith("# ")) return <h1 key={i} className="text-3xl font-black text-foreground mb-4 mt-6">{line.slice(2)}</h1>;
+        if (line.startsWith("## ")) return <h2 key={i} className="text-2xl font-bold text-foreground mb-3 mt-5">{line.slice(3)}</h2>;
+        if (line.startsWith("### ")) return <h3 key={i} className="text-xl font-bold text-foreground mb-2 mt-4">{line.slice(4)}</h3>;
+        if (line.startsWith("**") && line.endsWith("**")) return <p key={i} className="font-bold text-foreground mb-2">{line.slice(2, -2)}</p>;
         if (line === "") return <div key={i} className="mb-2" />;
-        return <p key={i} className="text-gray-700 leading-relaxed mb-2">{line}</p>;
+        return <p key={i} className="text-foreground leading-relaxed mb-2">{line}</p>;
       });
 
   return (
@@ -93,10 +93,10 @@ export default function BlogEditor({ initial, mode }: BlogEditorProps) {
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">
+          <h1 className="text-2xl font-bold text-foreground">
             {mode === "new" ? "New Blog Post" : "Edit Post"}
           </h1>
-          <p className="text-gray-500 text-sm mt-1">
+          <p className="text-muted-foreground text-sm mt-1">
             {mode === "new"
               ? "Write and publish content that improves your SEO and engages members."
               : "Update post content, cover image, or publish status."}
@@ -108,7 +108,7 @@ export default function BlogEditor({ initial, mode }: BlogEditorProps) {
             type="button"
             onClick={() => handleSave(false)}
             disabled={saving || !form.title || !form.content}
-            className="px-4 py-2 text-sm font-medium text-gray-600 border border-gray-200 rounded-xl hover:bg-gray-50 disabled:opacity-50 transition-colors"
+            className="px-4 py-2 text-sm font-medium text-muted-foreground border border-border rounded-xl hover:bg-muted disabled:opacity-50 transition-colors"
           >
             {saving ? "Saving…" : "Save Draft"}
           </button>
@@ -134,20 +134,20 @@ export default function BlogEditor({ initial, mode }: BlogEditorProps) {
         {/* Editor */}
         <div className="lg:col-span-2 space-y-4">
           {/* Title */}
-          <div className="bg-white border border-gray-100 rounded-xl p-5 shadow-sm">
+          <div className="bg-card text-card-foreground border border-border rounded-xl p-5 shadow-sm">
             <input
               id="post-title"
               type="text"
               placeholder="Post title…"
               value={form.title}
               onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
-              className="w-full text-2xl font-bold text-gray-900 placeholder-gray-300 border-0 focus:outline-none focus:ring-0"
+              className="w-full text-2xl font-bold text-foreground placeholder-gray-300 border-0 focus:outline-none focus:ring-0"
             />
           </div>
 
           {/* Write / Preview tabs */}
-          <div className="bg-white border border-gray-100 rounded-xl shadow-sm overflow-hidden">
-            <div className="flex border-b border-gray-100">
+          <div className="bg-card text-card-foreground border border-border rounded-xl shadow-sm overflow-hidden">
+            <div className="flex border-b border-border">
               {(["write", "preview"] as const).map((tab) => (
                 <button
                   key={tab}
@@ -171,21 +171,21 @@ export default function BlogEditor({ initial, mode }: BlogEditorProps) {
                 value={form.content}
                 onChange={(e) => setForm((f) => ({ ...f, content: e.target.value }))}
                 placeholder={`Write your post here...\n\nMarkdown headings are supported:\n# Heading 1\n## Heading 2\n### Heading 3`}
-                className="w-full h-96 px-5 py-4 text-sm text-gray-700 leading-relaxed resize-none focus:outline-none font-mono"
+                className="w-full h-96 px-5 py-4 text-sm text-foreground leading-relaxed resize-none focus:outline-none font-mono"
               />
             ) : (
               <div className="px-5 py-4 min-h-96 prose max-w-none">
                 {form.content
                   ? renderPreview(form.content)
-                  : <p className="text-gray-400 italic text-sm">Nothing to preview yet.</p>}
+                  : <p className="text-muted-foreground italic text-sm">Nothing to preview yet.</p>}
               </div>
             )}
           </div>
 
           {/* Excerpt */}
-          <div className="bg-white border border-gray-100 rounded-xl p-5 shadow-sm">
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">
-              Excerpt <span className="text-gray-400 font-normal">(shown in blog listing & SEO description)</span>
+          <div className="bg-card text-card-foreground border border-border rounded-xl p-5 shadow-sm">
+            <label className="block text-sm font-medium text-foreground mb-1.5">
+              Excerpt <span className="text-muted-foreground font-normal">(shown in blog listing & SEO description)</span>
             </label>
             <textarea
               id="post-excerpt"
@@ -201,20 +201,20 @@ export default function BlogEditor({ initial, mode }: BlogEditorProps) {
         {/* Sidebar */}
         <div className="space-y-4">
           {/* Status */}
-          <div className="bg-white border border-gray-100 rounded-xl p-5 shadow-sm">
-            <h2 className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">Status</h2>
+          <div className="bg-card text-card-foreground border border-border rounded-xl p-5 shadow-sm">
+            <h2 className="text-sm font-semibold text-foreground mb-3 uppercase tracking-wide">Status</h2>
             <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">{form.published ? "Published" : "Draft"}</span>
+              <span className="text-sm text-muted-foreground">{form.published ? "Published" : "Draft"}</span>
               <button
                 id="toggle-published-btn"
                 type="button"
                 onClick={() => setForm((f) => ({ ...f, published: !f.published }))}
                 className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                  form.published ? "bg-emerald-500" : "bg-gray-200"
+                  form.published ? "bg-emerald-500" : "bg-muted"
                 }`}
               >
                 <span
-                  className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${
+                  className={`inline-block h-4 w-4 transform rounded-full bg-card text-card-foreground shadow transition-transform ${
                     form.published ? "translate-x-6" : "translate-x-1"
                   }`}
                 />
@@ -223,8 +223,8 @@ export default function BlogEditor({ initial, mode }: BlogEditorProps) {
           </div>
 
           {/* Cover image */}
-          <div className="bg-white border border-gray-100 rounded-xl p-5 shadow-sm">
-            <h2 className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">Cover Image</h2>
+          <div className="bg-card text-card-foreground border border-border rounded-xl p-5 shadow-sm">
+            <h2 className="text-sm font-semibold text-foreground mb-3 uppercase tracking-wide">Cover Image</h2>
             <input
               id="post-cover-image"
               type="url"
@@ -234,7 +234,7 @@ export default function BlogEditor({ initial, mode }: BlogEditorProps) {
               className={inputCls}
             />
             {form.coverImage && (
-              <div className="mt-3 rounded-lg overflow-hidden border border-gray-100">
+              <div className="mt-3 rounded-lg overflow-hidden border border-border">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={form.coverImage}
@@ -247,9 +247,9 @@ export default function BlogEditor({ initial, mode }: BlogEditorProps) {
           </div>
 
           {/* Tags */}
-          <div className="bg-white border border-gray-100 rounded-xl p-5 shadow-sm">
-            <h2 className="text-sm font-semibold text-gray-700 mb-1 uppercase tracking-wide">Tags</h2>
-            <p className="text-xs text-gray-400 mb-2">Comma-separated</p>
+          <div className="bg-card text-card-foreground border border-border rounded-xl p-5 shadow-sm">
+            <h2 className="text-sm font-semibold text-foreground mb-1 uppercase tracking-wide">Tags</h2>
+            <p className="text-xs text-muted-foreground mb-2">Comma-separated</p>
             <input
               id="post-tags"
               type="text"

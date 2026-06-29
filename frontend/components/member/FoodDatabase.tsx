@@ -101,26 +101,26 @@ export default function FoodDatabase() {
   return (
     <div className="space-y-4">
       {/* Search & filter */}
-      <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4">
+      <div className="bg-card text-card-foreground rounded-xl border border-border shadow-sm p-4">
         <div className="flex gap-3">
           <input
             type="text"
             placeholder="Search Nigerian foods..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="flex-1 border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
           />
           <select
             value={category}
             onChange={(e) => setCategory(e.target.value)}
-            className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
           >
             {CATEGORIES.map((c) => (
               <option key={c} value={c}>{c}</option>
             ))}
           </select>
         </div>
-        <p className="text-xs text-gray-400 mt-2">{filtered.length} foods found</p>
+        <p className="text-xs text-muted-foreground mt-2">{filtered.length} foods found</p>
       </div>
 
       {/* Selected food detail */}
@@ -128,20 +128,20 @@ export default function FoodDatabase() {
         <div className="bg-indigo-50 border border-indigo-200 rounded-xl p-5">
           <div className="flex justify-between items-start">
             <div>
-              <h3 className="font-bold text-gray-900 text-lg">{selected.name}</h3>
+              <h3 className="font-bold text-foreground text-lg">{selected.name}</h3>
               {selected.localName && (
-                <p className="text-sm text-gray-500">Also known as: {selected.localName}</p>
+                <p className="text-sm text-muted-foreground">Also known as: {selected.localName}</p>
               )}
               <p className="text-xs text-indigo-600 mt-1">Per {selected.unit}</p>
             </div>
-            <button onClick={() => setSelected(null)} className="text-gray-400 hover:text-gray-600 text-xl">×</button>
+            <button onClick={() => setSelected(null)} className="text-muted-foreground hover:text-muted-foreground text-xl">×</button>
           </div>
           <div className="grid grid-cols-4 gap-3 mt-4">
             {[
               { label: "Calories", value: `${selected.calories} kcal`, color: "bg-orange-100 text-orange-700" },
-              { label: "Protein", value: `${selected.protein}g`, color: "bg-blue-100 text-blue-700" },
-              { label: "Carbs", value: `${selected.carbs}g`, color: "bg-yellow-100 text-yellow-700" },
-              { label: "Fats", value: `${selected.fats}g`, color: "bg-red-100 text-red-700" },
+              { label: "Protein", value: `${selected.protein}g`, color: "bg-primary/10 text-primary" },
+              { label: "Carbs", value: `${selected.carbs}g`, color: "bg-warning/10 text-warning" },
+              { label: "Fats", value: `${selected.fats}g`, color: "bg-destructive/10 text-destructive" },
             ].map((s) => (
               <div key={s.label} className={`${s.color} rounded-lg p-3 text-center`}>
                 <p className="font-bold text-sm">{s.value}</p>
@@ -158,17 +158,17 @@ export default function FoodDatabase() {
           <button
             key={food.name}
             onClick={() => setSelected(food)}
-            className={`text-left bg-white rounded-xl border p-4 hover:border-indigo-300 hover:shadow-sm transition-all ${
-              selected?.name === food.name ? "border-indigo-500 bg-indigo-50" : "border-gray-100"
+            className={`text-left bg-card text-card-foreground rounded-xl border p-4 hover:border-indigo-300 hover:shadow-sm transition-all ${
+              selected?.name === food.name ? "border-indigo-500 bg-indigo-50" : "border-border"
             }`}
           >
             <div className="flex justify-between items-start mb-2">
-              <p className="font-medium text-gray-900 text-sm">{food.name}</p>
-              <span className="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full">
+              <p className="font-medium text-foreground text-sm">{food.name}</p>
+              <span className="text-xs bg-muted text-muted-foreground px-2 py-0.5 rounded-full">
                 {food.category}
               </span>
             </div>
-            <p className="text-xs text-gray-400">Per {food.unit}</p>
+            <p className="text-xs text-muted-foreground">Per {food.unit}</p>
             <div className="flex gap-3 mt-2 text-xs">
               <span className="text-orange-600 font-medium">{food.calories} kcal</span>
               <span className="text-blue-600">P: {food.protein}g</span>

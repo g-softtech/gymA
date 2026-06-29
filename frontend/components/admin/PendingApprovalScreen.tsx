@@ -11,7 +11,7 @@ export default function PendingApprovalScreen({
 }) {
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#080811] text-white p-6">
-      <div className="max-w-md w-full bg-white/[0.03] border border-white/5 p-8 rounded-2xl text-center shadow-2xl">
+      <div className="max-w-md w-full bg-card text-card-foreground/[0.03] border border-white/5 p-8 rounded-2xl text-center shadow-2xl">
         <div className="w-16 h-16 mx-auto bg-amber-500/10 rounded-full flex items-center justify-center mb-6 text-2xl">
           ⏳
         </div>

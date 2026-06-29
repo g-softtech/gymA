@@ -98,14 +98,14 @@ export default function ProgressTracker({
   return (
     <div className="space-y-6">
       {/* Client selector */}
-      <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
+      <div className="bg-card text-card-foreground rounded-xl border border-border shadow-sm p-5">
         <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
           <div className="flex-1">
-            <label className="block text-xs font-medium text-gray-600 mb-1">Select Client</label>
+            <label className="block text-xs font-medium text-muted-foreground mb-1">Select Client</label>
             <select
               value={selectedMemberId ?? ""}
               onChange={(e) => handleMemberChange(e.target.value)}
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
             >
               <option value="">-- Choose client --</option>
               {clients.map((c) => (
@@ -126,8 +126,8 @@ export default function ProgressTracker({
 
       {/* Record form */}
       {showForm && selectedMemberId && (
-        <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 space-y-4">
-          <h2 className="text-base font-semibold text-gray-900">New Progress Entry for {memberName}</h2>
+        <div className="bg-card text-card-foreground rounded-xl border border-border shadow-sm p-6 space-y-4">
+          <h2 className="text-base font-semibold text-foreground">New Progress Entry for {memberName}</h2>
           {error && <p className="text-sm text-red-600 bg-red-50 px-3 py-2 rounded">{error}</p>}
           {success && <p className="text-sm text-green-700 bg-green-50 px-3 py-2 rounded">✅ {success}</p>}
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
@@ -140,26 +140,26 @@ export default function ProgressTracker({
               { key: "hipsCm", label: "Hips (cm)" },
             ].map((field) => (
               <div key={field.key}>
-                <label className="block text-xs font-medium text-gray-600 mb-1">{field.label}</label>
+                <label className="block text-xs font-medium text-muted-foreground mb-1">{field.label}</label>
                 <input
                   type="number"
                   step="0.1"
                   placeholder="—"
                   value={(form as any)[field.key]}
                   onChange={(e) => setForm({ ...form, [field.key]: e.target.value })}
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 />
               </div>
             ))}
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">Notes</label>
+            <label className="block text-xs font-medium text-muted-foreground mb-1">Notes</label>
             <textarea
               rows={2}
               placeholder="Session notes, observations..."
               value={form.notes}
               onChange={(e) => setForm({ ...form, notes: e.target.value })}
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
           </div>
           <button
@@ -187,9 +187,9 @@ export default function ProgressTracker({
               ].map((s) => {
                 const d = previous ? diff(s.value as number, previous[s.key] as number) : null;
                 return (
-                  <div key={s.label} className="bg-white rounded-xl border border-gray-100 shadow-sm p-4">
-                    <p className="text-xs text-gray-400 mb-1">{s.label}</p>
-                    <p className="text-2xl font-bold text-gray-900">
+                  <div key={s.label} className="bg-card text-card-foreground rounded-xl border border-border shadow-sm p-4">
+                    <p className="text-xs text-muted-foreground mb-1">{s.label}</p>
+                    <p className="text-2xl font-bold text-foreground">
                       {s.value != null ? `${s.value}${s.unit}` : "—"}
                     </p>
                     {d && (
@@ -205,8 +205,8 @@ export default function ProgressTracker({
 
           {/* Weight chart */}
           {chartData.length > 1 && (
-            <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
-              <h2 className="text-base font-semibold text-gray-900 mb-6">Weight Progress</h2>
+            <div className="bg-card text-card-foreground rounded-xl border border-border shadow-sm p-6">
+              <h2 className="text-base font-semibold text-foreground mb-6">Weight Progress</h2>
               <div className="relative h-40">
                 <svg viewBox={`0 0 ${chartData.length * 60} 120`} className="w-full h-full">
                   {/* Grid lines */}
@@ -256,14 +256,14 @@ export default function ProgressTracker({
           )}
 
           {/* Records table */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100">
-            <div className="px-6 py-4 border-b border-gray-100">
-              <h2 className="text-base font-semibold text-gray-900">All Records</h2>
+          <div className="bg-card text-card-foreground rounded-xl shadow-sm border border-border">
+            <div className="px-6 py-4 border-b border-border">
+              <h2 className="text-base font-semibold text-foreground">All Records</h2>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="bg-gray-50 text-left text-xs text-gray-500 uppercase tracking-wide border-b border-gray-100">
+                  <tr className="bg-muted text-left text-xs text-muted-foreground uppercase tracking-wide border-b border-border">
                     <th className="px-4 py-3">Date</th>
                     <th className="px-4 py-3">Weight</th>
                     <th className="px-4 py-3">Body Fat</th>
@@ -274,10 +274,10 @@ export default function ProgressTracker({
                     <th className="px-4 py-3">Notes</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-50">
+                <tbody className="divide-y divide-border">
                   {[...progressRecords].reverse().map((r) => (
-                    <tr key={r.id} className="hover:bg-gray-50">
-                      <td className="px-4 py-3 text-gray-500 whitespace-nowrap">
+                    <tr key={r.id} className="hover:bg-muted">
+                      <td className="px-4 py-3 text-muted-foreground whitespace-nowrap">
                         {new Date(r.recordedAt).toLocaleDateString("en-NG", { year: "numeric", month: "short", day: "numeric" })}
                       </td>
                       <td className="px-4 py-3">{r.weightKg != null ? `${r.weightKg}kg` : "—"}</td>
@@ -286,7 +286,7 @@ export default function ProgressTracker({
                       <td className="px-4 py-3">{r.chestCm != null ? `${r.chestCm}cm` : "—"}</td>
                       <td className="px-4 py-3">{r.waistCm != null ? `${r.waistCm}cm` : "—"}</td>
                       <td className="px-4 py-3">{r.hipsCm != null ? `${r.hipsCm}cm` : "—"}</td>
-                      <td className="px-4 py-3 text-gray-400 italic max-w-xs truncate">{r.notes || "—"}</td>
+                      <td className="px-4 py-3 text-muted-foreground italic max-w-xs truncate">{r.notes || "—"}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -297,7 +297,7 @@ export default function ProgressTracker({
       )}
 
       {selectedMemberId && progressRecords.length === 0 && (
-        <div className="bg-white rounded-xl border border-gray-100 p-12 text-center text-gray-400">
+        <div className="bg-card text-card-foreground rounded-xl border border-border p-12 text-center text-muted-foreground">
           <p className="text-4xl mb-3">📊</p>
           <p className="font-medium">No progress records yet</p>
           <p className="text-sm mt-1">Click &quot;Record Progress&quot; to add the first entry</p>
@@ -305,7 +305,7 @@ export default function ProgressTracker({
       )}
 
       {!selectedMemberId && (
-        <div className="bg-white rounded-xl border border-gray-100 p-12 text-center text-gray-400">
+        <div className="bg-card text-card-foreground rounded-xl border border-border p-12 text-center text-muted-foreground">
           <p className="text-4xl mb-3">👆</p>
           <p className="font-medium">Select a client to view progress</p>
         </div>

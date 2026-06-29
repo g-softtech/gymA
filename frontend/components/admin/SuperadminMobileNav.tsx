@@ -53,7 +53,7 @@ export default function SuperadminMobileNav() {
             className="absolute bottom-16 left-0 right-0 bg-[#11111a] rounded-t-2xl shadow-2xl p-4 border-t border-white/10"
             onClick={e => e.stopPropagation()}
           >
-            <div className="w-12 h-1 bg-white/20 rounded-full mx-auto mb-4" />
+            <div className="w-12 h-1 bg-card text-card-foreground/20 rounded-full mx-auto mb-4" />
             <div className="space-y-2">
               <a
                 href="/api/auth/signout"

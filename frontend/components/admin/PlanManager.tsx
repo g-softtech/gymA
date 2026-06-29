@@ -113,15 +113,15 @@ export default function PlanManager({ tenantId, slug, initialPlans }: PlanManage
 
   return (
     <div className="space-y-6">
-      <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
+      <div className="bg-card text-card-foreground rounded-xl border border-border shadow-sm p-6">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-base font-semibold text-gray-900">
+          <h2 className="text-base font-semibold text-foreground">
             {editingPlanId ? "Edit Plan" : "Create New Plan"}
           </h2>
           {editingPlanId && (
             <button
               onClick={resetForm}
-              className="text-sm text-gray-500 hover:text-gray-700 font-medium"
+              className="text-sm text-muted-foreground hover:text-foreground font-medium"
             >
               Cancel Edit
             </button>
@@ -132,69 +132,69 @@ export default function PlanManager({ tenantId, slug, initialPlans }: PlanManage
         )}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
           <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">Plan Name</label>
+            <label className="block text-xs font-medium text-muted-foreground mb-1">Plan Name</label>
             <input
               type="text"
               placeholder="e.g. Monthly Basic"
               value={form.name}
               onChange={(e) => setForm({ ...form, name: e.target.value })}
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">Price (₦)</label>
+            <label className="block text-xs font-medium text-muted-foreground mb-1">Price (₦)</label>
             <input
               type="number"
               placeholder="e.g. 15000"
               value={form.price}
               onChange={(e) => setForm({ ...form, price: e.target.value })}
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">Duration (days)</label>
+            <label className="block text-xs font-medium text-muted-foreground mb-1">Duration (days)</label>
             <input
               type="number"
               placeholder="e.g. 30"
               value={form.durationDays}
               onChange={(e) => setForm({ ...form, durationDays: e.target.value })}
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
           </div>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
           <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">Description (Optional)</label>
+            <label className="block text-xs font-medium text-muted-foreground mb-1">Description (Optional)</label>
             <input
               type="text"
               placeholder="e.g. Best for beginners"
               value={form.description}
               onChange={(e) => setForm({ ...form, description: e.target.value })}
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">Marketing Features (Comma separated)</label>
+            <label className="block text-xs font-medium text-muted-foreground mb-1">Marketing Features (Comma separated)</label>
             <input
               type="text"
               placeholder="e.g. 24/7 Access, Free Towel"
               value={form.features}
               onChange={(e) => setForm({ ...form, features: e.target.value })}
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
-            <p className="text-[10px] text-gray-400 mt-1">These show up on the plan card alongside your limits.</p>
+            <p className="text-[10px] text-muted-foreground mt-1">These show up on the plan card alongside your limits.</p>
           </div>
         </div>
 
         <div className="mb-6">
-          <h3 className="text-sm font-semibold text-gray-900 mb-3">Plan Features & Limits</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-gray-50 p-4 rounded-lg border border-gray-100">
+          <h3 className="text-sm font-semibold text-foreground mb-3">Plan Features & Limits</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-muted p-4 rounded-lg border border-border">
             {Object.entries(ENTITLEMENTS_REGISTRY).map(([key, config]) => {
               const typedKey = key as keyof Entitlements;
               return (
                 <div key={key} className="flex flex-col">
-                  <label className="block text-xs font-medium text-gray-700 mb-1">
+                  <label className="block text-xs font-medium text-foreground mb-1">
                     {config.label}
                   </label>
                   {config.type === "boolean" ? (
@@ -209,7 +209,7 @@ export default function PlanManager({ tenantId, slug, initialPlans }: PlanManage
                           },
                         })
                       }
-                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      className="w-full border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
                     >
                       <option value="false">No</option>
                       <option value="true">Yes</option>
@@ -227,10 +227,10 @@ export default function PlanManager({ tenantId, slug, initialPlans }: PlanManage
                           },
                         })
                       }
-                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      className="w-full border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
                     />
                   )}
-                  <p className="text-[10px] text-gray-400 mt-1">{config.description}</p>
+                  <p className="text-[10px] text-muted-foreground mt-1">{config.description}</p>
                 </div>
               );
             })}
@@ -245,22 +245,22 @@ export default function PlanManager({ tenantId, slug, initialPlans }: PlanManage
         </button>
       </div>
 
-      <div className="bg-white rounded-xl border border-gray-100 shadow-sm">
-        <div className="px-6 py-4 border-b border-gray-100">
-          <h2 className="text-base font-semibold text-gray-900">Existing Plans</h2>
+      <div className="bg-card text-card-foreground rounded-xl border border-border shadow-sm">
+        <div className="px-6 py-4 border-b border-border">
+          <h2 className="text-base font-semibold text-foreground">Existing Plans</h2>
         </div>
         {plans.length === 0 ? (
-          <p className="px-6 py-8 text-center text-gray-400">No plans yet. Create one above.</p>
+          <p className="px-6 py-8 text-center text-muted-foreground">No plans yet. Create one above.</p>
         ) : (
-          <div className="divide-y divide-gray-50">
+          <div className="divide-y divide-border">
             {plans.map((plan) => (
               <div key={plan.id} className="px-6 py-4 flex justify-between items-center">
                 <div>
-                  <p className="font-medium text-gray-900">{plan.name}</p>
-                  <p className="text-sm text-gray-500">{plan.durationDays} days access</p>
+                  <p className="font-medium text-foreground">{plan.name}</p>
+                  <p className="text-sm text-muted-foreground">{plan.durationDays} days access</p>
                 </div>
                 <div className="flex items-center gap-4">
-                  <p className="font-semibold text-gray-900">₦{plan.price.toLocaleString()}</p>
+                  <p className="font-semibold text-foreground">₦{plan.price.toLocaleString()}</p>
                   <button
                     onClick={() => handleEdit(plan)}
                     className="text-sm text-indigo-500 hover:text-indigo-700 hover:underline"

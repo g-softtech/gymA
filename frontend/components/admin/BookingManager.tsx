@@ -101,7 +101,7 @@ export default function BookingManager() {
   };
 
   if (loading) {
-    return <div className="animate-pulse h-64 bg-slate-100 dark:bg-white/5 rounded-xl"></div>;
+    return <div className="animate-pulse h-64 bg-slate-100 dark:bg-card text-card-foreground/5 rounded-xl"></div>;
   }
 
   const trainerBookings = bookings.filter(b => b.trainerId);
@@ -114,7 +114,7 @@ export default function BookingManager() {
           onClick={() => setActiveTab("classes")}
           className={`flex-1 py-2.5 text-sm font-medium rounded-lg transition-all ${
             activeTab === "classes"
-              ? "bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm"
+              ? "bg-card text-card-foreground dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm"
               : "text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
           }`}
         >
@@ -124,7 +124,7 @@ export default function BookingManager() {
           onClick={() => setActiveTab("trainers")}
           className={`flex-1 py-2.5 text-sm font-medium rounded-lg transition-all ${
             activeTab === "trainers"
-              ? "bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm"
+              ? "bg-card text-card-foreground dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm"
               : "text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
           }`}
         >
@@ -144,7 +144,7 @@ export default function BookingManager() {
             </button>
           </div>
 
-          <div className="bg-white dark:bg-[#11111a] border border-slate-200 dark:border-white/10 rounded-xl overflow-hidden">
+          <div className="bg-card text-card-foreground dark:bg-[#11111a] border border-slate-200 dark:border-white/10 rounded-xl overflow-hidden">
             {/* Mobile View: Cards */}
             <div className="md:hidden divide-y divide-slate-200 dark:divide-white/5">
               {classes.length === 0 ? (
@@ -160,7 +160,7 @@ export default function BookingManager() {
                           <p className="text-sm text-slate-500">{new Date(cls.startTime).toLocaleString()}</p>
                           <p className="text-sm text-slate-500 mt-1">Instructor: {cls.instructor?.user?.name || "Unassigned"}</p>
                         </div>
-                        <span className={`px-2 py-1 rounded-full text-xs font-semibold ${isFull ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'}`}>
+                        <span className={`px-2 py-1 rounded-full text-xs font-semibold ${isFull ? 'bg-destructive/10 text-destructive dark:bg-red-900/30 dark:text-red-400' : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'}`}>
                           {cls._count.bookings} / {cls.capacity}
                         </span>
                       </div>
@@ -181,7 +181,7 @@ export default function BookingManager() {
             {/* Tablet/Desktop View: Table */}
             <div className="hidden md:block overflow-x-auto">
               <table className="w-full text-left text-sm">
-                <thead className="bg-slate-50 dark:bg-white/5 border-b border-slate-200 dark:border-white/10 text-slate-500 dark:text-slate-400">
+                <thead className="bg-slate-50 dark:bg-card text-card-foreground/5 border-b border-slate-200 dark:border-white/10 text-slate-500 dark:text-slate-400">
                   <tr>
                     <th className="px-6 py-3 font-medium">Class Name</th>
                     <th className="px-6 py-3 font-medium">Date & Time</th>
@@ -201,7 +201,7 @@ export default function BookingManager() {
                     classes.map((cls) => {
                       const isFull = cls._count.bookings >= cls.capacity;
                       return (
-                        <tr key={cls.id} className="hover:bg-slate-50 dark:hover:bg-white/[0.02]">
+                        <tr key={cls.id} className="hover:bg-slate-50 dark:hover:bg-card text-card-foreground/[0.02]">
                           <td className="px-6 py-4 font-medium text-slate-900 dark:text-white">
                             {cls.title}
                             <div className="text-xs text-slate-500 font-normal">{cls.durationMins} mins</div>
@@ -213,7 +213,7 @@ export default function BookingManager() {
                             {cls.instructor?.user?.name || "Unassigned"}
                           </td>
                           <td className="px-6 py-4">
-                            <span className={`px-2 py-1 rounded-full text-xs font-semibold ${isFull ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'}`}>
+                            <span className={`px-2 py-1 rounded-full text-xs font-semibold ${isFull ? 'bg-destructive/10 text-destructive dark:bg-red-900/30 dark:text-red-400' : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'}`}>
                               {cls._count.bookings} / {cls.capacity}
                             </span>
                           </td>
@@ -238,7 +238,7 @@ export default function BookingManager() {
 
       {/* Trainers Tab */}
       {activeTab === "trainers" && (
-        <div className="bg-white dark:bg-[#11111a] border border-slate-200 dark:border-white/10 rounded-xl overflow-hidden">
+        <div className="bg-card text-card-foreground dark:bg-[#11111a] border border-slate-200 dark:border-white/10 rounded-xl overflow-hidden">
           {/* Mobile View: Cards */}
           <div className="md:hidden divide-y divide-slate-200 dark:divide-white/5">
             {trainerBookings.length === 0 ? (
@@ -255,7 +255,7 @@ export default function BookingManager() {
                     <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
                       b.status === "CONFIRMED" ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400" :
                       b.status === "PENDING" ? "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400" :
-                      "bg-slate-100 text-slate-700 dark:bg-white/10 dark:text-slate-300"
+                      "bg-slate-100 text-slate-700 dark:bg-card text-card-foreground/10 dark:text-slate-300"
                     }`}>
                       {b.status}
                     </span>
@@ -286,7 +286,7 @@ export default function BookingManager() {
           {/* Tablet/Desktop View: Table */}
           <div className="hidden md:block overflow-x-auto">
             <table className="w-full text-left text-sm">
-              <thead className="bg-slate-50 dark:bg-white/5 border-b border-slate-200 dark:border-white/10 text-slate-500 dark:text-slate-400">
+              <thead className="bg-slate-50 dark:bg-card text-card-foreground/5 border-b border-slate-200 dark:border-white/10 text-slate-500 dark:text-slate-400">
                 <tr>
                   <th className="px-6 py-3 font-medium">Member</th>
                   <th className="px-6 py-3 font-medium">Trainer</th>
@@ -304,7 +304,7 @@ export default function BookingManager() {
                   </tr>
                 ) : (
                   trainerBookings.map((b) => (
-                    <tr key={b.id} className="hover:bg-slate-50 dark:hover:bg-white/[0.02]">
+                    <tr key={b.id} className="hover:bg-slate-50 dark:hover:bg-card text-card-foreground/[0.02]">
                       <td className="px-6 py-4">
                         <div className="font-medium text-slate-900 dark:text-white">{b.member?.user?.name}</div>
                         <div className="text-xs text-slate-500">{b.member?.user?.email}</div>
@@ -320,7 +320,7 @@ export default function BookingManager() {
                         <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
                           b.status === "CONFIRMED" ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400" :
                           b.status === "PENDING" ? "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400" :
-                          "bg-slate-100 text-slate-700 dark:bg-white/10 dark:text-slate-300"
+                          "bg-slate-100 text-slate-700 dark:bg-card text-card-foreground/10 dark:text-slate-300"
                         }`}>
                           {b.status}
                         </span>
@@ -355,7 +355,7 @@ export default function BookingManager() {
       {/* Class Creation Modal */}
       {showClassModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-          <div className="bg-white dark:bg-slate-900 w-full max-w-md rounded-2xl shadow-xl overflow-hidden">
+          <div className="bg-card text-card-foreground dark:bg-slate-900 w-full max-w-md rounded-2xl shadow-xl overflow-hidden">
             <div className="p-6 border-b border-slate-200 dark:border-white/10 flex justify-between items-center">
               <h3 className="text-lg font-bold text-slate-900 dark:text-white">Schedule Class</h3>
               <button onClick={() => setShowClassModal(false)} className="text-slate-400 hover:text-slate-600">✕</button>
@@ -368,7 +368,7 @@ export default function BookingManager() {
                   required
                   value={formData.title}
                   onChange={e => setFormData({ ...formData, title: e.target.value })}
-                  className="w-full px-3 py-2 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-lg text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-card text-card-foreground/5 border border-slate-200 dark:border-white/10 rounded-lg text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   placeholder="e.g. HIIT Bootcamp"
                 />
               </div>
@@ -381,7 +381,7 @@ export default function BookingManager() {
                     required
                     value={formData.startTime}
                     onChange={e => setFormData({ ...formData, startTime: e.target.value })}
-                    className="w-full px-3 py-2 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-lg text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-card text-card-foreground/5 border border-slate-200 dark:border-white/10 rounded-lg text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   />
                 </div>
                 <div>
@@ -392,7 +392,7 @@ export default function BookingManager() {
                     required
                     value={formData.durationMins}
                     onChange={e => setFormData({ ...formData, durationMins: parseInt(e.target.value) })}
-                    className="w-full px-3 py-2 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-lg text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-card text-card-foreground/5 border border-slate-200 dark:border-white/10 rounded-lg text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   />
                 </div>
               </div>
@@ -406,7 +406,7 @@ export default function BookingManager() {
                     required
                     value={formData.capacity}
                     onChange={e => setFormData({ ...formData, capacity: parseInt(e.target.value) })}
-                    className="w-full px-3 py-2 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-lg text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-card text-card-foreground/5 border border-slate-200 dark:border-white/10 rounded-lg text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   />
                 </div>
                 <div>
@@ -414,7 +414,7 @@ export default function BookingManager() {
                   <select
                     value={formData.recurrenceWeeks}
                     onChange={e => setFormData({ ...formData, recurrenceWeeks: parseInt(e.target.value) })}
-                    className="w-full px-3 py-2 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-lg text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-card text-card-foreground/5 border border-slate-200 dark:border-white/10 rounded-lg text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   >
                     <option value={1}>Don't repeat</option>
                     <option value={4}>4 Weeks</option>
@@ -429,7 +429,7 @@ export default function BookingManager() {
                 <select
                   value={formData.instructorId}
                   onChange={e => setFormData({ ...formData, instructorId: e.target.value })}
-                  className="w-full px-3 py-2 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-lg text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-card text-card-foreground/5 border border-slate-200 dark:border-white/10 rounded-lg text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 >
                   <option value="">Unassigned</option>
                   {trainers.map(t => (

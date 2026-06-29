@@ -60,7 +60,7 @@ export function AccessPass() {
 
       {isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-          <div className="bg-white w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
+          <div className="bg-card text-card-foreground w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
             <div className="bg-indigo-600 p-4 text-center">
               <h2 className="text-xl font-bold text-white">Gym Access Pass</h2>
               <p className="text-indigo-100 text-sm mt-1">Scan at the front desk</p>
@@ -73,14 +73,14 @@ export function AccessPass() {
                   <p className="text-red-600 font-medium">{error}</p>
                   <button 
                     onClick={fetchQR}
-                    className="mt-4 px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium hover:bg-gray-50"
+                    className="mt-4 px-4 py-2 border border-border rounded-lg text-sm font-medium hover:bg-muted"
                   >
                     Try Again
                   </button>
                 </div>
               ) : token ? (
                 <div className="flex flex-col items-center relative">
-                  <div className="bg-white p-4 rounded-xl border-2 border-indigo-100 shadow-sm relative overflow-hidden">
+                  <div className="bg-card text-card-foreground p-4 rounded-xl border-2 border-indigo-100 shadow-sm relative overflow-hidden">
                     {/* Animated scanning line to prevent screenshots */}
                     <div className="absolute top-0 left-0 w-full h-1 bg-indigo-500 opacity-50 animate-[scan_2s_ease-in-out_infinite]" />
                     <QRCodeSVG 
@@ -90,7 +90,7 @@ export function AccessPass() {
                       includeMargin={true}
                     />
                   </div>
-                  <p className="text-gray-500 text-xs mt-4 flex items-center gap-1.5 bg-gray-50 px-3 py-1.5 rounded-full">
+                  <p className="text-muted-foreground text-xs mt-4 flex items-center gap-1.5 bg-muted px-3 py-1.5 rounded-full">
                     <span className="relative flex h-2 w-2">
                       <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
                       <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
@@ -100,16 +100,16 @@ export function AccessPass() {
                 </div>
               ) : (
                 <div className="animate-pulse flex flex-col items-center">
-                  <div className="w-[200px] h-[200px] bg-gray-200 rounded-xl" />
-                  <div className="h-4 w-32 bg-gray-200 rounded mt-4" />
+                  <div className="w-[200px] h-[200px] bg-muted rounded-xl" />
+                  <div className="h-4 w-32 bg-muted rounded mt-4" />
                 </div>
               )}
             </div>
 
-            <div className="p-4 border-t border-gray-100 bg-gray-50">
+            <div className="p-4 border-t border-border bg-muted">
               <button
                 onClick={() => setIsOpen(false)}
-                className="w-full bg-white border border-gray-300 text-gray-700 py-2.5 rounded-lg font-semibold hover:bg-gray-50 transition"
+                className="w-full bg-card text-card-foreground border border-border text-foreground py-2.5 rounded-lg font-semibold hover:bg-muted transition"
               >
                 Close
               </button>

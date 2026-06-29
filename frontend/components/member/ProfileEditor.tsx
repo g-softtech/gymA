@@ -101,65 +101,65 @@ export default function ProfileEditor({ userId, initialData }: Props) {
       )}
 
       {/* Personal Info */}
-      <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
-        <h2 className="text-base font-semibold text-gray-900 mb-4">Personal Information</h2>
+      <div className="bg-card text-card-foreground rounded-xl border border-border shadow-sm p-6">
+        <h2 className="text-base font-semibold text-foreground mb-4">Personal Information</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">Full Name</label>
+            <label className="block text-xs font-medium text-muted-foreground mb-1">Full Name</label>
             <input
               type="text"
               value={form.name}
               onChange={(e) => setForm({ ...form, name: e.target.value })}
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">Email</label>
+            <label className="block text-xs font-medium text-muted-foreground mb-1">Email</label>
             <input
               type="email"
               value={initialData.email}
               disabled
-              className="w-full border border-gray-100 bg-gray-50 rounded-lg px-3 py-2 text-sm text-gray-400 cursor-not-allowed"
+              className="w-full border border-border bg-muted rounded-lg px-3 py-2 text-sm text-muted-foreground cursor-not-allowed"
             />
           </div>
         </div>
       </div>
 
       {/* Body Stats */}
-      <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
-        <h2 className="text-base font-semibold text-gray-900 mb-4">Body Measurements</h2>
+      <div className="bg-card text-card-foreground rounded-xl border border-border shadow-sm p-6">
+        <h2 className="text-base font-semibold text-foreground mb-4">Body Measurements</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
           <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">Weight (kg)</label>
+            <label className="block text-xs font-medium text-muted-foreground mb-1">Weight (kg)</label>
             <input
               type="number"
               step="0.1"
               placeholder="e.g. 75"
               value={form.weightKg}
               onChange={(e) => setForm({ ...form, weightKg: e.target.value })}
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">Height (cm)</label>
+            <label className="block text-xs font-medium text-muted-foreground mb-1">Height (cm)</label>
             <input
               type="number"
               step="0.1"
               placeholder="e.g. 175"
               value={form.heightCm}
               onChange={(e) => setForm({ ...form, heightCm: e.target.value })}
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
           </div>
         </div>
         {bmi && bmiCategory && (
-          <div className="bg-gray-50 rounded-lg p-4 flex items-center justify-between">
+          <div className="bg-muted rounded-lg p-4 flex items-center justify-between">
             <div>
-              <p className="text-xs text-gray-500">Your BMI</p>
-              <p className="text-2xl font-bold text-gray-900">{bmi}</p>
+              <p className="text-xs text-muted-foreground">Your BMI</p>
+              <p className="text-2xl font-bold text-foreground">{bmi}</p>
             </div>
             <div className="text-right">
-              <p className="text-xs text-gray-500">Category</p>
+              <p className="text-xs text-muted-foreground">Category</p>
               <p className={`text-lg font-semibold ${bmiCategory.color}`}>{bmiCategory.label}</p>
             </div>
           </div>
@@ -167,8 +167,8 @@ export default function ProfileEditor({ userId, initialData }: Props) {
       </div>
 
       {/* Fitness Goals */}
-      <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
-        <h2 className="text-base font-semibold text-gray-900 mb-4">Fitness Goals</h2>
+      <div className="bg-card text-card-foreground rounded-xl border border-border shadow-sm p-6">
+        <h2 className="text-base font-semibold text-foreground mb-4">Fitness Goals</h2>
         <div className="flex flex-wrap gap-2">
           {GOAL_OPTIONS.map((goal) => {
             const selected = form.fitnessGoals.includes(goal);
@@ -179,7 +179,7 @@ export default function ProfileEditor({ userId, initialData }: Props) {
                 className={`px-4 py-2 rounded-full text-sm font-medium border transition-all ${
                   selected
                     ? "bg-indigo-600 text-white border-indigo-600"
-                    : "bg-white text-gray-600 border-gray-200 hover:border-indigo-400"
+                    : "bg-card text-card-foreground text-muted-foreground border-border hover:border-indigo-400"
                 }`}
               >
                 {selected ? "✓ " : ""}{goal}

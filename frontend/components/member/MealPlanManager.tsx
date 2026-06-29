@@ -232,36 +232,36 @@ export default function MealPlanManager({ memberId, weightKg, heightCm, fitnessG
       </div>
 
       {showForm && (
-        <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 space-y-5">
-          <h2 className="text-base font-semibold text-gray-900">New Meal Plan</h2>
+        <div className="bg-card text-card-foreground rounded-xl border border-border shadow-sm p-6 space-y-5">
+          <h2 className="text-base font-semibold text-foreground">New Meal Plan</h2>
           {error && <p className="text-sm text-red-600 bg-red-50 px-3 py-2 rounded">{error}</p>}
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">Diet Goal</label>
+              <label className="block text-xs font-medium text-muted-foreground mb-1">Diet Goal</label>
               <select
                 value={selectedGoal}
                 onChange={(e) => setSelectedGoal(e.target.value)}
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
               >
                 {GOALS.map((g) => <option key={g.value} value={g.value}>{g.label}</option>)}
               </select>
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">Plan Title (optional)</label>
+              <label className="block text-xs font-medium text-muted-foreground mb-1">Plan Title (optional)</label>
               <input
                 type="text"
                 placeholder={preview.title}
                 value={customTitle}
                 onChange={(e) => setCustomTitle(e.target.value)}
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
               />
             </div>
           </div>
 
-          <div className="bg-gray-50 rounded-xl p-4 space-y-3">
+          <div className="bg-muted rounded-xl p-4 space-y-3">
             <div className="flex justify-between items-center">
-              <h3 className="text-sm font-semibold text-gray-700">Plan Preview</h3>
+              <h3 className="text-sm font-semibold text-foreground">Plan Preview</h3>
               <div className="flex gap-3 text-xs">
                 <span className="text-orange-600 font-medium">{preview.totalCalories} kcal</span>
                 <span className="text-blue-600">P: {preview.protein}g</span>
@@ -270,14 +270,14 @@ export default function MealPlanManager({ memberId, weightKg, heightCm, fitnessG
               </div>
             </div>
             {preview.meals.map((meal, i) => (
-              <div key={i} className="bg-white rounded-lg p-3">
+              <div key={i} className="bg-card text-card-foreground rounded-lg p-3">
                 <div className="flex justify-between items-center mb-1">
                   <p className="text-xs font-semibold text-indigo-600">{meal.name} &middot; {meal.time}</p>
-                  <p className="text-xs text-gray-400">{meal.foods.reduce((s, f) => s + f.calories, 0)} kcal</p>
+                  <p className="text-xs text-muted-foreground">{meal.foods.reduce((s, f) => s + f.calories, 0)} kcal</p>
                 </div>
                 {meal.foods.map((f, j) => (
-                  <p key={j} className="text-xs text-gray-600">
-                    {f.name} <span className="text-gray-400">&mdash; {f.quantity}</span>
+                  <p key={j} className="text-xs text-muted-foreground">
+                    {f.name} <span className="text-muted-foreground">&mdash; {f.quantity}</span>
                   </p>
                 ))}
               </div>
@@ -295,26 +295,26 @@ export default function MealPlanManager({ memberId, weightKg, heightCm, fitnessG
       )}
 
       {plans.length === 0 ? (
-        <div className="bg-white rounded-xl border border-gray-100 p-12 text-center text-gray-400">
+        <div className="bg-card text-card-foreground rounded-xl border border-border p-12 text-center text-muted-foreground">
           <p className="text-4xl mb-3">🥗</p>
-          <p className="font-medium text-gray-600">No meal plans yet</p>
+          <p className="font-medium text-muted-foreground">No meal plans yet</p>
           <p className="text-sm mt-1">Create a Nigerian-adapted meal plan above</p>
         </div>
       ) : (
         plans.map((plan) => (
-          <div key={plan.id} className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+          <div key={plan.id} className="bg-card text-card-foreground rounded-xl border border-border shadow-sm overflow-hidden">
             <div
-              className="px-5 py-4 flex justify-between items-center cursor-pointer hover:bg-gray-50"
+              className="px-5 py-4 flex justify-between items-center cursor-pointer hover:bg-muted"
               onClick={() => setExpandedPlan(expandedPlan === plan.id ? null : plan.id)}
             >
               <div>
                 <div className="flex items-center gap-2">
-                  <h3 className="font-semibold text-gray-900">{plan.title}</h3>
+                  <h3 className="font-semibold text-foreground">{plan.title}</h3>
                   {plan.isAiGenerated && (
                     <span className="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full">🤖 AI</span>
                   )}
                 </div>
-                <p className="text-sm text-gray-500 mt-0.5">
+                <p className="text-sm text-muted-foreground mt-0.5">
                   {GOALS.find((g) => g.value === plan.goal)?.label ?? plan.goal} &middot; {plan.totalCalories} kcal/day
                 </p>
               </div>
@@ -330,27 +330,27 @@ export default function MealPlanManager({ memberId, weightKg, heightCm, fitnessG
                 >
                   Delete
                 </button>
-                <span className="text-gray-400">{expandedPlan === plan.id ? "▲" : "▼"}</span>
+                <span className="text-muted-foreground">{expandedPlan === plan.id ? "▲" : "▼"}</span>
               </div>
             </div>
 
             {expandedPlan === plan.id && (
-              <div className="border-t border-gray-100 p-5 space-y-3 bg-gray-50">
+              <div className="border-t border-border p-5 space-y-3 bg-muted">
                 {plan.meals.map((meal, i) => (
-                  <div key={i} className="bg-white rounded-lg p-4">
+                  <div key={i} className="bg-card text-card-foreground rounded-lg p-4">
                     <div className="flex justify-between items-center mb-2">
                       <p className="text-sm font-semibold text-indigo-600">{meal.name}</p>
-                      <p className="text-xs text-gray-400">{meal.time}</p>
+                      <p className="text-xs text-muted-foreground">{meal.time}</p>
                     </div>
                     <div className="space-y-1.5">
                       {meal.foods.map((f, j) => (
                         <div key={j} className="flex justify-between items-center text-sm">
-                          <span className="text-gray-800">{f.name} <span className="text-gray-400 text-xs">&mdash; {f.quantity}</span></span>
+                          <span className="text-foreground">{f.name} <span className="text-muted-foreground text-xs">&mdash; {f.quantity}</span></span>
                           <span className="text-orange-600 font-medium text-xs">{f.calories} kcal</span>
                         </div>
                       ))}
                     </div>
-                    <div className="flex gap-3 mt-2 text-xs text-gray-400">
+                    <div className="flex gap-3 mt-2 text-xs text-muted-foreground">
                       <span>P: {meal.foods.reduce((s, f) => s + f.protein, 0).toFixed(1)}g</span>
                       <span>C: {meal.foods.reduce((s, f) => s + f.carbs, 0).toFixed(1)}g</span>
                       <span>F: {meal.foods.reduce((s, f) => s + f.fats, 0).toFixed(1)}g</span>

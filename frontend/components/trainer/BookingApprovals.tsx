@@ -16,10 +16,10 @@ interface BookingItem {
 }
 
 const statusColor: Record<string, string> = {
-  PENDING: "bg-yellow-100 text-yellow-700",
-  CONFIRMED: "bg-green-100 text-green-700",
-  COMPLETED: "bg-indigo-100 text-indigo-700",
-  CANCELLED: "bg-red-100 text-red-600",
+  PENDING: "bg-warning/10 text-warning",
+  CONFIRMED: "bg-success/10 text-success",
+  COMPLETED: "bg-primary/10 text-primary",
+  CANCELLED: "bg-destructive/10 text-destructive",
   RESCHEDULED: "bg-purple-100 text-purple-700",
 };
 
@@ -64,7 +64,7 @@ export default function BookingApprovals({ bookings: initialBookings }: { bookin
             className={`px-3 py-1.5 rounded-lg text-sm font-medium transition ${
               filter === f
                 ? "bg-indigo-600 text-white"
-                : "bg-white border border-gray-200 text-gray-600 hover:border-indigo-300"
+                : "bg-card text-card-foreground border border-border text-muted-foreground hover:border-indigo-300"
             }`}
           >
             {f}
@@ -78,59 +78,59 @@ export default function BookingApprovals({ bookings: initialBookings }: { bookin
       </div>
 
       {filtered.length === 0 ? (
-        <div className="bg-white rounded-xl border border-gray-100 p-10 text-center text-gray-400">
+        <div className="bg-card text-card-foreground rounded-xl border border-border p-10 text-center text-muted-foreground">
           No bookings in this category.
         </div>
       ) : (
         filtered.map((b) => (
-          <div key={b.id} className="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
+          <div key={b.id} className="bg-card text-card-foreground rounded-xl border border-border shadow-sm p-5">
             <div className="flex justify-between items-start mb-3">
               <div>
-                <p className="font-semibold text-gray-900">{b.memberName}</p>
-                <p className="text-sm text-gray-500">{b.memberEmail}</p>
+                <p className="font-semibold text-foreground">{b.memberName}</p>
+                <p className="text-sm text-muted-foreground">{b.memberEmail}</p>
               </div>
-              <span className={`px-2 py-1 rounded-full text-xs font-medium ${statusColor[b.status] ?? "bg-gray-100 text-gray-500"}`}>
+              <span className={`px-2 py-1 rounded-full text-xs font-medium ${statusColor[b.status] ?? "bg-muted text-muted-foreground"}`}>
                 {b.status}
               </span>
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4 text-sm">
-              <div className="bg-gray-50 rounded-lg p-3">
-                <p className="text-xs text-gray-400 mb-0.5">Date</p>
-                <p className="font-medium text-gray-900">
+              <div className="bg-muted rounded-lg p-3">
+                <p className="text-xs text-muted-foreground mb-0.5">Date</p>
+                <p className="font-medium text-foreground">
                   {new Date(b.date).toLocaleDateString("en-NG", { weekday: "short", month: "short", day: "numeric" })}
                 </p>
               </div>
-              <div className="bg-gray-50 rounded-lg p-3">
-                <p className="text-xs text-gray-400 mb-0.5">Time</p>
-                <p className="font-medium text-gray-900">
+              <div className="bg-muted rounded-lg p-3">
+                <p className="text-xs text-muted-foreground mb-0.5">Time</p>
+                <p className="font-medium text-foreground">
                   {new Date(b.date).toLocaleTimeString("en-NG", { hour: "2-digit", minute: "2-digit" })}
                 </p>
               </div>
-              <div className="bg-gray-50 rounded-lg p-3">
-                <p className="text-xs text-gray-400 mb-0.5">Duration</p>
-                <p className="font-medium text-gray-900">{b.durationMins} min</p>
+              <div className="bg-muted rounded-lg p-3">
+                <p className="text-xs text-muted-foreground mb-0.5">Duration</p>
+                <p className="font-medium text-foreground">{b.durationMins} min</p>
               </div>
-              <div className="bg-gray-50 rounded-lg p-3">
-                <p className="text-xs text-gray-400 mb-0.5">Type</p>
-                <p className="font-medium text-gray-900">{b.sessionType}</p>
+              <div className="bg-muted rounded-lg p-3">
+                <p className="text-xs text-muted-foreground mb-0.5">Type</p>
+                <p className="font-medium text-foreground">{b.sessionType}</p>
               </div>
             </div>
 
             {b.notes && (
-              <p className="text-sm text-gray-500 italic mb-3">Note: {b.notes}</p>
+              <p className="text-sm text-muted-foreground italic mb-3">Note: {b.notes}</p>
             )}
 
             {/* Online session — meeting link */}
             {b.sessionType === "ONLINE" && b.status === "PENDING" && (
               <div className="mb-3">
-                <label className="block text-xs font-medium text-gray-600 mb-1">Meeting Link (optional)</label>
+                <label className="block text-xs font-medium text-muted-foreground mb-1">Meeting Link (optional)</label>
                 <input
                   type="text"
                   placeholder="https://meet.google.com/..."
                   value={meetingLinks[b.id] ?? b.meetingLink}
                   onChange={(e) => setMeetingLinks({ ...meetingLinks, [b.id]: e.target.value })}
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 />
               </div>
             )}
@@ -159,7 +159,7 @@ export default function BookingApprovals({ bookings: initialBookings }: { bookin
                 <button
                   onClick={() => updateStatus(b.id, "CANCELLED")}
                   disabled={loadingId === b.id}
-                  className="flex-1 bg-red-50 hover:bg-red-100 text-red-600 font-semibold py-2 rounded-lg text-sm border border-red-200 transition"
+                  className="flex-1 bg-red-50 hover:bg-destructive/10 text-destructive font-semibold py-2 rounded-lg text-sm border border-red-200 transition"
                 >
                   ❌ Decline
                 </button>

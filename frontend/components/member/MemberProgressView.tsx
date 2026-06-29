@@ -15,9 +15,9 @@ interface ProgressRecord {
 export default function MemberProgressView({ records }: { records: ProgressRecord[] }) {
   if (records.length === 0) {
     return (
-      <div className="bg-white rounded-xl border border-gray-100 p-12 text-center text-gray-400">
+      <div className="bg-card text-card-foreground rounded-xl border border-border p-12 text-center text-muted-foreground">
         <p className="text-4xl mb-3">📊</p>
-        <p className="font-medium text-gray-600">No progress records yet</p>
+        <p className="font-medium text-muted-foreground">No progress records yet</p>
         <p className="text-sm mt-1">Your trainer will record your progress here after sessions</p>
       </div>
     );
@@ -52,9 +52,9 @@ export default function MemberProgressView({ records }: { records: ProgressRecor
         ].map((s) => {
           const d = previous ? diff(s.value as number, previous[s.key] as number) : null;
           return (
-            <div key={s.label} className="bg-white rounded-xl border border-gray-100 shadow-sm p-4">
-              <p className="text-xs text-gray-400 mb-1">{s.label}</p>
-              <p className="text-2xl font-bold text-gray-900">
+            <div key={s.label} className="bg-card text-card-foreground rounded-xl border border-border shadow-sm p-4">
+              <p className="text-xs text-muted-foreground mb-1">{s.label}</p>
+              <p className="text-2xl font-bold text-foreground">
                 {s.value != null ? `${s.value}${s.unit}` : "—"}
               </p>
               {d && (
@@ -69,8 +69,8 @@ export default function MemberProgressView({ records }: { records: ProgressRecor
 
       {/* Weight chart */}
       {chartData.length > 1 && (
-        <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
-          <h2 className="text-base font-semibold text-gray-900 mb-6">Weight Progress</h2>
+        <div className="bg-card text-card-foreground rounded-xl border border-border shadow-sm p-6">
+          <h2 className="text-base font-semibold text-foreground mb-6">Weight Progress</h2>
           <div className="relative h-40">
             <svg viewBox={`0 0 ${chartData.length * 60} 120`} className="w-full h-full">
               {[0, 0.25, 0.5, 0.75, 1].map((pct) => (
@@ -105,14 +105,14 @@ export default function MemberProgressView({ records }: { records: ProgressRecor
       )}
 
       {/* Records history */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100">
-        <div className="px-6 py-4 border-b border-gray-100">
-          <h2 className="text-base font-semibold text-gray-900">Progress History</h2>
+      <div className="bg-card text-card-foreground rounded-xl shadow-sm border border-border">
+        <div className="px-6 py-4 border-b border-border">
+          <h2 className="text-base font-semibold text-foreground">Progress History</h2>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="bg-gray-50 text-left text-xs text-gray-500 uppercase tracking-wide border-b border-gray-100">
+              <tr className="bg-muted text-left text-xs text-muted-foreground uppercase tracking-wide border-b border-border">
                 <th className="px-4 py-3">Date</th>
                 <th className="px-4 py-3">Weight</th>
                 <th className="px-4 py-3">Body Fat</th>
@@ -121,17 +121,17 @@ export default function MemberProgressView({ records }: { records: ProgressRecor
                 <th className="px-4 py-3">Notes</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-50">
+            <tbody className="divide-y divide-border">
               {[...records].reverse().map((r) => (
-                <tr key={r.id} className="hover:bg-gray-50">
-                  <td className="px-4 py-3 text-gray-500 whitespace-nowrap">
+                <tr key={r.id} className="hover:bg-muted">
+                  <td className="px-4 py-3 text-muted-foreground whitespace-nowrap">
                     {new Date(r.recordedAt).toLocaleDateString("en-NG", { year: "numeric", month: "short", day: "numeric" })}
                   </td>
                   <td className="px-4 py-3">{r.weightKg != null ? `${r.weightKg}kg` : "—"}</td>
                   <td className="px-4 py-3">{r.bodyFatPct != null ? `${r.bodyFatPct}%` : "—"}</td>
                   <td className="px-4 py-3">{r.muscleMass != null ? `${r.muscleMass}kg` : "—"}</td>
                   <td className="px-4 py-3">{r.waistCm != null ? `${r.waistCm}cm` : "—"}</td>
-                  <td className="px-4 py-3 text-gray-400 italic max-w-xs truncate">{r.notes || "—"}</td>
+                  <td className="px-4 py-3 text-muted-foreground italic max-w-xs truncate">{r.notes || "—"}</td>
                 </tr>
               ))}
             </tbody>

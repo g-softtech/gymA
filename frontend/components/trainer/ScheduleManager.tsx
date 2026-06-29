@@ -26,10 +26,10 @@ interface Props {
 }
 
 const statusColor: Record<string, string> = {
-  PENDING: "bg-yellow-100 text-yellow-700 border-yellow-200",
-  CONFIRMED: "bg-green-100 text-green-700 border-green-200",
-  COMPLETED: "bg-indigo-100 text-indigo-700 border-indigo-200",
-  CANCELLED: "bg-red-100 text-red-600 border-red-200",
+  PENDING: "bg-warning/10 text-warning border-yellow-200",
+  CONFIRMED: "bg-success/10 text-success border-green-200",
+  COMPLETED: "bg-primary/10 text-primary border-indigo-200",
+  CANCELLED: "bg-destructive/10 text-destructive border-red-200",
   RESCHEDULED: "bg-purple-100 text-purple-700 border-purple-200",
 };
 
@@ -136,7 +136,7 @@ export default function ScheduleManager({
             className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
               activeTab === tab.key
                 ? "bg-indigo-600 text-white"
-                : "bg-white border border-gray-200 text-gray-600 hover:border-indigo-300"
+                : "bg-card text-card-foreground border border-border text-muted-foreground hover:border-indigo-300"
             }`}
           >
             {tab.label}
@@ -146,11 +146,11 @@ export default function ScheduleManager({
 
       {/* Availability tab */}
       {activeTab === "availability" && (
-        <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
+        <div className="bg-card text-card-foreground rounded-xl border border-border shadow-sm p-6">
           <div className="flex justify-between items-center mb-5">
             <div>
-              <h2 className="text-base font-semibold text-gray-900">Weekly Availability</h2>
-              <p className="text-sm text-gray-500 mt-0.5">
+              <h2 className="text-base font-semibold text-foreground">Weekly Availability</h2>
+              <p className="text-sm text-muted-foreground mt-0.5">
                 Set which days and times you are available for bookings each week
               </p>
             </div>
@@ -167,9 +167,9 @@ export default function ScheduleManager({
             <table className="w-full text-sm">
               <thead>
                 <tr>
-                  <th className="text-left text-xs text-gray-500 font-medium pb-3 pr-4 w-16">Time</th>
+                  <th className="text-left text-xs text-muted-foreground font-medium pb-3 pr-4 w-16">Time</th>
                   {DAYS.map((d) => (
-                    <th key={d} className="text-center text-xs text-gray-500 font-medium pb-3 px-1">
+                    <th key={d} className="text-center text-xs text-muted-foreground font-medium pb-3 px-1">
                       {d.slice(0, 3)}
                     </th>
                   ))}
@@ -177,8 +177,8 @@ export default function ScheduleManager({
               </thead>
               <tbody>
                 {TIME_SLOTS.map((slot) => (
-                  <tr key={slot} className="border-t border-gray-50">
-                    <td className="text-xs text-gray-400 py-1.5 pr-4 whitespace-nowrap">{slot}</td>
+                  <tr key={slot} className="border-t border-border">
+                    <td className="text-xs text-muted-foreground py-1.5 pr-4 whitespace-nowrap">{slot}</td>
                     {DAYS.map((day) => {
                       const active = (availability[day] ?? []).includes(slot);
                       return (
@@ -188,7 +188,7 @@ export default function ScheduleManager({
                             className={`w-7 h-7 rounded-md border text-xs font-medium transition-all ${
                               active
                                 ? "bg-indigo-600 border-indigo-600 text-white"
-                                : "bg-gray-50 border-gray-200 text-gray-300 hover:border-indigo-300"
+                                : "bg-muted border-border text-muted-foreground hover:border-indigo-300"
                             }`}
                           >
                             {active ? "✓" : ""}
@@ -203,8 +203,8 @@ export default function ScheduleManager({
           </div>
 
           {/* Summary */}
-          <div className="mt-5 pt-4 border-t border-gray-100">
-            <p className="text-xs font-medium text-gray-500 mb-2">Your weekly availability summary:</p>
+          <div className="mt-5 pt-4 border-t border-border">
+            <p className="text-xs font-medium text-muted-foreground mb-2">Your weekly availability summary:</p>
             <div className="flex flex-wrap gap-2">
               {DAYS.map((day) => {
                 const slots = availability[day] ?? [];
@@ -218,7 +218,7 @@ export default function ScheduleManager({
                 );
               })}
               {DAYS.every((d) => (availability[d] ?? []).length === 0) && (
-                <p className="text-xs text-gray-400 italic">No availability set yet</p>
+                <p className="text-xs text-muted-foreground italic">No availability set yet</p>
               )}
             </div>
           </div>
@@ -229,16 +229,16 @@ export default function ScheduleManager({
       {activeTab === "calendar" && (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Calendar */}
-          <div className="lg:col-span-2 bg-white rounded-xl border border-gray-100 shadow-sm p-6">
+          <div className="lg:col-span-2 bg-card text-card-foreground rounded-xl border border-border shadow-sm p-6">
             <div className="flex justify-between items-center mb-4">
-              <button onClick={prevMonth} className="p-2 hover:bg-gray-100 rounded-lg transition">←</button>
-              <h2 className="text-base font-semibold text-gray-900">{monthLabel}</h2>
-              <button onClick={nextMonth} className="p-2 hover:bg-gray-100 rounded-lg transition">→</button>
+              <button onClick={prevMonth} className="p-2 hover:bg-muted rounded-lg transition">←</button>
+              <h2 className="text-base font-semibold text-foreground">{monthLabel}</h2>
+              <button onClick={nextMonth} className="p-2 hover:bg-muted rounded-lg transition">→</button>
             </div>
 
             <div className="grid grid-cols-7 gap-1 mb-2">
               {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((d) => (
-                <div key={d} className="text-center text-xs font-medium text-gray-400 py-1">{d}</div>
+                <div key={d} className="text-center text-xs font-medium text-muted-foreground py-1">{d}</div>
               ))}
             </div>
 
@@ -261,15 +261,15 @@ export default function ScheduleManager({
                         : isToday
                         ? "border-2 border-indigo-400 text-indigo-700"
                         : past
-                        ? "text-gray-300"
+                        ? "text-muted-foreground"
                         : available
-                        ? "hover:bg-indigo-50 text-gray-700"
-                        : "text-gray-400 hover:bg-gray-50"
+                        ? "hover:bg-indigo-50 text-foreground"
+                        : "text-muted-foreground hover:bg-muted"
                     }`}
                   >
                     <span className="font-medium">{date.getDate()}</span>
                     {available && !past && (
-                      <span className={`w-1.5 h-1.5 rounded-full ${isSelected ? "bg-white" : "bg-indigo-400"}`} />
+                      <span className={`w-1.5 h-1.5 rounded-full ${isSelected ? "bg-card text-card-foreground" : "bg-indigo-400"}`} />
                     )}
                     {dayBookings.length > 0 && (
                       <span className={`text-xs font-bold ${isSelected ? "text-white" : "text-green-600"}`}>
@@ -281,7 +281,7 @@ export default function ScheduleManager({
               })}
             </div>
 
-            <div className="mt-4 flex gap-4 text-xs text-gray-500">
+            <div className="mt-4 flex gap-4 text-xs text-muted-foreground">
               <div className="flex items-center gap-1.5">
                 <span className="w-2 h-2 rounded-full bg-indigo-400" />
                 Available
@@ -294,16 +294,16 @@ export default function ScheduleManager({
           </div>
 
           {/* Selected date detail */}
-          <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
+          <div className="bg-card text-card-foreground rounded-xl border border-border shadow-sm p-5">
             {!selectedDate ? (
-              <div className="text-center text-gray-400 py-8">
+              <div className="text-center text-muted-foreground py-8">
                 <p className="text-3xl mb-2">📅</p>
                 <p className="text-sm">Click a date to see details</p>
               </div>
             ) : (
               <div className="space-y-4">
                 <div>
-                  <h3 className="font-semibold text-gray-900">
+                  <h3 className="font-semibold text-foreground">
                     {selectedDate.toLocaleDateString("en-NG", {
                       weekday: "long", month: "long", day: "numeric",
                     })}
@@ -312,9 +312,9 @@ export default function ScheduleManager({
 
                 {/* Available slots */}
                 <div>
-                  <p className="text-xs font-medium text-gray-500 mb-2">Available Time Slots</p>
+                  <p className="text-xs font-medium text-muted-foreground mb-2">Available Time Slots</p>
                   {selectedSlots.length === 0 ? (
-                    <p className="text-xs text-gray-400 italic">Not available this day</p>
+                    <p className="text-xs text-muted-foreground italic">Not available this day</p>
                   ) : (
                     <div className="flex flex-wrap gap-1.5">
                       {selectedSlots.map((slot) => {
@@ -329,8 +329,8 @@ export default function ScheduleManager({
                             key={slot}
                             className={`text-xs px-2 py-1 rounded-md font-medium ${
                               booked
-                                ? "bg-red-100 text-red-600 line-through"
-                                : "bg-green-100 text-green-700"
+                                ? "bg-destructive/10 text-destructive line-through"
+                                : "bg-success/10 text-success"
                             }`}
                           >
                             {slot}
@@ -343,15 +343,15 @@ export default function ScheduleManager({
 
                 {/* Bookings on this day */}
                 <div>
-                  <p className="text-xs font-medium text-gray-500 mb-2">
+                  <p className="text-xs font-medium text-muted-foreground mb-2">
                     Bookings ({selectedBookings.length})
                   </p>
                   {selectedBookings.length === 0 ? (
-                    <p className="text-xs text-gray-400 italic">No bookings this day</p>
+                    <p className="text-xs text-muted-foreground italic">No bookings this day</p>
                   ) : (
                     <div className="space-y-2">
                       {selectedBookings.map((b) => (
-                        <div key={b.id} className={`rounded-lg p-2.5 border text-xs ${statusColor[b.status] ?? "bg-gray-50 border-gray-200"}`}>
+                        <div key={b.id} className={`rounded-lg p-2.5 border text-xs ${statusColor[b.status] ?? "bg-muted border-border"}`}>
                           <p className="font-semibold">{b.memberName}</p>
                           <p>
                             {new Date(b.date).toLocaleTimeString("en-NG", {

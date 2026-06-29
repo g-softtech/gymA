@@ -42,14 +42,14 @@ export default function AdminLockoutGuard({
       {/* Full screen lockout if expired and not on billing page */}
       {!isActive && !isBillingPage && (
         <div className="fixed inset-0 z-[100] bg-slate-900/50 backdrop-blur-sm flex flex-col items-center justify-center p-6 text-center">
-          <div className="bg-white p-10 rounded-3xl shadow-2xl max-w-lg w-full">
-            <div className="w-20 h-20 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-6">
+          <div className="bg-card text-card-foreground p-10 rounded-3xl shadow-2xl max-w-lg w-full">
+            <div className="w-20 h-20 bg-destructive/10 text-destructive rounded-full flex items-center justify-center mx-auto mb-6">
               <svg className="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8V7a4 4 0 00-8 0v4h8z" />
               </svg>
             </div>
-            <h1 className="text-3xl font-black text-gray-900 mb-4">Dashboard Locked</h1>
-            <p className="text-gray-600 mb-8 leading-relaxed">
+            <h1 className="text-3xl font-black text-foreground mb-4">Dashboard Locked</h1>
+            <p className="text-muted-foreground mb-8 leading-relaxed">
               Your CortexFit SaaS subscription has expired and the grace period has ended. 
               Admin functionality is currently locked. Your members can still access their accounts, but you cannot manage your gym.
             </p>

@@ -37,7 +37,7 @@ export function LockedFeatureOverlay({ featureName = "This feature", className =
         
         <h3 className="text-2xl font-bold text-white mb-3">Feature Locked</h3>
         
-        <p className="text-gray-400 mb-8 leading-relaxed">
+        <p className="text-muted-foreground mb-8 leading-relaxed">
           {featureName} is locked on your current plan. Upgrade to unlock advanced capabilities instantly.
         </p>
         
