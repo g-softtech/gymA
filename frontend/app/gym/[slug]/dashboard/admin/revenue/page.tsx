@@ -78,7 +78,7 @@ export default async function RevenuePage({
           { label: "Total Revenue", value: `₦${totalRevenue.toLocaleString()}`, icon: "💰", color: "bg-success/10 text-success" },
           { label: "Active Revenue", value: `₦${activeRevenue.toLocaleString()}`, icon: "✅", color: "bg-primary/10 text-primary" },
           { label: "Total Subscriptions", value: subscriptions.length, icon: "📋", color: "bg-warning/10 text-warning" },
-          { label: "Active Plans", value: Object.keys(byPlan).length, icon: "📦", color: "bg-secondary/10 text-secondary" },
+          { label: "Active Plans", value: Object.keys(byPlan).length, icon: "📦", color: "bg-purple-500/10 text-purple-600 dark:text-purple-400" },
         ].map((s) => (
           <div key={s.label} className={`min-w-[200px] md:min-w-0 flex-shrink-0 snap-start rounded-xl p-5 ${s.color}`}>
             <div className="text-2xl mb-2">{s.icon}</div>

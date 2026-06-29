@@ -57,7 +57,7 @@ export default function TrainerAnalyticsClient() {
             <p className="text-sm font-medium text-muted-foreground">Total Active Clients</p>
             <h3 className="text-3xl font-bold text-foreground mt-1">{data.totalActiveClients}</h3>
           </div>
-          <div className="p-3 bg-secondary/10 text-secondary rounded-lg text-2xl">👥</div>
+          <div className="p-3 bg-purple-500/10 text-purple-600 dark:text-purple-400 rounded-lg text-2xl">👥</div>
         </div>
       </div>
 

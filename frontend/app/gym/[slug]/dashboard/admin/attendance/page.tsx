@@ -84,7 +84,7 @@ export default async function AttendancePage({
           { label: "Today", value: todayCount, icon: "📅", color: "bg-primary/10 text-primary" },
           { label: "This Week", value: weekCount, icon: "📆", color: "bg-primary/10 text-primary" },
           { label: "Total Records", value: recentAttendance.length, icon: "📋", color: "bg-success/10 text-success" },
-          { label: "Active Members", value: members.length, icon: "👥", color: "bg-secondary/10 text-secondary" },
+          { label: "Active Members", value: members.length, icon: "👥", color: "bg-purple-500/10 text-purple-600 dark:text-purple-400" },
         ].map((s) => (
           <div key={s.label} className={`rounded-xl p-5 ${s.color}`}>
             <div className="text-2xl mb-2">{s.icon}</div>

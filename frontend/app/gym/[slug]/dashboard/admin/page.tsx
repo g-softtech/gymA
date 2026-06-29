@@ -71,7 +71,7 @@ export default async function AdminDashboardPage({
     { label: "Total Members", value: totalMembers, color: "bg-primary/10 text-primary", icon: "👥" },
     { label: "Active Subscriptions", value: activeSubscriptions, color: "bg-success/10 text-success", icon: "✅" },
     { label: "Revenue (Active)", value: `₦${revenue.toLocaleString()}`, color: "bg-warning/10 text-warning", icon: "💰" },
-    { label: "Membership Plans", value: totalPlans, color: "bg-secondary/10 text-secondary", icon: "📋" },
+    { label: "Membership Plans", value: totalPlans, color: "bg-purple-500/10 text-purple-600 dark:text-purple-400", icon: "📋" },
   ];
 
   return (

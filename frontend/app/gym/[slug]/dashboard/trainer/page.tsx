@@ -68,7 +68,7 @@ export default async function TrainerDashboardPage({
           { label: "Upcoming Sessions", value: upcomingBookings.length, icon: "📅", color: "bg-primary/10 text-primary" },
           { label: "Pending Approvals", value: pendingBookings.length, icon: "⏳", color: "bg-warning/10 text-warning" },
           { label: "Total Clients", value: clientIds.size, icon: "👥", color: "bg-success/10 text-success" },
-          { label: "Completed Sessions", value: completedBookings.length, icon: "✅", color: "bg-secondary/10 text-secondary" },
+          { label: "Completed Sessions", value: completedBookings.length, icon: "✅", color: "bg-purple-500/10 text-purple-600 dark:text-purple-400" },
         ].map((s) => (
           <div key={s.label} className={`rounded-xl p-5 ${s.color}`}>
             <div className="text-2xl mb-2">{s.icon}</div>
