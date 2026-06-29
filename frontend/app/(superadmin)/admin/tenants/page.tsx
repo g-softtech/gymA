@@ -46,47 +46,47 @@ export default async function SuperAdminTenantsPage() {
       {/* Header */}
       <div className="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-white">Gyms</h1>
-          <p className="text-slate-400 text-sm mt-1">
+          <h1 className="text-2xl font-bold text-foreground">Gyms</h1>
+          <p className="text-muted-foreground text-sm mt-1">
             {tenants.length} gym{tenants.length !== 1 ? "s" : ""} on the platform
           </p>
         </div>
       </div>
 
       {/* Table */}
-      <div className="bg-card text-card-foreground/[0.03] border border-white/5 rounded-xl overflow-hidden">
+      <div className="bg-card text-card-foreground border border-border rounded-xl overflow-hidden shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-white/5">
-                <th className="text-left px-6 py-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+              <tr className="border-b border-border">
+                <th className="text-left px-6 py-3.5 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                   Gym
                 </th>
-                <th className="text-left px-6 py-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                <th className="text-left px-6 py-3.5 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                   Slug / Domain
                 </th>
-                <th className="text-left px-6 py-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                <th className="text-left px-6 py-3.5 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                   Plan
                 </th>
-                <th className="text-left px-6 py-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                <th className="text-left px-6 py-3.5 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                   Users
                 </th>
-                <th className="text-left px-6 py-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                <th className="text-left px-6 py-3.5 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                   Plans
                 </th>
-                <th className="text-left px-6 py-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                <th className="text-left px-6 py-3.5 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                   Status
                 </th>
-                <th className="text-left px-6 py-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                <th className="text-left px-6 py-3.5 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                   Actions
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/[0.04]">
+            <tbody className="divide-y divide-border">
               {tenants.map((tenant) => (
                 <tr
                   key={tenant.id}
-                  className="hover:bg-card text-card-foreground/[0.02] transition-colors"
+                  className="hover:bg-muted/50 transition-colors"
                 >
                   {/* Gym name + avatar */}
                   <td className="px-6 py-4">
@@ -111,9 +111,9 @@ export default async function SuperAdminTenantsPage() {
                         )}
                       </div>
                       <div>
-                        <p className="font-semibold text-white">{tenant.name}</p>
+                        <p className="font-semibold text-foreground">{tenant.name}</p>
                         {tenant.settings?.city && (
-                          <p className="text-xs text-slate-500">
+                          <p className="text-xs text-muted-foreground">
                             {tenant.settings.city}, {tenant.settings.country}
                           </p>
                         )}
@@ -123,7 +123,7 @@ export default async function SuperAdminTenantsPage() {
 
                   {/* Slug / domain */}
                   <td className="px-6 py-4">
-                    <p className="text-slate-300 font-mono text-xs">/{tenant.slug}</p>
+                    <p className="text-muted-foreground font-mono text-xs">/{tenant.slug}</p>
                     {tenant.settings?.customDomain && (
                       <p className="text-xs text-indigo-400 mt-0.5">
                         {tenant.settings.customDomain}
@@ -142,14 +142,14 @@ export default async function SuperAdminTenantsPage() {
 
                   {/* User count */}
                   <td className="px-6 py-4">
-                    <span className="text-slate-300 font-semibold">
+                    <span className="text-muted-foreground font-semibold">
                       {tenant._count.users}
                     </span>
                   </td>
 
                   {/* Membership plans count */}
                   <td className="px-6 py-4">
-                    <span className="text-slate-400">{tenant._count.membershipPlans}</span>
+                    <span className="text-muted-foreground">{tenant._count.membershipPlans}</span>
                   </td>
 
                   {/* Status */}
@@ -181,7 +181,7 @@ export default async function SuperAdminTenantsPage() {
           </table>
 
           {tenants.length === 0 && (
-            <div className="text-center py-16 text-slate-500">
+            <div className="text-center py-16 text-muted-foreground">
               <p className="text-4xl mb-3">🏢</p>
               <p className="text-sm">No gyms on the platform yet.</p>
             </div>

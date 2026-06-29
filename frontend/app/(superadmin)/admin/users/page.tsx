@@ -52,13 +52,13 @@ export default async function SuperAdminUsersPage({
   return (
     <div className="p-8">
       {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-white">All Users</h1>
-        <p className="text-slate-400 text-sm mt-1">
-          {users.length} user{users.length !== 1 ? "s" : ""} shown
-          {filterRole ? ` · ${filterRole}` : ""}
-          {filterTenantId ? ` · ${tenants.find((t) => t.id === filterTenantId)?.name ?? filterTenantId}` : ""}
-        </p>
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+        <div>
+          <h1 className="text-2xl font-bold text-foreground">All Users</h1>
+          <p className="text-muted-foreground text-sm mt-1">
+            Manage members, trainers, and admins across all gyms.
+          </p>
+        </div>
       </div>
 
       {/* Filters */}
@@ -109,35 +109,35 @@ export default async function SuperAdminUsersPage({
       </form>
 
       {/* Table */}
-      <div className="bg-card text-card-foreground/[0.03] border border-white/5 rounded-xl overflow-hidden">
+      <div className="bg-card text-card-foreground border border-border rounded-xl overflow-hidden shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-white/5">
-                <th className="text-left px-6 py-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+              <tr className="border-b border-border">
+                <th className="text-left px-6 py-3.5 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                   User
                 </th>
-                <th className="text-left px-6 py-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                <th className="text-left px-6 py-3.5 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                   Email
                 </th>
-                <th className="text-left px-6 py-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                <th className="text-left px-6 py-3.5 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                   Role
                 </th>
-                <th className="text-left px-6 py-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                <th className="text-left px-6 py-3.5 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                   Gym
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/[0.04]">
+            <tbody className="divide-y divide-border">
               {users.map((user) => (
                 <tr
                   key={user.id}
-                  className="hover:bg-card text-card-foreground/[0.02] transition-colors"
+                  className="hover:bg-muted/50 transition-colors"
                 >
                   {/* Avatar + name */}
-                  <td className="px-6 py-3.5">
+                  <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-xs font-bold text-white uppercase shrink-0 overflow-hidden">
+                      <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold text-primary uppercase shrink-0 overflow-hidden">
                         {user.image ? (
                           // eslint-disable-next-line @next/next/no-img-element
                           <img
@@ -149,15 +149,17 @@ export default async function SuperAdminUsersPage({
                           (user.name?.[0] ?? user.email?.[0] ?? "?")
                         )}
                       </div>
-                      <p className="font-medium text-white">
-                        {user.name ?? <span className="text-slate-500 italic">No name</span>}
-                      </p>
+                      <div>
+                        <p className="font-medium text-foreground">
+                          {user.name ?? "Unnamed User"}
+                        </p>
+                      </div>
                     </div>
                   </td>
 
                   {/* Email */}
                   <td className="px-6 py-3.5">
-                    <p className="text-slate-400 text-xs">{user.email}</p>
+                    <p className="text-muted-foreground text-xs">{user.email}</p>
                   </td>
 
                   {/* Role */}
@@ -185,7 +187,7 @@ export default async function SuperAdminUsersPage({
           </table>
 
           {users.length === 0 && (
-            <div className="text-center py-16 text-slate-500">
+            <div className="text-center py-16 text-muted-foreground">
               <p className="text-4xl mb-3">👥</p>
               <p className="text-sm">No users match your filters.</p>
             </div>

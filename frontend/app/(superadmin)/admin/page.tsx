@@ -127,8 +127,8 @@ export default async function SuperAdminOverviewPage() {
     <div className="p-8">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-white">Platform Overview</h1>
-        <p className="text-slate-400 text-sm mt-1">
+        <h1 className="text-2xl font-bold text-foreground">Platform Overview</h1>
+        <p className="text-muted-foreground text-sm mt-1">
           Monitor all gyms and users across the CortexFit platform.
         </p>
       </div>
@@ -138,22 +138,22 @@ export default async function SuperAdminOverviewPage() {
         {statCards.map((card) => (
           <div
             key={card.label}
-            className="bg-card text-card-foreground/[0.03] border border-white/5 rounded-xl p-5 hover:bg-card text-card-foreground/[0.05] transition-colors"
+            className="bg-card text-card-foreground border border-border rounded-xl p-5 hover:shadow-md transition-all shadow-sm"
           >
-            <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${card.color} flex items-center justify-center text-lg mb-3`}>
+            <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${card.color} flex items-center justify-center text-lg mb-3 text-white`}>
               {card.icon}
             </div>
-            <p className="text-3xl font-bold text-white">{card.value.toLocaleString()}</p>
-            <p className="text-sm font-medium text-slate-300 mt-0.5">{card.label}</p>
-            <p className="text-xs text-slate-500 mt-0.5">{card.sub}</p>
+            <p className="text-3xl font-bold text-foreground">{card.value.toLocaleString()}</p>
+            <p className="text-sm font-medium text-muted-foreground mt-0.5">{card.label}</p>
+            <p className="text-xs text-muted-foreground mt-0.5 opacity-80">{card.sub}</p>
           </div>
         ))}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Plan Breakdown */}
-        <div className="bg-card text-card-foreground/[0.03] border border-white/5 rounded-xl p-6">
-          <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4">
+        <div className="bg-card text-card-foreground border border-border rounded-xl p-6 shadow-sm">
+          <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-4">
             Subscription Plans
           </h2>
           <div className="space-y-3">
@@ -164,20 +164,20 @@ export default async function SuperAdminOverviewPage() {
                 >
                   {p.plan}
                 </span>
-                <span className="text-sm font-semibold text-white">
+                <span className="text-sm font-semibold text-foreground">
                   {p._count._all} gym{p._count._all !== 1 ? "s" : ""}
                 </span>
               </div>
             ))}
             {stats.planBreakdown.length === 0 && (
-              <p className="text-sm text-slate-500">No data yet.</p>
+              <p className="text-sm text-muted-foreground">No data yet.</p>
             )}
           </div>
         </div>
 
         {/* Recent Gyms */}
-        <div className="bg-card text-card-foreground/[0.03] border border-white/5 rounded-xl p-6">
-          <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4">
+        <div className="bg-card text-card-foreground border border-border rounded-xl p-6 shadow-sm">
+          <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-4">
             Recently Added Gyms
           </h2>
           <div className="space-y-3">
@@ -194,8 +194,8 @@ export default async function SuperAdminOverviewPage() {
                   {t.name[0]}
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="text-sm font-medium text-white truncate">{t.name}</p>
-                  <p className="text-xs text-slate-500">{t._count.users} users · /{t.slug}</p>
+                  <p className="text-sm font-medium text-foreground truncate">{t.name}</p>
+                  <p className="text-xs text-muted-foreground">{t._count.users} users · /{t.slug}</p>
                 </div>
                 <span
                   className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${planColors[t.plan] ?? "bg-slate-700 text-slate-300"}`}
@@ -205,21 +205,21 @@ export default async function SuperAdminOverviewPage() {
               </div>
             ))}
             {stats.recentTenants.length === 0 && (
-              <p className="text-sm text-slate-500">No gyms yet.</p>
+              <p className="text-sm text-muted-foreground">No gyms yet.</p>
             )}
           </div>
         </div>
 
         {/* Recent Revenue (Phase 9B.5) */}
-        <div className="bg-card text-card-foreground/[0.03] border border-white/5 rounded-xl p-6 lg:col-span-2">
-          <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4 flex items-center justify-between">
+        <div className="bg-card text-card-foreground border border-border rounded-xl p-6 shadow-sm lg:col-span-2">
+          <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-4 flex items-center justify-between">
             <span>Recent SaaS Invoices</span>
             <span className="text-xs text-indigo-400 font-medium normal-case">Phase 9B.5</span>
           </h2>
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="border-b border-white/10 text-xs uppercase text-slate-500">
+                <tr className="border-b border-border text-xs uppercase text-muted-foreground">
                   <th className="py-3 px-4 font-semibold">Date</th>
                   <th className="py-3 px-4 font-semibold">Gym</th>
                   <th className="py-3 px-4 font-semibold">Amount</th>
@@ -228,19 +228,19 @@ export default async function SuperAdminOverviewPage() {
               </thead>
               <tbody className="text-sm">
                 {stats.recentInvoices.map((inv) => (
-                  <tr key={inv.id} className="border-b border-white/5 hover:bg-card text-card-foreground/[0.02]">
-                    <td className="py-3 px-4 text-slate-300">
+                  <tr key={inv.id} className="border-b border-border hover:bg-muted/50 transition-colors">
+                    <td className="py-3 px-4 text-muted-foreground">
                       {new Date(inv.createdAt).toLocaleDateString()}
                     </td>
-                    <td className="py-3 px-4 font-medium text-white">
+                    <td className="py-3 px-4 font-medium text-foreground">
                       {inv.tenant!.name}
                     </td>
-                    <td className="py-3 px-4 text-emerald-400 font-semibold">
+                    <td className="py-3 px-4 text-emerald-500 dark:text-emerald-400 font-semibold">
                       ₦{inv.amount.toLocaleString()}
                     </td>
                     <td className="py-3 px-4">
                       <span className={`text-xs px-2 py-1 rounded-md font-medium ${
-                        inv.status === "SUCCESS" || inv.status === "paid" || inv.status === "PAID" ? "bg-green-500/10 text-green-400" : "bg-yellow-500/10 text-yellow-400"
+                        inv.status === "SUCCESS" || inv.status === "paid" || inv.status === "PAID" ? "bg-green-500/10 text-green-600 dark:text-green-400" : "bg-yellow-500/10 text-yellow-600 dark:text-yellow-400"
                       }`}>
                         {inv.status}
                       </span>
@@ -249,7 +249,7 @@ export default async function SuperAdminOverviewPage() {
                 ))}
                 {stats.recentInvoices.length === 0 && (
                   <tr>
-                    <td colSpan={4} className="py-8 text-center text-slate-500">
+                    <td colSpan={4} className="py-8 text-center text-muted-foreground">
                       No invoices found.
                     </td>
                   </tr>
