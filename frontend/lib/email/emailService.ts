@@ -21,7 +21,7 @@ export async function sendEmail({
         "Authorization": `Bearer ${process.env.RESEND_API_KEY}`,
       },
       body: JSON.stringify({
-        from: "CortexFit Billing <onboarding@resend.dev>",
+        from: "CortexFit Billing <info@thecortexsystems.com>",
         to,
         subject,
         html,
