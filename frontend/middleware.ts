@@ -79,8 +79,8 @@ export default withAuth(
     console.log(`${TRACE} │  token.tenantSlug= ${(token as any)?.tenantSlug ?? "undefined"}`);
 
     // ── 0. API Route Bailout ────────────────────────────────────────────────
-    if (pathname.startsWith("/api/")) {
-      console.log(`${TRACE} └─ PASS: API route bailout`);
+    if (pathname.startsWith("/api/") || pathname.startsWith("/not-found")) {
+      console.log(`${TRACE} └─ PASS: API route or not-found bailout`);
       return NextResponse.next();
     }
 
