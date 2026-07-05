@@ -32,6 +32,10 @@ model Tenant {
   settings         TenantSettings?
   transactions     Transaction[]
   users            User[]
+
+  @@index([billingStatus])
+  @@index([billingEndsAt])
+  @@index([trialEndsAt])
 }
 
 model User {

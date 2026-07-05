@@ -61,8 +61,7 @@ function isCustomDomain(hostname: string): boolean {
 // Main middleware (wrapped in withAuth for NextAuth JWT session access)
 // ─────────────────────────────────────────────────────────────────────────────
 
-import { billingGuard } from "@/lib/billing/billingGuard";
-
+// Removed billingGuard import to fix Edge Runtime crash with node:util/types
 export default withAuth(
   async function middleware(req: NextRequest) {
     const token = (
@@ -113,11 +112,8 @@ export default withAuth(
     }
 
     // ── 3. Billing Enforcement ──────────────────────────────────────────────
-    const billingResponse = await billingGuard(req);
-    if (billingResponse) {
-      console.log(`${TRACE} └─ BLOCKED: billing guard redirect`);
-      return billingResponse;
-    }
+    // billingGuard relies on Prisma (Node.js runtime) and cannot run in Edge middleware.
+    // Enforcements should be migrated to the App Router layout/page layer using next/headers and redirect().
 
     console.log(`${TRACE} └─ PASS: proceeding to page handler`);
     return NextResponse.next();

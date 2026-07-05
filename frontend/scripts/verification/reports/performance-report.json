@@ -1,0 +1,12 @@
+{
+  "billingGuardLookup": {
+    "min": 210.52240000000165,
+    "max": 5938.775000000001,
+    "average": 623.0870849999999,
+    "median": 312.6234000000004,
+    "p95": 1947.948199999999,
+    "iterations": 100
+  },
+  "cronExecution": "PENDING MANUAL VERIFICATION",
+  "webhookProcessing": "PENDING MANUAL VERIFICATION"
+}
