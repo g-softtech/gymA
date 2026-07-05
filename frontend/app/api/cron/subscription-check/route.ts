@@ -1,5 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { processExpiringSubscriptions } from "@/lib/subscriptions/lifecycleEngine";
+import { processPlatformSubscriptions } from "@/lib/subscriptions/platformLifecycleEngine";
+import { runBillingReconciliationJob } from "@/lib/billing/billingReconciliationJob";
+import { detectRevenueLeaks } from "@/lib/billing/revenueLeakDetector";
+import { acquireLock, releaseLock } from "@/lib/distributedLock";
+import { logger } from "@/lib/logger";
+// Side-effect import: registers all billing event listeners
+import "@/lib/billing/billingNotifications";
 
 export async function GET(req: NextRequest) {
   // 1. Authenticate cron job
@@ -18,18 +25,43 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const result = await processExpiringSubscriptions();
+    const correlationId = crypto.randomUUID();
+
+    // ── Execute Engines with Distributed Locks ─────────────────────────────
+
+    let lifecycleProcessed = 0;
+    if (await acquireLock({ lockId: "platformLifecycleEngine", timeoutMs: 300000, correlationId })) {
+      try {
+        lifecycleProcessed = await processPlatformSubscriptions();
+      } finally {
+        await releaseLock("platformLifecycleEngine", correlationId);
+      }
+    }
+
+    if (await acquireLock({ lockId: "billingReconciliation", timeoutMs: 300000, correlationId })) {
+      try {
+        await runBillingReconciliationJob();
+      } finally {
+        await releaseLock("billingReconciliation", correlationId);
+      }
+    }
+
+    if (await acquireLock({ lockId: "revenueLeakDetector", timeoutMs: 60000, correlationId })) {
+      try {
+        await detectRevenueLeaks();
+      } finally {
+        await releaseLock("revenueLeakDetector", correlationId);
+      }
+    }
 
     return NextResponse.json({
       success: true,
-      message: "Subscription lifecycle check completed successfully",
-      stats: result,
+      processed: lifecycleProcessed,
+      correlationId,
+      timestamp: new Date().toISOString(),
     });
-  } catch (error: any) {
-    console.error("[Cron:SubscriptionCheck] Error processing subscriptions:", error);
-    return NextResponse.json(
-      { success: false, error: error.message || "Internal server error" },
-      { status: 500 }
-    );
+  } catch (error) {
+    logger.error("CRON_ERROR", { error: String(error) });
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }

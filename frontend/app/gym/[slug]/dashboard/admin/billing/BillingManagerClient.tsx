@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { useBranding } from "@/components/TenantThemeProvider";
-import type { PlatformPlanConfig } from "@/lib/billing/pricingConfig";
+import type { PlatformPlanConfig } from "@/lib/billing/pricing.config";
+import { PricingCard } from "@/components/billing/PricingCard";
 
 type PlanInfo = {
   subscriptionPlan: string;
@@ -35,6 +36,7 @@ export default function BillingManagerClient() {
 
   const fetchPlans = async () => {
     try {
+      // In a real app, this API endpoint would be updated to return planCatalogService.getPlans()
       const res = await fetch("/api/billing/plans");
       const json = await res.json();
       if (!res.ok) throw new Error(json.error || "Failed to fetch plans");
@@ -44,15 +46,15 @@ export default function BillingManagerClient() {
     }
   };
 
-  const handleUpgrade = async (planAlias: string, planName: string) => {
-    setCheckoutLoading(planName);
+  const handleUpgrade = async (planCode: string) => {
+    setCheckoutLoading(planCode);
     setError("");
 
     try {
       const res = await fetch("/api/billing/initialize", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ planCode: planAlias }),
+        body: JSON.stringify({ planCode }),
       });
 
       const json = await res.json();
@@ -70,7 +72,7 @@ export default function BillingManagerClient() {
   if (loading) return <div className="p-8 text-center text-muted-foreground animate-pulse">Loading billing state...</div>;
 
   return (
-    <div className="max-w-5xl mx-auto space-y-8">
+    <div className="max-w-7xl mx-auto space-y-8">
       <div>
         <h1 className="text-3xl font-bold text-foreground">Platform Subscription</h1>
         <p className="mt-2 text-muted-foreground">Manage your subscription, plan limits, and billing history.</p>
@@ -112,61 +114,37 @@ export default function BillingManagerClient() {
       </div>
 
       {/* Plans Comparison */}
-      <div className="grid md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 xl:gap-6 items-start">
         {plans.map((plan) => {
           const isCurrent = status?.subscriptionPlan === plan.code;
           return (
-          <div 
-            key={plan.code} 
-            className={`bg-card text-card-foreground rounded-3xl p-8 border-2 transition-all ${isCurrent ? "border-indigo-600 shadow-xl shadow-indigo-100" : "border-border hover:border-border shadow-sm"}`}
-          >
-            {isCurrent && (
-              <div className="inline-block px-3 py-1 bg-primary/10 text-primary text-xs font-bold rounded-full mb-4">
-                CURRENT PLAN
-              </div>
-            )}
-            <h3 className="text-xl font-bold text-foreground">{plan.name}</h3>
-            <div className="mt-2 flex items-baseline gap-1">
-              <span className="text-3xl font-black text-foreground">
-                {plan.amountNGN === 0 ? "Free" : `₦${plan.amountNGN.toLocaleString()}`}
-              </span>
-              <span className="text-sm text-muted-foreground">/{plan.interval}</span>
-            </div>
-            <p className="mt-2 text-sm text-muted-foreground h-10">{plan.description}</p>
-            
-            <ul className="mt-6 space-y-4">
-              {plan.features.map((f, i) => (
-                <li key={i} className="flex items-start gap-3 text-sm text-muted-foreground">
-                  <svg className="w-5 h-5 text-green-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                  {f}
-                </li>
-              ))}
-            </ul>
-
-            <div className="mt-8">
-              {isCurrent ? (
-                <button disabled className="w-full py-3 rounded-xl bg-muted text-muted-foreground font-bold text-sm cursor-not-allowed">
-                  Current Plan
-                </button>
-              ) : plan.code === "FREE" ? (
-                <button disabled className="w-full py-3 rounded-xl border-2 border-border text-muted-foreground font-bold text-sm cursor-not-allowed">
-                  Downgrade Support Coming Soon
-                </button>
-              ) : (
-                <button 
-                  onClick={() => handleUpgrade(plan.code, plan.name)}
-                  disabled={!!checkoutLoading}
-                  className="w-full py-3 rounded-xl text-white font-bold text-sm hover:opacity-90 transition-all shadow-lg"
-                  style={{ background: primaryColor || "linear-gradient(135deg, #6366F1, #8B5CF6)" }}
-                >
-                  {checkoutLoading === plan.name ? "Redirecting..." : `Upgrade to ${plan.name}`}
-                </button>
-              )}
-            </div>
-          </div>
-        )})}
+            <PricingCard 
+              key={plan.code} 
+              plan={plan} 
+              renderAction={(p) => {
+                if (isCurrent) {
+                  return (
+                    <button disabled className="w-full py-3 rounded-xl bg-muted text-muted-foreground font-bold text-sm cursor-not-allowed">
+                      Current Plan
+                    </button>
+                  );
+                }
+                
+                // Assuming we can only upgrade from current, not downgrade yet
+                return (
+                  <button 
+                    onClick={() => handleUpgrade(p.code)}
+                    disabled={!!checkoutLoading}
+                    className="w-full py-3 rounded-xl text-white font-bold text-sm hover:opacity-90 transition-all shadow-lg"
+                    style={{ background: primaryColor || "linear-gradient(135deg, #6366F1, #8B5CF6)" }}
+                  >
+                    {checkoutLoading === p.code ? "Redirecting..." : `Upgrade to ${p.ui.displayName}`}
+                  </button>
+                );
+              }}
+            />
+          );
+        })}
       </div>
     </div>
   );

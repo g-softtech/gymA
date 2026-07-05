@@ -36,6 +36,7 @@ export default async function SuperAdminLayout({
     { href: "/admin", label: "Overview", icon: "⚡" },
     { href: "/admin/tenants", label: "Gyms", icon: "🏢" },
     { href: "/admin/users", label: "All Users", icon: "👥" },
+    { href: "/admin/billing", label: "Billing", icon: "💰" },
   ];
 
   return (

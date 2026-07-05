@@ -13,7 +13,7 @@ const pool = globalForPrisma.pool ?? new Pool({
   connectionString: process.env.DATABASE_URL,
   max: 10,                 // Strictly cap connections per serverless instance lambda
   idleTimeoutMillis: 30000, // Drop idle connections quickly
-  connectionTimeoutMillis: 2000
+  connectionTimeoutMillis: 10000
 });
 const adapter = globalForPrisma.adapter ?? new PrismaPg(pool);
 

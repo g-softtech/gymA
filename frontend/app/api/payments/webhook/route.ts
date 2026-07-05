@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
 import { fulfillPayment } from "@/lib/paymentFulfillment";
-import { handlePaystackWebhook } from "@/lib/billing/handler";
 import { prisma } from "@/lib/prisma";
 
 /**
@@ -49,29 +48,20 @@ export async function POST(req: NextRequest) {
     try {
       const reference = event.data.reference;
 
-      // Determine routing via DB lookup (source of truth)
-      const saasInvoice = await prisma.saaSInvoice.findUnique({
+      // Process Member Transactions
+      const transaction = await prisma.transaction.findUnique({
         where: { reference },
       });
 
-      if (saasInvoice) {
-        console.log(`[webhook] Reference ${reference} matches SaaS invoice. Routing to Platform billing handler.`);
-        await handlePaystackWebhook(event, saasInvoice);
-      } else {
-        const transaction = await prisma.transaction.findUnique({
-          where: { reference },
+      if (transaction) {
+        console.log(`[webhook] Reference ${reference} matches Transaction. Routing to Member billing handler.`);
+        await fulfillPayment(reference, {
+          amountKobo: event.data.amount,
+          currency: event.data.currency,
+          rawResponse: event.data,
         });
-
-        if (transaction) {
-          console.log(`[webhook] Reference ${reference} matches Transaction. Routing to Member billing handler.`);
-          await fulfillPayment(reference, {
-            amountKobo: event.data.amount,
-            currency: event.data.currency,
-            rawResponse: event.data,
-          });
-        } else {
-          console.warn(`[webhook] Unrecognized reference: ${reference}. Ignoring event.`);
-        }
+      } else {
+        console.warn(`[webhook] Unrecognized reference or not a member transaction: ${reference}. Ignoring event.`);
       }
     } catch (err) {
       // Log the error but still return 200 so Paystack doesn't retry

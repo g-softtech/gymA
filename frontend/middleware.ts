@@ -57,8 +57,10 @@ function isCustomDomain(hostname: string): boolean {
 // Main middleware (wrapped in withAuth for NextAuth JWT session access)
 // ─────────────────────────────────────────────────────────────────────────────
 
+import { billingGuard } from "@/lib/billing/billingGuard";
+
 export default withAuth(
-  function middleware(req: NextRequest) {
+  async function middleware(req: NextRequest) {
     const token = (
       req as NextRequest & {
         nextauth: { token: { role?: string; tenantId?: string; tenantSlug?: string; email?: string } | null };
@@ -104,6 +106,13 @@ export default withAuth(
       url.searchParams.set("path", pathname);
       console.log(`${TRACE} └─ REWRITE: custom domain → /api/gym/resolve?domain=${hostname}`);
       return NextResponse.rewrite(url);
+    }
+
+    // ── 3. Billing Enforcement ──────────────────────────────────────────────
+    const billingResponse = await billingGuard(req);
+    if (billingResponse) {
+      console.log(`${TRACE} └─ BLOCKED: billing guard redirect`);
+      return billingResponse;
     }
 
     console.log(`${TRACE} └─ PASS: proceeding to page handler`);
