@@ -50,6 +50,10 @@ function getSubdomainSlug(hostname: string): string | null {
 function isCustomDomain(hostname: string): boolean {
   const host = hostname.split(":")[0];
   const rootHost = ROOT_DOMAIN.split(":")[0];
+  
+  // Never treat vercel preview URLs or the main vercel project URL as a custom domain
+  if (host.endsWith(".vercel.app")) return false;
+
   return host !== rootHost && !host.endsWith(`.${rootHost}`) && host !== "localhost";
 }
 
