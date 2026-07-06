@@ -53,14 +53,14 @@ export async function POST(req: NextRequest) {
       update: {
         specialties: specialties ?? [],
         bio: bio ?? "",
-        hourlyRate: hourlyRate ? parseFloat(hourlyRate) : null,
+        hourlyRate: hourlyRate ?? null,
       },
       create: {
         userId: user.id,
         specialties: specialties ?? [],
         availability: {},
         bio: bio ?? "",
-        hourlyRate: hourlyRate ? parseFloat(hourlyRate) : null,
+        hourlyRate: hourlyRate ?? null,
       },
     });
 
