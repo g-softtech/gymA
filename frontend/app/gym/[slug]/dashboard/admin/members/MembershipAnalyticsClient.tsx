@@ -40,7 +40,7 @@ export default function MembershipAnalyticsClient() {
         <div className="bg-card text-card-foreground p-6 rounded-xl border border-border shadow-sm flex items-center justify-between">
           <div>
             <p className="text-sm font-medium text-muted-foreground">Active Members</p>
-            <h3 className="text-3xl font-bold text-foreground mt-1">{data.activeMembers}</h3>
+            <h3 className="text-3xl font-bold text-foreground mt-1">{data.active}</h3>
           </div>
           <div className="p-3 bg-indigo-50 text-indigo-600 rounded-lg text-2xl">👥</div>
         </div>
@@ -48,7 +48,7 @@ export default function MembershipAnalyticsClient() {
         <div className="bg-card text-card-foreground p-6 rounded-xl border border-border shadow-sm flex items-center justify-between">
           <div>
             <p className="text-sm font-medium text-muted-foreground">New This Month</p>
-            <h3 className="text-3xl font-bold text-foreground mt-1">{data.newMembersThisMonth}</h3>
+            <h3 className="text-3xl font-bold text-foreground mt-1">{data.newMembers}</h3>
           </div>
           <div className="p-3 bg-green-50 text-green-600 rounded-lg text-2xl">📈</div>
         </div>
@@ -56,20 +56,20 @@ export default function MembershipAnalyticsClient() {
         <div className="bg-card text-card-foreground p-6 rounded-xl border border-border shadow-sm flex items-center justify-between">
           <div>
             <p className="text-sm font-medium text-muted-foreground">Retention Rate</p>
-            <h3 className="text-3xl font-bold text-foreground mt-1">{data.retentionRate}%</h3>
+            <h3 className="text-3xl font-bold text-foreground mt-1">{data.retention}%</h3>
           </div>
           <div className="p-3 bg-purple-50 text-purple-600 rounded-lg text-2xl">❤️</div>
         </div>
       </div>
 
-      {data.membersByPlan && data.membersByPlan.length > 0 && (
+      {data.byPlan && data.byPlan.length > 0 && (
         <div className="bg-card text-card-foreground p-6 rounded-xl border border-border shadow-sm">
           <h3 className="text-lg font-bold text-foreground mb-6">Members by Plan</h3>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
-                  data={data.membersByPlan}
+                  data={data.byPlan}
                   dataKey="activeMembers"
                   nameKey="planName"
                   cx="50%"
@@ -78,7 +78,7 @@ export default function MembershipAnalyticsClient() {
                   fill="#8884d8"
                   label={({ name, percent }) => `${name} ${((percent ?? 0) * 100).toFixed(0)}%`}
                 >
-                  {data.membersByPlan.map((entry: any, index: number) => (
+                  {data.byPlan.map((entry: any, index: number) => (
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                   ))}
                 </Pie>
