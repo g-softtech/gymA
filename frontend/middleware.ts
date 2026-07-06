@@ -1,6 +1,7 @@
 import { withAuth } from "next-auth/middleware";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { checkPublicRateLimit, checkAuthRateLimit } from "./lib/rateLimit";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Domain routing helpers
@@ -82,6 +83,33 @@ export default withAuth(
     console.log(`${TRACE} │  token.role      = ${(token as any)?.role ?? "undefined"}`);
     console.log(`${TRACE} │  token.tenantId  = ${(token as any)?.tenantId ?? "undefined"}`);
     console.log(`${TRACE} │  token.tenantSlug= ${(token as any)?.tenantSlug ?? "undefined"}`);
+
+    // ── RATE LIMITING ───────────────────────────────────────────────────────
+    // 1. Skip webhooks
+    const isWebhook = pathname.startsWith("/api/webhooks") || pathname.startsWith("/api/payments/webhook");
+    const isApi = pathname.startsWith("/api/");
+    
+    if (isApi && !isWebhook) {
+      const isAuthApi = pathname.startsWith("/api/auth/") && !pathname.startsWith("/api/auth/session");
+      const isPublicApi = isAuthApi || pathname.startsWith("/api/public/");
+
+      if (isPublicApi) {
+        // Strict rate limit by IP
+        const ip = req.ip ?? req.headers.get("x-forwarded-for") ?? "127.0.0.1";
+        const rl = await checkPublicRateLimit(ip);
+        if (rl.limited) {
+          console.log(`${TRACE} └─ BLOCKED: Public API Rate Limit Exceeded for IP ${ip}`);
+          return rl.response!;
+        }
+      } else if (token?.sub) {
+        // Relaxed rate limit by User ID
+        const rl = await checkAuthRateLimit(token.sub as string);
+        if (rl.limited) {
+          console.log(`${TRACE} └─ BLOCKED: Auth API Rate Limit Exceeded for User ${token.sub}`);
+          return rl.response!;
+        }
+      }
+    }
 
     // ── 0. API Route Bailout ────────────────────────────────────────────────
     if (pathname.startsWith("/api/") || pathname.startsWith("/not-found")) {

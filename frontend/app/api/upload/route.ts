@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getAuthSession } from "@/lib/auth";
 import { v2 as cloudinary } from "cloudinary";
+import { MAX_UPLOAD_SIZE, validateImageMagicBytes, generateRandomFilename } from "@/lib/fileValidation";
 
 // Configure Cloudinary
 cloudinary.config({
@@ -33,14 +34,26 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "No file provided" }, { status: 400 });
     }
 
+    if (file.size > MAX_UPLOAD_SIZE) {
+      return NextResponse.json({ error: `File exceeds maximum size of ${MAX_UPLOAD_SIZE / 1024 / 1024}MB` }, { status: 400 });
+    }
+
     // Convert the file to a buffer
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
+    // Validate Magic Bytes
+    const { valid, mime } = validateImageMagicBytes(buffer);
+    if (!valid) {
+      return NextResponse.json({ error: "Invalid file content. Only real images are allowed." }, { status: 400 });
+    }
+
+    const randomName = generateRandomFilename(file.name);
+
     // Upload using upload_stream
     const result = await new Promise((resolve, reject) => {
       const uploadStream = cloudinary.uploader.upload_stream(
-        { folder: folder, resource_type: "image" },
+        { folder: folder, resource_type: "image", public_id: randomName.split(".")[0], format: mime?.split("/")[1] },
         (error, result) => {
           if (error) reject(error);
           else resolve(result);
@@ -56,7 +69,7 @@ export async function POST(req: Request) {
   } catch (error: any) {
     console.error("[POST /api/upload]", error);
     return NextResponse.json(
-      { error: error.message || "Failed to upload image" },
+      { error: "Internal Server Error" },
       { status: 500 }
     );
   }

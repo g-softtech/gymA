@@ -20,11 +20,31 @@ const nextConfig: NextConfig = {
               "default-src 'self'",
               "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.paystack.co https://checkout.paystack.com",
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://checkout.paystack.com",
-              "img-src 'self' data: https: blob:",
+              "img-src 'self' data: https: blob: res.cloudinary.com",
               "font-src 'self' data: https: https://fonts.gstatic.com",
               "frame-src 'self' https://checkout.paystack.com https://maps.google.com https://www.google.com",
               "connect-src 'self' https://api.paystack.co https://checkout.paystack.com",
             ].join("; "),
+          },
+          {
+            key: "Strict-Transport-Security",
+            value: "max-age=63072000; includeSubDomains; preload",
+          },
+          {
+            key: "X-Frame-Options",
+            value: "SAMEORIGIN",
+          },
+          {
+            key: "X-Content-Type-Options",
+            value: "nosniff",
+          },
+          {
+            key: "Referrer-Policy",
+            value: "strict-origin-when-cross-origin",
+          },
+          {
+            key: "Permissions-Policy",
+            value: "camera=(), microphone=(), geolocation=(), browsing-topics=()",
           },
         ],
       },

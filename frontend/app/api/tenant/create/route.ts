@@ -8,6 +8,7 @@ import { adminNotificationService } from "@/lib/notifications/AdminNotificationS
 import { NewTenantSignupPayload } from "@/lib/notifications/types";
 import crypto from "crypto";
 import { TRIAL_DURATION_DAYS } from "@/lib/billing/pricingConfig";
+import { validateBody, tenantCreateSchema } from "@/lib/validation";
 /**
  * POST /api/tenant/create
  *
@@ -36,14 +37,9 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { name } = await req.json();
-
-    if (!name || typeof name !== "string" || name.trim().length < 2) {
-      return NextResponse.json(
-        { error: "Gym name must be at least 2 characters." },
-        { status: 400 }
-      );
-    }
+    const { data, error } = await validateBody(tenantCreateSchema)(req);
+    if (error) return error;
+    const name = data!.name;
 
     // Derive a clean URL slug from the gym name
     const slug = name
@@ -82,6 +78,7 @@ export async function POST(req: Request) {
         data: {
           tenantId: tenant.id,
           role: "ADMIN",
+          sessionVersion: { increment: 1 }
         },
       });
 

@@ -6,6 +6,7 @@ import { prisma } from "./prisma";
 import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
+import { auditLogger, AuditEventType } from "./auditLogger";
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma) as any,
@@ -53,11 +54,13 @@ export const authOptions: NextAuthOptions = {
 
         if (!user) {
           console.log("[AUTH TRACE] Rejecting: User not found in DB");
+          auditLogger.log(AuditEventType.USER_FAILED_LOGIN, null, { email, reason: "User not found" });
           throw new Error("Invalid email or password.");
         }
 
         if (!user.password) {
           console.log("[AUTH TRACE] Rejecting: Account has no password (Google-only)");
+          auditLogger.log(AuditEventType.USER_FAILED_LOGIN, user.tenantId, { email, reason: "No password set" }, user.id);
           throw new Error("This account uses Google Sign-In. Please use the Google button.");
         }
 
@@ -70,6 +73,7 @@ export const authOptions: NextAuthOptions = {
 
         if (!passwordValid) {
           console.log("[AUTH TRACE] Rejecting: Password mismatch");
+          auditLogger.log(AuditEventType.USER_FAILED_LOGIN, user.tenantId, { email, reason: "Password mismatch" }, user.id);
           throw new Error("Invalid email or password.");
         }
 
@@ -78,6 +82,8 @@ export const authOptions: NextAuthOptions = {
           role: user.role,
           tenantId: user.tenantId
         });
+
+        auditLogger.log(AuditEventType.USER_LOGIN, user.tenantId, { email, provider: "credentials" }, user.id);
 
         return {
           id: user.id,
@@ -133,6 +139,7 @@ export const authOptions: NextAuthOptions = {
           id: true,
           role: true,
           tenantId: true,
+          sessionVersion: true,
           tenant: { select: { slug: true, status: true } },
         },
       });
@@ -152,11 +159,19 @@ export const authOptions: NextAuthOptions = {
       console.log(`${TRACE} │    dbUser.tenant.slug= ${dbUser.tenant?.slug ?? "null"}`);
 
       // 3. Hydrate token with guaranteed DB values
+      
+      // ✅ Session Revocation Check
+      if (token.sessionVersion && token.sessionVersion !== dbUser.sessionVersion) {
+        console.error(`${TRACE} └─ 🚨 REVOCATION TRIGGERED: DB sessionVersion=${dbUser.sessionVersion}, Token=${token.sessionVersion}`);
+        throw new Error("Session revoked");
+      }
+      
       token.id = dbUser.id;
       token.role = dbUser.role;
       token.tenantId = dbUser.tenantId ?? undefined;
       token.tenantSlug = dbUser.tenant?.slug ?? null;
       token.tenantStatus = dbUser.tenant?.status ?? null;
+      token.sessionVersion = dbUser.sessionVersion;
 
       console.log(`${TRACE} └─ FINAL TOKEN (after hydration):`);
       console.log(`${TRACE}    token.id        = ${token.id}`);

@@ -34,6 +34,7 @@ model Tenant {
   users            User[]
   intelligenceActionLogs IntelligenceActionLog[]
   intelligenceMetrics    TenantIntelligenceMetrics[]
+  intelligenceOpsMetrics IntelligenceOpsMetrics[]
 
   @@index([billingStatus])
   @@index([billingEndsAt])
@@ -49,6 +50,7 @@ model User {
   password         String?
   role             Role             @default(MEMBER)
   tenantId         String?
+  sessionVersion   Int              @default(1)
   accounts         Account[]
   badges           Badge[]          @relation("UserBadges")
   challengeEntries ChallengeEntry[] @relation("UserChallenges")
@@ -859,6 +861,27 @@ enum ExplorationPolicyType {
   EPSILON_GREEDY
 }
 
+enum ExperimentLayer {
+  SCORING
+  POLICY
+}
+
+enum ExperimentType {
+  CHURN_RISK_MODEL
+  DISCOUNT_STRATEGY
+  ENGAGEMENT_MODEL
+}
+
+enum ExperimentVariant {
+  CONTROL
+  BAYESIAN
+  THOMPSON
+  UCB
+  EPSILON_GREEDY
+  WEIGHTED_SAMPLING
+  TOP_K
+}
+
 model IntelligenceActionLog {
   id               String    @id @default(cuid())
   tenantId         String
@@ -885,10 +908,62 @@ model IntelligenceActionLog {
   // Relations
   tenant           Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   targetMember     MemberProfile @relation(fields: [targetMemberId], references: [id], onDelete: Cascade)
+  experimentOutcomes ExperimentOutcome[]
 
   @@index([tenantId, actionType])
   @@index([tenantId, targetMemberId])
   @@index([outcomeStatus])
+}
+
+model IntelligenceOpsMetrics {
+  id                  String   @id @default(cuid())
+  tenantId            String
+  tenant              Tenant   @relation(fields: [tenantId], references: [id])
+  timestamp           DateTime @default(now())
+  
+  // Pipeline Stats (Funnel)
+  generatedCount      Int      @default(0)
+  approvedCount       Int      @default(0)
+  executedCount       Int      @default(0)
+  successfulCount     Int      @default(0)
+  
+  // Additional Outcome Stats
+  partialSuccessCount Int      @default(0)
+  failureCount        Int      @default(0)
+  ignoredCount        Int      @default(0)
+  failedExecutionCount Int     @default(0) // executionStatus = FAILED
+  
+  retainedMRR         Float    @default(0)
+  
+  // Averages
+  averageConfidence    Float   @default(0)
+  averageExecutionTime Float   @default(0) // ms from generation to execution
+  averageEvaluationDelay Float @default(0) // ms from execution to outcome evaluation
+  
+  // Metadata & Context
+  lastRollup          DateTime @default(now())
+  rollupVersion       Int      @default(1)
+  rollupDurationMs    Int      @default(0)
+  rollupKey           String   @unique // tenantId + timestampBucket + rollupVersion
+  lastRecommendation  DateTime?
+  algorithmVersion    Int
+  explorationVersion  Int
+  explorationPolicy   ExplorationPolicyType
+
+  @@index([tenantId, timestamp])
+}
+
+model IntelligenceRollupJobLog {
+  id               String    @id @default(cuid())
+  startedAt        DateTime  @default(now())
+  finishedAt       DateTime?
+  status           String    // SUCCESS or FAILED
+  errorMessage     String?   @db.Text
+  recordsProcessed Int       @default(0)
+  tenantId         String?   // optional for batch mode
+
+  @@index([status])
+  @@index([startedAt])
 }
 
 model TenantIntelligenceMetrics {
@@ -917,4 +992,124 @@ model TenantIntelligenceMetrics {
   tenant             Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 
   @@unique([tenantId, metricType, actionType, segmentKey, windowStart, windowEnd])
+}
+
+// ── EXPERIMENTATION (PHASE 9) ─────────────────────────────────────────────
+
+model IntelligenceExperiment {
+  id              String   @id @default(cuid())
+  name            String
+  type            ExperimentType
+  layer           ExperimentLayer
+  isActive        Boolean  @default(true)
+
+  startDate       DateTime
+  endDate         DateTime?
+
+  trafficSplit    Json     // { control: 0.7, bayes: 0.15, ucb: 0.15 }
+
+  createdAt       DateTime @default(now())
+}
+
+model ExperimentAssignment {
+  id            String @id @default(cuid())
+  tenantId      String
+  userId        String
+
+  experimentId  String
+  variant       ExperimentVariant
+
+  assignedAt    DateTime @default(now())
+
+  @@index([tenantId, experimentId])
+}
+
+model ExperimentOutcome {
+  id              String @id @default(cuid())
+  experimentId    String
+  variant         ExperimentVariant
+
+  actionLogId     String
+  actionLog       IntelligenceActionLog @relation(fields: [actionLogId], references: [id])
+
+  success         Boolean
+  mrrImpact       Float
+
+  evaluationWindowStart DateTime
+  evaluationWindowEnd   DateTime
+  evaluatedAt     DateTime @default(now())
+
+  @@index([experimentId, evaluationWindowStart])
+}
+
+model ExperimentSnapshot {
+  id              String   @id @default(cuid())
+  experimentId    String
+
+  startWindow     DateTime
+  endWindow       DateTime
+
+  controlMetrics  Json
+  variantMetrics  Json
+
+  uplift          Float
+  significance    Float
+
+  createdAt       DateTime @default(now())
+
+  @@index([experimentId, startWindow])
+}
+
+// ── GOVERNANCE (PHASE 10) ────────────────────────────────────────────────
+
+model IntelligenceVersionRegistry {
+  id                String    @id @default(cuid())
+  
+  // Versions
+  scoringVersion    Int       @default(1)
+  policyVersion     Int       @default(1)
+  
+  // Promotion metadata
+  experimentId      String?   
+  promotedVariant   String?
+
+  status            String    // ACTIVE, DEPRECATED, ROLLED_BACK
+
+  // Time-based reproducibility
+  activatedAt       DateTime  @default(now())
+  deactivatedAt     DateTime?
+  
+  // Traceability
+  previousVersionId String?
+  previousVersion   IntelligenceVersionRegistry? @relation("VersionHistory", fields: [previousVersionId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  nextVersions      IntelligenceVersionRegistry[] @relation("VersionHistory")
+
+  @@index([status])
+}
+
+model IntelligencePromotionLog {
+  id              String   @id @default(cuid())
+  experimentId    String
+  variantName     String
+  
+  promotedBy      String   // Admin User ID
+  reason          String?  @db.Text
+  
+  promotedAt      DateTime @default(now())
+
+  @@index([experimentId])
+}
+
+model IntelligenceSafetyEvent {
+  id              String   @id @default(cuid())
+  tenantId        String?  // Null means GLOBAL event
+  
+  action          String   // DISABLE, THROTTLE, ROLLBACK, ENABLE
+  reason          String   @db.Text
+  triggeredBy     String   // Admin User ID
+  
+  triggeredAt     DateTime @default(now())
+
+  @@index([tenantId])
+  @@index([action])
 }

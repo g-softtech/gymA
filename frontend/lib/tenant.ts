@@ -3,6 +3,7 @@ import type { Session } from "next-auth";
 import { getAuthSession } from "./auth";
 import { prisma } from "./prisma";
 import { TENANT_PLAN_LIMITS, TenantLimits } from "./tenant-entitlements";
+import { Permission, hasPermission } from "./permissions";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -76,12 +77,13 @@ export function getTenantContextFromSession(
 // ─────────────────────────────────────────────────────────────────────────────
 
 /**
- * Asserts that the user's role is one of the allowed roles.
- * Returns a 403 NextResponse if the check fails, otherwise null.
+ * Global centralized authorization check.
+ * Replaces direct string role checking.
+ * Returns a 403 NextResponse if the user lacks the required permission.
  */
-export function requireRole(
+export function authorize(
   ctx: TenantContext | null,
-  allowedRoles: string[]
+  permission: Permission
 ): NextResponse | null {
   if (!ctx) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -92,27 +94,25 @@ export function requireRole(
     return NextResponse.json({ error: "Tenant is not approved for API access." }, { status: 403 });
   }
 
-  if (!allowedRoles.includes(ctx.role)) {
+  if (!hasPermission(ctx.role, permission)) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
   return null;
 }
 
-/** Requires ADMIN or SUPERADMIN role. */
+/** Legacy helpers adapted to new system where possible, but recommend direct authorize() usage. */
 export function requireAdmin(ctx: TenantContext | null): NextResponse | null {
-  return requireRole(ctx, ["ADMIN", "SUPERADMIN"]);
+  return authorize(ctx, Permission.EDIT_SETTINGS);
 }
 
-/** Requires TRAINER, ADMIN, or SUPERADMIN role. */
 export function requireTrainer(ctx: TenantContext | null): NextResponse | null {
-  return requireRole(ctx, ["TRAINER", "ADMIN", "SUPERADMIN"]);
+  return authorize(ctx, Permission.MANAGE_WORKOUTS);
 }
 
-/** Requires SUPERADMIN role only. */
 export function requireSuperAdmin(
   ctx: TenantContext | null
 ): NextResponse | null {
-  return requireRole(ctx, ["SUPERADMIN"]);
+  return authorize(ctx, Permission.SYSTEM_ADMIN);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

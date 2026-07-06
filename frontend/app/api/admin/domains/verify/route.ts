@@ -33,6 +33,6 @@ export async function POST(req: NextRequest) {
     }
   } catch (error: any) {
     console.error("[POST /api/admin/domains/verify]", error.message);
-    return NextResponse.json({ error: error.message || "Internal server error" }, { status: 500 });
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }

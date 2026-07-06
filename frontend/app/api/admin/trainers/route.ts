@@ -4,9 +4,10 @@ import { getAuthSession } from "@/lib/auth";
 import {
   getTenantContextFromSession,
   requireAdmin,
-  noTenantContext,
-} from "@/lib/tenant";
+import { noTenantContext } from "@/lib/tenant";
 import { checkTrainerQuota } from "@/lib/enforcement";
+import { auditLogger, AuditEventType } from "@/lib/auditLogger";
+import { validateBody, trainerCreateSchema } from "@/lib/validation";
 
 export async function POST(req: NextRequest) {
   try {
@@ -24,11 +25,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: quota.reason }, { status: 403 });
     }
 
-    const { email, specialties, bio, hourlyRate } = await req.json();
-
-    if (!email) {
-      return NextResponse.json({ error: "Email is required." }, { status: 400 });
-    }
+    const { data, error } = await validateBody(trainerCreateSchema)(req);
+    if (error) return error;
+    const { email, specialties, bio, hourlyRate } = data!;
 
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user) {
@@ -46,7 +45,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    await prisma.user.update({ where: { id: user.id }, data: { role: "TRAINER" } });
+    await prisma.user.update({ where: { id: user.id }, data: { role: "TRAINER", sessionVersion: { increment: 1 } } });
 
     const profile = await prisma.trainerProfile.upsert({
       where: { userId: user.id },
@@ -74,6 +73,13 @@ export async function POST(req: NextRequest) {
           "Your account has been upgraded to Trainer. You can now manage clients and bookings.",
       },
     });
+
+    auditLogger.log(
+      AuditEventType.MEMBER_PROMOTED,
+      ctx.tenantId,
+      { targetUserId: user.id, newRole: "TRAINER", targetEmail: user.email },
+      ctx.userId
+    );
 
     return NextResponse.json({ success: true, profile }, { status: 201 });
   } catch (err) {

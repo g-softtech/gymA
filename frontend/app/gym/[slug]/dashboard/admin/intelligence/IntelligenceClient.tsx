@@ -1,12 +1,60 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { ActionableRecommendation, SimulationResult } from "@/lib/intelligence/types";
 import { format } from "date-fns";
 import { ActionExecutor } from "@/lib/intelligence/actionExecutor";
 import { toast } from "react-hot-toast";
 
 export default function IntelligenceClient({
+  tenantId,
+  tenantSlug,
+  initialRecommendations,
+}: {
+  tenantId: string;
+  tenantSlug: string;
+  initialRecommendations: ActionableRecommendation[];
+}) {
+  const [activeTab, setActiveTab] = useState<"live" | "timeline" | "log" | "impact">("live");
+
+  return (
+    <div className="space-y-6">
+      {/* Tabs */}
+      <div className="flex gap-2 border-b border-border">
+        <TabButton id="live" label="Live Recommendations" activeTab={activeTab} onClick={setActiveTab} />
+        <TabButton id="timeline" label="Impact Timeline" activeTab={activeTab} onClick={setActiveTab} />
+        <TabButton id="log" label="Event Log" activeTab={activeTab} onClick={setActiveTab} />
+        <TabButton id="impact" label="Business Impact" activeTab={activeTab} onClick={setActiveTab} />
+      </div>
+
+      {/* Content */}
+      <div className="pt-2">
+        {activeTab === "live" && <LiveRecommendations tenantId={tenantId} tenantSlug={tenantSlug} initialRecommendations={initialRecommendations} />}
+        {activeTab === "timeline" && <ImpactTimeline tenantSlug={tenantSlug} />}
+        {activeTab === "log" && <EventLog tenantSlug={tenantSlug} />}
+        {activeTab === "impact" && <BusinessImpact tenantSlug={tenantSlug} />}
+      </div>
+    </div>
+  );
+}
+
+function TabButton({ id, label, activeTab, onClick }: { id: string; label: string; activeTab: string; onClick: (id: any) => void }) {
+  return (
+    <button
+      onClick={() => onClick(id)}
+      className={`px-4 py-2 text-sm font-medium transition-colors ${
+        activeTab === id
+          ? "border-b-2 border-primary text-foreground"
+          : "text-muted-foreground hover:text-foreground"
+      }`}
+    >
+      {label}
+    </button>
+  );
+}
+
+function LiveRecommendations({
   tenantId,
   tenantSlug,
   initialRecommendations,
@@ -159,6 +207,141 @@ export default function IntelligenceClient({
           </div>
         );
       })}
+    </div>
+  );
+}
+
+function ImpactTimeline({ tenantSlug }: { tenantSlug: string }) {
+  const { data } = useQuery({
+    queryKey: ["intelligence-history", tenantSlug],
+    queryFn: async () => {
+      const res = await fetch(`/api/gym/${tenantSlug}/intelligence/history`);
+      return res.json();
+    },
+  });
+
+  const logs = data?.data || [];
+
+  return (
+    <div className="bg-card rounded-xl border border-border p-6 shadow-sm">
+      <h3 className="text-lg font-semibold mb-6">AI Impact Timeline</h3>
+      
+      {logs.length === 0 ? (
+        <div className="text-center text-muted-foreground py-16">No AI history available yet.</div>
+      ) : (
+        <div className="relative border-l border-border ml-4 space-y-8 pb-4">
+          {logs.map((log: any) => (
+            <div key={log.id} className="relative pl-6">
+              <div className={`absolute -left-1.5 top-1.5 h-3 w-3 rounded-full border-2 border-background ${
+                log.outcomeStatus === 'SUCCESS' ? 'bg-green-500' :
+                log.outcomeStatus === 'FAILED' ? 'bg-red-500' :
+                'bg-blue-500'
+              }`} />
+              
+              <div className="flex flex-col gap-1">
+                <div className="text-sm text-muted-foreground">{new Date(log.executedAt).toLocaleString()}</div>
+                <div className="font-medium text-foreground">
+                  AI executed <span className="font-bold">{log.actionType}</span> for {log.targetMember?.firstName} {log.targetMember?.lastName}
+                </div>
+                <div className="text-sm text-muted-foreground">
+                  Outcome: <span className="font-semibold">{log.outcomeStatus}</span>
+                  {log.mrrImpact && <span className="ml-2 text-green-500 font-medium">₦{Number(log.mrrImpact).toLocaleString()} Retained</span>}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function EventLog({ tenantSlug }: { tenantSlug: string }) {
+  const { data } = useQuery({
+    queryKey: ["intelligence-history", tenantSlug],
+    queryFn: async () => {
+      const res = await fetch(`/api/gym/${tenantSlug}/intelligence/history`);
+      return res.json();
+    },
+  });
+
+  const logs = data?.data || [];
+
+  return (
+    <div className="bg-card rounded-xl border border-border p-6 shadow-sm">
+      <h3 className="text-lg font-semibold mb-4">AI Event Log</h3>
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm text-left">
+          <thead>
+            <tr className="border-b border-border text-muted-foreground">
+              <th className="py-3 font-medium">Date</th>
+              <th className="font-medium">Action</th>
+              <th className="font-medium">Member</th>
+              <th className="font-medium">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {logs.length === 0 ? (
+              <tr>
+                <td colSpan={4} className="py-6 text-center text-muted-foreground">No historical actions found</td>
+              </tr>
+            ) : (
+              logs.map((log: any) => (
+                <tr key={log.id} className="border-b border-border last:border-0">
+                  <td className="py-3">{new Date(log.executedAt).toLocaleDateString()}</td>
+                  <td>{log.actionType}</td>
+                  <td>{log.targetMember?.firstName} {log.targetMember?.lastName}</td>
+                  <td>
+                    <span className={`px-2 py-1 rounded text-xs font-semibold ${
+                      log.outcomeStatus === 'SUCCESS' ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' :
+                      log.outcomeStatus === 'FAILED' ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400' :
+                      'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-400'
+                    }`}>
+                      {log.outcomeStatus}
+                    </span>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+function BusinessImpact({ tenantSlug }: { tenantSlug: string }) {
+  const { data } = useQuery({
+    queryKey: ["intelligence-value", tenantSlug],
+    queryFn: async () => {
+      const res = await fetch(`/api/gym/${tenantSlug}/intelligence/value`);
+      return res.json();
+    },
+  });
+
+  if (!data) return <div className="h-64 animate-pulse bg-card rounded-xl border border-border" />;
+
+  return (
+    <div className="space-y-6">
+      <div className="bg-card rounded-xl border border-border p-6 shadow-sm">
+        <h3 className="text-lg font-semibold mb-6">AI Value Delivered</h3>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <ImpactMetric label="Retained MRR" value={`₦${data.retainedMRR?.toLocaleString() || '0'}`} color="text-green-600 dark:text-green-400" />
+          <ImpactMetric label="Successful Saves" value={data.successfulInterventions || 0} />
+          <ImpactMetric label="Members Retained" value={data.membersSaved || 0} />
+          <ImpactMetric label="Avg Confidence" value={`${Math.round((data.averageConfidence || 0) * 100)}%`} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ImpactMetric({ label, value, color = "text-foreground" }: { label: string; value: string | number; color?: string }) {
+  return (
+    <div className="space-y-1">
+      <p className="text-sm font-medium text-muted-foreground">{label}</p>
+      <p className={`text-3xl font-bold ${color}`}>{value}</p>
     </div>
   );
 }

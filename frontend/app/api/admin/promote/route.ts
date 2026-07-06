@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
     }
 
     // ✅ Assign tenantId to the promoted admin if provided
-    const updateData: { role: "ADMIN"; tenantId?: string } = { role: "ADMIN" };
+    const updateData: { role: "ADMIN"; sessionVersion: { increment: number }; tenantId?: string } = { role: "ADMIN", sessionVersion: { increment: 1 } };
     if (tenantId) {
       // Verify the tenant exists before assigning
       const tenant = await prisma.tenant.findUnique({ where: { id: tenantId } });

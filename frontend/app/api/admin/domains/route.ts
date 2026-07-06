@@ -74,7 +74,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ success: true, data: updated, vercel: vercelResponse });
   } catch (error: any) {
     console.error("[POST /api/admin/domains]", error.message);
-    return NextResponse.json({ error: error.message || "Internal server error" }, { status: 500 });
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }
 
@@ -100,7 +100,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ data: settings });
   } catch (error: any) {
     console.error("[GET /api/admin/domains]", error.message);
-    return NextResponse.json({ error: error.message || "Internal server error" }, { status: 500 });
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }
 
@@ -152,6 +152,6 @@ export async function DELETE(req: NextRequest) {
     return NextResponse.json({ success: true });
   } catch (error: any) {
     console.error("[DELETE /api/admin/domains]", error.message);
-    return NextResponse.json({ error: error.message || "Internal server error" }, { status: 500 });
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }

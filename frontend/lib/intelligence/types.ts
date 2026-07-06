@@ -68,3 +68,25 @@ export type SimulationResult = {
   membersReached: number;
   risks: string[];
 };
+
+export type OperationsMetrics = {
+  lastRollup: Date | null;
+  rollupHealth: "healthy" | "warning" | "stale" | "broken";
+  averageExecutionTime: number;
+  averageEvaluationDelay: number;
+  failedCount: number;
+  queueHealth: "healthy" | "degraded" | "failing";
+};
+
+export type PerformanceMetrics = {
+  retainedMRR: number;
+  successCount: number;
+  averageConfidence: number;
+  generatedCount: number;
+  policyComparisons: {
+    algorithmVersion: number;
+    explorationPolicy: string;
+    successRate: number;
+    sampleSize: number;
+  }[];
+};
