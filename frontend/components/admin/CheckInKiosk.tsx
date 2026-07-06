@@ -160,7 +160,7 @@ export function CheckInKiosk() {
                   console.error("Raw Scanner error:", error);
                   
                   let errMsg = error?.message || "Unknown error";
-                  let errName = error?.name || "UnknownName";
+                  let errName = (error as any)?.name || "UnknownName";
 
                   // Display the exact raw error on screen for debugging
                   setScanResult({ 
