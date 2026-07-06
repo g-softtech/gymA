@@ -4,7 +4,8 @@ import { getAuthSession } from "@/lib/auth";
 import {
   getTenantContextFromSession,
   requireAdmin,
-import { noTenantContext } from "@/lib/tenant";
+  noTenantContext,
+} from "@/lib/tenant";
 import { checkTrainerQuota } from "@/lib/enforcement";
 import { auditLogger, AuditEventType } from "@/lib/auditLogger";
 import { validateBody, trainerCreateSchema } from "@/lib/validation";

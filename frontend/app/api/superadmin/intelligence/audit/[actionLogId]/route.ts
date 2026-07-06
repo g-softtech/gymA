@@ -4,17 +4,19 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET(
   req: Request,
-  { params }: { params: { actionLogId: string } }
+  { params }: { params: Promise<{ actionLogId: string }> }
 ) {
   const session = await getAuthSession();
   if (session?.user?.role !== "SUPERADMIN") {
     return new NextResponse("Unauthorized", { status: 401 });
   }
 
+  const { actionLogId } = await params;
+
   try {
     // 1. Fetch the immutable execution record (Phase 7.2)
     const actionLog = await prisma.intelligenceActionLog.findUnique({
-      where: { id: params.actionLogId },
+      where: { id: actionLogId },
       include: {
         experimentOutcomes: true // Phase 9
       }

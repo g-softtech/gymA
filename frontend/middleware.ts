@@ -1,7 +1,7 @@
 import { withAuth } from "next-auth/middleware";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { checkPublicRateLimit, checkAuthRateLimit } from "./lib/rateLimit";
+import { checkPublicRateLimit, checkAuthRateLimit } from "@/lib/ratelimit";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Domain routing helpers
