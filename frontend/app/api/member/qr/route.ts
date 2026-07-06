@@ -29,8 +29,8 @@ export async function GET(req: Request) {
     // Generate cryptographic nonce
     const nonce = crypto.randomBytes(16).toString("hex");
 
-    // Save nonce to MemberProfile to prevent replay attacks and set a strict 15s TTL
-    const expiresAt = new Date(Date.now() + 15000); // 15 seconds
+    // Save nonce to MemberProfile to prevent replay attacks and set a strict 60s TTL
+    const expiresAt = new Date(Date.now() + 60000); // 60 seconds
 
     await prisma.memberProfile.update({
       where: { id: member.id },
@@ -40,7 +40,7 @@ export async function GET(req: Request) {
       }
     });
 
-    // Create JWT with 15-second expiration
+    // Create JWT with 60-second expiration
     // Payload includes nonce, tenantId, and memberId
     const alg = "HS256";
     const jwt = await new SignJWT({
@@ -50,12 +50,12 @@ export async function GET(req: Request) {
     })
       .setProtectedHeader({ alg })
       .setIssuedAt()
-      .setExpirationTime("15s")
+      .setExpirationTime("60s")
       .sign(JWT_SECRET);
 
     return NextResponse.json({
       token: jwt,
-      expiresIn: 15
+      expiresIn: 60
     });
 
   } catch (error) {

@@ -80,14 +80,14 @@ export function AccessPass() {
                 </div>
               ) : token ? (
                 <div className="flex flex-col items-center relative">
-                  <div className="bg-card text-card-foreground p-4 rounded-xl border-2 border-indigo-100 shadow-sm relative overflow-hidden">
-                    {/* Animated scanning line to prevent screenshots */}
-                    <div className="absolute top-0 left-0 w-full h-1 bg-indigo-500 opacity-50 animate-[scan_2s_ease-in-out_infinite]" />
+                  <div className="bg-white p-4 rounded-xl shadow-sm relative overflow-hidden flex items-center justify-center">
                     <QRCodeSVG 
                       value={token} 
                       size={200}
                       level="M"
                       includeMargin={true}
+                      bgColor="#FFFFFF"
+                      fgColor="#000000"
                     />
                   </div>
                   <p className="text-muted-foreground text-xs mt-4 flex items-center gap-1.5 bg-muted px-3 py-1.5 rounded-full">
