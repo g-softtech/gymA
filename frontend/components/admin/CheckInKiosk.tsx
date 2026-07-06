@@ -161,22 +161,13 @@ export function CheckInKiosk() {
           return;
         }
 
-        // Scale down large images to prevent memory issues
-        const MAX_WIDTH = 1000;
-        let width = img.width;
-        let height = img.height;
-        if (width > MAX_WIDTH) {
-          height = (MAX_WIDTH / width) * height;
-          width = MAX_WIDTH;
-        }
+        canvas.width = img.width;
+        canvas.height = img.height;
+        context.drawImage(img, 0, 0, img.width, img.height);
 
-        canvas.width = width;
-        canvas.height = height;
-        context.drawImage(img, 0, 0, width, height);
-
-        const imageData = context.getImageData(0, 0, width, height);
+        const imageData = context.getImageData(0, 0, img.width, img.height);
         const code = jsQR(imageData.data, imageData.width, imageData.height, {
-          inversionAttempts: "dontInvert",
+          inversionAttempts: "attemptBoth",
         });
 
         if (code) {
