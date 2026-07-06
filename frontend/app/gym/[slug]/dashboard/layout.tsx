@@ -111,6 +111,8 @@ export default async function DashboardLayout({
     { href: `/gym/${slug}/dashboard/admin/checkin`, label: "Check-in Desk", icon: "📲" },
     { href: `/gym/${slug}/dashboard/admin/attendance`, label: "Attendance", icon: "✅" },
     { href: `/gym/${slug}/dashboard/admin/revenue`, label: "Revenue", icon: "💰" },
+    { href: `/gym/${slug}/dashboard/admin/analytics`, label: "Analytics ⭐", icon: "📈" },
+    { href: `/gym/${slug}/dashboard/admin/intelligence`, label: "Intelligence ⚡", icon: "🧠" },
     { href: `/gym/${slug}/dashboard/admin/ai-usage`, label: "AI Usage", icon: "🤖" },
     { href: `/gym/${slug}/dashboard/admin/blog`, label: "Blog", icon: "📝" },
     { href: `/gym/${slug}/dashboard/admin/notifications`, label: `Notifications${unreadCount > 0 ? ` (${unreadCount})` : ""}`, icon: "🔔" },

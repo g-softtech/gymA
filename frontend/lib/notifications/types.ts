@@ -30,3 +30,22 @@ export interface EmailTemplateResult {
   html: string;
   text: string;
 }
+
+export type NotificationPriority = "critical" | "high" | "normal" | "low";
+
+export interface NotificationIntent {
+  tenantId: string;
+  userId: string;
+  
+  /** General category/type of the notification, useful for analytics and templates */
+  type: string;
+  
+  title: string;
+  message: string;
+  
+  /** Indicates the urgency of delivery */
+  priority: NotificationPriority;
+  
+  /** Optional extensible data (e.g., link URLs, IDs) */
+  metadata?: Record<string, unknown>;
+}

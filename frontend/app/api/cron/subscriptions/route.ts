@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { revalidateTag } from "next/cache";
+import { subscriptionDomainBus, createSubscriptionEvent } from "@/lib/subscriptions/events";
 
 /**
  * GET /api/cron/subscriptions
@@ -62,34 +62,32 @@ export async function GET(req: NextRequest) {
           where: { id: sub.id },
           data: { status: "EXPIRED" },
         }),
-        // Create expiry notification for the member
-        prisma.notification.create({
-          data: {
-            tenantId: sub.tenantId,
-            userId: sub.member.user.id,
-            type: "SUBSCRIPTION_EXPIRY",
-            title: "Membership Expired",
-            message: `Your ${sub.plan.name} membership has expired. Renew now to continue accessing gym services.`,
-          },
-        }),
       ]);
+      // Publish Domain Event for Cache Invalidation & Audit Logging
+      const eventId = typeof crypto !== "undefined" ? crypto.randomUUID() : Math.random().toString();
+      await subscriptionDomainBus.publish(
+        createSubscriptionEvent({
+          type: "SubscriptionExpired",
+          tenantId: sub.tenantId,
+          correlationId: `cron-expiry-${sub.id}-${now.getTime()}`,
+          actorId: "system.cron",
+          source: "cron.subscription-check",
+          payload: {
+            subscriptionId: sub.id,
+            memberId: sub.memberId,
+            previousStatus: "ACTIVE",
+            newStatus: "EXPIRED",
+            reason: "End date has passed",
+          },
+        })
+      );
+
       expiredCount++;
     } catch (err) {
       console.error(`[cron/subscriptions] Failed to expire subscription ${sub.id}:`, err);
       errorCount++;
     }
   }
-      // Collect tenant IDs to invalidate cache
-      const affectedTenants = new Set<string>();
-      expiredSubscriptions.forEach(sub => affectedTenants.add(sub.tenantId));
-
-      affectedTenants.forEach(tenantId => {
-        try {
-          revalidateTag(`tenant-subscriptions-${tenantId}`, "default");
-        } catch (err) {
-          console.error(`[cron/subscriptions] Failed to revalidate cache for tenant ${tenantId}`, err);
-        }
-      });
   // ── 4. Also send 3-day expiry warning notifications ────────────────────────
   const warningDate = new Date();
   warningDate.setDate(warningDate.getDate() + 3);
@@ -130,15 +128,20 @@ export async function GET(req: NextRequest) {
       });
 
       if (!existingWarning) {
-        await prisma.notification.create({
-          data: {
+        await subscriptionDomainBus.publish(
+          createSubscriptionEvent({
+            type: "SubscriptionExpiring",
             tenantId: sub.tenantId,
-            userId: sub.member.user.id,
-            type: "SUBSCRIPTION_EXPIRY",
-            title: `Membership Expiring in ${daysLeft} day${daysLeft !== 1 ? "s" : ""} ⏰`,
-            message: `Your ${sub.plan.name} membership expires on ${sub.endDate.toLocaleDateString("en-NG", { day: "numeric", month: "long", year: "numeric" })}. Renew now to avoid interruption.`,
-          },
-        });
+            correlationId: `cron-warning-${sub.id}-${now.getTime()}`,
+            actorId: "system.cron",
+            source: "cron.subscription-check",
+            payload: {
+              subscriptionId: sub.id,
+              memberId: sub.member.user.id,
+              daysLeft,
+            },
+          })
+        );
         warnedCount++;
       }
     } catch (err) {

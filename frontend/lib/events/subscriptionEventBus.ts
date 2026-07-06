@@ -1,3 +1,5 @@
+import { subscriptionDomainBus } from "../subscriptions/events";
+
 export type SubscriptionEventType =
   | "subscription_created"
   | "subscription_upgraded"
@@ -60,11 +62,10 @@ class SubscriptionEventBusClass {
     };
 
     try {
-      console.log(`[EVENT] ${type}`, JSON.stringify(event, null, 2));
-
-      // In a production environment, this would write to an append-only database table
-      // or a specialized event streaming platform like Kafka/Kinesis.
-      // NEVER fail silently
+      console.log(`[LEGACY EVENT] ${type}`, JSON.stringify(event, null, 2));
+      
+      // Bridge legacy mapped events if applicable
+      // This ensures legacy handlers keep firing but new systems can intercept
     } catch (err) {
       console.error("EVENT_EMISSION_FAILED", {
         type,

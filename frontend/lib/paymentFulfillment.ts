@@ -2,7 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
 import { processAndSendReceipt } from "./receipts/receiptService";
 import { isSubscriptionActive } from "./subscriptions/memberSubscriptionState";
-import { revalidateTag } from "next/cache";
+import { subscriptionDomainBus, createSubscriptionEvent } from "./subscriptions/events";
 
 /**
  * Fulfills a payment idempotently. 
@@ -57,8 +57,9 @@ export async function fulfillPayment(reference: string, gatewayData: {
     if (!plan) throw new Error("Membership plan not found");
 
     // Execute atomic transaction
+    let fulfillmentStatus: any = null;
     try {
-      const fulfillmentStatus = await prisma.$transaction(async (tx) => {
+      fulfillmentStatus = await prisma.$transaction(async (tx) => {
         // a. Mark transaction SUCCESS ATOMICALLY
         const updateResult = await tx.transaction.updateMany({
           where: { id: transaction.id, status: "PENDING" },
@@ -128,7 +129,7 @@ export async function fulfillPayment(reference: string, gatewayData: {
       endDate.setDate(endDate.getDate() + plan.durationDays);
 
       // d. Create NEW Subscription 
-      await tx.subscription.create({
+      const newSub = await tx.subscription.create({
         data: {
           memberId: memberProfile.id,
           planId: plan.id,
@@ -140,18 +141,17 @@ export async function fulfillPayment(reference: string, gatewayData: {
         },
       });
 
-        // e. Create Notification
-        await tx.notification.create({
-          data: {
-            tenantId: transaction.tenantId,
-            userId: transaction.memberId,
-            type: "PAYMENT",
-            title: currentActiveSub?.planId === plan.id ? "Subscription Renewed 🎉" : "Subscription Upgraded 🎉",
-            message: `Your ${plan.name} membership is now active until ${endDate.toLocaleDateString("en-NG", { day: "numeric", month: "long", year: "numeric" })}.`,
-          },
-        });
+        // e. (Notifications are now handled asynchronously via Domain Events)
 
-        return { alreadyFulfilled: false, subscriptionStart: startDate, subscriptionEnd: endDate, memberName: user?.name, memberEmail: user?.email };
+        return { 
+          alreadyFulfilled: false, 
+          subscriptionStart: startDate, 
+          subscriptionEnd: endDate, 
+          memberName: user?.name, 
+          memberEmail: user?.email,
+          subscriptionId: newSub.id,
+          previousStatus: currentActiveSub ? currentActiveSub.status : "NONE"
+        };
       });
 
       if (fulfillmentStatus.alreadyFulfilled) {
@@ -197,12 +197,27 @@ export async function fulfillPayment(reference: string, gatewayData: {
       throw error;
     }
 
-    // Invalidate the subscription health cache for this tenant
-    try {
-      revalidateTag(`tenant-subscriptions-${transaction.tenantId}`, "default");
-    } catch (err) {
-      console.error(`Failed to revalidate cache for tenant ${transaction.tenantId}`, err);
-    }
+    // Generate Correlation ID for tracing this specific billing operation
+    const correlationId = `billing-fulfill-${reference}-${Date.now()}`;
+
+    // Publish domain event
+    await subscriptionDomainBus.publish(
+      createSubscriptionEvent({
+        type: "SubscriptionRenewed",
+        tenantId: transaction.tenantId,
+        correlationId,
+        causationId: transaction.id,
+        actorId: "system",
+        source: "billing.webhook",
+        payload: {
+          subscriptionId: fulfillmentStatus.subscriptionId!,
+          memberId: transaction.memberId,
+          planId: plan.id,
+          newStatus: "ACTIVE",
+          previousStatus: fulfillmentStatus.previousStatus,
+        },
+      })
+    );
 
     console.log(`[fulfillPayment] ✅ Successfully fulfilled membership transaction ${reference}`);
     return { success: true, alreadyFulfilled: false };

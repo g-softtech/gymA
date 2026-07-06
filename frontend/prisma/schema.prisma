@@ -32,6 +32,8 @@ model Tenant {
   settings         TenantSettings?
   transactions     Transaction[]
   users            User[]
+  intelligenceActionLogs IntelligenceActionLog[]
+  intelligenceMetrics    TenantIntelligenceMetrics[]
 
   @@index([billingStatus])
   @@index([billingEndsAt])
@@ -116,6 +118,7 @@ model MemberProfile {
   subscriptions    Subscription[]
   transactions     Transaction[]
   workouts         WorkoutPlan[]
+  intelligenceActionLogs IntelligenceActionLog[]
 }
 
 model TrainerProfile {
@@ -491,6 +494,14 @@ model TenantSettings {
   paystackSubscriptionCode String?   @unique
   homepageLayout           Json?
   defaultCurrency          Currency  @default(NGN)
+  gymType                  String?
+
+  // Phase 7.1: Behavioral Fingerprinting
+  attendanceBaselinePerWeek Int      @default(2)
+  avgSessionDurationMinutes Int      @default(60)
+  retentionCurveType        String   @default("standard") // "steep_dropoff", "gradual"
+  learningDecayLambda       Float    @default(0.04)
+
   tenant                   Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 }
 
@@ -679,6 +690,19 @@ model CronLock {
   expiresAt DateTime
 }
 
+model AuditLog {
+  id            String   @id @default(cuid())
+  tenantId      String
+  eventType     String
+  actorId       String?
+  correlationId String?
+  occurredAt    DateTime @default(now())
+  payload       Json
+
+  @@index([tenantId, eventType])
+  @@index([correlationId])
+}
+
 enum Role {
   SUPERADMIN
   ADMIN
@@ -819,4 +843,78 @@ enum AdminNotificationStatus {
   SENDING
   SENT
   FAILED
+}
+
+enum IntelligenceSegment {
+  HIGH_RISK
+  MEDIUM_RISK
+  LOW_RISK
+  ALL
+}
+
+enum ExplorationPolicyType {
+  DETERMINISTIC_RANKING
+  THOMPSON
+  UCB
+  EPSILON_GREEDY
+}
+
+model IntelligenceActionLog {
+  id               String    @id @default(cuid())
+  tenantId         String
+  recommendationId String
+  actionType       String
+  targetMemberId   String
+  confidenceScore  Float
+  
+  // Scoring Context
+  algorithmVersion   Int      @default(1)
+  explorationVersion Int      @default(1)
+  explorationPolicy  ExplorationPolicyType @default(DETERMINISTIC_RANKING)
+  scoringSnapshot    Json?
+  
+  // Execution State
+  executionStatus  String    @default("EXECUTED") // EXECUTED
+  executedAt       DateTime  @default(now())
+
+  // Outcome State
+  outcomeStatus    String    @default("PENDING") // PENDING, SUCCESS, FAILED, EXPIRED
+  resolvedAt       DateTime? 
+  mrrImpact        Decimal?  @db.Decimal(10, 2)
+
+  // Relations
+  tenant           Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  targetMember     MemberProfile @relation(fields: [targetMemberId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, actionType])
+  @@index([tenantId, targetMemberId])
+  @@index([outcomeStatus])
+}
+
+model TenantIntelligenceMetrics {
+  id                 String   @id @default(cuid())
+  tenantId           String
+  
+  // Dimensionality
+  metricType         String   // e.g., "CHURN", "UPSELL", "RECOVERY"
+  actionType         String   // e.g., "DISCOUNT", "EMAIL"
+  segmentKey         IntelligenceSegment @default(ALL)
+  
+  // Time Windowing (Bounding the feedback loop)
+  windowStart        DateTime 
+  windowEnd          DateTime
+
+  successRate        Float    @default(0.1)
+  partialSuccessRate Float    @default(0.0)
+  failureRate        Float    @default(0.9)
+  totalSamples       Int      @default(0)
+  
+  // Exponential Decay tracking
+  decayFactor        Float    @default(1.0) 
+
+  algorithmVersion   Int      @default(1)
+  lastComputedAt     DateTime @default(now())
+  tenant             Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, metricType, actionType, segmentKey, windowStart, windowEnd])
 }

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthSession } from "@/lib/auth";
 import { getTenantContextFromSession, requireAdmin, noTenantContext } from "@/lib/tenant";
-import { revalidateTag } from "next/cache";
+import { subscriptionDomainBus, createSubscriptionEvent } from "@/lib/subscriptions/events";
 
 /**
  * GET /api/member/subscription
@@ -111,25 +111,25 @@ export async function PATCH(req: NextRequest) {
       data: { status: newStatus },
     });
 
-    try {
-      revalidateTag(`tenant-subscriptions-${ctx.tenantId}`, "default");
-    } catch (e) {
-      console.error(`Failed to revalidate cache for tenant ${ctx.tenantId}`, e);
-    }
-
-    // Notify the member
-    await prisma.notification.create({
-      data: {
+    const eventType = action === "cancel" ? "SubscriptionCancelled" : "SubscriptionActivated";
+    
+    await subscriptionDomainBus.publish(
+      createSubscriptionEvent({
+        type: eventType as any,
         tenantId: ctx.tenantId,
-        userId: sub.member.user.id,
-        type: "SUBSCRIPTION_EXPIRY",
-        title: action === "cancel" ? "Membership Cancelled" : "Membership Activated",
-        message:
-          action === "cancel"
-            ? `Your ${sub.plan.name} membership has been cancelled by the gym. Please contact reception for details.`
-            : `Your ${sub.plan.name} membership has been activated by the gym administration.`,
-      },
-    });
+        correlationId: `admin-patch-${subscriptionId}-${Date.now()}`,
+        actorId: session?.user?.id || "system.admin",
+        source: "admin.portal",
+        payload: {
+          subscriptionId: subscriptionId,
+          memberId: sub.memberId,
+          planId: sub.planId,
+          reason: `Admin requested ${action}`,
+          previousStatus: sub.status,
+          newStatus: newStatus,
+        },
+      })
+    );
 
     return NextResponse.json(updated);
   } catch (err) {
