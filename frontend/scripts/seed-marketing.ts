@@ -155,7 +155,7 @@ async function main() {
       averageEvaluationDelay: 86400000,
       algorithmVersion: 2,
       explorationVersion: 1,
-      explorationPolicy: "BAYESIAN",
+      explorationPolicy: "THOMPSON",
       rollupKey: `showcase-metrics-${tenant.id}`,
     }
   });
