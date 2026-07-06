@@ -95,7 +95,7 @@ export default withAuth(
 
       if (isPublicApi) {
         // Strict rate limit by IP
-        const ip = req.ip ?? req.headers.get("x-forwarded-for") ?? "127.0.0.1";
+        const ip = req.headers.get("x-forwarded-for") ?? "127.0.0.1";
         const rl = await checkPublicRateLimit(ip);
         if (rl.limited) {
           console.log(`${TRACE} └─ BLOCKED: Public API Rate Limit Exceeded for IP ${ip}`);
