@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Scanner as OriginalScanner } from '@yudiel/react-qr-scanner';
 import dynamic from 'next/dynamic';
+import jsQR from 'jsqr';
 
 const Scanner = dynamic(() => import('@yudiel/react-qr-scanner').then(mod => mod.Scanner), { ssr: false });
 
@@ -29,6 +30,7 @@ export function CheckInKiosk() {
   
   const [showOverrideModal, setShowOverrideModal] = useState(false);
   const [overrideTarget, setOverrideTarget] = useState<{ memberId: string, originalMethod?: string } | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   
   const loadingRef = useRef(loading);
 
@@ -140,6 +142,55 @@ export function CheckInKiosk() {
     }
   };
 
+  const handleNativeScanFallback = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setLoading(true);
+    setScanResult(null);
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        const context = canvas.getContext("2d");
+        if (!context) {
+          setScanResult({ error: "Could not decode image." });
+          setLoading(false);
+          return;
+        }
+
+        // Scale down large images to prevent memory issues
+        const MAX_WIDTH = 1000;
+        let width = img.width;
+        let height = img.height;
+        if (width > MAX_WIDTH) {
+          height = (MAX_WIDTH / width) * height;
+          width = MAX_WIDTH;
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        context.drawImage(img, 0, 0, width, height);
+
+        const imageData = context.getImageData(0, 0, width, height);
+        const code = jsQR(imageData.data, imageData.width, imageData.height, {
+          inversionAttempts: "dontInvert",
+        });
+
+        if (code) {
+          handleScan(code.data);
+        } else {
+          setScanResult({ error: "No QR code found in the image. Try again." });
+          setLoading(false);
+        }
+      };
+      img.src = event.target?.result as string;
+    };
+    reader.readAsDataURL(file);
+  };
+
   return (
     <div className="grid md:grid-cols-2 gap-8 items-start">
       {/* LEFT COL: Scanner & Search */}
@@ -171,6 +222,24 @@ export function CheckInKiosk() {
                 scanDelay={1000}
                 formats={["qr_code"]}
               />
+            </div>
+            
+            <div className="mt-4 border-t border-border pt-4 text-center">
+              <p className="text-sm text-muted-foreground mb-3">Camera blocked or not working?</p>
+              <input 
+                type="file" 
+                accept="image/*" 
+                capture="environment"
+                ref={fileInputRef}
+                className="hidden"
+                onChange={handleNativeScanFallback}
+              />
+              <button 
+                onClick={() => fileInputRef.current?.click()}
+                className="w-full bg-primary/10 text-primary font-semibold py-3 rounded-lg hover:bg-primary/20 transition flex items-center justify-center gap-2"
+              >
+                <span>📸</span> Open Native Camera App
+              </button>
             </div>
           </div>
         </div>
