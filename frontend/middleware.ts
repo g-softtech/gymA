@@ -101,11 +101,12 @@ export default withAuth(
           console.log(`${TRACE} └─ BLOCKED: Public API Rate Limit Exceeded for IP ${ip}`);
           return rl.response!;
         }
-      } else if (token?.sub) {
+      } else if ((token as any)?.sub) {
         // Relaxed rate limit by User ID
-        const rl = await checkAuthRateLimit(token.sub as string);
+        const userId = (token as any).sub as string;
+        const rl = await checkAuthRateLimit(userId);
         if (rl.limited) {
-          console.log(`${TRACE} └─ BLOCKED: Auth API Rate Limit Exceeded for User ${token.sub}`);
+          console.log(`${TRACE} └─ BLOCKED: Auth API Rate Limit Exceeded for User ${userId}`);
           return rl.response!;
         }
       }
