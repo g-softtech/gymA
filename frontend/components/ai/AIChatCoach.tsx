@@ -67,9 +67,11 @@ export default function AIChatCoach({
           { role: "assistant", content: data.reply },
         ]);
       } else {
+        const errorData = await res.json().catch(() => ({}));
+        const errMsg = errorData.error || "Sorry, I couldn't respond right now. Please try again.";
         setMessages((prev) => [
           ...prev,
-          { role: "assistant", content: "Sorry, I couldn't respond right now. Please try again." },
+          { role: "assistant", content: `[DEBUG] ${errMsg}` },
         ]);
       }
     } catch {
