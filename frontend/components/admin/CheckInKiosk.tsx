@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Scanner as OriginalScanner } from '@yudiel/react-qr-scanner';
 import dynamic from 'next/dynamic';
-import jsQR from 'jsqr';
+import { Html5Qrcode } from 'html5-qrcode';
 
 const Scanner = dynamic(() => import('@yudiel/react-qr-scanner').then(mod => mod.Scanner), { ssr: false });
 
@@ -142,44 +142,30 @@ export function CheckInKiosk() {
     }
   };
 
-  const handleNativeScanFallback = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleNativeScanFallback = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     setLoading(true);
     setScanResult(null);
 
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const img = new Image();
-      img.onload = () => {
-        const canvas = document.createElement("canvas");
-        const context = canvas.getContext("2d");
-        if (!context) {
-          setScanResult({ error: "Could not decode image." });
-          setLoading(false);
-          return;
-        }
-
-        canvas.width = img.width;
-        canvas.height = img.height;
-        context.drawImage(img, 0, 0, img.width, img.height);
-
-        const imageData = context.getImageData(0, 0, img.width, img.height);
-        const code = jsQR(imageData.data, imageData.width, imageData.height, {
-          inversionAttempts: "attemptBoth",
-        });
-
-        if (code) {
-          handleScan(code.data);
-        } else {
-          setScanResult({ error: "No QR code found in the image. Try again." });
-          setLoading(false);
-        }
-      };
-      img.src = event.target?.result as string;
-    };
-    reader.readAsDataURL(file);
+    try {
+      const html5QrCode = new Html5Qrcode("dummy-reader-id"); // required but not used for file scan
+      const decodedText = await html5QrCode.scanFile(file, true);
+      
+      if (decodedText) {
+        handleScan(decodedText);
+      } else {
+        setScanResult({ error: "No QR code found in the image. Please try again." });
+      }
+    } catch (err: any) {
+      console.error("File scan error:", err);
+      setScanResult({ error: "No QR code found in the image. Please try again." });
+    } finally {
+      setLoading(false);
+      // Reset input so they can snap again if it fails
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
   };
 
   return (
@@ -217,6 +203,10 @@ export function CheckInKiosk() {
             
             <div className="mt-4 border-t border-border pt-4 text-center">
               <p className="text-sm text-muted-foreground mb-3">Camera blocked or not working?</p>
+              
+              {/* Dummy reader div required by html5-qrcode even for file scanning */}
+              <div id="dummy-reader-id" style={{ display: "none" }}></div>
+              
               <input 
                 type="file" 
                 accept="image/*" 
