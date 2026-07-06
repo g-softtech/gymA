@@ -2,6 +2,8 @@
 import { prisma } from "@/lib/prisma";
 import { getAuthSession } from "@/lib/auth";
 import { redirect } from "next/navigation";
+import Link from "next/link";
+import { getSubscriptionHealthState } from "@/lib/subscriptions/memberSubscriptionState";
 import type { User, MemberProfile, Subscription, MembershipPlan } from "@prisma/client";
 import MembershipAnalyticsClient from "./MembershipAnalyticsClient";
 import UpgradeIntelligenceClient from "./UpgradeIntelligenceClient";
@@ -60,9 +62,17 @@ export default async function AdminMembersPage({
 
   return (
     <div className="max-w-6xl mx-auto space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-foreground">Members</h1>
-        <p className="text-muted-foreground mt-1">{members.length} registered member{members.length !== 1 ? "s" : ""}</p>
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-2xl font-bold text-foreground">Members</h1>
+          <p className="text-muted-foreground mt-1">{members.length} registered member{members.length !== 1 ? "s" : ""}</p>
+        </div>
+        <Link 
+          href={`/gym/${slug}/dashboard/admin/members/health`}
+          className="bg-primary text-primary-foreground hover:bg-primary/90 px-4 py-2 rounded-md font-medium text-sm transition-colors"
+        >
+          View Subscription Health
+        </Link>
       </div>
 
       <MembershipAnalyticsClient />
@@ -91,8 +101,7 @@ export default async function AdminMembersPage({
               ) : (
                 members.map((user: UserWithProfile) => {
                   const sub = user.memberProfile?.subscriptions?.[0];
-                  const isActive = sub?.status === "ACTIVE" && new Date(sub.endDate) > new Date();
-                  const isExpired = sub && new Date(sub.endDate) < new Date();
+                  const healthState = getSubscriptionHealthState(sub);
                   return (
                     <tr key={user.id} className="hover:bg-muted transition-colors">
                       <td className="px-6 py-4">
@@ -114,14 +123,14 @@ export default async function AdminMembersPage({
                         )}
                       </td>
                       <td className="px-6 py-4">
-                        {!sub ? (
+                        {healthState === "UNKNOWN" ? (
                           <span className="px-2 py-1 rounded-full text-xs font-medium bg-muted text-muted-foreground">No plan</span>
-                        ) : isExpired ? (
+                        ) : healthState === "EXPIRED" ? (
                           <span className="px-2 py-1 rounded-full text-xs font-medium bg-destructive/10 text-destructive">Expired</span>
-                        ) : isActive ? (
+                        ) : healthState === "ACTIVE" ? (
                           <span className="px-2 py-1 rounded-full text-xs font-medium bg-success/10 text-success">Active</span>
                         ) : (
-                          <span className="px-2 py-1 rounded-full text-xs font-medium bg-warning/10 text-warning">{sub.status}</span>
+                          <span className="px-2 py-1 rounded-full text-xs font-medium bg-warning/10 text-warning">{healthState}</span>
                         )}
                       </td>
                       <td className="px-6 py-4 text-muted-foreground">

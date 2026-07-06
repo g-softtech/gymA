@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
 import { processAndSendReceipt } from "./receipts/receiptService";
+import { isSubscriptionActive } from "./subscriptions/memberSubscriptionState";
+import { revalidateTag } from "next/cache";
 
 /**
  * Fulfills a payment idempotently. 
@@ -91,15 +93,15 @@ export async function fulfillPayment(reference: string, gatewayData: {
       });
 
       // c. Find existing active subscription
-      const currentActiveSub = await tx.subscription.findFirst({
+      const latestSub = await tx.subscription.findFirst({
         where: {
           memberId: memberProfile.id,
           tenantId: transaction.tenantId,
-          status: "ACTIVE",
-          endDate: { gt: new Date() },
         },
         orderBy: { endDate: "desc" },
       });
+
+      const currentActiveSub = isSubscriptionActive(latestSub) ? latestSub : null;
 
       let startDate = new Date();
       let endDate = new Date();
@@ -193,6 +195,13 @@ export async function fulfillPayment(reference: string, gatewayData: {
         return { success: true, alreadyFulfilled: true };
       }
       throw error;
+    }
+
+    // Invalidate the subscription health cache for this tenant
+    try {
+      revalidateTag(`tenant-subscriptions-${transaction.tenantId}`, "default");
+    } catch (err) {
+      console.error(`Failed to revalidate cache for tenant ${transaction.tenantId}`, err);
     }
 
     console.log(`[fulfillPayment] ✅ Successfully fulfilled membership transaction ${reference}`);

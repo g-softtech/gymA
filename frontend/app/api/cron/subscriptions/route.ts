@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { revalidateTag } from "next/cache";
 
 /**
  * GET /api/cron/subscriptions
@@ -78,7 +79,17 @@ export async function GET(req: NextRequest) {
       errorCount++;
     }
   }
+      // Collect tenant IDs to invalidate cache
+      const affectedTenants = new Set<string>();
+      expiredSubscriptions.forEach(sub => affectedTenants.add(sub.tenantId));
 
+      affectedTenants.forEach(tenantId => {
+        try {
+          revalidateTag(`tenant-subscriptions-${tenantId}`, "default");
+        } catch (err) {
+          console.error(`[cron/subscriptions] Failed to revalidate cache for tenant ${tenantId}`, err);
+        }
+      });
   // ── 4. Also send 3-day expiry warning notifications ────────────────────────
   const warningDate = new Date();
   warningDate.setDate(warningDate.getDate() + 3);

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthSession } from "@/lib/auth";
 import { getTenantContextFromSession, requireAdmin, noTenantContext } from "@/lib/tenant";
+import { revalidateTag } from "next/cache";
 
 /**
  * GET /api/member/subscription
@@ -109,6 +110,12 @@ export async function PATCH(req: NextRequest) {
       where: { id: subscriptionId },
       data: { status: newStatus },
     });
+
+    try {
+      revalidateTag(`tenant-subscriptions-${ctx.tenantId}`, "default");
+    } catch (e) {
+      console.error(`Failed to revalidate cache for tenant ${ctx.tenantId}`, e);
+    }
 
     // Notify the member
     await prisma.notification.create({
