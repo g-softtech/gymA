@@ -157,10 +157,15 @@ export function CheckInKiosk() {
                   }
                 }}
                 onError={(error) => {
-                  console.log("Scanner error:", error?.message);
-                  if (error?.message?.includes('Permission')) {
-                    setScanResult({ error: "Camera permission denied. Please allow camera access in your browser settings." });
-                  }
+                  console.error("Raw Scanner error:", error);
+                  
+                  let errMsg = error?.message || "Unknown error";
+                  let errName = error?.name || "UnknownName";
+
+                  // Display the exact raw error on screen for debugging
+                  setScanResult({ 
+                    error: `[DEBUG] Camera failed to start. Error: ${errName} - ${errMsg}. Please ensure your browser has camera permissions and you are on a secure (HTTPS) connection.` 
+                  });
                 }}
                 allowMultiple={true}
                 scanDelay={1000}
