@@ -1,7 +1,10 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { Scanner } from '@yudiel/react-qr-scanner';
+import { Scanner as OriginalScanner } from '@yudiel/react-qr-scanner';
+import dynamic from 'next/dynamic';
+
+const Scanner = dynamic(() => import('@yudiel/react-qr-scanner').then(mod => mod.Scanner), { ssr: false });
 
 type MemberData = {
   id: string;
@@ -147,19 +150,22 @@ export function CheckInKiosk() {
           </div>
           <div className="p-4">
             <div className="w-full overflow-hidden rounded-lg border-2 border-dashed border-border aspect-square relative bg-muted flex items-center justify-center">
-              {typeof window !== 'undefined' && (
-                <Scanner 
-                  onScan={(result) => {
-                    if (result && result.length > 0 && !loadingRef.current) {
-                      handleScan(result[0].rawValue);
-                    }
-                  }}
-                  onError={(error) => console.log(error?.message)}
-                  allowMultiple={true}
-                  scanDelay={1000}
-                  formats={["qr_code"]}
-                />
-              )}
+              <Scanner 
+                onScan={(result) => {
+                  if (result && result.length > 0 && !loadingRef.current) {
+                    handleScan(result[0].rawValue);
+                  }
+                }}
+                onError={(error) => {
+                  console.log("Scanner error:", error?.message);
+                  if (error?.message?.includes('Permission')) {
+                    setScanResult({ error: "Camera permission denied. Please allow camera access in your browser settings." });
+                  }
+                }}
+                allowMultiple={true}
+                scanDelay={1000}
+                formats={["qr_code"]}
+              />
             </div>
           </div>
         </div>
