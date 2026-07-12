@@ -26,7 +26,8 @@ export function TenantMobileNav({
     <div className="md:hidden flex items-center">
       <button
         onClick={() => setOpen(!open)}
-        className="p-2 text-foreground"
+        className="p-2 transition-opacity hover:opacity-80"
+        style={{ color: primaryColor }}
         aria-label="Toggle mobile menu"
       >
         {open ? <X className="w-7 h-7" /> : <Menu className="w-7 h-7" />}
