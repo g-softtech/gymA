@@ -167,12 +167,12 @@ export default async function GymPublicPage({
                 </>
               )}
             </div>
-            <div className="hidden md:flex items-center gap-7 text-sm font-medium text-gray-600">
-              {services.length > 0 && <a href="#services" className="hover:text-gray-900 transition-colors">Services</a>}
-              {tenant.membershipPlans.length > 0 && <a href="#plans" className="hover:text-gray-900 transition-colors">Pricing</a>}
-              {trainers.length > 0 && <a href="#trainers" className="hover:text-gray-900 transition-colors">Trainers</a>}
-              {tenant.blogPosts.length > 0 && <a href="#blog" className="hover:text-gray-900 transition-colors">Blog</a>}
-              <a href="#contact" className="hover:text-gray-900 transition-colors">Contact</a>
+            <div className="hidden md:flex items-center gap-7 text-sm font-medium text-muted-foreground">
+              {services.length > 0 && <a href="#services" className="hover:text-foreground transition-colors">Services</a>}
+              {tenant.membershipPlans.length > 0 && <a href="#plans" className="hover:text-foreground transition-colors">Pricing</a>}
+              {trainers.length > 0 && <a href="#trainers" className="hover:text-foreground transition-colors">Trainers</a>}
+              {tenant.blogPosts.length > 0 && <a href="#blog" className="hover:text-foreground transition-colors">Blog</a>}
+              <a href="#contact" className="hover:text-foreground transition-colors">Contact</a>
             </div>
             <div className="flex items-center gap-3">
               <Link
@@ -285,7 +285,7 @@ export default async function GymPublicPage({
               if (stats.length === 0) return null;
               return (
           <section id="stats" className="py-14" style={{ background: gradientMain }}>
-            <div className="max-w-5xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+            <div className="max-w-5xl mx-auto px-6 flex flex-wrap justify-center gap-10 md:gap-20 text-center">
               {stats.map((stat, i) => (
                 <div key={i}>
                   <p className="text-4xl md:text-5xl font-black text-white drop-shadow">{stat.value}</p>
@@ -307,8 +307,8 @@ export default async function GymPublicPage({
               >
                 About Us
               </span>
-              <h2 className="text-4xl font-black text-gray-900 mb-6">Our Story</h2>
-              <p className="text-gray-600 text-lg leading-relaxed">{s.description}</p>
+              <h2 className="text-4xl font-black text-foreground mb-6">Our Story</h2>
+              <p className="text-muted-foreground text-lg leading-relaxed">{s.description}</p>
             </div>
           </section>
               );
@@ -325,7 +325,7 @@ export default async function GymPublicPage({
                 >
                   Why Choose Us
                 </span>
-                <h2 className="text-4xl font-black text-gray-900">Everything You Need</h2>
+                <h2 className="text-4xl font-black text-foreground">Everything You Need</h2>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {features.map((feat, i) => (
@@ -341,8 +341,8 @@ export default async function GymPublicPage({
                         {feat.icon}
                       </div>
                     )}
-                    <h3 className="font-bold text-gray-900 text-lg mb-2">{feat.title}</h3>
-                    <p className="text-gray-500 text-sm leading-relaxed">{feat.description}</p>
+                    <h3 className="font-bold text-foreground text-lg mb-2">{feat.title}</h3>
+                    <p className="text-muted-foreground text-sm leading-relaxed">{feat.description}</p>
                   </div>
                 ))}
               </div>
@@ -361,12 +361,12 @@ export default async function GymPublicPage({
                 >
                   Activities & Programs
                 </span>
-                <h2 className="text-4xl font-black text-gray-900">What We Offer</h2>
+                <h2 className="text-4xl font-black text-foreground">What We Offer</h2>
               </div>
               {services.length === 0 ? (
                 <div className="bg-white rounded-2xl border border-gray-100 shadow-sm py-16 text-center">
                   <div className="text-4xl mb-4 opacity-50">🏋️</div>
-                  <p className="text-gray-500 font-medium">No programs available yet</p>
+                  <p className="text-muted-foreground font-medium">No programs available yet</p>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -392,8 +392,8 @@ export default async function GymPublicPage({
                       </div>
                     )}
                     <div className="p-6 bg-white">
-                      <h3 className="font-bold text-gray-900 text-xl mb-2">{svc.title}</h3>
-                      <p className="text-gray-500 text-sm leading-relaxed mb-4">{svc.description}</p>
+                      <h3 className="font-bold text-foreground text-xl mb-2">{svc.title}</h3>
+                      <p className="text-muted-foreground text-sm leading-relaxed mb-4">{svc.description}</p>
                       {svc.scheduleInfo && (
                         <div className="flex items-center gap-2 text-xs font-semibold text-indigo-700 bg-indigo-50 px-3 py-1.5 rounded-lg inline-flex">
                           🗓️ {svc.scheduleInfo}
@@ -420,7 +420,7 @@ export default async function GymPublicPage({
                 >
                   Our Team
                 </span>
-                <h2 className="text-4xl font-black text-gray-900">Meet Our Trainers</h2>
+                <h2 className="text-4xl font-black text-foreground">Meet Our Trainers</h2>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                 {trainers.map((trainer) => {
@@ -444,17 +444,17 @@ export default async function GymPublicPage({
                         )}
                       </div>
                       <div className="p-5">
-                        <h3 className="font-bold text-gray-900 text-lg flex items-center gap-2">
+                        <h3 className="font-bold text-foreground text-lg flex items-center gap-2">
                           {trainer.user.name ?? "Trainer"}
                         </h3>
                         {trainer.title && (
                           <p className="text-indigo-600 font-semibold text-sm mb-1">{trainer.title}</p>
                         )}
                         {trainer.yearsOfExperience && trainer.yearsOfExperience > 0 && (
-                          <p className="text-gray-500 text-xs font-medium mb-3">{trainer.yearsOfExperience} years of experience</p>
+                          <p className="text-muted-foreground text-xs font-medium mb-3">{trainer.yearsOfExperience} years of experience</p>
                         )}
                         {trainer.bio && (
-                          <p className="text-gray-500 text-sm mt-1 line-clamp-2">{trainer.bio}</p>
+                          <p className="text-muted-foreground text-sm mt-1 line-clamp-2">{trainer.bio}</p>
                         )}
                         {trainer.specialties.length > 0 && (
                           <div className="flex flex-wrap gap-1.5 mt-3">
@@ -494,13 +494,13 @@ export default async function GymPublicPage({
                 >
                   Pricing
                 </span>
-                <h2 className="text-4xl font-black text-gray-900">Membership Plans</h2>
-                <p className="text-gray-500 mt-3 text-lg">Choose the plan that fits your goals.</p>
+                <h2 className="text-4xl font-black text-foreground">Membership Plans</h2>
+                <p className="text-muted-foreground mt-3 text-lg">Choose the plan that fits your goals.</p>
             </div>
 
             {tenant.membershipPlans.length === 0 ? (
               <div className="text-center py-10 bg-white rounded-2xl border border-gray-100 shadow-sm">
-                <p className="text-gray-500 mb-4">Membership plans are coming soon.</p>
+                <p className="text-muted-foreground mb-4">Membership plans are coming soon.</p>
                 <Link
                   href={`/gym/${slug}/join`}
                   className="inline-block px-8 py-3 rounded-xl font-semibold text-white transition-all hover:opacity-90 hover:shadow-md"
@@ -531,9 +531,9 @@ export default async function GymPublicPage({
                       </div>
                     )}
                     <div className="p-8 bg-white flex flex-col h-full">
-                      <h3 className="text-xl font-bold text-gray-900 mb-1">{plan.name}</h3>
+                      <h3 className="text-xl font-bold text-foreground mb-1">{plan.name}</h3>
                       {plan.description && (
-                        <p className="text-gray-500 text-sm mb-4">{plan.description}</p>
+                        <p className="text-muted-foreground text-sm mb-4">{plan.description}</p>
                       )}
                       <div className="mb-2">
                         <span className="text-5xl font-black" style={{ color: primary }}>
@@ -554,7 +554,7 @@ export default async function GymPublicPage({
                         return (
                           <ul className="space-y-2 mb-8 flex-1">
                             {combinedFeatures.map((feat, i) => (
-                              <li key={i} className={`flex items-center gap-2 text-sm ${feat.included ? "text-gray-600" : "text-gray-400 line-through"}`}>
+                              <li key={i} className={`flex items-center gap-2 text-sm ${feat.included ? "text-muted-foreground" : "text-gray-400 line-through"}`}>
                                 {feat.included ? (
                                   <span style={{ color: primary }}>✓</span>
                                 ) : (
@@ -596,7 +596,7 @@ export default async function GymPublicPage({
                 >
                   Testimonials
                 </span>
-                <h2 className="text-4xl font-black text-gray-900">What Our Members Say</h2>
+                <h2 className="text-4xl font-black text-foreground">What Our Members Say</h2>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {testimonials.map((t, i) => (
@@ -620,7 +620,7 @@ export default async function GymPublicPage({
                         </div>
                       )}
                       <div>
-                        <p className="font-bold text-gray-900 text-sm">{t.name}</p>
+                        <p className="font-bold text-foreground text-sm">{t.name}</p>
                         {t.role && <p className="text-gray-400 text-xs">{t.role}</p>}
                       </div>
                     </div>
@@ -642,12 +642,12 @@ export default async function GymPublicPage({
                 >
                   Gallery
                 </span>
-                <h2 className="text-4xl font-black text-gray-900">Inside {tenant.name}</h2>
+                <h2 className="text-4xl font-black text-foreground">Inside {tenant.name}</h2>
               </div>
               {gallery.length === 0 ? (
                 <div className="bg-white rounded-2xl border border-gray-100 shadow-sm py-16 text-center">
                   <div className="text-4xl mb-4 opacity-50">🖼️</div>
-                  <p className="text-gray-500 font-medium">No facilities uploaded yet</p>
+                  <p className="text-muted-foreground font-medium">No facilities uploaded yet</p>
                 </div>
               ) : (
                 <div className="columns-2 md:columns-3 gap-4 space-y-4">
@@ -661,7 +661,7 @@ export default async function GymPublicPage({
                       className="w-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                     {item.category && (
-                      <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold text-gray-900 shadow-sm">
+                      <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold text-foreground shadow-sm">
                         {item.category}
                       </div>
                     )}
@@ -690,7 +690,7 @@ export default async function GymPublicPage({
                 >
                   Blog
                 </span>
-                <h2 className="text-4xl font-black text-gray-900">Fitness Tips & Insights</h2>
+                <h2 className="text-4xl font-black text-foreground">Fitness Tips & Insights</h2>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 {tenant.blogPosts.map((post) => (
@@ -717,11 +717,11 @@ export default async function GymPublicPage({
                       </div>
                     )}
                     <div className="p-5">
-                      <h3 className="font-bold text-gray-900 text-lg leading-snug mb-2 group-hover:underline">
+                      <h3 className="font-bold text-foreground text-lg leading-snug mb-2 group-hover:underline">
                         {post.title}
                       </h3>
                       {post.excerpt && (
-                        <p className="text-gray-500 text-sm line-clamp-2">{post.excerpt}</p>
+                        <p className="text-muted-foreground text-sm line-clamp-2">{post.excerpt}</p>
                       )}
                       <p className="text-xs text-gray-400 mt-3">
                         {post.publishedAt
@@ -761,7 +761,7 @@ export default async function GymPublicPage({
               >
                 Get In Touch
               </span>
-              <h2 className="text-4xl font-black text-gray-900">Find Us</h2>
+              <h2 className="text-4xl font-black text-foreground">Find Us</h2>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
@@ -773,8 +773,8 @@ export default async function GymPublicPage({
                       📍
                     </div>
                     <div>
-                      <p className="font-semibold text-gray-900 text-sm mb-0.5">Address</p>
-                      <p className="text-gray-500 text-sm">
+                      <p className="font-semibold text-foreground text-sm mb-0.5">Address</p>
+                      <p className="text-muted-foreground text-sm">
                         {[s?.address, s?.city, s?.state, s?.country].filter(Boolean).join(", ")}
                       </p>
                     </div>
@@ -786,8 +786,8 @@ export default async function GymPublicPage({
                       📞
                     </div>
                     <div>
-                      <p className="font-semibold text-gray-900 text-sm mb-0.5">Phone</p>
-                      <p className="text-gray-500 text-sm group-hover:text-gray-800 transition-colors">{s.phone}</p>
+                      <p className="font-semibold text-foreground text-sm mb-0.5">Phone</p>
+                      <p className="text-muted-foreground text-sm group-hover:text-gray-800 transition-colors">{s.phone}</p>
                     </div>
                   </a>
                 )}
@@ -797,8 +797,8 @@ export default async function GymPublicPage({
                       ✉️
                     </div>
                     <div>
-                      <p className="font-semibold text-gray-900 text-sm mb-0.5">Email</p>
-                      <p className="text-gray-500 text-sm group-hover:text-gray-800 transition-colors">{s.email}</p>
+                      <p className="font-semibold text-foreground text-sm mb-0.5">Email</p>
+                      <p className="text-muted-foreground text-sm group-hover:text-gray-800 transition-colors">{s.email}</p>
                     </div>
                   </a>
                 )}
@@ -806,7 +806,7 @@ export default async function GymPublicPage({
                 {/* Social links */}
                 {socialLinks.length > 0 && (
                   <div className="pt-4">
-                    <p className="font-semibold text-gray-900 text-sm mb-3">Follow Us</p>
+                    <p className="font-semibold text-foreground text-sm mb-3">Follow Us</p>
                     <div className="flex flex-wrap gap-2">
                       {socialLinks.map((link, i) => (
                         <a
@@ -829,7 +829,7 @@ export default async function GymPublicPage({
               {/* Opening hours */}
               {Object.keys(openingHours).length > 0 ? (
                 <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100">
-                  <h3 className="font-bold text-gray-900 mb-4">Opening Hours</h3>
+                  <h3 className="font-bold text-foreground mb-4">Opening Hours</h3>
                   <div className="space-y-2">
                     {DAYS.map((day) => {
                       const h = openingHours[day];
@@ -847,7 +847,7 @@ export default async function GymPublicPage({
                           >
                             {isToday ? `${day} (Today)` : day}
                           </span>
-                          <span className="text-sm text-gray-500">
+                          <span className="text-sm text-muted-foreground">
                             {h.closed ? (
                               <span className="text-red-400 font-medium">Closed</span>
                             ) : (
