@@ -54,8 +54,7 @@ export default function AnimatedStats({
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-50px" }}
             transition={{ delay: i * 0.1, duration: 0.6, type: "spring", bounce: 0.4 }}
-            className="flex-1 min-w-[250px] max-w-[350px] flex flex-col items-center justify-center p-8 rounded-3xl border border-white/20 backdrop-blur-md shadow-2xl"
-            style={{ background: "rgba(255,255,255,0.15)" }}
+            className="flex-1 min-w-[250px] max-w-[350px] flex flex-col items-center justify-center p-4"
           >
             <p className="text-5xl md:text-6xl font-black text-white drop-shadow-lg mb-3 text-center">
               <AnimatedNumber value={stat.value} />
