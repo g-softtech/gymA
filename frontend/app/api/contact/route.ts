@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { ResendEmailProvider } from "@/lib/notifications/providers/ResendEmailProvider";
 
 /**
  * POST /api/contact
@@ -50,7 +51,7 @@ export async function POST(req: NextRequest) {
     // ── Resolve tenant ────────────────────────────────────────────────────────
     const tenant = await prisma.tenant.findUnique({
       where: { slug },
-      select: { id: true, name: true, isActive: true },
+      select: { id: true, name: true, isActive: true, settings: true },
     });
 
     if (!tenant || !tenant.isActive) {
@@ -78,6 +79,34 @@ export async function POST(req: NextRequest) {
           .join("\n"),
       },
     });
+
+    // ── Send Email to Gym Owner ───────────────────────────────────────────────
+    // If the gym has configured a contact email in their settings, send it!
+    const gymEmail = (tenant.settings as any)?.email;
+    if (gymEmail && typeof gymEmail === "string") {
+      try {
+        const provider = new ResendEmailProvider();
+        const htmlBody = `
+          <h2>New Contact Form Submission</h2>
+          <p><strong>Name:</strong> ${name}</p>
+          <p><strong>Email:</strong> ${email}</p>
+          ${phone ? `<p><strong>Phone:</strong> ${phone}</p>` : ""}
+          <hr />
+          <p>${message.replace(/\n/g, "<br/>")}</p>
+        `;
+        const textBody = `New Enquiry from ${name}\nEmail: ${email}\nPhone: ${phone || "N/A"}\n\nMessage:\n${message}`;
+        
+        await provider.sendEmail(
+          [gymEmail],
+          `📩 Website Enquiry: ${subject?.trim() || "New Message"} from ${name}`,
+          htmlBody,
+          textBody
+        );
+      } catch (emailErr) {
+        // We log the error but don't fail the API request so the user still sees "Success"
+        console.error("[contact] Failed to send email via Resend:", emailErr);
+      }
+    }
 
     return NextResponse.json({ success: true });
   } catch (err) {
