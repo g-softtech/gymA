@@ -5,7 +5,8 @@ import type { Metadata } from "next";
 import { TenantThemeProvider } from "@/components/TenantThemeProvider";
 import ContactForm from "@/components/ContactForm";
 import { getEntitlementFeatures } from "@/lib/entitlements/registry";
-import AnimatedStats from "@/components/ui/AnimatedStats";
+import AnimatedStats, { AnimatedNumber } from "@/components/ui/AnimatedStats";
+import { TenantMobileNav } from "@/components/ui/TenantMobileNav";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types mirroring TenantSettings JSON blobs
@@ -139,6 +140,14 @@ export default async function GymPublicPage({
       : []),
   ].filter((l) => l.href);
 
+  const navLinks = [
+    ...(services.length > 0 ? [{ label: "Services", href: "#services" }] : []),
+    ...(tenant.membershipPlans.length > 0 ? [{ label: "Pricing", href: "#plans" }] : []),
+    ...(trainers.length > 0 ? [{ label: "Trainers", href: "#trainers" }] : []),
+    ...(tenant.blogPosts.length > 0 ? [{ label: "Blog", href: "#blog" }] : []),
+    { label: "Contact", href: "#contact" },
+  ];
+
   const gradientMain = `linear-gradient(135deg, ${primary}, ${secondary})`;
   const gradientSoft = `linear-gradient(135deg, ${primary}15, ${secondary}20)`;
 
@@ -168,18 +177,19 @@ export default async function GymPublicPage({
                 </>
               )}
             </div>
+            {/* Desktop Nav */}
             <div className="hidden md:flex items-center gap-7 text-sm font-medium text-muted-foreground">
-              {services.length > 0 && <a href="#services" className="hover:text-foreground transition-colors">Services</a>}
-              {tenant.membershipPlans.length > 0 && <a href="#plans" className="hover:text-foreground transition-colors">Pricing</a>}
-              {trainers.length > 0 && <a href="#trainers" className="hover:text-foreground transition-colors">Trainers</a>}
-              {tenant.blogPosts.length > 0 && <a href="#blog" className="hover:text-foreground transition-colors">Blog</a>}
-              <a href="#contact" className="hover:text-foreground transition-colors">Contact</a>
+              {navLinks.map((link) => (
+                <a key={link.label} href={link.href} className="hover:text-foreground transition-colors">{link.label}</a>
+              ))}
             </div>
-            <div className="flex items-center gap-3">
+
+            {/* Desktop Buttons */}
+            <div className="hidden md:flex items-center gap-3">
               <Link
                 href={`/api/auth/signin?callbackUrl=/gym/${slug}/dashboard/member`}
                 id="nav-signin-btn"
-                className="hidden sm:inline-block px-4 py-2 text-sm font-semibold rounded-lg border transition-all hover:shadow-sm"
+                className="px-4 py-2 text-sm font-semibold rounded-lg border transition-all hover:shadow-sm"
                 style={{ borderColor: primary, color: primary }}
               >
                 Sign In
@@ -193,6 +203,14 @@ export default async function GymPublicPage({
                 Join Now
               </Link>
             </div>
+
+            {/* Mobile Nav Toggle */}
+            <TenantMobileNav 
+              links={navLinks} 
+              primaryColor={primary} 
+              signInHref={`/api/auth/signin?callbackUrl=/gym/${slug}/dashboard/member`} 
+              joinHref={`/gym/${slug}/join`} 
+            />
           </div>
         </nav>
 
