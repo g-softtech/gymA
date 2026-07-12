@@ -62,6 +62,11 @@ export default async function MemberDashboardPage({
     ? Math.max(0, Math.ceil((new Date(activeSub.endDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))
     : null;
 
+  const isNewMember =
+    memberProfile.attendances.length === 0 &&
+    memberProfile.workouts.length === 0 &&
+    memberProfile.subscriptions.length === 0;
+
   // Unread messages count
   const unreadMessages = await prisma.message.count({
     where: { receiverId: session.user.id, read: false },
@@ -78,7 +83,7 @@ export default async function MemberDashboardPage({
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-foreground">
-            Welcome back, {session.user.name?.split(" ")[0] ?? "there"}!
+            {isNewMember ? "Welcome" : "Welcome back"}, {session.user.name?.split(" ")[0] ?? "there"}!
           </h1>
           <p className="text-muted-foreground mt-1">Here is your fitness overview.</p>
         </div>
