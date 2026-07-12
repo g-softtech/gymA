@@ -144,7 +144,7 @@ export default async function GymPublicPage({
 
   return (
     <TenantThemeProvider settings={s}>
-      <div className="min-h-screen bg-background text-foreground" style={{ fontFamily: s?.fontFamily ? `'${s.fontFamily}', system-ui, sans-serif` : undefined }}>
+      <div className="min-h-screen w-full overflow-x-hidden bg-background text-foreground" style={{ fontFamily: s?.fontFamily ? `'${s.fontFamily}', system-ui, sans-serif` : undefined }}>
 
         {/* ── Nav ────────────────────────────────────────────────────────────── */}
         <nav
