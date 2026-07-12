@@ -640,24 +640,25 @@ export default async function GymPublicPage({
                   <p className="text-muted-foreground font-medium">No facilities uploaded yet</p>
                 </div>
               ) : (
-                <div className="columns-2 md:columns-3 gap-4 space-y-4">
+                <div className="flex flex-wrap justify-center gap-6">
                 {gallery.map((item, i) => (
-                  <div key={i} className="break-inside-avoid rounded-xl overflow-hidden group relative">
+                  <div key={i} className="group relative rounded-3xl overflow-hidden shadow-2xl flex-1 min-w-[320px] max-w-[550px] aspect-video border border-white/10">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={optimizeImageUrl(item.imageUrl)}
                       alt={item.caption ?? "Gallery image"}
                       loading="lazy"
-                      className="w-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
                     />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent opacity-70 group-hover:opacity-100 transition-opacity duration-500" />
                     {item.category && (
-                      <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold text-foreground shadow-sm">
+                      <div className="absolute top-4 left-4 bg-white/10 backdrop-blur-md px-4 py-1.5 rounded-full text-xs font-bold text-white shadow-sm border border-white/20">
                         {item.category}
                       </div>
                     )}
                     {item.caption && (
-                      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4">
-                        <p className="text-white text-sm font-medium drop-shadow-md">{item.caption}</p>
+                      <div className="absolute bottom-0 left-0 right-0 p-6 transform translate-y-2 group-hover:translate-y-0 transition-transform duration-500">
+                        <p className="text-white text-lg font-bold drop-shadow-lg">{item.caption}</p>
                       </div>
                     )}
                   </div>
