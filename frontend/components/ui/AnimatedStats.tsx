@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import { motion, useInView, useSpring, useTransform } from "framer-motion";
 
-function AnimatedNumber({ value }: { value: string }) {
+export function AnimatedNumber({ value }: { value: string }) {
   // Extract number and surrounding text (e.g., "$100k" -> prefix "$", num 100, suffix "k")
   const match = value.match(/(^.*?)([\d,.]+)(.*$)/);
   const numStr = match ? match[2].replace(/,/g, '') : "0";

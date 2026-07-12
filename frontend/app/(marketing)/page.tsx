@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { AnimatedNumber } from "@/components/ui/AnimatedStats";
 import { planCatalogService } from "@/lib/billing/StaticPlanCatalogService";
 import { PricingCard } from "@/components/billing/PricingCard";
 export default function HomePage() {
@@ -178,12 +179,13 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Stats */}
       <section className="bg-indigo-600 py-12 px-6">
         <div className="max-w-5xl mx-auto grid grid-cols-2 sm:grid-cols-4 gap-8 text-center">
           {stats.map((s) => (
             <div key={s.label}>
-              <p className="text-3xl font-extrabold text-white">{s.value}</p>
+              <p className="text-3xl font-extrabold text-white">
+                <AnimatedNumber value={s.value} />
+              </p>
               <p className="text-indigo-200 text-sm mt-1">{s.label}</p>
             </div>
           ))}
