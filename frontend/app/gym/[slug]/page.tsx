@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import { TenantThemeProvider } from "@/components/TenantThemeProvider";
 import ContactForm from "@/components/ContactForm";
 import { getEntitlementFeatures } from "@/lib/entitlements/registry";
+import AnimatedStats from "@/components/ui/AnimatedStats";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types mirroring TenantSettings JSON blobs
@@ -283,18 +284,7 @@ export default async function GymPublicPage({
 
             case "stats":
               if (stats.length === 0) return null;
-              return (
-          <section id="stats" className="py-14" style={{ background: gradientMain }}>
-            <div className="max-w-5xl mx-auto px-6 flex flex-wrap justify-center gap-10 md:gap-20 text-center">
-              {stats.map((stat, i) => (
-                <div key={i}>
-                  <p className="text-4xl md:text-5xl font-black text-white drop-shadow">{stat.value}</p>
-                  <p className="text-white/75 text-sm font-medium mt-1 uppercase tracking-wider">{stat.label}</p>
-                </div>
-              ))}
-            </div>
-          </section>
-              );
+              return <AnimatedStats key="stats" stats={stats} gradientMain={gradientMain} />;
 
             case "about":
               if (!s?.description) return null;
