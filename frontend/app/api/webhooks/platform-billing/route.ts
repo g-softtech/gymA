@@ -76,7 +76,7 @@ export async function POST(req: Request) {
   }
 }
 
-async function handleSubscriptionSuccess(payload: any) {
+export async function handleSubscriptionSuccess(payload: any) {
   const metadata = payload.metadata || {};
   const tenantId = metadata.tenantId;
   const targetPlan = (metadata.targetPlan || metadata.planCode) as TenantPlan;
