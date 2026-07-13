@@ -29,10 +29,15 @@ export default function CheckoutButton({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ itemType: "MEMBERSHIP", itemId: planId }),
       });
-      const data = await initRes.json();
+      let data;
+      try {
+        data = await initRes.json();
+      } catch (e) {
+        throw new Error(`Server returned an invalid response (Status: ${initRes.status})`);
+      }
 
       if (!initRes.ok || !data.accessCode) {
-        alert("Failed to initialize payment");
+        alert(data?.error || "Failed to initialize payment");
         setLoading(false);
         return;
       }
@@ -70,7 +75,7 @@ export default function CheckoutButton({
       });
     } catch (err) {
       console.error(err);
-      alert("An error occurred starting payment.");
+      alert(`Payment Error: ${err instanceof Error ? err.message : String(err)}`);
       setLoading(false);
     }
   };
