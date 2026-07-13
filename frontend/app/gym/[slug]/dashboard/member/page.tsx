@@ -135,6 +135,15 @@ export default async function MemberDashboardPage({
                 <Link href={`/gym/${slug}#plans`} className="underline font-medium">Renew now</Link>
               </div>
             )}
+
+            <div className="pt-4 mt-2 border-t border-border flex justify-end">
+              <Link
+                href={`/gym/${slug}#plans`}
+                className="text-sm font-semibold text-indigo-600 hover:text-indigo-700 transition-colors"
+              >
+                Upgrade Plan &rarr;
+              </Link>
+            </div>
           </div>
         ) : (
           <div className="text-center py-6">
