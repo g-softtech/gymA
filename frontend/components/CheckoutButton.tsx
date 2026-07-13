@@ -59,9 +59,16 @@ export default function CheckoutButton({
         return;
       }
 
+      const paystackKey = process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY;
+      if (!paystackKey) {
+        alert("Payment gateway is not configured. Please contact the gym administrator.");
+        setLoading(false);
+        return;
+      }
+
       const paystack = new PaystackPop();
       paystack.newTransaction({
-        key: process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY || "",
+        key: paystackKey,
         access_code: data.accessCode,
         onSuccess: async (transaction: any) => {
           // 3. Verify server-side
