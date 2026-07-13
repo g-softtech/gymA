@@ -13,6 +13,7 @@ interface CheckoutButtonProps {
 }
 
 export default function CheckoutButton({
+  email,
   amount,
   planId,
   tenantSlug,
@@ -70,6 +71,8 @@ export default function CheckoutButton({
       paystack.newTransaction({
         key: paystackKey,
         access_code: data.accessCode,
+        email: email,
+        amount: Math.round(amount * 100),
         onSuccess: async (transaction: any) => {
           // 3. Verify server-side
           try {
