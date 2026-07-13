@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Script from "next/script";
 
 interface CheckoutButtonProps {
   email: string;
@@ -43,6 +44,12 @@ export default function CheckoutButton({
       }
 
       // 2. Open Paystack Popup using access_code
+      if (typeof (window as any).PaystackPop === "undefined") {
+        alert("Payment system is still loading. Please check your internet connection or disable adblockers, then try again.");
+        setLoading(false);
+        return;
+      }
+
       const paystack = new (window as any).PaystackPop();
       paystack.newTransaction({
         key: process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY || "",
@@ -82,7 +89,7 @@ export default function CheckoutButton({
 
   return (
     <>
-      <script src="https://js.paystack.co/v1/inline.js" async></script>
+      <Script src="https://js.paystack.co/v1/inline.js" strategy="lazyOnload" />
       <button
         id="paystack-checkout-btn"
         disabled={loading}
