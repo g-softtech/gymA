@@ -79,20 +79,24 @@ export async function POST(req: Request) {
 async function handleSubscriptionSuccess(payload: any) {
   const metadata = payload.metadata || {};
   const tenantId = metadata.tenantId;
-  const targetPlan = metadata.targetPlan as TenantPlan;
+  const targetPlan = (metadata.targetPlan || metadata.planCode) as TenantPlan;
 
   if (!tenantId || !targetPlan) return;
-
-  // Extend billing by 30 days from next_payment_date or now
-  const nextPaymentDate = payload.next_payment_date
-    ? new Date(payload.next_payment_date)
-    : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
-
-  const correlationId = crypto.randomUUID();
 
   const tenant = await prisma.tenant.findUnique({ where: { id: tenantId } });
   if (!tenant) return;
   const billingStatusBefore = tenant.billingStatus;
+
+  // Extend billing by 30 days from next_payment_date or existing billingEndsAt
+  const currentEndDate = tenant.billingEndsAt && tenant.billingEndsAt.getTime() > Date.now() 
+    ? tenant.billingEndsAt.getTime() 
+    : Date.now();
+
+  const nextPaymentDate = payload.next_payment_date
+    ? new Date(payload.next_payment_date)
+    : new Date(currentEndDate + 30 * 24 * 60 * 60 * 1000);
+
+  const correlationId = crypto.randomUUID();
 
   await prisma.$transaction(async (tx) => {
     // Update authoritative billing fields on Tenant

@@ -87,15 +87,12 @@ export default function CheckoutButton({
             });
 
             if (verifyRes.ok) {
-              router.refresh();
-              router.push(`/gym/${tenantSlug}/dashboard/member?welcome=1`);
+              window.location.href = `/gym/${tenantSlug}/dashboard/member?welcome=1`;
             } else {
-              router.refresh();
-              router.push(`/gym/${tenantSlug}/dashboard/member?notice=payment_processing`);
+              window.location.href = `/gym/${tenantSlug}/dashboard/member?notice=payment_processing`;
             }
           } catch {
-            router.refresh();
-            router.push(`/gym/${tenantSlug}/dashboard/member?notice=payment_processing`);
+            window.location.href = `/gym/${tenantSlug}/dashboard/member?notice=payment_processing`;
           }
         },
         onCancel: () => {
