@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import Script from "next/script";
 
 interface CheckoutButtonProps {
   email: string;
@@ -44,13 +43,23 @@ export default function CheckoutButton({
       }
 
       // 2. Open Paystack Popup using access_code
-      if (typeof (window as any).PaystackPop === "undefined") {
+      let PaystackPop;
+      try {
+        // @ts-ignore
+        const PaystackModule = await import("@paystack/inline-js");
+        PaystackPop = PaystackModule.default || (PaystackModule as any).PaystackPop;
+      } catch (err) {
+        console.warn("Failed to dynamically import paystack, falling back to window", err);
+        PaystackPop = (window as any).PaystackPop;
+      }
+
+      if (typeof PaystackPop === "undefined" || !PaystackPop) {
         alert("Payment system is still loading. Please check your internet connection or disable adblockers, then try again.");
         setLoading(false);
         return;
       }
 
-      const paystack = new (window as any).PaystackPop();
+      const paystack = new PaystackPop();
       paystack.newTransaction({
         key: process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY || "",
         access_code: data.accessCode,
@@ -89,7 +98,6 @@ export default function CheckoutButton({
 
   return (
     <>
-      <Script src="https://js.paystack.co/v1/inline.js" strategy="lazyOnload" />
       <button
         id="paystack-checkout-btn"
         disabled={loading}
