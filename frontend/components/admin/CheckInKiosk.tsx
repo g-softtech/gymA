@@ -25,6 +25,7 @@ type CheckInResponse = {
 export function CheckInKiosk() {
   const [scanResult, setScanResult] = useState<CheckInResponse | null>(null);
   const [loading, setLoading] = useState(false);
+  const [facingMode, setFacingMode] = useState<"environment" | "user">("environment");
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<any[]>([]);
   
@@ -179,6 +180,7 @@ export function CheckInKiosk() {
           <div className="p-4">
             <div className="w-full overflow-hidden rounded-lg border-2 border-dashed border-border aspect-square relative bg-muted flex items-center justify-center">
               <Scanner 
+                constraints={{ facingMode }}
                 onScan={(result) => {
                   if (result && result.length > 0 && !loadingRef.current) {
                     handleScan(result[0].rawValue);
@@ -189,6 +191,12 @@ export function CheckInKiosk() {
                   
                   let errMsg = error?.message || "Unknown error";
                   let errName = (error as any)?.name || "UnknownName";
+
+                  // Fallback to front camera if back camera is missing/denied on laptops
+                  if (facingMode === "environment" && (errName === "OverconstrainedError" || errName === "UnknownName" || errName === "NotAllowedError")) {
+                    setFacingMode("user");
+                    return;
+                  }
 
                   // Display the exact raw error on screen for debugging
                   setScanResult({ 
