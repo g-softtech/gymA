@@ -90,8 +90,9 @@ export default function CheckoutButton({
         },
       });
     } catch (err) {
-      console.error(err);
-      alert(`Payment Error: ${err instanceof Error ? err.message : String(err)}`);
+      console.error("Payment setup error:", err);
+      const errString = err instanceof Error ? err.message : JSON.stringify(err);
+      alert(`Payment Error Details: ${errString}`);
       setLoading(false);
     }
   };
