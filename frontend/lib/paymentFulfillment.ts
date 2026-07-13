@@ -80,17 +80,15 @@ export async function fulfillPayment(reference: string, gatewayData: {
 
       // b. Ensure member profile exists
       let memberProfile = await tx.memberProfile.findUnique({
-        where: { userId: transaction.memberId },
+        where: { id: transaction.memberId },
       });
 
       if (!memberProfile) {
-        memberProfile = await tx.memberProfile.create({
-          data: { userId: transaction.memberId, fitnessGoals: [] },
-        });
+        throw new Error("MemberProfile not found for transaction memberId: " + transaction.memberId);
       }
 
       const user = await tx.user.findUnique({
-        where: { id: transaction.memberId },
+        where: { id: memberProfile.userId },
       });
 
       // c. Find existing active subscription
