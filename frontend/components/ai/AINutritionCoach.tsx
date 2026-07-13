@@ -96,8 +96,8 @@ export default function AINutritionCoach({ memberId, memberData }: { memberId: s
 
   return (
     <div className="space-y-6">
-      <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 space-y-5">
-        <h2 className="text-base font-semibold text-gray-900">Personalise your meal plan</h2>
+      <div className="bg-card text-card-foreground rounded-xl border border-border shadow-sm p-6 space-y-5">
+        <h2 className="text-base font-semibold">Personalise your meal plan</h2>
 
         {(!memberData.weightKg || !memberData.heightCm) && (
           <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 text-sm text-yellow-800">
@@ -107,30 +107,30 @@ export default function AINutritionCoach({ memberId, memberData }: { memberId: s
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">Diet Goal</label>
+            <label className="block text-xs font-medium text-muted-foreground mb-1">Diet Goal</label>
             <select value={form.goal} onChange={(e) => setForm({ ...form, goal: e.target.value })}
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              className="w-full border border-input bg-background text-foreground rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
               {GOALS.map((g) => <option key={g.value} value={g.value}>{g.label}</option>)}
             </select>
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">Activity Level</label>
+            <label className="block text-xs font-medium text-muted-foreground mb-1">Activity Level</label>
             <select value={form.activityLevel} onChange={(e) => setForm({ ...form, activityLevel: e.target.value })}
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              className="w-full border border-input bg-background text-foreground rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
               {ACTIVITY_LEVELS.map((a) => <option key={a.value} value={a.value}>{a.label}</option>)}
             </select>
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">Allergies / Restrictions</label>
+            <label className="block text-xs font-medium text-muted-foreground mb-1">Allergies / Restrictions</label>
             <input type="text" value={form.allergies} onChange={(e) => setForm({ ...form, allergies: e.target.value })}
               placeholder="e.g. peanut allergy, no pork"
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+              className="w-full border border-input bg-background text-foreground rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">Food Preferences</label>
+            <label className="block text-xs font-medium text-muted-foreground mb-1">Food Preferences</label>
             <input type="text" value={form.preferences} onChange={(e) => setForm({ ...form, preferences: e.target.value })}
               placeholder="e.g. Nigerian foods, vegetarian"
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+              className="w-full border border-input bg-background text-foreground rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
           </div>
         </div>
 
