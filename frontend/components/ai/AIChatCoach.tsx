@@ -94,14 +94,14 @@ export default function AIChatCoach({
   return (
     <div className="space-y-4">
       {/* Chat window */}
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden flex flex-col" style={{ height: "520px" }}>
+      <div className="bg-card text-card-foreground rounded-2xl border border-border shadow-sm overflow-hidden flex flex-col" style={{ height: "520px" }}>
         {/* Header */}
-        <div className="px-5 py-3 border-b border-gray-100 flex items-center gap-3 bg-gradient-to-r from-orange-50 to-indigo-50">
+        <div className="px-5 py-3 border-b border-border flex items-center gap-3 bg-muted/50">
           <div className="w-9 h-9 rounded-full bg-indigo-600 flex items-center justify-center text-lg">
             🤖
           </div>
           <div>
-            <p className="font-semibold text-gray-900 text-sm">AI Coach</p>
+            <p className="font-semibold text-foreground text-sm">AI Coach</p>
             <p className="text-xs text-green-500 font-medium">● Online</p>
           </div>
         </div>
@@ -119,7 +119,7 @@ export default function AIChatCoach({
                 className={`max-w-sm lg:max-w-md px-4 py-3 rounded-2xl text-sm leading-relaxed ${
                   m.role === "user"
                     ? "bg-indigo-600 text-white rounded-br-sm"
-                    : "bg-gray-100 text-gray-800 rounded-bl-sm"
+                    : "bg-muted text-foreground rounded-bl-sm"
                 }`}
               >
                 {m.content.split("\n").map((line, j) => (
@@ -134,11 +134,11 @@ export default function AIChatCoach({
               <div className="w-7 h-7 rounded-full bg-indigo-600 flex items-center justify-center text-sm shrink-0 mr-2">
                 🤖
               </div>
-              <div className="bg-gray-100 rounded-2xl rounded-bl-sm px-4 py-3">
+              <div className="bg-muted rounded-2xl rounded-bl-sm px-4 py-3">
                 <div className="flex gap-1 items-center">
-                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
-                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
-                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
+                  <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
+                  <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
+                  <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
                 </div>
               </div>
             </div>
@@ -147,7 +147,7 @@ export default function AIChatCoach({
         </div>
 
         {/* Input */}
-        <div className="px-4 py-3 border-t border-gray-100 flex gap-3 items-end">
+        <div className="px-4 py-3 border-t border-border flex gap-3 items-end">
           <textarea
             rows={1}
             placeholder="Ask your AI coach anything..."
@@ -155,7 +155,7 @@ export default function AIChatCoach({
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
             disabled={loading}
-            className="flex-1 border border-gray-200 rounded-xl px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50"
+            className="flex-1 bg-background text-foreground border border-input rounded-xl px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-50"
           />
           <button
             onClick={() => sendMessage(input)}
@@ -169,7 +169,7 @@ export default function AIChatCoach({
 
       {/* Suggested questions */}
       <div>
-        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">
+        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3">
           Suggested Questions
         </p>
         <div className="flex flex-wrap gap-2">
@@ -178,7 +178,7 @@ export default function AIChatCoach({
               key={q}
               onClick={() => sendMessage(q)}
               disabled={loading}
-              className="text-xs bg-white border border-gray-200 text-gray-600 px-3 py-1.5 rounded-full hover:border-indigo-400 hover:text-indigo-600 transition disabled:opacity-40"
+              className="bg-background text-foreground border border-border hover:bg-muted text-xs px-4 py-2 rounded-full transition disabled:opacity-50"
             >
               {q}
             </button>

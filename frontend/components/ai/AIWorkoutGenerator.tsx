@@ -78,45 +78,45 @@ export default function AIWorkoutGenerator({ memberId, memberData }: { memberId:
   return (
     <div className="space-y-6">
       {/* Config form */}
-      <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 space-y-5">
-        <h2 className="text-base font-semibold text-gray-900">Tell the AI about yourself</h2>
+      <div className="bg-card text-card-foreground rounded-xl border border-border shadow-sm p-6 space-y-5">
+        <h2 className="text-base font-semibold text-foreground">Tell the AI about yourself</h2>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">Fitness Level</label>
+            <label className="block text-xs font-medium text-muted-foreground mb-1">Fitness Level</label>
             <select value={form.fitnessLevel} onChange={(e) => setForm({ ...form, fitnessLevel: e.target.value })}
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              className="w-full bg-background border border-input rounded-lg px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary">
               {FITNESS_LEVELS.map((l) => <option key={l}>{l}</option>)}
             </select>
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">Days per Week</label>
+            <label className="block text-xs font-medium text-muted-foreground mb-1">Days per Week</label>
             <select value={form.daysPerWeek} onChange={(e) => setForm({ ...form, daysPerWeek: parseInt(e.target.value) })}
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              className="w-full bg-background border border-input rounded-lg px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary">
               {DAYS_OPTIONS.map((d) => <option key={d} value={d}>{d} days</option>)}
             </select>
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">Focus Area</label>
+            <label className="block text-xs font-medium text-muted-foreground mb-1">Focus Area</label>
             <select value={form.focusArea} onChange={(e) => setForm({ ...form, focusArea: e.target.value })}
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              className="w-full bg-background border border-input rounded-lg px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary">
               {FOCUS_AREAS.map((f) => <option key={f}>{f}</option>)}
             </select>
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">Available Equipment</label>
+            <label className="block text-xs font-medium text-muted-foreground mb-1">Available Equipment</label>
             <select value={form.equipment} onChange={(e) => setForm({ ...form, equipment: e.target.value })}
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              className="w-full bg-background border border-input rounded-lg px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary">
               {EQUIPMENT_OPTIONS.map((e) => <option key={e}>{e}</option>)}
             </select>
           </div>
         </div>
 
         <div>
-          <label className="block text-xs font-medium text-gray-600 mb-1">Your Goals</label>
+          <label className="block text-xs font-medium text-muted-foreground mb-1">Your Goals</label>
           <input type="text" value={form.goals} onChange={(e) => setForm({ ...form, goals: e.target.value })}
             placeholder="e.g. lose weight, build muscle, improve endurance"
-            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+            className="w-full bg-background border border-input rounded-lg px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary" />
         </div>
 
         {error && <p className="text-sm text-red-600 bg-red-50 px-3 py-2 rounded">{error}</p>}
