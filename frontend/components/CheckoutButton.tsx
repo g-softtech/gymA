@@ -89,9 +89,12 @@ export default function CheckoutButton({
             if (verifyRes.ok) {
               window.location.href = `/gym/${tenantSlug}/dashboard/member?welcome=1`;
             } else {
+              const errData = await verifyRes.json().catch(() => ({}));
+              alert(`Payment verification failed: ${errData.error || 'Please contact support.'}`);
               window.location.href = `/gym/${tenantSlug}/dashboard/member?notice=payment_processing`;
             }
-          } catch {
+          } catch (err: any) {
+            alert(`Payment processing error: ${err.message || 'Please contact support.'}`);
             window.location.href = `/gym/${tenantSlug}/dashboard/member?notice=payment_processing`;
           }
         },

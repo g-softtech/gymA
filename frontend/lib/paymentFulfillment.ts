@@ -124,7 +124,7 @@ export async function fulfillPayment(reference: string, gatewayData: {
       }
 
       endDate = new Date(startDate);
-      endDate.setDate(endDate.getDate() + plan.durationDays);
+      endDate.setDate(endDate.getDate() + (plan.durationDays || 30));
 
       // d. Create NEW Subscription 
       const newSub = await tx.subscription.create({
