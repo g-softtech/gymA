@@ -129,12 +129,17 @@ export async function handleSubscriptionSuccess(payload: any) {
     });
 
     if (payload.amount) {
-      await tx.saaSInvoice.create({
-        data: {
+      const invoiceRef = payload.reference || `sub_${Date.now()}`;
+      await tx.saaSInvoice.upsert({
+        where: { reference: invoiceRef },
+        update: {
+          status: "paid",
+        },
+        create: {
           tenantId,
           amount: payload.amount / 100,
           status: "paid",
-          reference: payload.reference || `sub_${Date.now()}`,
+          reference: invoiceRef,
         },
       });
     }
