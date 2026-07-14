@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import { useBranding } from "@/components/TenantThemeProvider";
 import type { PlatformPlanConfig } from "@/lib/billing/pricingConfig";
 import { PricingCard } from "@/components/billing/PricingCard";
@@ -21,10 +22,33 @@ export default function BillingManagerClient() {
   const [status, setStatus] = useState<PlanInfo | null>(null);
   const [plans, setPlans] = useState<AnyPlanConfig[]>([]);
   const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null);
+  const searchParams = useSearchParams();
+  const router = useRouter();
 
   useEffect(() => {
-    Promise.all([fetchStatus(), fetchPlans()]).finally(() => setLoading(false));
-  }, []);
+    const reference = searchParams.get("reference");
+    
+    if (reference) {
+      setLoading(true);
+      // Fast-path synchronous verification
+      fetch("/api/billing/verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reference }),
+      })
+        .then((res) => res.json())
+        .then(() => {
+          // Clean URL
+          router.replace(window.location.pathname);
+          // Now fetch updated status
+          return Promise.all([fetchStatus(), fetchPlans()]);
+        })
+        .catch((e) => setError("Payment verification failed. It may take a few minutes for the system to process the webhook."))
+        .finally(() => setLoading(false));
+    } else {
+      Promise.all([fetchStatus(), fetchPlans()]).finally(() => setLoading(false));
+    }
+  }, [searchParams, router]);
 
   const fetchStatus = async () => {
     try {
