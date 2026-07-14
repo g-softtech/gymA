@@ -77,11 +77,26 @@ export async function POST(req: Request) {
 }
 
 export async function handleSubscriptionSuccess(payload: any) {
-  const metadata = payload.metadata || {};
-  const tenantId = metadata.tenantId;
-  const targetPlan = (metadata.targetPlan || metadata.planCode) as TenantPlan;
+  let metadata = payload.metadata || {};
+  if (typeof metadata === "string") {
+    try { metadata = JSON.parse(metadata); } catch { metadata = {}; }
+  }
 
-  if (!tenantId || !targetPlan) return;
+  // Parse from reference as robust fallback (Format: PLATFORM_{planCode}_{tenantId}_{timestamp})
+  const parts = (payload.reference || "").split("_");
+  const refPlanCode = parts.length >= 4 ? parts[1] : undefined;
+  const refTenantId = parts.length >= 4 ? parts[2] : undefined;
+
+  const tenantId = metadata.tenantId || refTenantId;
+  let targetPlan = (metadata.targetPlan || metadata.planCode || refPlanCode) as string;
+  if (targetPlan === "PRO") targetPlan = "GROWTH"; // Fix enum mismatch
+
+  console.log(`[platform-billing] Processing success for tenant=${tenantId}, plan=${targetPlan}`);
+
+  if (!tenantId || !targetPlan) {
+    console.error(`[platform-billing] Missing tenantId or targetPlan for reference ${payload.reference}`);
+    return;
+  }
 
   const tenant = await prisma.tenant.findUnique({ where: { id: tenantId } });
   if (!tenant) return;
@@ -103,7 +118,7 @@ export async function handleSubscriptionSuccess(payload: any) {
     await tx.tenant.update({
       where: { id: tenantId },
       data: {
-        plan: targetPlan,
+        plan: targetPlan as TenantPlan,
         billingStatus: "ACTIVE",
         billingEndsAt: nextPaymentDate,
       },

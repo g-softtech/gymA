@@ -30,6 +30,11 @@ export async function POST(req: NextRequest) {
     const host = req.headers.get("host") || "localhost:3000";
     const protocol = host.includes("localhost") ? "http" : "https";
     
+    // Fetch tenant to get the slug for the callback URL
+    const tenant = await prisma.tenant.findUnique({ where: { id: tenantId } });
+    if (!tenant) return NextResponse.json({ error: "Tenant not found" }, { status: 404 });
+    const slug = tenant.slug;
+
     // Generate a unique reference so our webhook can handle atomic provisioning
     const reference = `PLATFORM_${planCode}_${tenantId}_${Date.now()}`;
 
@@ -60,7 +65,7 @@ export async function POST(req: NextRequest) {
           tenantId: tenantId,
           planCode: platformPlan.code,
         },
-        callback_url: `${protocol}://${host}/dashboard/admin/billing?success=true`,
+        callback_url: `${protocol}://${host}/gym/${slug}/dashboard/admin/billing?success=true`,
       }),
     });
 
