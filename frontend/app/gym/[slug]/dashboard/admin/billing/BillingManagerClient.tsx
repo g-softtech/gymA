@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useBranding } from "@/components/TenantThemeProvider";
-import type { PlatformPlanConfig } from "@/lib/billing/pricing.config";
+import type { PlatformPlanConfig } from "@/lib/billing/pricingConfig";
 import { PricingCard } from "@/components/billing/PricingCard";
 
 type PlanInfo = {
@@ -117,8 +117,8 @@ export default function BillingManagerClient() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 xl:gap-6 items-start">
         {plans.map((plan) => {
           const isCurrent = status?.subscriptionPlan === plan.code;
-          const currentPlanConfig = plans.find(p => p.code === (status?.subscriptionPlan || "STARTER")) || plans[0];
-          const isDowngrade = plan.pricing?.[0]?.amountSubunits < currentPlanConfig?.pricing?.[0]?.amountSubunits;
+          const currentPlanConfig = plans.find(p => p.code === (status?.subscriptionPlan || "FREE")) || plans[0];
+          const isDowngrade = plan.amountNGN < currentPlanConfig.amountNGN;
 
           return (
             <PricingCard 
@@ -132,7 +132,7 @@ export default function BillingManagerClient() {
                       disabled={!!checkoutLoading}
                       className="w-full py-3 rounded-xl border-2 border-indigo-600 text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 font-bold text-sm transition-all"
                     >
-                      {checkoutLoading === p.code ? "Redirecting..." : `Renew ${p.ui?.displayName}`}
+                      {checkoutLoading === p.code ? "Redirecting..." : `Renew ${p.name}`}
                     </button>
                   );
                 }
@@ -152,7 +152,7 @@ export default function BillingManagerClient() {
                     className="w-full py-3 rounded-xl text-white font-bold text-sm hover:opacity-90 transition-all shadow-lg"
                     style={{ background: primaryColor || "linear-gradient(135deg, #6366F1, #8B5CF6)" }}
                   >
-                    {checkoutLoading === p.code ? "Redirecting..." : `Upgrade to ${p.ui?.displayName}`}
+                    {checkoutLoading === p.code ? "Redirecting..." : `Upgrade to ${p.name}`}
                   </button>
                 );
               }}
