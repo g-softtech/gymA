@@ -72,6 +72,13 @@ export default async function MemberDashboardPage({
     where: { receiverId: session.user.id, read: false },
   });
 
+  const highestPlan = await prisma.membershipPlan.findFirst({
+    where: { tenantId: session.user.tenantId, isActive: true },
+    orderBy: { price: "desc" },
+  });
+
+  const isHighestPlan = activeSub && highestPlan && activeSub.plan.price >= highestPlan.price;
+
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       {welcome === "1" && (
@@ -136,14 +143,16 @@ export default async function MemberDashboardPage({
               </div>
             )}
 
-            <div className="pt-4 mt-2 border-t border-border flex justify-end">
-              <Link
-                href={`/gym/${slug}#plans`}
-                className="text-sm font-semibold text-indigo-600 hover:text-indigo-700 transition-colors"
-              >
-                Manage Plan &rarr;
-              </Link>
-            </div>
+            {!isHighestPlan && (
+              <div className="pt-4 mt-2 border-t border-border flex justify-end">
+                <Link
+                  href={`/gym/${slug}#plans`}
+                  className="text-sm font-semibold text-indigo-600 hover:text-indigo-700 transition-colors"
+                >
+                  Upgrade Plan &rarr;
+                </Link>
+              </div>
+            )}
           </div>
         ) : (
           <div className="text-center py-6">
