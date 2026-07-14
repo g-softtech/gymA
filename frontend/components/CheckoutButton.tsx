@@ -71,6 +71,7 @@ export default function CheckoutButton({
       paystack.newTransaction({
         key: paystackKey,
         access_code: data.accessCode,
+        reference: data.reference,
         email: email,
         amount: Math.round(amount * 100),
         onSuccess: async (transaction: any) => {
