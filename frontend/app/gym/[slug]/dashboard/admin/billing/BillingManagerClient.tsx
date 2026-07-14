@@ -127,7 +127,7 @@ export default function BillingManagerClient() {
             <PricingCard 
               key={plan.code} 
               plan={plan} 
-              renderAction={(p) => {
+              renderAction={(p: any) => {
                 if (isCurrent) {
                   return (
                     <button 
