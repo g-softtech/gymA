@@ -175,6 +175,7 @@ export default async function DashboardLayout({
         <SidebarNav
           slug={slug}
           role={role}
+          isSandbox={isSandbox}
           adminLinks={adminLinks}
           trainerLinks={trainerLinks}
           memberLinks={memberLinks}
@@ -209,6 +210,7 @@ export default async function DashboardLayout({
       <MobileNav
         slug={slug}
         role={role as "SUPERADMIN" | "ADMIN" | "TRAINER" | "MEMBER"}
+        isSandbox={isSandbox}
         adminLinks={adminLinks}
         trainerLinks={trainerLinks}
         memberLinks={memberLinks}

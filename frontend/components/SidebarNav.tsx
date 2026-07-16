@@ -13,6 +13,7 @@ interface NavLink {
 interface SidebarNavProps {
   slug: string;
   role: string;
+  isSandbox?: boolean;
   adminLinks: NavLink[];
   trainerLinks: NavLink[];
   memberLinks: NavLink[];
@@ -38,24 +39,26 @@ export function SidebarNav({
   memberLinks,
   user,
   branding,
+  isSandbox = false,
 }: SidebarNavProps) {
   const pathname = usePathname();
 
   let activeLinks = memberLinks;
   let currentContext = "MEMBER";
 
-  const isSandbox = pathname.includes("/sandbox/");
+  // If passed explicitly via prop, trust it, otherwise fallback to pathname (though prop is preferred)
+  const _isSandbox = isSandbox || pathname.includes("/sandbox/");
   const isDashboardAdmin = pathname.includes("/dashboard/admin");
   const isDashboardTrainer = pathname.includes("/dashboard/trainer");
   const isDashboardMember = pathname.includes("/dashboard/member");
 
   // Determine actual path context
   let pathContext = "MEMBER";
-  if (isDashboardAdmin || (isSandbox && (pathname.endsWith(slug) || pathname.includes("/admin")))) {
+  if (isDashboardAdmin || (_isSandbox && (pathname.endsWith(slug) || pathname.includes("/admin")))) {
     pathContext = "ADMIN";
-  } else if (isDashboardTrainer || (isSandbox && pathname.includes("/trainer"))) {
+  } else if (isDashboardTrainer || (_isSandbox && pathname.includes("/trainer"))) {
     pathContext = "TRAINER";
-  } else if (isDashboardMember || (isSandbox && pathname.includes("/member"))) {
+  } else if (isDashboardMember || (_isSandbox && pathname.includes("/member"))) {
     pathContext = "MEMBER";
   }
 
@@ -133,14 +136,14 @@ export function SidebarNav({
         <div className="px-3 py-2 border-t border-border">
           {currentContext !== "MEMBER" ? (
             <Link
-              href={isSandbox ? `/sandbox/${slug}/member` : `/gym/${slug}/dashboard/member`}
+              href={_isSandbox ? `/sandbox/${slug}/member` : `/gym/${slug}/dashboard/member`}
               className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold transition-colors w-full bg-accent hover:bg-accent/80 text-foreground"
             >
               <span>👤</span> Switch to Member View
             </Link>
           ) : (
             <Link
-              href={isSandbox ? `/sandbox/${slug}${role === "TRAINER" ? "/trainer" : ""}` : `/gym/${slug}/dashboard/${role === "TRAINER" ? "trainer" : "admin"}`}
+              href={_isSandbox ? `/sandbox/${slug}${role === "TRAINER" ? "/trainer" : ""}` : `/gym/${slug}/dashboard/${role === "TRAINER" ? "trainer" : "admin"}`}
               className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold transition-colors w-full bg-accent hover:bg-accent/80 text-foreground"
             >
               <span>{role === "TRAINER" ? "🏋️" : "👑"}</span> Switch to {role === "TRAINER" ? "Trainer" : "Admin"} View

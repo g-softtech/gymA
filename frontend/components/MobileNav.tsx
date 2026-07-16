@@ -18,9 +18,10 @@ interface MobileNavProps {
   trainerLinks: NavLink[];
   memberLinks: NavLink[];
   primaryColor: string;
+  isSandbox?: boolean;
 }
 
-export function MobileNav({ slug, role, adminLinks, trainerLinks, memberLinks, primaryColor }: MobileNavProps) {
+export function MobileNav({ slug, role, adminLinks, trainerLinks, memberLinks, primaryColor, isSandbox = false }: MobileNavProps) {
   const pathname = usePathname();
   const [moreOpen, setMoreOpen] = useState(false);
 
@@ -31,11 +32,26 @@ export function MobileNav({ slug, role, adminLinks, trainerLinks, memberLinks, p
   let activeLinks = memberLinks;
   let currentContext = "MEMBER";
 
+  const _isSandbox = isSandbox || pathname.includes("/sandbox/");
+  const isDashboardAdmin = pathname.includes("/dashboard/admin");
+  const isDashboardTrainer = pathname.includes("/dashboard/trainer");
+  const isDashboardMember = pathname.includes("/dashboard/member");
+
+  // Determine actual path context
+  let pathContext = "MEMBER";
+  if (isDashboardAdmin || (_isSandbox && (pathname.endsWith(slug) || pathname.includes("/admin")))) {
+    pathContext = "ADMIN";
+  } else if (isDashboardTrainer || (_isSandbox && pathname.includes("/trainer"))) {
+    pathContext = "TRAINER";
+  } else if (isDashboardMember || (_isSandbox && pathname.includes("/member"))) {
+    pathContext = "MEMBER";
+  }
+
   if (role === "SUPERADMIN" || role === "ADMIN") {
-    if (pathname.includes("/dashboard/admin")) {
+    if (pathContext === "ADMIN") {
       activeLinks = adminLinks;
       currentContext = "ADMIN";
-    } else if (pathname.includes("/dashboard/trainer")) {
+    } else if (pathContext === "TRAINER") {
       activeLinks = trainerLinks;
       currentContext = "TRAINER";
     } else {
@@ -43,7 +59,7 @@ export function MobileNav({ slug, role, adminLinks, trainerLinks, memberLinks, p
       currentContext = "MEMBER";
     }
   } else if (role === "TRAINER") {
-    if (pathname.includes("/dashboard/member")) {
+    if (pathContext === "MEMBER") {
       activeLinks = memberLinks;
       currentContext = "MEMBER";
     } else {
@@ -137,7 +153,7 @@ export function MobileNav({ slug, role, adminLinks, trainerLinks, memberLinks, p
                   <div className="my-2 border-t border-border" />
                   {currentContext !== "MEMBER" ? (
                     <Link
-                      href={`/gym/${slug}/dashboard/member`}
+                      href={_isSandbox ? `/sandbox/${slug}/member` : `/gym/${slug}/dashboard/member`}
                       onClick={() => setMoreOpen(false)}
                       className="flex items-center gap-4 px-4 py-3 rounded-xl bg-primary/10 text-primary hover:bg-primary/20 transition"
                     >
@@ -146,7 +162,7 @@ export function MobileNav({ slug, role, adminLinks, trainerLinks, memberLinks, p
                     </Link>
                   ) : (
                     <Link
-                      href={`/gym/${slug}/dashboard/${role === "TRAINER" ? "trainer" : "admin"}`}
+                      href={_isSandbox ? `/sandbox/${slug}${role === "TRAINER" ? "/trainer" : ""}` : `/gym/${slug}/dashboard/${role === "TRAINER" ? "trainer" : "admin"}`}
                       onClick={() => setMoreOpen(false)}
                       className="flex items-center gap-4 px-4 py-3 rounded-xl bg-primary/10 text-primary hover:bg-primary/20 transition"
                     >
