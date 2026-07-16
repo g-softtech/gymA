@@ -118,6 +118,30 @@ export default withAuth(
       return NextResponse.next();
     }
 
+    // ── 0.5 Sandbox Routing ──────────────────────────────────────────────────
+    if (pathname.startsWith("/sandbox/")) {
+      // Extract the slug and path. e.g. /sandbox/eco-fitness-hub/members -> /gym/eco-fitness-hub/dashboard/admin/members
+      const parts = pathname.split("/");
+      const slug = parts[2];
+      const remaining = parts.slice(3).join("/");
+      
+      const newPathname = `/gym/${slug}/dashboard/admin${remaining ? `/${remaining}` : ""}`;
+      const url = req.nextUrl.clone();
+      url.pathname = newPathname;
+      
+      const requestHeaders = new Headers(req.headers);
+      requestHeaders.set("x-guest-session-tenant-slug", slug);
+
+      const res = NextResponse.rewrite(url, {
+        request: {
+          headers: requestHeaders,
+        },
+      });
+      
+      console.log(`${TRACE} └─ REWRITE: sandbox → ${newPathname} (Guest: ${slug})`);
+      return res;
+    }
+
     // ── 1. Subdomain routing ────────────────────────────────────────────────
     const subdomainSlug = getSubdomainSlug(hostname);
     if (subdomainSlug) {

@@ -18,6 +18,7 @@ model Tenant {
   isActive               Boolean                     @default(true)
   status                 TenantStatus                @default(PENDING)
   billingStatus          String                      @default("ACTIVE")
+  isDemo                 Boolean                     @default(false)
   attendances            Attendance[]
   attendanceEvents       AttendanceEvent[]
   blogPosts              BlogPost[]
@@ -1112,13 +1113,4 @@ model IntelligenceSafetyEvent {
 
   @@index([tenantId])
   @@index([action])
-}
-
-model SandboxTenant {
-  id        String   @id @default(uuid())
-  slug      String   @unique
-  gymName   String
-  logoUrl   String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 }

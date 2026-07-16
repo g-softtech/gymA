@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import QueryProvider from "@/components/QueryProvider";
+import { DemoSandboxProvider } from "@/components/sandbox/DemoSandboxProvider";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -41,7 +42,9 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <QueryProvider>
-            {children}
+            <DemoSandboxProvider>
+              {children}
+            </DemoSandboxProvider>
           </QueryProvider>
         </ThemeProvider>
       </body>

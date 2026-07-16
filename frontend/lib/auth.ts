@@ -1,6 +1,7 @@
 import NextAuth from "next-auth";
 import type { NextAuthOptions, Session } from "next-auth";
 import { getServerSession } from "next-auth/next";
+import { headers } from "next/headers";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "./prisma";
 import GoogleProvider from "next-auth/providers/google";
@@ -215,7 +216,37 @@ export const authOptions: NextAuthOptions = {
   },
 };
 
-export function getAuthSession(): Promise<Session | null> {
+export async function getAuthSession(): Promise<Session | null> {
+  try {
+    const headersList = await headers();
+    const guestSlug = headersList.get("x-guest-session-tenant-slug");
+    
+    if (guestSlug) {
+      const tenant = await prisma.tenant.findUnique({
+        where: { slug: guestSlug },
+        select: { id: true, name: true, slug: true, isDemo: true }
+      });
+
+      if (tenant && tenant.isDemo) {
+        // Construct a mock admin session
+        return {
+          user: {
+            id: `guest-admin-${tenant.id}`,
+            name: "Sandbox Guest",
+            email: "guest@sandbox.local",
+            image: null,
+            role: "ADMIN",
+            tenantId: tenant.id,
+            tenantSlug: tenant.slug,
+          },
+          expires: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
+        } as Session;
+      }
+    }
+  } catch (err) {
+    console.error("[AUTH] Error checking guest session headers:", err);
+  }
+
   return getServerSession(authOptions);
 }
 
