@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthSession } from "@/lib/auth";
-import {
 import { verifyWriteAccess } from "@/lib/sandbox/guard";
+import {
   getTenantContextFromSession,
   requireTrainer,
   noTenantContext,
