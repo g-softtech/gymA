@@ -125,7 +125,11 @@ export default withAuth(
       const remaining = parts.slice(3).join("/");
       
       let newPathname = `/gym/${slug}/dashboard/admin`;
-      if (remaining.startsWith("member") || remaining.startsWith("trainer") || remaining.startsWith("admin")) {
+      if (remaining === "member" || remaining.startsWith("member/")) {
+        newPathname = `/gym/${slug}/dashboard/${remaining}`;
+      } else if (remaining === "trainer" || remaining.startsWith("trainer/")) {
+        newPathname = `/gym/${slug}/dashboard/${remaining}`;
+      } else if (remaining === "admin" || remaining.startsWith("admin/")) {
         newPathname = `/gym/${slug}/dashboard/${remaining}`;
       } else if (remaining) {
         newPathname = `/gym/${slug}/dashboard/admin/${remaining}`;
