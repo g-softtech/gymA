@@ -224,14 +224,16 @@ export async function getAuthSession(): Promise<Session | null> {
     if (guestSlug) {
       const tenant = await prisma.tenant.findUnique({
         where: { slug: guestSlug },
-        select: { id: true, name: true, slug: true, isDemo: true }
+        select: { id: true, name: true, slug: true, isDemo: true, users: { take: 1 } }
       });
 
       if (tenant && tenant.isDemo) {
         // Construct a mock admin session
+        const fallbackUserId = tenant.users.length > 0 ? tenant.users[0].id : `guest-admin-${tenant.id}`;
+        
         return {
           user: {
-            id: `guest-admin-${tenant.id}`,
+            id: fallbackUserId,
             name: "Sandbox Guest",
             email: "guest@sandbox.local",
             image: null,
