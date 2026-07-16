@@ -5,9 +5,13 @@ import { prisma } from "@/lib/prisma";
 import { checkEntitlement } from "@/lib/entitlements/check-entitlement";
 import { EntitlementKeys } from "@/lib/entitlements/registry";
 
+import { verifyWriteAccess } from "@/lib/sandbox/guard";
 export async function POST(req: NextRequest) {
   try {
     const session = await getAuthSession();
+    if (session?.user?.tenantId) {
+      await verifyWriteAccess(session.user.tenantId);
+    }
     if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const tenantContext = await getTenantContextFromSession(session);

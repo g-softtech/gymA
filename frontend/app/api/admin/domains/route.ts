@@ -5,6 +5,7 @@ import { normalizeDomain } from "@/lib/tenant";
 import { addDomainToVercel, removeDomainFromVercel } from "@/lib/vercel";
 import { verifyTenantEntitlement } from "@/lib/tenant";
 
+import { verifyWriteAccess } from "@/lib/sandbox/guard";
 // Validate domain format (e.g. powergym.com or app.powergym.com)
 const isValidDomain = (domain: string) => {
   if (domain.length > 253) return false;
@@ -15,6 +16,9 @@ const isValidDomain = (domain: string) => {
 export async function POST(req: NextRequest) {
   try {
     const session = await getAuthSession();
+    if (session?.user?.tenantId) {
+      await verifyWriteAccess(session.user.tenantId);
+    }
     if (!session?.user || !session.user.tenantId || (session.user.role !== "ADMIN" && session.user.role !== "SUPERADMIN")) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -81,6 +85,9 @@ export async function POST(req: NextRequest) {
 export async function GET(req: NextRequest) {
   try {
     const session = await getAuthSession();
+    if (session?.user?.tenantId) {
+      await verifyWriteAccess(session.user.tenantId);
+    }
     if (!session?.user || !session.user.tenantId || (session.user.role !== "ADMIN" && session.user.role !== "SUPERADMIN")) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -107,6 +114,9 @@ export async function GET(req: NextRequest) {
 export async function DELETE(req: NextRequest) {
   try {
     const session = await getAuthSession();
+    if (session?.user?.tenantId) {
+      await verifyWriteAccess(session.user.tenantId);
+    }
     if (!session?.user || !session.user.tenantId || (session.user.role !== "ADMIN" && session.user.role !== "SUPERADMIN")) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }

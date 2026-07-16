@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthSession } from "@/lib/auth";
 
+import { verifyWriteAccess } from "@/lib/sandbox/guard";
 // PATCH /api/bookings/[bookingId] — update booking status
 export async function PATCH(
   req: NextRequest,
@@ -9,6 +10,9 @@ export async function PATCH(
 ) {
   try {
     const session = await getAuthSession();
+    if (session?.user?.tenantId) {
+      await verifyWriteAccess(session.user.tenantId);
+    }
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }

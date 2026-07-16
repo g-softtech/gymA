@@ -3,6 +3,7 @@ import { getAuthSession } from "@/lib/auth";
 import { v2 as cloudinary } from "cloudinary";
 import { MAX_UPLOAD_SIZE, validateImageMagicBytes, generateRandomFilename } from "@/lib/fileValidation";
 
+import { verifyWriteAccess } from "@/lib/sandbox/guard";
 // Configure Cloudinary
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -13,6 +14,9 @@ cloudinary.config({
 export async function POST(req: Request) {
   try {
     const session = await getAuthSession();
+    if (session?.user?.tenantId) {
+      await verifyWriteAccess(session.user.tenantId);
+    }
 
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

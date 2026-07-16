@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthSession } from "@/lib/auth";
 import {
+import { verifyWriteAccess } from "@/lib/sandbox/guard";
   getTenantContextFromSession,
   requireAdmin,
   noTenantContext,
@@ -40,6 +41,9 @@ export async function GET(
 
     // Authenticated mode
     const session = await getAuthSession();
+    if (session?.user?.tenantId) {
+      await verifyWriteAccess(session.user.tenantId);
+    }
     const ctx = getTenantContextFromSession(session);
     const roleErr = requireAdmin(ctx);
     if (roleErr) return roleErr;
@@ -67,6 +71,9 @@ export async function PATCH(
 ) {
   try {
     const session = await getAuthSession();
+    if (session?.user?.tenantId) {
+      await verifyWriteAccess(session.user.tenantId);
+    }
     const ctx = getTenantContextFromSession(session);
 
     const roleErr = requireAdmin(ctx);
@@ -117,6 +124,9 @@ export async function DELETE(
 ) {
   try {
     const session = await getAuthSession();
+    if (session?.user?.tenantId) {
+      await verifyWriteAccess(session.user.tenantId);
+    }
     const ctx = getTenantContextFromSession(session);
 
     const roleErr = requireAdmin(ctx);

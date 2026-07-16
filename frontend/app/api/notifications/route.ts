@@ -3,10 +3,14 @@ import { prisma } from "@/lib/prisma";
 import { getAuthSession } from "@/lib/auth";
 import { getTenantContextFromSession, noTenantContext } from "@/lib/tenant";
 
+import { verifyWriteAccess } from "@/lib/sandbox/guard";
 // GET /api/notifications
 export async function GET(_req: NextRequest) {
   try {
     const session = await getAuthSession();
+    if (session?.user?.tenantId) {
+      await verifyWriteAccess(session.user.tenantId);
+    }
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -35,6 +39,9 @@ export async function GET(_req: NextRequest) {
 export async function PATCH(_req: NextRequest) {
   try {
     const session = await getAuthSession();
+    if (session?.user?.tenantId) {
+      await verifyWriteAccess(session.user.tenantId);
+    }
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }

@@ -2,9 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 import { getAuthSession } from "@/lib/auth";
 import { handleSubscriptionSuccess } from "../../webhooks/platform-billing/route";
 
+import { verifyWriteAccess } from "@/lib/sandbox/guard";
 export async function POST(req: NextRequest) {
   try {
     const session = await getAuthSession();
+    if (session?.user?.tenantId) {
+      await verifyWriteAccess(session.user.tenantId);
+    }
     if (!session?.user?.tenantId || (session.user.role !== "ADMIN" && session.user.role !== "SUPERADMIN")) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }

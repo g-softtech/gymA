@@ -3,12 +3,16 @@ import { prisma } from "@/lib/prisma";
 import { getAuthSession } from "@/lib/auth";
 import { getTenantContextFromSession, noTenantContext } from "@/lib/tenant";
 
+import { verifyWriteAccess } from "@/lib/sandbox/guard";
 export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ postId: string }> }
 ) {
   try {
     const session = await getAuthSession();
+    if (session?.user?.tenantId) {
+      await verifyWriteAccess(session.user.tenantId);
+    }
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }

@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { getAuthSession } from "@/lib/auth";
 import { canUseWhiteLabel } from "@/lib/feature-gates";
 
+import { verifyWriteAccess } from "@/lib/sandbox/guard";
 // Validation helpers
 const isValidHexColor = (color: string) => /^#([0-9a-fA-F]{6})$/i.test(color);
 const isValidHttpsUrl = (url: string) => /^https:\/\/[^\s$.?#].[^\s]*$/i.test(url);
@@ -11,6 +12,9 @@ const sanitizeBrandName = (name: string) => name.replace(/[<>]/g, "").trim();
 export async function GET(req: NextRequest) {
   try {
     const session = await getAuthSession();
+    if (session?.user?.tenantId) {
+      await verifyWriteAccess(session.user.tenantId);
+    }
     if (!session?.user?.tenantId || (session.user.role !== "ADMIN" && session.user.role !== "SUPERADMIN")) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -39,6 +43,9 @@ export async function GET(req: NextRequest) {
 export async function PUT(req: NextRequest) {
   try {
     const session = await getAuthSession();
+    if (session?.user?.tenantId) {
+      await verifyWriteAccess(session.user.tenantId);
+    }
     if (!session?.user?.tenantId || (session.user.role !== "ADMIN" && session.user.role !== "SUPERADMIN")) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }

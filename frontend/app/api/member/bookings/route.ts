@@ -3,10 +3,14 @@ import { prisma } from "@/lib/prisma";
 import { getAuthSession } from "@/lib/auth";
 import { getTenantContextFromSession, noTenantContext } from "@/lib/tenant";
 
+import { verifyWriteAccess } from "@/lib/sandbox/guard";
 // DELETE /api/member/bookings?bookingId=xxx — cancel a booking
 export async function DELETE(req: NextRequest) {
   try {
     const session = await getAuthSession();
+    if (session?.user?.tenantId) {
+      await verifyWriteAccess(session.user.tenantId);
+    }
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }

@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { getAuthSession } from "@/lib/auth";
 import { checkMemberQuota } from "@/lib/enforcement";
 
+import { verifyWriteAccess } from "@/lib/sandbox/guard";
 /**
  * POST /api/gym/[slug]/join
  * Assigns the authenticated user to the specified tenant.
@@ -16,6 +17,9 @@ export async function POST(
   try {
     const { slug } = await params;
     const session = await getAuthSession();
+    if (session?.user?.tenantId) {
+      await verifyWriteAccess(session.user.tenantId);
+    }
 
     const TRACE = `[FORENSIC:join-api][${Date.now()}]`;
     console.log(`${TRACE} ┌─ POST /api/gym/${slug}/join`);

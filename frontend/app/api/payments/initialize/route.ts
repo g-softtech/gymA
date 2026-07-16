@@ -5,9 +5,13 @@ import { initializePaystackTransaction } from "@/lib/paystack";
 import { Prisma } from "@prisma/client";
 import { RENEWAL_WINDOW_DAYS } from "@/lib/billing/pricingConfig";
 
+import { verifyWriteAccess } from "@/lib/sandbox/guard";
 export async function POST(req: Request) {
   try {
     const session = await getAuthSession();
+    if (session?.user?.tenantId) {
+      await verifyWriteAccess(session.user.tenantId);
+    }
     if (!session?.user?.id || !session.user.tenantId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }

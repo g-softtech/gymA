@@ -3,9 +3,13 @@ import { getTenantContextFromSession, requireSuperAdmin } from "@/lib/tenant";
 import { getAuthSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
+import { verifyWriteAccess } from "@/lib/sandbox/guard";
 export async function PATCH(req: Request) {
   try {
     const session = await getAuthSession();
+    if (session?.user?.tenantId) {
+      await verifyWriteAccess(session.user.tenantId);
+    }
     const ctx = getTenantContextFromSession(session);
     const roleErr = requireSuperAdmin(ctx);
     if (roleErr) return roleErr;

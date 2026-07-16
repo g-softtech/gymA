@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthSession } from "@/lib/auth";
 import {
+import { verifyWriteAccess } from "@/lib/sandbox/guard";
   getTenantContextFromSession,
   requireTrainer,
   noTenantContext,
@@ -11,6 +12,9 @@ import {
 export async function PATCH(req: NextRequest) {
   try {
     const session = await getAuthSession();
+    if (session?.user?.tenantId) {
+      await verifyWriteAccess(session.user.tenantId);
+    }
     // ✅ Phase 4: proper role guard + tenantId from session
     const ctx = getTenantContextFromSession(session);
 
