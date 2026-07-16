@@ -19,7 +19,8 @@ export default async function AdminDashboardPage({
 }) {
   const { slug } = await params;
   const session = await getAuthSession();
-
+  const isSandbox = session?.user?.email === "guest@sandbox.local";
+  const adminBase = isSandbox ? `/sandbox/${slug}` : `/gym/${slug}/dashboard/admin`;
 
   if (!session?.user) return null;
   // if (session.user.role !== "ADMIN" && session.user.role !== "SUPERADMIN") {
@@ -82,7 +83,7 @@ export default async function AdminDashboardPage({
           <p className="text-muted-foreground mt-1">{tenant.name} — Management Overview</p>
         </div>
         <Link
-          href={`/gym/${slug}/dashboard/admin/plans`}
+          href={`${adminBase}/plans`}
           className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-indigo-700 transition"
         >
           + Manage Plans
@@ -170,7 +171,7 @@ export default async function AdminDashboardPage({
       <div className="bg-card text-card-foreground rounded-xl shadow-sm border border-border">
         <div className="px-6 py-4 border-b border-border flex justify-between items-center">
           <h2 className="text-lg font-semibold text-foreground">Membership Plans</h2>
-          <Link href={`/gym/${slug}/dashboard/admin/plans`} className="text-sm text-indigo-600 hover:underline">
+          <Link href={`${adminBase}/plans`} className="text-sm text-indigo-600 hover:underline">
             Manage →
           </Link>
         </div>

@@ -9,6 +9,8 @@ export default async function WebsiteHubPage({
 }) {
   const { slug } = await params;
   const session = await getAuthSession();
+  const isSandbox = session?.user?.email === "guest@sandbox.local";
+  const adminBase = isSandbox ? `/sandbox/${slug}` : `/gym/${slug}/dashboard/admin`;
   const settings = await prisma.tenantSettings.findFirst({
     where: { tenant: { slug } },
     select: {
@@ -25,7 +27,7 @@ export default async function WebsiteHubPage({
 
   const sections = [
     {
-      href: `/gym/${slug}/dashboard/admin/branding`,
+      href: `${adminBase}/branding`,
       icon: "🎨",
       title: "Branding",
       desc: "Logo, colors, fonts, and dark mode",
@@ -34,7 +36,7 @@ export default async function WebsiteHubPage({
       id: "website-branding-link",
     },
     {
-      href: `/gym/${slug}/dashboard/admin/website/info`,
+      href: `${adminBase}/website/info`,
       icon: "🏢",
       title: "Business Info",
       desc: "Gym name, contact details, address, and opening hours",
@@ -43,7 +45,7 @@ export default async function WebsiteHubPage({
       id: "website-info-link",
     },
     {
-      href: `/gym/${slug}/dashboard/admin/website/social`,
+      href: `${adminBase}/website/social`,
       icon: "📲",
       title: "Social Media",
       desc: "Instagram, Facebook, TikTok, WhatsApp, and more",
@@ -52,7 +54,7 @@ export default async function WebsiteHubPage({
       id: "website-social-link",
     },
     {
-      href: `/gym/${slug}/dashboard/admin/website/hero`,
+      href: `${adminBase}/website/hero`,
       icon: "🖼️",
       title: "Hero Section",
       desc: "Headline, subheadline, CTA button, and background image",
@@ -61,7 +63,7 @@ export default async function WebsiteHubPage({
       id: "website-hero-link",
     },
     {
-      href: `/gym/${slug}/dashboard/admin/website/content`,
+      href: `${adminBase}/website/content`,
       icon: "📝",
       title: "Page Content",
       desc: "Stats, services, testimonials, gallery, and feature highlights",
@@ -70,7 +72,7 @@ export default async function WebsiteHubPage({
       id: "website-content-link",
     },
     {
-      href: `/gym/${slug}/dashboard/admin/domains`,
+      href: `${adminBase}/domains`,
       icon: "🌍",
       title: "Custom Domain",
       desc: "Connect your own domain (e.g. powergym.com)",
