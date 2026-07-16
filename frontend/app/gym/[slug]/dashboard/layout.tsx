@@ -104,7 +104,7 @@ export default async function DashboardLayout({
   const isGrace = daysRemaining < 0 && daysRemaining >= -3;
 
   // ✅ Sandbox Path Adaptation
-  const isSandbox = session.user.id.startsWith("guest-admin-");
+  const isSandbox = session.user.email === "guest@sandbox.local" || session.user.id.startsWith("guest-admin-");
   const adminBase = isSandbox ? `/sandbox/${slug}` : `/gym/${slug}/dashboard/admin`;
   const trainerBase = isSandbox ? `/sandbox/${slug}/trainer` : `/gym/${slug}/dashboard/trainer`;
   const memberBase = isSandbox ? `/sandbox/${slug}/member` : `/gym/${slug}/dashboard/member`;
