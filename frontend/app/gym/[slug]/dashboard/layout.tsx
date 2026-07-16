@@ -103,46 +103,52 @@ export default async function DashboardLayout({
   const isActive = daysRemaining >= -3; // Includes 3-day grace period
   const isGrace = daysRemaining < 0 && daysRemaining >= -3;
 
+  // ✅ Sandbox Path Adaptation
+  const isSandbox = session.user.id.startsWith("guest-admin-");
+  const adminBase = isSandbox ? `/sandbox/${slug}` : `/gym/${slug}/dashboard/admin`;
+  const trainerBase = isSandbox ? `/sandbox/${slug}/trainer` : `/gym/${slug}/dashboard/trainer`;
+  const memberBase = isSandbox ? `/sandbox/${slug}/member` : `/gym/${slug}/dashboard/member`;
+
   const adminLinks = [
-    { href: `/gym/${slug}/dashboard/admin`, label: "Overview", icon: "📊" },
-    { href: `/gym/${slug}/dashboard/admin/members`, label: "Members", icon: "👥" },
-    { href: `/gym/${slug}/dashboard/admin/plans`, label: "Plans", icon: "📋" },
-    { href: `/gym/${slug}/dashboard/admin/trainers`, label: "Trainers", icon: "🏋️" },
-    { href: `/gym/${slug}/dashboard/admin/checkin`, label: "Check-in Desk", icon: "📲" },
-    { href: `/gym/${slug}/dashboard/admin/attendance`, label: "Attendance", icon: "✅" },
-    { href: `/gym/${slug}/dashboard/admin/revenue`, label: "Revenue", icon: "💰" },
-    { href: `/gym/${slug}/dashboard/admin/analytics`, label: "Analytics ⭐", icon: "📈" },
-    { href: `/gym/${slug}/dashboard/admin/intelligence`, label: "Intelligence ⚡", icon: "🧠" },
-    { href: `/gym/${slug}/dashboard/admin/ai-usage`, label: "AI Usage", icon: "🤖" },
-    { href: `/gym/${slug}/dashboard/admin/blog`, label: "Blog", icon: "📝" },
-    { href: `/gym/${slug}/dashboard/admin/notifications`, label: `Notifications${unreadCount > 0 ? ` (${unreadCount})` : ""}`, icon: "🔔" },
-    { href: `/gym/${slug}/dashboard/admin/website`, label: "Website", icon: "🌐" },
-    { href: `/gym/${slug}/dashboard/admin/billing`, label: "Platform Subscription", icon: "💳" },
+    { href: `${adminBase}`, label: "Overview", icon: "📊" },
+    { href: `${adminBase}/members`, label: "Members", icon: "👥" },
+    { href: `${adminBase}/plans`, label: "Plans", icon: "📋" },
+    { href: `${adminBase}/trainers`, label: "Trainers", icon: "🏋️" },
+    { href: `${adminBase}/checkin`, label: "Check-in Desk", icon: "📲" },
+    { href: `${adminBase}/attendance`, label: "Attendance", icon: "✅" },
+    { href: `${adminBase}/revenue`, label: "Revenue", icon: "💰" },
+    { href: `${adminBase}/analytics`, label: "Analytics ⭐", icon: "📈" },
+    { href: `${adminBase}/intelligence`, label: "Intelligence ⚡", icon: "🧠" },
+    { href: `${adminBase}/ai-usage`, label: "AI Usage", icon: "🤖" },
+    { href: `${adminBase}/blog`, label: "Blog", icon: "📝" },
+    { href: `${adminBase}/notifications`, label: `Notifications${unreadCount > 0 ? ` (${unreadCount})` : ""}`, icon: "🔔" },
+    { href: `${adminBase}/website`, label: "Website", icon: "🌐" },
+    { href: `${adminBase}/billing`, label: "Platform Subscription", icon: "💳" },
   ];
 
   const trainerLinks = [
-    { href: `/gym/${slug}/dashboard/trainer`, label: "Overview", icon: "📊" },
-    { href: `/gym/${slug}/dashboard/trainer/clients`, label: "My Clients", icon: "👥" },
-    { href: `/gym/${slug}/dashboard/trainer/workouts`, label: "Workout Plans", icon: "💪" },
-    { href: `/gym/${slug}/dashboard/trainer/schedule`, label: "My Schedule", icon: "📅" },
-    { href: `/gym/${slug}/dashboard/trainer/bookings`, label: "Bookings", icon: "📋" },
-    { href: `/gym/${slug}/dashboard/trainer/progress`, label: "Progress", icon: "📊" },
-    { href: `/gym/${slug}/dashboard/trainer/messages`, label: "Messages", icon: "💬" },
+    { href: `${trainerBase}`, label: "Overview", icon: "📊" },
+    { href: `${trainerBase}/clients`, label: "My Clients", icon: "👥" },
+    { href: `${trainerBase}/workouts`, label: "Workout Plans", icon: "💪" },
+    { href: `${trainerBase}/schedule`, label: "My Schedule", icon: "📅" },
+    { href: `${trainerBase}/bookings`, label: "Bookings", icon: "📋" },
+    { href: `${trainerBase}/progress`, label: "Progress", icon: "📊" },
+    { href: `${trainerBase}/messages`, label: "Messages", icon: "💬" },
   ];
 
   const memberLinks = [
-    { href: `/gym/${slug}/dashboard/member`, label: "Dashboard", icon: "🏠" },
-    { href: `/gym/${slug}/dashboard/member/profile`, label: "My Profile", icon: "👤" },
-    { href: `/gym/${slug}/dashboard/member/workouts`, label: "Workouts", icon: "💪" },
-    { href: `/gym/${slug}/dashboard/member/nutrition`, label: "Nutrition", icon: "🥗" },
-    { href: `/gym/${slug}/dashboard/member/community`, label: "Community", icon: "🏅" },
-    { href: `/gym/${slug}/dashboard/member/ai`, label: "AI Coach", icon: "🤖" },
-    { href: `/gym/${slug}/dashboard/member/book-trainer`, label: "Book Trainer", icon: "🏋️" },
-    { href: `/gym/${slug}/dashboard/member/bookings`, label: "My Schedule", icon: "📅" },
-    { href: `/gym/${slug}/dashboard/member/progress`, label: "My Progress", icon: "📊" },
-    { href: `/gym/${slug}/dashboard/member/attendance`, label: "Attendance", icon: "✅" },
-    { href: `/gym/${slug}/dashboard/member/notifications`, label: "Notifications", icon: "🔔" },
-    { href: `/gym/${slug}/dashboard/member/messages`, label: "Messages", icon: "💬" },
+    { href: `${memberBase}`, label: "Dashboard", icon: "🏠" },
+    { href: `${memberBase}/profile`, label: "My Profile", icon: "👤" },
+    { href: `${memberBase}/workouts`, label: "Workouts", icon: "💪" },
+    { href: `${memberBase}/nutrition`, label: "Nutrition", icon: "🥗" },
+    { href: `${memberBase}/community`, label: "Community", icon: "🏅" },
+    { href: `${memberBase}/ai`, label: "AI Coach", icon: "🤖" },
+    { href: `${memberBase}/book-trainer`, label: "Book Trainer", icon: "🏋️" },
+    { href: `${memberBase}/bookings`, label: "My Schedule", icon: "📅" },
+    { href: `${memberBase}/progress`, label: "My Progress", icon: "📊" },
+    { href: `${memberBase}/attendance`, label: "Attendance", icon: "✅" },
+    { href: `${memberBase}/notifications`, label: "Notifications", icon: "🔔" },
+    { href: `${memberBase}/messages`, label: "Messages", icon: "💬" },
   ];
 
   return (

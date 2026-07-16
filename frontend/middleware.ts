@@ -120,12 +120,17 @@ export default withAuth(
 
     // ── 0.5 Sandbox Routing ──────────────────────────────────────────────────
     if (pathname.startsWith("/sandbox/")) {
-      // Extract the slug and path. e.g. /sandbox/eco-fitness-hub/members -> /gym/eco-fitness-hub/dashboard/admin/members
       const parts = pathname.split("/");
       const slug = parts[2];
       const remaining = parts.slice(3).join("/");
       
-      const newPathname = `/gym/${slug}/dashboard/admin${remaining ? `/${remaining}` : ""}`;
+      let newPathname = `/gym/${slug}/dashboard/admin`;
+      if (remaining.startsWith("member") || remaining.startsWith("trainer") || remaining.startsWith("admin")) {
+        newPathname = `/gym/${slug}/dashboard/${remaining}`;
+      } else if (remaining) {
+        newPathname = `/gym/${slug}/dashboard/admin/${remaining}`;
+      }
+      
       const url = req.nextUrl.clone();
       url.pathname = newPathname;
       
