@@ -60,7 +60,7 @@ async function cleanupTenants() {
       }
 
       if (trainerIds.length > 0) {
-        await prisma.classSession.deleteMany({ where: { trainerId: { in: trainerIds } } });
+        await prisma.classSession.deleteMany({ where: { instructorId: { in: trainerIds } } });
       }
 
       if (userIds.length > 0) {
