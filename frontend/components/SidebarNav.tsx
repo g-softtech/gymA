@@ -54,12 +54,27 @@ export function SidebarNav({
 
   // Determine actual path context
   let pathContext = "MEMBER";
-  if (isDashboardAdmin || (_isSandbox && (pathname.endsWith(slug) || pathname.includes("/admin")))) {
-    pathContext = "ADMIN";
-  } else if (isDashboardTrainer || (_isSandbox && pathname.includes("/trainer"))) {
-    pathContext = "TRAINER";
-  } else if (isDashboardMember || (_isSandbox && pathname.includes("/member"))) {
-    pathContext = "MEMBER";
+  
+  if (_isSandbox) {
+    const parts = pathname.split("/");
+    const remaining = parts.slice(3).join("/");
+    
+    if (remaining === "member" || remaining.startsWith("member/")) {
+      pathContext = "MEMBER";
+    } else if (remaining === "trainer" || remaining.startsWith("trainer/")) {
+      pathContext = "TRAINER";
+    } else {
+      // Anything else in sandbox is ADMIN (overview, members, plans, etc)
+      pathContext = "ADMIN";
+    }
+  } else {
+    if (isDashboardAdmin) {
+      pathContext = "ADMIN";
+    } else if (isDashboardTrainer) {
+      pathContext = "TRAINER";
+    } else if (isDashboardMember) {
+      pathContext = "MEMBER";
+    }
   }
 
   if (role === "SUPERADMIN" || role === "ADMIN") {
