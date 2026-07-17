@@ -97,8 +97,8 @@ async function main() {
         email: data.email,
         instagramUrl: data.instagramUrl,
         tiktokUrl: data.tiktokUrl,
-        heroData: JSON.stringify(data.heroData),
-        servicesData: JSON.stringify(data.servicesData),
+        heroData: data.heroData,
+        servicesData: data.servicesData,
       },
       update: {
         primaryColor: data.primaryColor,
@@ -108,8 +108,8 @@ async function main() {
         email: data.email,
         instagramUrl: data.instagramUrl,
         tiktokUrl: data.tiktokUrl,
-        heroData: JSON.stringify(data.heroData),
-        servicesData: JSON.stringify(data.servicesData),
+        heroData: data.heroData,
+        servicesData: data.servicesData,
       }
     });
 

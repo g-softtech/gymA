@@ -56,8 +56,8 @@ async function main() {
       tiktokUrl: "https://tiktok.com/@EcofitnessHub",
       twitterUrl: "",
       facebookUrl: "",
-      heroData: JSON.stringify(heroData),
-      servicesData: JSON.stringify(servicesData),
+      heroData: heroData,
+      servicesData: servicesData,
     },
     update: {
       logoUrl: "https://ecofitnesshub.com/wp-content/uploads/2026/01/EcoFitness-Logo-1.png",
@@ -68,8 +68,8 @@ async function main() {
       email: "customerservice@ecofitnesshub.com",
       instagramUrl: "https://instagram.com/EcofitnessHub",
       tiktokUrl: "https://tiktok.com/@EcofitnessHub",
-      heroData: JSON.stringify(heroData),
-      servicesData: JSON.stringify(servicesData),
+      heroData: heroData,
+      servicesData: servicesData,
     }
   });
 
