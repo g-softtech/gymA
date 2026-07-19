@@ -240,6 +240,7 @@ export async function getAuthSession(): Promise<Session | null> {
             role: "ADMIN",
             tenantId: tenant.id,
             tenantSlug: tenant.slug,
+            tenantStatus: "APPROVED",
           },
           expires: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
         } as Session;

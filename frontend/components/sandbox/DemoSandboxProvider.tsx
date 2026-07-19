@@ -21,18 +21,29 @@ export function DemoSandboxProvider({ children }: { children: ReactNode }) {
     const handleEvent = () => triggerDemoModal();
     window.addEventListener("demo-mode-active", handleEvent);
 
-    // Global Fetch Interceptor to catch DEMO_MODE_ACTIVE from any Server Action or API
+    // Global Fetch Interceptor
     const originalFetch = window.fetch;
     window.fetch = async (...args) => {
-      const response = await originalFetch(...args);
-      // Clone so we don't consume the original response body before the caller gets it
+      let [resource, config] = args;
+      
+      // Inject Sandbox Header for API calls if we're inside a sandbox
+      if (typeof window !== "undefined" && window.location.pathname.startsWith("/sandbox/")) {
+        const slug = window.location.pathname.split("/")[2];
+        if (slug) {
+          config = config || {};
+          config.headers = {
+            ...config.headers,
+            "x-guest-session-tenant-slug": slug
+          };
+        }
+      }
+
+      const response = await originalFetch(resource, config);
       const clone = response.clone();
       try {
         const data = await clone.json();
         if (data?.error === "DEMO_MODE_ACTIVE" || data?.message === "DEMO_MODE_ACTIVE") {
           window.dispatchEvent(new CustomEvent("demo-mode-active"));
-          // Return a pending promise so the UI doesn't crash from an unhandled rejection,
-          // or reject softly. We reject so that loaders stop spinning.
           return Promise.reject(new Error("DEMO_MODE_ACTIVE"));
         }
       } catch (err) {

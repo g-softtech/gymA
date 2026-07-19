@@ -216,7 +216,7 @@ export default withAuth(
 
         // ── Protected routes ──────────────────────────────────────────────
         if (pathname.startsWith("/api/")) {
-          const result = !!token;
+          const result = !!token || req.headers.has("x-guest-session-tenant-slug");
           console.log(`${ATRACE} └─ ${result ? "ALLOW" : "DENY (no token)"}: protected API`);
           return result;
         }
