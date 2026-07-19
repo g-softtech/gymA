@@ -146,23 +146,59 @@ export function SidebarNav({
         })}
       </nav>
 
-      {/* DUAL ROLE TOGGLE */}
+      {/* ROLE SWITCHER */}
       {(role === "TRAINER" || role === "ADMIN" || role === "SUPERADMIN") && (
-        <div className="px-3 py-2 border-t border-border">
-          {currentContext !== "MEMBER" ? (
-            <Link
-              href={_isSandbox ? `/sandbox/${slug}/member` : `/gym/${slug}/dashboard/member`}
-              className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold transition-colors w-full bg-accent hover:bg-accent/80 text-foreground"
-            >
-              <span>👤</span> Switch to Member View
-            </Link>
-          ) : (
-            <Link
-              href={_isSandbox ? `/sandbox/${slug}${role === "TRAINER" ? "/trainer" : ""}` : `/gym/${slug}/dashboard/${role === "TRAINER" ? "trainer" : "admin"}`}
-              className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold transition-colors w-full bg-accent hover:bg-accent/80 text-foreground"
-            >
-              <span>{role === "TRAINER" ? "🏋️" : "👑"}</span> Switch to {role === "TRAINER" ? "Trainer" : "Admin"} View
-            </Link>
+        <div className="px-3 py-2 border-t border-border space-y-1">
+          {/* If ADMIN/SUPERADMIN, they can switch between Admin, Trainer, and Member */}
+          {(role === "ADMIN" || role === "SUPERADMIN") && (
+            <>
+              {currentContext !== "ADMIN" && (
+                <Link
+                  href={_isSandbox ? `/sandbox/${slug}` : `/gym/${slug}/dashboard/admin`}
+                  className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold transition-colors w-full bg-accent hover:bg-accent/80 text-foreground"
+                >
+                  <span>👑</span> Switch to Admin View
+                </Link>
+              )}
+              {currentContext !== "TRAINER" && (
+                <Link
+                  href={_isSandbox ? `/sandbox/${slug}/trainer` : `/gym/${slug}/dashboard/trainer`}
+                  className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold transition-colors w-full bg-accent hover:bg-accent/80 text-foreground"
+                >
+                  <span>🏋️</span> Switch to Trainer View
+                </Link>
+              )}
+              {currentContext !== "MEMBER" && (
+                <Link
+                  href={_isSandbox ? `/sandbox/${slug}/member` : `/gym/${slug}/dashboard/member`}
+                  className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold transition-colors w-full bg-accent hover:bg-accent/80 text-foreground"
+                >
+                  <span>👤</span> Switch to Member View
+                </Link>
+              )}
+            </>
+          )}
+
+          {/* If TRAINER, they can only switch between Trainer and Member */}
+          {role === "TRAINER" && (
+            <>
+              {currentContext !== "TRAINER" && (
+                <Link
+                  href={_isSandbox ? `/sandbox/${slug}/trainer` : `/gym/${slug}/dashboard/trainer`}
+                  className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold transition-colors w-full bg-accent hover:bg-accent/80 text-foreground"
+                >
+                  <span>🏋️</span> Switch to Trainer View
+                </Link>
+              )}
+              {currentContext !== "MEMBER" && (
+                <Link
+                  href={_isSandbox ? `/sandbox/${slug}/member` : `/gym/${slug}/dashboard/member`}
+                  className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold transition-colors w-full bg-accent hover:bg-accent/80 text-foreground"
+                >
+                  <span>👤</span> Switch to Member View
+                </Link>
+              )}
+            </>
           )}
         </div>
       )}

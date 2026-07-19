@@ -161,28 +161,69 @@ export function MobileNav({ slug, role, adminLinks, trainerLinks, memberLinks, p
                 </Link>
               ))}
 
-              {/* DUAL ROLE TOGGLE */}
+              {/* ROLE SWITCHER */}
               {(role === "TRAINER" || role === "ADMIN" || role === "SUPERADMIN") && (
                 <>
                   <div className="my-2 border-t border-border" />
-                  {currentContext !== "MEMBER" ? (
-                    <Link
-                      href={_isSandbox ? `/sandbox/${slug}/member` : `/gym/${slug}/dashboard/member`}
-                      onClick={() => setMoreOpen(false)}
-                      className="flex items-center gap-4 px-4 py-3 rounded-xl bg-primary/10 text-primary hover:bg-primary/20 transition"
-                    >
-                      <span className="text-2xl">👤</span>
-                      <span className="font-semibold">Switch to Member View</span>
-                    </Link>
-                  ) : (
-                    <Link
-                      href={_isSandbox ? `/sandbox/${slug}${role === "TRAINER" ? "/trainer" : ""}` : `/gym/${slug}/dashboard/${role === "TRAINER" ? "trainer" : "admin"}`}
-                      onClick={() => setMoreOpen(false)}
-                      className="flex items-center gap-4 px-4 py-3 rounded-xl bg-primary/10 text-primary hover:bg-primary/20 transition"
-                    >
-                      <span className="text-2xl">{role === "TRAINER" ? "🏋️" : "👑"}</span>
-                      <span className="font-semibold">Switch to {role === "TRAINER" ? "Trainer" : "Admin"} View</span>
-                    </Link>
+                  
+                  {(role === "ADMIN" || role === "SUPERADMIN") && (
+                    <>
+                      {currentContext !== "ADMIN" && (
+                        <Link
+                          href={_isSandbox ? `/sandbox/${slug}` : `/gym/${slug}/dashboard/admin`}
+                          onClick={() => setMoreOpen(false)}
+                          className="flex items-center gap-4 px-4 py-3 rounded-xl bg-primary/10 text-primary hover:bg-primary/20 transition"
+                        >
+                          <span className="text-2xl">👑</span>
+                          <span className="font-semibold">Switch to Admin View</span>
+                        </Link>
+                      )}
+                      {currentContext !== "TRAINER" && (
+                        <Link
+                          href={_isSandbox ? `/sandbox/${slug}/trainer` : `/gym/${slug}/dashboard/trainer`}
+                          onClick={() => setMoreOpen(false)}
+                          className="flex items-center gap-4 px-4 py-3 rounded-xl bg-primary/10 text-primary hover:bg-primary/20 transition"
+                        >
+                          <span className="text-2xl">🏋️</span>
+                          <span className="font-semibold">Switch to Trainer View</span>
+                        </Link>
+                      )}
+                      {currentContext !== "MEMBER" && (
+                        <Link
+                          href={_isSandbox ? `/sandbox/${slug}/member` : `/gym/${slug}/dashboard/member`}
+                          onClick={() => setMoreOpen(false)}
+                          className="flex items-center gap-4 px-4 py-3 rounded-xl bg-primary/10 text-primary hover:bg-primary/20 transition"
+                        >
+                          <span className="text-2xl">👤</span>
+                          <span className="font-semibold">Switch to Member View</span>
+                        </Link>
+                      )}
+                    </>
+                  )}
+
+                  {role === "TRAINER" && (
+                    <>
+                      {currentContext !== "TRAINER" && (
+                        <Link
+                          href={_isSandbox ? `/sandbox/${slug}/trainer` : `/gym/${slug}/dashboard/trainer`}
+                          onClick={() => setMoreOpen(false)}
+                          className="flex items-center gap-4 px-4 py-3 rounded-xl bg-primary/10 text-primary hover:bg-primary/20 transition"
+                        >
+                          <span className="text-2xl">🏋️</span>
+                          <span className="font-semibold">Switch to Trainer View</span>
+                        </Link>
+                      )}
+                      {currentContext !== "MEMBER" && (
+                        <Link
+                          href={_isSandbox ? `/sandbox/${slug}/member` : `/gym/${slug}/dashboard/member`}
+                          onClick={() => setMoreOpen(false)}
+                          className="flex items-center gap-4 px-4 py-3 rounded-xl bg-primary/10 text-primary hover:bg-primary/20 transition"
+                        >
+                          <span className="text-2xl">👤</span>
+                          <span className="font-semibold">Switch to Member View</span>
+                        </Link>
+                      )}
+                    </>
                   )}
                 </>
               )}
