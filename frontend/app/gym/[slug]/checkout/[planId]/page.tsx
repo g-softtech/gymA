@@ -13,7 +13,9 @@ export default async function CheckoutPage({
   const { slug, planId } = await params;
   const session = await getAuthSession();
 
-  if (!session?.user) return null;
+  if (!session?.user) {
+    redirect(`/api/auth/signin?callbackUrl=/gym/${slug}/checkout/${planId}`);
+  }
   const plan = await prisma.membershipPlan.findUnique({
     where: { id: planId },
     include: { tenant: true },
@@ -45,7 +47,7 @@ export default async function CheckoutPage({
         </div>
 
         {(() => {
-          const customFeatures = (plan.features as string[]).map(f => ({ name: f, included: true }));
+          const customFeatures = ((plan.features as string[]) || []).map(f => ({ name: f, included: true }));
           const entitlementFeatures = getEntitlementFeatures(plan.entitlements as any);
           const combinedFeatures = [...customFeatures, ...entitlementFeatures];
           
