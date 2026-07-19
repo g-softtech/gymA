@@ -17,6 +17,7 @@ export default function CheckoutButton({
   amount,
   planId,
   tenantSlug,
+  userId,
 }: CheckoutButtonProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);

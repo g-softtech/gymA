@@ -4,30 +4,30 @@ import { prisma } from "../lib/prisma";
 
 const GYMS = [
   {
-    name: "Zenith Yoga Studio",
-    slug: "zenith-yoga-studio",
+    name: "Bodyline Fitness & Gym",
+    slug: "bodyline-fitness",
     plans: [
-      { name: "Drop-in Class", price: 5000, durationDays: 1, description: "Single yoga session" },
-      { name: "Zenith Monthly", price: 30000, durationDays: 30, description: "Unlimited Yoga Classes" },
-      { name: "Mindfulness Package", price: 50000, durationDays: 30, description: "Yoga + Meditation + Spa" },
+      { name: "Day Pass", price: 5000, durationDays: 1, description: "Single day access to all facilities" },
+      { name: "Monthly Membership", price: 35000, durationDays: 30, description: "Unlimited access to gym, pool, and spa" },
+      { name: "Annual Membership", price: 300000, durationDays: 365, description: "Full year premium access with personal training" },
     ]
   },
   {
-    name: "Iron Forge CrossFit",
-    slug: "iron-forge-crossfit",
+    name: "Bodyrox Fitness Studio",
+    slug: "bodyrox-fitness",
     plans: [
-      { name: "Forge Foundation", price: 25000, durationDays: 30, description: "Basic Equipment Access" },
-      { name: "WOD Master", price: 40000, durationDays: 30, description: "Unlimited WODs" },
-      { name: "Iron Elite", price: 65000, durationDays: 30, description: "WODs + Personal Coaching" },
+      { name: "Walk-in Class", price: 4000, durationDays: 1, description: "Drop in for any group class" },
+      { name: "Monthly Pro", price: 40000, durationDays: 30, description: "Unlimited gym access and group classes" },
+      { name: "Quarterly Access", price: 110000, durationDays: 90, description: "3 months of elite fitness" },
     ]
   },
   {
-    name: "Elite Wellness Club",
-    slug: "elite-wellness-club",
+    name: "iFitness Abuja",
+    slug: "ifitness-abuja",
     plans: [
-      { name: "Club Member", price: 50000, durationDays: 30, description: "Gym & Pool Access" },
-      { name: "Premium Wellness", price: 100000, durationDays: 30, description: "Gym, Pool, Spa & Massage" },
-      { name: "Platinum Executive", price: 250000, durationDays: 365, description: "Full Year All Access" },
+      { name: "Basic Monthly", price: 25000, durationDays: 30, description: "Access to the main gym floor" },
+      { name: "Premium Monthly", price: 35000, durationDays: 30, description: "Multi-branch access + fitness classes" },
+      { name: "Annual Access", price: 250000, durationDays: 365, description: "12 months of unrestricted access" },
     ]
   }
 ];
@@ -46,6 +46,7 @@ async function main() {
     
     // Clean up if exists
     try {
+      await prisma.user.deleteMany({ where: { email: { endsWith: `@${gym.slug}.demo` } } });
       await prisma.tenant.delete({ where: { slug: gym.slug } });
     } catch (e) {
       // Ignore

@@ -17,8 +17,7 @@ export default async function MemberDashboardPage({
 
 
 
-
-
+  const isSandbox = session?.user?.email === "guest@sandbox.local";
 
   if (!session?.user) return null;
   const memberProfile = await prisma.memberProfile.upsert({
