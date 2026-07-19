@@ -9,7 +9,6 @@ import { NewTenantSignupPayload } from "@/lib/notifications/types";
 import crypto from "crypto";
 import { TRIAL_DURATION_DAYS } from "@/lib/billing/pricingConfig";
 import { validateBody, tenantCreateSchema } from "@/lib/validation";
-import { verifyWriteAccess } from "@/lib/sandbox/guard";
 /**
  * POST /api/tenant/create
  *
@@ -25,9 +24,6 @@ export async function POST(req: Request) {
 
   try {
     const session = await getAuthSession();
-    if (session?.user?.tenantId) {
-      await verifyWriteAccess(session.user.tenantId);
-    }
 
     logger.info("┌─ POST /api/tenant/create", { 
       ...logCtx, 

@@ -3,7 +3,6 @@ import { getAuthSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { jwtVerify } from "jose";
 
-import { verifyWriteAccess } from "@/lib/sandbox/guard";
 const JWT_SECRET = new TextEncoder().encode(
   process.env.NEXTAUTH_SECRET || "fallback_secret_for_qr_generation_only"
 );
@@ -11,9 +10,6 @@ const JWT_SECRET = new TextEncoder().encode(
 export async function POST(req: Request) {
   try {
     const session = await getAuthSession();
-    if (session?.user?.tenantId) {
-      await verifyWriteAccess(session.user.tenantId);
-    }
     if (!session?.user?.email || !["ADMIN", "SUPERADMIN"].includes(session.user.role)) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }

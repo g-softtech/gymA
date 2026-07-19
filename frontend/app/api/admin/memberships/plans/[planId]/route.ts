@@ -2,13 +2,9 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthSession } from "@/lib/auth";
 
-import { verifyWriteAccess } from "@/lib/sandbox/guard";
 export async function PATCH(req: Request, { params }: { params: Promise<{ planId: string }> }) {
   try {
     const session = await getAuthSession();
-    if (session?.user?.tenantId) {
-      await verifyWriteAccess(session.user.tenantId);
-    }
     const { planId } = await params;
     if (!session?.user?.id || session.user.role !== "ADMIN") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -56,9 +52,6 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ planId
 export async function DELETE(req: Request, { params }: { params: Promise<{ planId: string }> }) {
   try {
     const session = await getAuthSession();
-    if (session?.user?.tenantId) {
-      await verifyWriteAccess(session.user.tenantId);
-    }
     const { planId } = await params;
     
     if (!session?.user?.id || session.user.role !== "ADMIN") {

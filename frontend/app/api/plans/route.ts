@@ -8,7 +8,6 @@ import {
 } from "@/lib/tenant";
 import { EntitlementsSchema, defaultEntitlements } from "@/lib/entitlements/schema";
 
-import { verifyWriteAccess } from "@/lib/sandbox/guard";
 /**
  * POST /api/plans — create a membership plan
  * Now accepts: name, price, durationDays, description, features[], featured, entitlements
@@ -16,9 +15,6 @@ import { verifyWriteAccess } from "@/lib/sandbox/guard";
 export async function POST(req: NextRequest) {
   try {
     const session = await getAuthSession();
-    if (session?.user?.tenantId) {
-      await verifyWriteAccess(session.user.tenantId);
-    }
     const ctx = getTenantContextFromSession(session);
 
     const roleErr = requireAdmin(ctx);
@@ -84,9 +80,6 @@ export async function POST(req: NextRequest) {
 export async function GET(_req: NextRequest) {
   try {
     const session = await getAuthSession();
-    if (session?.user?.tenantId) {
-      await verifyWriteAccess(session.user.tenantId);
-    }
     const ctx = getTenantContextFromSession(session);
     if (!ctx?.tenantId) return noTenantContext();
 

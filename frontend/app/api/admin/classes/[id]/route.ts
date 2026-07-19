@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthSession } from "@/lib/auth";
 
-import { verifyWriteAccess } from "@/lib/sandbox/guard";
 // DELETE /api/admin/classes/[id]
 export async function DELETE(
   req: Request,
@@ -10,9 +9,6 @@ export async function DELETE(
 ) {
   try {
     const session = await getAuthSession();
-    if (session?.user?.tenantId) {
-      await verifyWriteAccess(session.user.tenantId);
-    }
     if (!session?.user?.tenantId || (session.user.role !== "ADMIN" && session.user.role !== "SUPERADMIN")) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }

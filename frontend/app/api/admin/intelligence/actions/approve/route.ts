@@ -3,13 +3,9 @@ import { getAuthSession } from "@/lib/auth";
 import { ActionRegistry } from "@/lib/actions/actionRegistry";
 import { ActionExecutor } from "@/lib/actions/actionExecutor";
 
-import { verifyWriteAccess } from "@/lib/sandbox/guard";
 export async function POST(req: Request) {
   try {
     const session = await getAuthSession();
-    if (session?.user?.tenantId) {
-      await verifyWriteAccess(session.user.tenantId);
-    }
     if (!session?.user?.tenantId || !["ADMIN", "SUPERADMIN"].includes(session.user.role)) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }

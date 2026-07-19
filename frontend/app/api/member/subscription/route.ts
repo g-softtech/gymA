@@ -4,7 +4,6 @@ import { getAuthSession } from "@/lib/auth";
 import { getTenantContextFromSession, requireAdmin, noTenantContext } from "@/lib/tenant";
 import { subscriptionDomainBus, createSubscriptionEvent } from "@/lib/subscriptions/events";
 
-import { verifyWriteAccess } from "@/lib/sandbox/guard";
 /**
  * GET /api/member/subscription
  *
@@ -15,9 +14,6 @@ import { verifyWriteAccess } from "@/lib/sandbox/guard";
 export async function GET(_req: NextRequest) {
   try {
     const session = await getAuthSession();
-    if (session?.user?.tenantId) {
-      await verifyWriteAccess(session.user.tenantId);
-    }
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -84,9 +80,6 @@ export async function GET(_req: NextRequest) {
 export async function PATCH(req: NextRequest) {
   try {
     const session = await getAuthSession();
-    if (session?.user?.tenantId) {
-      await verifyWriteAccess(session.user.tenantId);
-    }
     const ctx = getTenantContextFromSession(session);
 
     const roleErr = requireAdmin(ctx);

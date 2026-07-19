@@ -2,13 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { getAuthSession } from "@/lib/auth";
 import { fulfillPayment } from "@/lib/paymentFulfillment";
 
-import { verifyWriteAccess } from "@/lib/sandbox/guard";
 export async function POST(req: NextRequest) {
   try {
     const session = await getAuthSession();
-    if (session?.user?.tenantId) {
-      await verifyWriteAccess(session.user.tenantId);
-    }
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }

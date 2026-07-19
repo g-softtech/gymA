@@ -10,13 +10,9 @@ import { checkTrainerQuota } from "@/lib/enforcement";
 import { auditLogger, AuditEventType } from "@/lib/auditLogger";
 import { validateBody, trainerCreateSchema } from "@/lib/validation";
 
-import { verifyWriteAccess } from "@/lib/sandbox/guard";
 export async function POST(req: NextRequest) {
   try {
     const session = await getAuthSession();
-    if (session?.user?.tenantId) {
-      await verifyWriteAccess(session.user.tenantId);
-    }
     const ctx = getTenantContextFromSession(session);
 
     // ✅ Role check via helper
@@ -96,9 +92,6 @@ export async function POST(req: NextRequest) {
 export async function GET(_req: NextRequest) {
   try {
     const session = await getAuthSession();
-    if (session?.user?.tenantId) {
-      await verifyWriteAccess(session.user.tenantId);
-    }
     const ctx = getTenantContextFromSession(session);
 
     // ✅ Role check via helper
@@ -122,9 +115,6 @@ export async function GET(_req: NextRequest) {
 export async function PATCH(req: NextRequest) {
   try {
     const session = await getAuthSession();
-    if (session?.user?.tenantId) {
-      await verifyWriteAccess(session.user.tenantId);
-    }
     const ctx = getTenantContextFromSession(session);
 
     // ✅ Role check via helper

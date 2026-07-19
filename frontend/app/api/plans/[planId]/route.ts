@@ -3,16 +3,12 @@ import { prisma } from "@/lib/prisma";
 import { getAuthSession } from "@/lib/auth";
 import { EntitlementsSchema, defaultEntitlements } from "@/lib/entitlements/schema";
 
-import { verifyWriteAccess } from "@/lib/sandbox/guard";
 export async function DELETE(
   _req: NextRequest,
   { params }: { params: Promise<{ planId: string }> }
 ) {
   try {
     const session = await getAuthSession();
-    if (session?.user?.tenantId) {
-      await verifyWriteAccess(session.user.tenantId);
-    }
     if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "SUPERADMIN")) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -36,9 +32,6 @@ export async function PUT(
 ) {
   try {
     const session = await getAuthSession();
-    if (session?.user?.tenantId) {
-      await verifyWriteAccess(session.user.tenantId);
-    }
     if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "SUPERADMIN")) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
