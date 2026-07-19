@@ -23,6 +23,16 @@ export default function CheckoutButton({
 
   const handlePayment = async () => {
     setLoading(true);
+
+    // Sandbox Simulation Bypass
+    if (userId.startsWith("guest-")) {
+      setTimeout(() => {
+        alert("Sandbox Mode: Simulated successful payment!");
+        window.location.href = `/sandbox/${tenantSlug}/member?welcome=1`;
+      }, 800);
+      return;
+    }
+
     try {
       // 1. Initialize server-side to prevent price tampering and create PENDING Transaction
       const initRes = await fetch("/api/payments/initialize", {

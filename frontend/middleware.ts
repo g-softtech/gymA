@@ -131,6 +131,8 @@ export default withAuth(
         newPathname = `/gym/${slug}/dashboard/${remaining}`;
       } else if (remaining === "admin" || remaining.startsWith("admin/")) {
         newPathname = `/gym/${slug}/dashboard/${remaining}`;
+      } else if (remaining.startsWith("checkout/")) {
+        newPathname = `/gym/${slug}/${remaining}`;
       } else if (remaining) {
         newPathname = `/gym/${slug}/dashboard/admin/${remaining}`;
       }

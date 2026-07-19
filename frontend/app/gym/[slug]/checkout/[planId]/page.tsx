@@ -77,14 +77,26 @@ export default async function CheckoutPage({
           Paying as:{" "}
           <span className="font-medium text-gray-700">{session.user.email}</span>
         </p>
-        <CheckoutButton
-          email={session.user.email!}
-          amount={Number(plan.price)}
-          planName={plan.name}
-          planId={plan.id}
-          tenantSlug={plan.tenant.slug}
-          userId={session.user.id!}
-        />
+
+        {session.user.email === "guest@sandbox.local" ? (
+          <form action={async () => {
+            "use server";
+            redirect(`/sandbox/${slug}/member?welcome=1`);
+          }}>
+            <button type="submit" className="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl transition shadow-md flex items-center justify-center gap-2">
+              <span className="text-lg">💳</span> Simulate Sandbox Payment
+            </button>
+          </form>
+        ) : (
+          <CheckoutButton
+            email={session.user.email!}
+            amount={Number(plan.price)}
+            planName={plan.name}
+            planId={plan.id}
+            tenantSlug={plan.tenant.slug}
+            userId={session.user.id!}
+          />
+        )}
       </div>
     </div>
   );

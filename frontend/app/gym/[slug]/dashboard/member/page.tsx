@@ -139,14 +139,14 @@ export default async function MemberDashboardPage({
             {daysLeft! <= 7 && (
               <div className="mt-2 bg-red-50 border border-red-200 rounded-lg p-3 text-sm text-red-700">
                 ⚠️ Your membership expires soon.{" "}
-                <Link href={`/gym/${slug}#plans`} className="underline font-medium">Renew now</Link>
+                <Link href={isSandbox ? `/sandbox/${slug}/member/billing` : `/gym/${slug}#plans`} className="underline font-medium">Renew now</Link>
               </div>
             )}
 
             {!isHighestPlan && (
               <div className="pt-4 mt-2 border-t border-border flex justify-end">
                 <Link
-                  href={`/gym/${slug}#plans`}
+                  href={isSandbox ? `/sandbox/${slug}/member/billing` : `/gym/${slug}#plans`}
                   className="text-sm font-semibold text-indigo-600 hover:text-indigo-700 transition-colors"
                 >
                   Upgrade Plan &rarr;
@@ -158,8 +158,8 @@ export default async function MemberDashboardPage({
           <div className="text-center py-6">
             <p className="text-muted-foreground mb-4">You have no active membership plan.</p>
             <Link
-              href={`/gym/${slug}#plans`}
-              className="inline-block bg-indigo-600 text-white px-5 py-2 rounded-lg font-semibold hover:bg-indigo-700 transition"
+              href={isSandbox ? `/sandbox/${slug}/member/billing` : `/gym/${slug}#plans`}
+              className="inline-flex px-4 py-2 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700"
             >
               Browse Plans
             </Link>
