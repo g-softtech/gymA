@@ -36,7 +36,7 @@ export default async function TrainerDashboardPage({
   // Auto-create trainer profile if missing
   if (!trainerProfile) {
     await prisma.trainerProfile.create({
-      data: { userId: session!.user.id, specialties: [], availability: {} },
+      data: { userId: session!.user.id, specialties: [], availability: {}, showOnWebsite: true },
     });
     redirect(`/gym/${slug}/dashboard/trainer`);
   }
