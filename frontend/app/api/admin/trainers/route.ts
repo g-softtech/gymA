@@ -61,6 +61,7 @@ export async function POST(req: NextRequest) {
         availability: {},
         bio: bio ?? "",
         hourlyRate: hourlyRate ?? null,
+        showOnWebsite: true,
       },
     });
 
