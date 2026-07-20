@@ -255,12 +255,29 @@ export default function TrainerManager({ tenantId, trainers: initialTrainers }: 
                   <div className="text-sm text-muted-foreground font-medium">
                     ₦{t.hourlyRate?.toLocaleString() ?? "—"}/hr • {t.totalBookings} booking{t.totalBookings !== 1 ? "s" : ""}
                   </div>
-                  <button
-                    onClick={() => editingId === t.id ? setEditingId(null) : startEditing(t)}
-                    className="text-sm text-indigo-600 font-semibold hover:underline"
-                  >
-                    {editingId === t.id ? "Cancel Editing" : "Edit Public Profile"}
-                  </button>
+                  <div className="flex gap-4 items-center">
+                    {typeof window !== "undefined" && window.location.pathname.startsWith("/sandbox") && (
+                      <button
+                        onClick={async () => {
+                          await fetch("/api/sandbox/impersonate", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ userId: t.id }),
+                          });
+                          window.location.reload();
+                        }}
+                        className="text-sm text-indigo-600 font-semibold hover:underline"
+                      >
+                        Login as User
+                      </button>
+                    )}
+                    <button
+                      onClick={() => editingId === t.id ? setEditingId(null) : startEditing(t)}
+                      className="text-sm text-indigo-600 font-semibold hover:underline"
+                    >
+                      {editingId === t.id ? "Cancel Editing" : "Edit Public Profile"}
+                    </button>
+                  </div>
                 </div>
               </div>
 

@@ -7,6 +7,7 @@ import { getSubscriptionHealthState } from "@/lib/subscriptions/memberSubscripti
 import type { User, MemberProfile, Subscription, MembershipPlan } from "@prisma/client";
 import MembershipAnalyticsClient from "./MembershipAnalyticsClient";
 import UpgradeIntelligenceClient from "./UpgradeIntelligenceClient";
+import ImpersonateButton from "@/components/admin/ImpersonateButton";
 
 type UserWithProfile = User & {
   memberProfile:
@@ -105,15 +106,18 @@ export default async function AdminMembersPage({
                   return (
                     <tr key={user.id} className="hover:bg-muted transition-colors">
                       <td className="px-6 py-4">
-                        <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold uppercase">
-                            {user.name?.[0] ?? user.email?.[0] ?? "?"}
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold uppercase">
+                              {user.name?.[0] ?? user.email?.[0] ?? "?"}
+                            </div>
+                            <div>
+                              <span className="font-medium text-foreground">{user.name ?? "—"}</span>
+                              {user.role === "TRAINER" && <span className="ml-2 px-2 py-0.5 rounded text-[10px] font-bold bg-primary/10 text-primary uppercase">Trainer</span>}
+                              {user.role === "ADMIN" && <span className="ml-2 px-2 py-0.5 rounded text-[10px] font-bold bg-purple-100 text-purple-700 uppercase">Admin</span>}
+                            </div>
                           </div>
-                          <div>
-                            <span className="font-medium text-foreground">{user.name ?? "—"}</span>
-                            {user.role === "TRAINER" && <span className="ml-2 px-2 py-0.5 rounded text-[10px] font-bold bg-primary/10 text-primary uppercase">Trainer</span>}
-                            {user.role === "ADMIN" && <span className="ml-2 px-2 py-0.5 rounded text-[10px] font-bold bg-purple-100 text-purple-700 uppercase">Admin</span>}
-                          </div>
+                          <ImpersonateButton userId={user.id} />
                         </div>
                       </td>
                       <td className="px-6 py-4 text-muted-foreground">{user.email ?? "—"}</td>

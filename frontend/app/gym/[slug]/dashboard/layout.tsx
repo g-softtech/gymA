@@ -2,12 +2,14 @@
 import { ReactNode } from "react";
 import { prisma } from "@/lib/prisma";
 import { notFound, redirect } from "next/navigation";
+import { cookies } from "next/headers";
 import { getAuthSession } from "@/lib/auth";
 import { getUserAccessContext } from "@/lib/access-control";
 import AdminLockoutGuard from "@/components/admin/AdminLockoutGuard";
 import PendingApprovalScreen from "@/components/admin/PendingApprovalScreen";
 import { MobileNav } from "@/components/MobileNav";
 import { SidebarNav } from "@/components/SidebarNav";
+import ImpersonateBanner from "@/components/admin/ImpersonateBanner";
 
 export default async function DashboardLayout({
   children,
@@ -104,7 +106,14 @@ export default async function DashboardLayout({
   const isGrace = daysRemaining < 0 && daysRemaining >= -3;
 
   // ✅ Sandbox Path Adaptation
-  const isSandbox = session.user.email === "guest@sandbox.local" || session.user.id.startsWith("guest-admin-");
+  const headersList = await import("next/headers").then(m => m.headers());
+  const isSandboxContext = !!headersList.get("x-guest-session-tenant-slug");
+  
+  const cookieStore = await cookies();
+  const isImpersonating = !!cookieStore.get("sandbox_impersonate_userId")?.value;
+
+  const isSandbox = isSandboxContext || session.user.email === "guest@sandbox.local" || session.user.id.startsWith("guest-admin-");
+
   const adminBase = isSandbox ? `/sandbox/${slug}` : `/gym/${slug}/dashboard/admin`;
   const trainerBase = isSandbox ? `/sandbox/${slug}/trainer` : `/gym/${slug}/dashboard/trainer`;
   const memberBase = isSandbox ? `/sandbox/${slug}/member` : `/gym/${slug}/dashboard/member`;
@@ -201,6 +210,9 @@ export default async function DashboardLayout({
               slug={slug}
               daysRemaining={daysRemaining}
             />
+          )}
+          {isSandboxContext && isImpersonating && (
+            <ImpersonateBanner userName={session.user.name || "User"} />
           )}
           <div className="flex-1 p-6 overflow-y-auto pb-24 md:pb-6">{children}</div>
         </main>

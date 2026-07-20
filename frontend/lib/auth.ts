@@ -1,7 +1,7 @@
 import NextAuth from "next-auth";
 import type { NextAuthOptions, Session } from "next-auth";
 import { getServerSession } from "next-auth/next";
-import { headers } from "next/headers";
+import { headers, cookies } from "next/headers";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "./prisma";
 import GoogleProvider from "next-auth/providers/google";
@@ -228,6 +228,33 @@ export async function getAuthSession(): Promise<Session | null> {
       });
 
       if (tenant && tenant.isDemo) {
+        const cookieStore = await cookies();
+        const impersonateUserId = cookieStore.get("sandbox_impersonate_userId")?.value;
+
+        if (impersonateUserId) {
+          // Fetch real user
+          const realUser = await prisma.user.findUnique({
+            where: { id: impersonateUserId, tenantId: tenant.id },
+            select: { id: true, name: true, email: true, image: true, role: true }
+          });
+          
+          if (realUser) {
+            return {
+              user: {
+                id: realUser.id,
+                name: realUser.name || "Sandbox User",
+                email: realUser.email || "guest@sandbox.local",
+                image: realUser.image || null,
+                role: realUser.role,
+                tenantId: tenant.id,
+                tenantSlug: tenant.slug,
+                tenantStatus: "APPROVED",
+              },
+              expires: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
+            } as Session;
+          }
+        }
+
         // Construct a mock admin session
         const fallbackUserId = tenant.users.length > 0 ? tenant.users[0].id : `guest-admin-${tenant.id}`;
         
