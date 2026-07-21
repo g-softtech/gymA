@@ -221,12 +221,21 @@ export function SidebarNav({
           </div>
         </div>
         <div className="flex items-center justify-between w-full mt-3">
-          <a
-            href={`/api/auth/signout?callbackUrl=/gym/${slug}`}
-            className="text-xs hover:underline text-destructive"
+          <button
+            onClick={async () => {
+              if (_isSandbox) {
+                await fetch("/api/sandbox/impersonate", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ action: "revert" }),
+                }).catch(console.error);
+              }
+              window.location.href = `/api/auth/signout?callbackUrl=/gym/${slug}`;
+            }}
+            className="text-xs hover:underline text-destructive text-left"
           >
             Sign out
-          </a>
+          </button>
           <ThemeToggle />
         </div>
       </div>

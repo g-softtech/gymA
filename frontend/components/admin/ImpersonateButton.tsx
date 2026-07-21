@@ -15,7 +15,9 @@ export default function ImpersonateButton({ userId }: { userId: string }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userId }),
       });
-      window.location.reload();
+      const parts = pathname.split("/");
+      const base = parts.slice(0, 3).join("/"); // e.g. /sandbox/titan-fitness
+      window.location.href = base;
     } catch (e) {
       console.error("Failed to impersonate", e);
     }

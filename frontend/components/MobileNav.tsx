@@ -241,13 +241,22 @@ export function MobileNav({ slug, role, adminLinks, trainerLinks, memberLinks, p
               )}
             </div>
             <div className="mt-4 pt-4 border-t border-border flex items-center justify-between px-4">
-              <a
-                href={`/api/auth/signout?callbackUrl=/gym/${slug}`}
-                className="flex items-center gap-4 py-3 px-4 rounded-xl hover:bg-destructive/10 text-destructive transition"
+              <button
+                onClick={async () => {
+                  if (_isSandbox) {
+                    await fetch("/api/sandbox/impersonate", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ action: "revert" }),
+                    }).catch(console.error);
+                  }
+                  window.location.href = `/api/auth/signout?callbackUrl=/gym/${slug}`;
+                }}
+                className="flex items-center gap-4 py-3 px-4 rounded-xl hover:bg-destructive/10 text-destructive w-full text-left transition"
               >
                 <span className="text-2xl">🚪</span>
                 <span className="font-semibold">Sign out</span>
-              </a>
+              </button>
               <ThemeToggle />
             </div>
           </div>
