@@ -88,13 +88,25 @@ export function MobileNav({ slug, role, adminLinks, trainerLinks, memberLinks, p
   const isAdminContext = currentContext === "ADMIN";
 
   // Define bottom bar links based on context
-  let bottomLinks = [];
+  let bottomLinks: typeof activeLinks = [];
   if (isAdminContext) {
+    const adminBase = activeLinks[0]?.href ?? `/gym/${slug}/dashboard/admin`; // Fallback, but should be accurate from activeLinks
+    
+    // Attempt to pick 4 key items from activeLinks to ensure correct paths and avoid hardcoding missing pages
+    // The preferred icons are Home, Members, Check-in (since Bookings is mostly trainer/member), Revenue
+    
+    const findLink = (partialHref: string, fallbackLabel: string, fallbackIcon: string) => {
+      const link = activeLinks.find(l => l.href.endsWith(partialHref) || l.href === partialHref);
+      if (link) return link;
+      // Fallback if not found (though it should be in activeLinks)
+      return { href: partialHref.startsWith("/") ? partialHref : `${adminBase}/${partialHref}`, label: fallbackLabel, icon: fallbackIcon };
+    };
+
     bottomLinks = [
-      { href: `/gym/${slug}/dashboard/admin`, label: "Home", icon: "🏠" },
-      { href: `/gym/${slug}/dashboard/admin/bookings`, label: "Bookings", icon: "📅" },
-      { href: `/gym/${slug}/dashboard/admin/members`, label: "Members", icon: "👥" },
-      { href: `/gym/${slug}/dashboard/admin/revenue`, label: "Revenue", icon: "💰" },
+      { href: adminBase, label: "Home", icon: "🏠" },
+      { ...findLink("members", "Members", "👥") },
+      { ...findLink("checkin", "Check-in", "📲") },
+      { ...findLink("revenue", "Revenue", "💰") },
     ];
   } else {
     // Member or Trainer
