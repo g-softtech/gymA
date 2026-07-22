@@ -143,8 +143,10 @@ export async function POST(req: Request) {
       reference: transaction.reference
     });
 
-  } catch (error) {
-    console.error("POST /api/payments/initialize error:", error);
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+  } catch (err: any) {
+    console.error("[POST /api/payments/initialize]", err);
+    return NextResponse.json({ 
+      error: `[INIT ERROR]: ${err?.message || String(err)}` 
+    }, { status: 500 });
   }
 }
