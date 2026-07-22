@@ -55,6 +55,7 @@ async function main() {
           name: sb.name,
           slug: sb.slug,
           isDemo: true,
+          status: "APPROVED",
           settings: {
             create: {
               description: sb.description,

@@ -147,44 +147,53 @@ export function SidebarNav({
       </nav>
 
       {/* ROLE SWITCHER */}
-      {(role === "TRAINER" || role === "ADMIN" || role === "SUPERADMIN") && (
+      {(_isSandbox || role === "TRAINER" || role === "ADMIN" || role === "SUPERADMIN") && (
         <div className="px-3 py-2 border-t border-border space-y-1">
-          {/* If ADMIN/SUPERADMIN, they can switch between Admin, Trainer, and Member */}
-          {(role === "ADMIN" || role === "SUPERADMIN") && (
+          {/* If ADMIN/SUPERADMIN OR Sandbox, they can switch between Admin, Trainer, and Member */}
+          {(_isSandbox || role === "ADMIN" || role === "SUPERADMIN") && (
             <>
               {currentContext !== "ADMIN" && (
-                <Link
-                  href={_isSandbox ? `/sandbox/${slug}` : `/gym/${slug}/dashboard/admin`}
+                <button
+                  onClick={async () => {
+                    if (_isSandbox) await fetch("/api/sandbox/impersonate", { method: "POST", body: JSON.stringify({ action: "revert" }) }).catch(() => {});
+                    window.location.href = _isSandbox ? `/sandbox/${slug}` : `/gym/${slug}/dashboard/admin`;
+                  }}
                   className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold transition-colors w-full bg-accent hover:bg-accent/80 text-foreground"
                 >
                   <span>👑</span> Switch to Admin View
-                </Link>
+                </button>
               )}
               {currentContext !== "TRAINER" && (
-                <Link
-                  href={_isSandbox ? `/sandbox/${slug}/trainer` : `/gym/${slug}/dashboard/trainer`}
+                <button
+                  onClick={async () => {
+                    if (_isSandbox) await fetch("/api/sandbox/impersonate", { method: "POST", body: JSON.stringify({ action: "revert" }) }).catch(() => {});
+                    window.location.href = _isSandbox ? `/sandbox/${slug}/trainer` : `/gym/${slug}/dashboard/trainer`;
+                  }}
                   className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold transition-colors w-full bg-accent hover:bg-accent/80 text-foreground"
                 >
                   <span>🏋️</span> Switch to Trainer View
-                </Link>
+                </button>
               )}
               {currentContext !== "MEMBER" && (
-                <Link
-                  href={_isSandbox ? `/sandbox/${slug}/member` : `/gym/${slug}/dashboard/member`}
+                <button
+                  onClick={async () => {
+                    if (_isSandbox) await fetch("/api/sandbox/impersonate", { method: "POST", body: JSON.stringify({ action: "revert" }) }).catch(() => {});
+                    window.location.href = _isSandbox ? `/sandbox/${slug}/member` : `/gym/${slug}/dashboard/member`;
+                  }}
                   className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold transition-colors w-full bg-accent hover:bg-accent/80 text-foreground"
                 >
                   <span>👤</span> Switch to Member View
-                </Link>
+                </button>
               )}
             </>
           )}
 
-          {/* If TRAINER, they can only switch between Trainer and Member */}
-          {role === "TRAINER" && (
+          {/* If strictly TRAINER (and not Sandbox), they can only switch between Trainer and Member */}
+          {!_isSandbox && role === "TRAINER" && (
             <>
               {currentContext !== "TRAINER" && (
                 <Link
-                  href={_isSandbox ? `/sandbox/${slug}/trainer` : `/gym/${slug}/dashboard/trainer`}
+                  href={`/gym/${slug}/dashboard/trainer`}
                   className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold transition-colors w-full bg-accent hover:bg-accent/80 text-foreground"
                 >
                   <span>🏋️</span> Switch to Trainer View
@@ -192,7 +201,7 @@ export function SidebarNav({
               )}
               {currentContext !== "MEMBER" && (
                 <Link
-                  href={_isSandbox ? `/sandbox/${slug}/member` : `/gym/${slug}/dashboard/member`}
+                  href={`/gym/${slug}/dashboard/member`}
                   className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold transition-colors w-full bg-accent hover:bg-accent/80 text-foreground"
                 >
                   <span>👤</span> Switch to Member View
