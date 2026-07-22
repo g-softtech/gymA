@@ -35,10 +35,12 @@ export default function CheckoutButton({
     }
 
     try {
-      // 1. Initialize server-side to prevent price tampering and create PENDING Transaction
       const initRes = await fetch("/api/payments/initialize", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          ...(window.location.pathname.startsWith("/sandbox/") ? { "x-guest-session-tenant-slug": tenantSlug } : {})
+        },
         body: JSON.stringify({ itemType: "MEMBERSHIP", itemId: planId }),
       });
       let data;
@@ -88,9 +90,13 @@ export default function CheckoutButton({
         onSuccess: async (transaction: any) => {
           // 3. Verify server-side
           try {
+            const isSandbox = window.location.pathname.startsWith("/sandbox/");
             const verifyRes = await fetch("/api/payments/verify", {
               method: "POST",
-              headers: { "Content-Type": "application/json" },
+              headers: { 
+                "Content-Type": "application/json",
+                ...(isSandbox ? { "x-guest-session-tenant-slug": tenantSlug } : {})
+              },
               body: JSON.stringify({
                 reference: transaction.reference,
                 planId, // kept for backward compatibility, but fulfillment relies on reference
@@ -98,12 +104,14 @@ export default function CheckoutButton({
               }),
             });
 
+            const baseRedirectUrl = isSandbox ? `/sandbox/${tenantSlug}` : `/gym/${tenantSlug}`;
+
             if (verifyRes.ok) {
-              window.location.href = `/gym/${tenantSlug}/dashboard/member?welcome=1`;
+              window.location.href = `${baseRedirectUrl}/dashboard/member?welcome=1`;
             } else {
               const errData = await verifyRes.json().catch(() => ({}));
               alert(`Payment verification failed: ${errData.error || 'Please contact support.'}`);
-              window.location.href = `/gym/${tenantSlug}/dashboard/member?notice=payment_processing`;
+              window.location.href = `${baseRedirectUrl}/dashboard/member?notice=payment_processing`;
             }
           } catch (err: any) {
             alert(`Payment processing error: ${err.message || 'Please contact support.'}`);

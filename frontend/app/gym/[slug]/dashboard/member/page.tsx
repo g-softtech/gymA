@@ -3,6 +3,7 @@ import { getAuthSession } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { AccessPass } from "@/components/member/AccessPass";
+import { headers } from "next/headers";
 
 export default async function MemberDashboardPage({
   params,
@@ -17,7 +18,8 @@ export default async function MemberDashboardPage({
 
 
 
-  const isSandbox = session?.user?.email === "guest@sandbox.local";
+  const headersList = await headers();
+  const isSandbox = !!headersList.get("x-guest-session-tenant-slug");
 
   if (!session?.user) return null;
   const memberProfile = await prisma.memberProfile.upsert({

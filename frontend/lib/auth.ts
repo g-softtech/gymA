@@ -218,6 +218,33 @@ export const authOptions: NextAuthOptions = {
 
 export async function getAuthSession(): Promise<Session | null> {
   try {
+    const cookieStore = await cookies();
+    const impersonateUserId = cookieStore.get("sandbox_impersonate_userId")?.value;
+
+    if (impersonateUserId) {
+      const realUser = await prisma.user.findUnique({
+        where: { id: impersonateUserId },
+        include: { tenant: true }
+      });
+      // CRITICAL SECURITY: Only allow impersonation if the target user belongs to a Sandbox (isDemo) gym.
+      // This guarantees the main production app is completely unaffected and secure.
+      if (realUser && realUser.tenant?.isDemo) {
+        return {
+          user: {
+            id: realUser.id,
+            name: realUser.name || "Sandbox User",
+            email: realUser.email || "guest@sandbox.local",
+            image: realUser.image || null,
+            role: realUser.role,
+            tenantId: realUser.tenantId,
+            tenantSlug: realUser.tenant?.slug,
+            tenantStatus: realUser.tenant?.status,
+          },
+          expires: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
+        } as Session;
+      }
+    }
+
     const headersList = await headers();
     const guestSlug = headersList.get("x-guest-session-tenant-slug");
     
@@ -228,8 +255,6 @@ export async function getAuthSession(): Promise<Session | null> {
       });
 
       if (tenant && tenant.isDemo) {
-        const cookieStore = await cookies();
-        const impersonateUserId = cookieStore.get("sandbox_impersonate_userId")?.value;
 
         if (impersonateUserId) {
           // Fetch real user

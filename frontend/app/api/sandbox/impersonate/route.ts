@@ -16,6 +16,23 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Missing userId" }, { status: 400 });
     }
 
+    const { getAuthSession } = await import("@/lib/auth");
+    const { prisma } = await import("@/lib/prisma");
+
+    const session = await getAuthSession();
+    if (!session?.user || (session.user.role !== "SUPERADMIN" && session.user.role !== "ADMIN")) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const targetUser = await prisma.user.findUnique({
+      where: { id: userId },
+      include: { tenant: true },
+    });
+
+    if (!targetUser || !targetUser.tenant?.isDemo) {
+      return NextResponse.json({ error: "Cannot impersonate non-sandbox user" }, { status: 403 });
+    }
+
     // Set cookie that expires in 1 hour
     cookieStore.set({
       name: "sandbox_impersonate_userId",
