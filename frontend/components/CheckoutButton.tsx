@@ -80,12 +80,13 @@ export default function CheckoutButton({
         return;
       }
 
+      const safeEmail = (email && email.includes("@")) ? email.trim() : `guest_${userId.substring(0, 8)}@sandbox.local`;
       const paystack = new PaystackPop();
       paystack.newTransaction({
         key: paystackKey,
         access_code: data.accessCode,
         reference: data.reference,
-        email: email,
+        email: safeEmail,
         amount: Math.round(amount * 100),
         onSuccess: async (transaction: any) => {
           // 3. Verify server-side
