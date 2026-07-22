@@ -2,8 +2,9 @@ import ContactForm from "@/components/marketing/ContactForm";
 
 export default function ContactPage() {
   const contactInfo = [
-    { icon: "📧", label: "Email", value: "hello@cortexfit.africa", href: "mailto:hello@cortexfit.africa" },
-    { icon: "📱", label: "WhatsApp", value: "+234 800 SMART GYM", href: "https://wa.me/2348001234567" },
+    { icon: "📧", label: "Email", value: "info@thecortexsystems.com", href: "mailto:info@thecortexsystems.com" },
+    { icon: "📱", label: "WhatsApp", value: "07013981891", href: "https://wa.me/2347013981891" },
+    { icon: "📞", label: "Phone", value: "07013981891", href: "tel:+2347013981891" },
     { icon: "📍", label: "Office", value: "Victoria Island, Lagos, Nigeria", href: null },
     { icon: "⏰", label: "Support Hours", value: "Mon–Sat, 8AM–8PM WAT", href: null },
   ];

@@ -120,6 +120,7 @@ export async function processAndSendReceipt({
       to: memberEmail,
       subject,
       html,
+      replyTo: tenantEmail || undefined,
     });
 
     // 6. Update to SENT or FAILED

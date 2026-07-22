@@ -100,7 +100,8 @@ export async function POST(req: NextRequest) {
           [gymEmail],
           `📩 Website Enquiry: ${subject?.trim() || "New Message"} from ${name}`,
           htmlBody,
-          textBody
+          textBody,
+          email
         );
       } catch (emailErr) {
         // We log the error but don't fail the API request so the user still sees "Success"

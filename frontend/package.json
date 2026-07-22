@@ -6,9 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint",
+    "lint": "next lint",
     "test": "dotenv -e .env.test -- vitest run",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "audit:billing": "npx tsx scripts/verification/verify-repository.ts"
   },
   "dependencies": {
     "@ai-sdk/google": "^3.0.83",

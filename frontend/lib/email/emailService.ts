@@ -2,10 +2,12 @@ export async function sendEmail({
   to,
   subject,
   html,
+  replyTo,
 }: {
   to: string;
   subject: string;
   html: string;
+  replyTo?: string;
 }) {
   if (!process.env.RESEND_API_KEY) {
     console.warn(`[emailService] RESEND_API_KEY is not configured. Email to ${to} was not sent.`);
@@ -14,18 +16,23 @@ export async function sendEmail({
   }
 
   try {
+    const payload: any = {
+      from: "CortexFit Billing <info@thecortexsystems.com>",
+      to,
+      subject,
+      html,
+    };
+    if (replyTo) {
+      payload.reply_to = replyTo;
+    }
+
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${process.env.RESEND_API_KEY}`,
       },
-      body: JSON.stringify({
-        from: "CortexFit Billing <info@thecortexsystems.com>",
-        to,
-        subject,
-        html,
-      }),
+      body: JSON.stringify(payload),
     });
 
     if (!res.ok) {

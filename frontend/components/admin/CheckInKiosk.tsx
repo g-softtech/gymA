@@ -25,6 +25,7 @@ type CheckInResponse = {
 export function CheckInKiosk() {
   const [scanResult, setScanResult] = useState<CheckInResponse | null>(null);
   const [loading, setLoading] = useState(false);
+  const [cameraActive, setCameraActive] = useState(false);
   const [facingMode, setFacingMode] = useState<"environment" | "user">("environment");
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<any[]>([]);
@@ -178,35 +179,39 @@ export function CheckInKiosk() {
             QR Scanner
           </div>
           <div className="p-4">
-            <div className="w-full overflow-hidden rounded-lg border-2 border-dashed border-border aspect-square relative bg-muted flex items-center justify-center">
-              <Scanner 
-                constraints={{ facingMode }}
-                onScan={(result) => {
-                  if (result && result.length > 0 && !loadingRef.current) {
-                    handleScan(result[0].rawValue);
-                  }
-                }}
-                onError={(error) => {
-                  console.error("Raw Scanner error:", error);
-                  
-                  let errMsg = error?.message || "Unknown error";
-                  let errName = (error as any)?.name || "UnknownName";
+            <div className="w-full overflow-hidden rounded-lg border-2 border-dashed border-border aspect-square relative bg-muted flex flex-col items-center justify-center p-4">
+              {!cameraActive ? (
+                <div className="text-center space-y-4">
+                  <div className="text-4xl">📷</div>
+                  <h3 className="font-semibold">Start Live Scanner</h3>
+                  <p className="text-sm text-muted-foreground">For iOS/Safari, you must click the button below to allow camera access.</p>
+                  <button 
+                    onClick={() => setCameraActive(true)}
+                    className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-6 rounded-lg transition"
+                  >
+                    Turn on Camera
+                  </button>
+                </div>
+              ) : (
+                <Scanner 
+                  onScan={(result) => {
+                    if (result && result.length > 0 && !loadingRef.current) {
+                      handleScan(result[0].rawValue);
+                    }
+                  }}
+                  onError={(error) => {
+                    console.error("Raw Scanner error:", error);
+                    let errMsg = error?.message || "Unknown error";
+                    let errName = (error as any)?.name || "UnknownName";
 
-                  // Fallback to front camera if back camera is missing/denied on laptops
-                  if (facingMode === "environment" && (errName === "OverconstrainedError" || errName === "UnknownName" || errName === "NotAllowedError")) {
-                    setFacingMode("user");
-                    return;
-                  }
-
-                  // Display the exact raw error on screen for debugging
-                  setScanResult({ 
-                    error: `[DEBUG] Camera failed to start. Error: ${errName} - ${errMsg}. Please ensure your browser has camera permissions and you are on a secure (HTTPS) connection.` 
-                  });
-                }}
-                allowMultiple={true}
-                scanDelay={1000}
-                formats={["qr_code"]}
-              />
+                    setScanResult({ 
+                      error: `[DEBUG] Camera failed. Error: ${errName} - ${errMsg}. Please check iOS Privacy Settings for Safari.` 
+                    });
+                  }}
+                  allowMultiple={true}
+                  scanDelay={1000}
+                />
+              )}
             </div>
             
             <div className="mt-4 border-t border-border pt-4 text-center">

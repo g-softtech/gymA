@@ -1,1 +1,198 @@
-[]
+[
+  {
+    "file": "app/api/admin/revenue/refund/route.ts",
+    "line": 40,
+    "pattern": "Transaction DB Mutation (update)",
+    "allowed": true,
+    "reason": "Authorized lifecycle owner"
+  },
+  {
+    "file": "app/api/cron/subscriptions/route.ts",
+    "line": 61,
+    "pattern": "Subscription DB Mutation (update)",
+    "allowed": true,
+    "reason": "Authorized lifecycle owner"
+  },
+  {
+    "file": "app/api/member/subscription/route.ts",
+    "line": 109,
+    "pattern": "Subscription DB Mutation (update)",
+    "allowed": true,
+    "reason": "Authorized lifecycle owner"
+  },
+  {
+    "file": "app/api/payments/initialize/route.ts",
+    "line": 113,
+    "pattern": "Transaction DB Mutation (create)",
+    "allowed": true,
+    "reason": "Authorized lifecycle owner"
+  },
+  {
+    "file": "app/api/webhooks/platform-billing/route.ts",
+    "line": 45,
+    "pattern": "BillingEvent DB Mutation (create)",
+    "allowed": true,
+    "reason": "Authorized lifecycle owner"
+  },
+  {
+    "file": "lib/paymentFulfillment.ts",
+    "line": 227,
+    "pattern": "Transaction DB Mutation (update)",
+    "allowed": true,
+    "reason": "Authorized lifecycle owner"
+  },
+  {
+    "file": "scripts/billing-disaster-recovery.ts",
+    "line": 42,
+    "pattern": "Tenant DB Mutation (create)",
+    "allowed": true,
+    "reason": "Authorized lifecycle owner"
+  },
+  {
+    "file": "scripts/billing-disaster-recovery.ts",
+    "line": 118,
+    "pattern": "BillingEvent DB Mutation (delete)",
+    "allowed": true,
+    "reason": "Authorized lifecycle owner"
+  },
+  {
+    "file": "scripts/cleanup-tenants.ts",
+    "line": 56,
+    "pattern": "Subscription DB Mutation (delete)",
+    "allowed": true,
+    "reason": "Authorized lifecycle owner"
+  },
+  {
+    "file": "scripts/cleanup-tenants.ts",
+    "line": 59,
+    "pattern": "Transaction DB Mutation (delete)",
+    "allowed": true,
+    "reason": "Authorized lifecycle owner"
+  },
+  {
+    "file": "scripts/phase15_audit.ts",
+    "line": 13,
+    "pattern": "Transaction DB Mutation (delete)",
+    "allowed": true,
+    "reason": "Authorized lifecycle owner"
+  },
+  {
+    "file": "scripts/phase15_audit.ts",
+    "line": 16,
+    "pattern": "Subscription DB Mutation (delete)",
+    "allowed": true,
+    "reason": "Authorized lifecycle owner"
+  },
+  {
+    "file": "scripts/phase15_audit.ts",
+    "line": 51,
+    "pattern": "Transaction DB Mutation (create)",
+    "allowed": true,
+    "reason": "Authorized lifecycle owner"
+  },
+  {
+    "file": "scripts/phase15_audit.ts",
+    "line": 96,
+    "pattern": "Transaction DB Mutation (create)",
+    "allowed": true,
+    "reason": "Authorized lifecycle owner"
+  },
+  {
+    "file": "scripts/phase15_audit.ts",
+    "line": 131,
+    "pattern": "Transaction DB Mutation (create)",
+    "allowed": true,
+    "reason": "Authorized lifecycle owner"
+  },
+  {
+    "file": "scripts/phase15_audit.ts",
+    "line": 175,
+    "pattern": "Transaction DB Mutation (update)",
+    "allowed": true,
+    "reason": "Authorized lifecycle owner"
+  },
+  {
+    "file": "scripts/phase15_audit.ts",
+    "line": 188,
+    "pattern": "Transaction DB Mutation (create)",
+    "allowed": true,
+    "reason": "Authorized lifecycle owner"
+  },
+  {
+    "file": "scripts/phase15_audit.ts",
+    "line": 240,
+    "pattern": "Subscription DB Mutation (create)",
+    "allowed": true,
+    "reason": "Authorized lifecycle owner"
+  },
+  {
+    "file": "scripts/seed-bodyline.ts",
+    "line": 112,
+    "pattern": "Subscription DB Mutation (create)",
+    "allowed": true,
+    "reason": "Authorized lifecycle owner"
+  },
+  {
+    "file": "scripts/seed-demo.ts",
+    "line": 104,
+    "pattern": "Subscription DB Mutation (create)",
+    "allowed": true,
+    "reason": "Authorized lifecycle owner"
+  },
+  {
+    "file": "scripts/seed-marketing.ts",
+    "line": 11,
+    "pattern": "Tenant DB Mutation (create)",
+    "allowed": true,
+    "reason": "Authorized lifecycle owner"
+  },
+  {
+    "file": "scripts/seed-marketing.ts",
+    "line": 125,
+    "pattern": "Subscription DB Mutation (create)",
+    "allowed": true,
+    "reason": "Authorized lifecycle owner"
+  },
+  {
+    "file": "scripts/seed-sandboxes.ts",
+    "line": 119,
+    "pattern": "Subscription DB Mutation (create)",
+    "allowed": true,
+    "reason": "Authorized lifecycle owner"
+  },
+  {
+    "file": "scripts/seed-tenant.ts",
+    "line": 34,
+    "pattern": "Tenant DB Mutation (delete)",
+    "allowed": true,
+    "reason": "Authorized lifecycle owner"
+  },
+  {
+    "file": "scripts/seed-tenant.ts",
+    "line": 51,
+    "pattern": "Tenant DB Mutation (create)",
+    "allowed": true,
+    "reason": "Authorized lifecycle owner"
+  },
+  {
+    "file": "scripts/seed-tenant.ts",
+    "line": 141,
+    "pattern": "Subscription DB Mutation (create)",
+    "allowed": true,
+    "reason": "Authorized lifecycle owner"
+  },
+  {
+    "file": "scripts/seed-tenant.ts",
+    "line": 161,
+    "pattern": "Subscription DB Mutation (create)",
+    "allowed": true,
+    "reason": "Authorized lifecycle owner"
+  },
+  {
+    "file": "scripts/seed-test-users.ts",
+    "line": 24,
+    "pattern": "Tenant DB Mutation (create)",
+    "allowed": true,
+    "reason": "Authorized lifecycle owner"
+  }
+]

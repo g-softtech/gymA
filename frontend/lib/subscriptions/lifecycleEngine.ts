@@ -64,6 +64,7 @@ export async function processExpiringSubscriptions() {
       to: user.email,
       subject: `Your Membership is Expiring Soon`,
       html,
+      replyTo: sub.tenant.email || undefined,
     });
 
     if (emailSent.success) {
@@ -133,6 +134,7 @@ export async function processExpiringSubscriptions() {
       to: user.email,
       subject: `Your Membership has Expired`,
       html,
+      replyTo: sub.tenant.email || undefined,
     });
 
     if (emailSent.success) {
