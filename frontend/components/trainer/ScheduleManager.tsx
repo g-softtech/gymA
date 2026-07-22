@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { toast } from "react-hot-toast";
 
 const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 const TIME_SLOTS = [
@@ -41,10 +43,34 @@ export default function ScheduleManager({
   const [availability, setAvailability] = useState<Record<string, string[]>>(
     initialAvailability ?? {}
   );
+  const [localBookings, setLocalBookings] = useState<BookingItem[]>(bookings);
+  const router = useRouter();
+
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [activeTab, setActiveTab] = useState<"availability" | "calendar">("availability");
   const [currentMonth, setCurrentMonth] = useState(new Date());
+
+  const handleUpdateStatus = async (bookingId: string, status: string) => {
+    try {
+      setLocalBookings(prev => prev.map(b => b.id === bookingId ? { ...b, status } : b));
+      const res = await fetch(`/api/bookings/${bookingId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status })
+      });
+      if (res.ok) {
+        toast.success(`Booking ${status.toLowerCase()}`);
+        router.refresh();
+      } else {
+        toast.error("Failed to update status");
+        setLocalBookings(bookings); // revert on failure
+      }
+    } catch (err) {
+      toast.error("Network error");
+      setLocalBookings(bookings); // revert on failure
+    }
+  };
 
   const toggleSlot = (day: string, slot: string) => {
     const current = availability[day] ?? [];
@@ -89,7 +115,7 @@ export default function ScheduleManager({
   };
 
   const getBookingsForDate = (date: Date) => {
-    return bookings.filter((b) => {
+    return localBookings.filter((b) => {
       const bd = new Date(b.date);
       return (
         bd.getDate() === date.getDate() &&
@@ -359,7 +385,25 @@ export default function ScheduleManager({
                             })}
                             {" · "}{b.durationMins}min · {b.sessionType}
                           </p>
-                          <p className="capitalize mt-0.5 font-medium">{b.status.toLowerCase()}</p>
+                          <div className="flex items-center justify-between">
+                            <p className="capitalize mt-0.5 font-medium">{b.status.toLowerCase()}</p>
+                            {b.status === "PENDING" && (
+                              <div className="flex gap-2 mt-2">
+                                <button
+                                  onClick={(e) => { e.stopPropagation(); handleUpdateStatus(b.id, "CONFIRMED"); }}
+                                  className="px-3 py-1 bg-green-100 text-green-700 hover:bg-green-200 rounded-md font-medium transition"
+                                >
+                                  Approve
+                                </button>
+                                <button
+                                  onClick={(e) => { e.stopPropagation(); handleUpdateStatus(b.id, "CANCELLED"); }}
+                                  className="px-3 py-1 bg-red-100 text-red-700 hover:bg-red-200 rounded-md font-medium transition"
+                                >
+                                  Reject
+                                </button>
+                              </div>
+                            )}
+                          </div>
                         </div>
                       ))}
                     </div>
