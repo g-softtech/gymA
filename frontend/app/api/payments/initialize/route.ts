@@ -129,9 +129,9 @@ export async function POST(req: Request) {
     const paystackAmount = Math.round(amountFloat * 100);
     const callback_url = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/gym/${tenant?.slug}/dashboard/member?payment=verify`;
 
-    const safeEmail = (session.user.email && session.user.email.includes("@")) 
+    const safeEmail = (session.user.email && session.user.email.includes("@") && !session.user.email.endsWith(".local")) 
       ? session.user.email.trim() 
-      : `guest_${session.user.id.substring(0, 8)}@sandbox.local`;
+      : `guest_${session.user.id.substring(0, 8)}@example.com`;
 
     const paystackData = await initializePaystackTransaction({
       amount: paystackAmount,

@@ -80,7 +80,7 @@ export default function CheckoutButton({
         return;
       }
 
-      const safeEmail = (email && email.includes("@")) ? email.trim() : `guest_${userId.substring(0, 8)}@sandbox.local`;
+      const safeEmail = (email && email.includes("@") && !email.endsWith(".local")) ? email.trim() : `guest_${userId.substring(0, 8)}@example.com`;
       const paystack = new PaystackPop();
       paystack.newTransaction({
         key: paystackKey,
