@@ -3,9 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Scanner as OriginalScanner } from '@yudiel/react-qr-scanner';
 import dynamic from 'next/dynamic';
-import { Html5Qrcode } from 'html5-qrcode';
-
-const Scanner = dynamic(() => import('@yudiel/react-qr-scanner').then(mod => mod.Scanner), { ssr: false });
+import { Html5Qrcode, Html5QrcodeScanner } from 'html5-qrcode';
 
 type MemberData = {
   id: string;
@@ -25,7 +23,6 @@ type CheckInResponse = {
 export function CheckInKiosk() {
   const [scanResult, setScanResult] = useState<CheckInResponse | null>(null);
   const [loading, setLoading] = useState(false);
-  const [cameraActive, setCameraActive] = useState(false);
   const [facingMode, setFacingMode] = useState<"environment" | "user">("environment");
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<any[]>([]);
@@ -39,6 +36,32 @@ export function CheckInKiosk() {
   useEffect(() => {
     loadingRef.current = loading;
   }, [loading]);
+
+  useEffect(() => {
+    // Only initialize scanner on the client side
+    if (typeof window !== "undefined") {
+      const scanner = new Html5QrcodeScanner(
+        "html5qr-reader",
+        { fps: 10, qrbox: { width: 250, height: 250 } },
+        false
+      );
+
+      scanner.render(
+        (decodedText) => {
+          if (!loadingRef.current) {
+            handleScan(decodedText);
+          }
+        },
+        (error) => {
+          // ignore background errors to prevent spamming
+        }
+      );
+
+      return () => {
+        scanner.clear().catch(console.error);
+      };
+    }
+  }, []);
 
   const handleScan = async (token: string) => {
     if (!navigator.onLine) {
@@ -179,39 +202,8 @@ export function CheckInKiosk() {
             QR Scanner
           </div>
           <div className="p-4">
-            <div className="w-full overflow-hidden rounded-lg border-2 border-dashed border-border aspect-square relative bg-muted flex flex-col items-center justify-center p-4">
-              {!cameraActive ? (
-                <div className="text-center space-y-4">
-                  <div className="text-4xl">📷</div>
-                  <h3 className="font-semibold">Start Live Scanner</h3>
-                  <p className="text-sm text-muted-foreground">For iOS/Safari, you must click the button below to allow camera access.</p>
-                  <button 
-                    onClick={() => setCameraActive(true)}
-                    className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-6 rounded-lg transition"
-                  >
-                    Turn on Camera
-                  </button>
-                </div>
-              ) : (
-                <Scanner 
-                  onScan={(result) => {
-                    if (result && result.length > 0 && !loadingRef.current) {
-                      handleScan(result[0].rawValue);
-                    }
-                  }}
-                  onError={(error) => {
-                    console.error("Raw Scanner error:", error);
-                    let errMsg = error?.message || "Unknown error";
-                    let errName = (error as any)?.name || "UnknownName";
-
-                    setScanResult({ 
-                      error: `[DEBUG] Camera failed. Error: ${errName} - ${errMsg}. Please check iOS Privacy Settings for Safari.` 
-                    });
-                  }}
-                  allowMultiple={true}
-                  scanDelay={1000}
-                />
-              )}
+            <div className="w-full overflow-hidden rounded-lg border-2 border-dashed border-border bg-muted p-4">
+              <div id="html5qr-reader" className="w-full"></div>
             </div>
             
             <div className="mt-4 border-t border-border pt-4 text-center">
