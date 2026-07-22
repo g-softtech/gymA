@@ -14,6 +14,7 @@ interface Trainer {
   title: string | null;
   yearsOfExperience: number | null;
   publicPhotoUrl: string | null;
+  availability: Record<string, string[]>;
 }
 
 interface Props {
@@ -33,11 +34,18 @@ export default function BookTrainerClient({ tenantId, memberId, trainers }: Prop
   // Generate the next 14 days for selection
   const days = Array.from({ length: 14 }).map((_, i) => addDays(new Date(), i));
 
-  // Mock available time slots (since we don't have a schedule engine yet)
-  const timeSlots = [
-    "08:00 AM", "09:00 AM", "10:00 AM", "11:00 AM",
-    "02:00 PM", "03:00 PM", "04:00 PM", "05:00 PM"
-  ];
+  // Derive time slots from the trainer's availability for the selected date
+  const dayName = format(selectedDate, "EEEE");
+  const rawTimeSlots = selectedTrainer?.availability?.[dayName] || [];
+  
+  const timeSlots = rawTimeSlots.map(time => {
+    const [h, m] = time.split(":");
+    let hours = parseInt(h, 10);
+    const ampm = hours >= 12 ? "PM" : "AM";
+    hours = hours % 12;
+    hours = hours ? hours : 12; // the hour '0' should be '12'
+    return `${hours.toString().padStart(2, '0')}:${m} ${ampm}`;
+  });
 
   const handleBook = async () => {
     if (!selectedTrainer || !selectedTime) return;
@@ -145,22 +153,28 @@ export default function BookTrainerClient({ tenantId, memberId, trainers }: Prop
               Available Times on {format(selectedDate, "MMM do")}
             </h3>
             
-            <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
-              {timeSlots.map(time => {
-                const isSelected = selectedTime === time;
-                return (
-                  <button
-                    key={time}
-                    onClick={() => { setSelectedTime(time); setError(""); }}
-                    className={`py-2 px-1 text-sm font-semibold rounded-lg border transition ${
-                      isSelected ? "bg-indigo-50 border-indigo-600 text-indigo-700 ring-1 ring-indigo-600" : "bg-card text-card-foreground border-border text-foreground hover:border-indigo-300"
-                    }`}
-                  >
-                    {time}
-                  </button>
-                )
-              })}
-            </div>
+            {timeSlots.length > 0 ? (
+              <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
+                {timeSlots.map(time => {
+                  const isSelected = selectedTime === time;
+                  return (
+                    <button
+                      key={time}
+                      onClick={() => { setSelectedTime(time); setError(""); }}
+                      className={`py-2 px-1 text-sm font-semibold rounded-lg border transition ${
+                        isSelected ? "bg-indigo-50 border-indigo-600 text-indigo-700 ring-1 ring-indigo-600" : "bg-card text-card-foreground border-border text-foreground hover:border-indigo-300"
+                      }`}
+                    >
+                      {time}
+                    </button>
+                  )
+                })}
+              </div>
+            ) : (
+              <div className="p-4 text-sm text-center text-muted-foreground bg-muted rounded-lg border border-border">
+                No trainer schedule available on this day.
+              </div>
+            )}
 
             {error && (
               <div className="mt-6 p-4 bg-destructive/10 text-destructive rounded-lg border border-red-100 text-sm font-medium">

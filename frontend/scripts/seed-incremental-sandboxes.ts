@@ -54,6 +54,7 @@ async function main() {
         data: {
           name: sb.name,
           slug: sb.slug,
+          isDemo: true,
           settings: {
             create: {
               description: sb.description,

@@ -70,6 +70,7 @@ export default async function BookTrainerPage({
           title: t.trainerProfile!.title,
           yearsOfExperience: t.trainerProfile!.yearsOfExperience,
           publicPhotoUrl: t.trainerProfile!.publicPhotoUrl,
+          availability: (t.trainerProfile!.availability as Record<string, string[]>) || {},
         }))} 
       />
     </div>
