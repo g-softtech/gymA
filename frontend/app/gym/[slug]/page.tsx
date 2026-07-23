@@ -60,14 +60,32 @@ export async function generateMetadata({
     hero?.subheadline ??
     `Join ${tenant.name} and start your fitness journey today.`;
 
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://cortexfit.vercel.app";
+  const canonicalUrl = `${baseUrl}/gym/${slug}`;
+
+  // Safe image fallbacks
+  const ogImageUrl = s?.ogImageUrl || s?.logoUrl || hero?.bgImageUrl || `${baseUrl}/images/default-gym-og.png`;
+
   return {
     title,
     description,
+    alternates: {
+      canonical: canonicalUrl,
+    },
     icons: { icon: s?.faviconUrl ?? "/favicon.ico" },
     openGraph: {
       title,
       description,
-      images: s?.ogImageUrl ? [{ url: s.ogImageUrl }] : s?.logoUrl ? [{ url: s.logoUrl }] : [],
+      url: canonicalUrl,
+      siteName: brandName,
+      type: "website",
+      images: [{ url: ogImageUrl, width: 1200, height: 630, alt: brandName }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [ogImageUrl],
     },
   };
 }
@@ -151,9 +169,33 @@ export default async function GymPublicPage({
   const gradientMain = `linear-gradient(135deg, ${primary}, ${secondary})`;
   const gradientSoft = `linear-gradient(135deg, ${primary}15, ${secondary}20)`;
 
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://cortexfit.vercel.app";
+  const canonicalUrl = `${baseUrl}/gym/${slug}`;
+
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "HealthAndBeautyBusiness",
+    "name": s?.brandName || tenant.name,
+    "description": heroSub,
+    "url": canonicalUrl,
+    "image": optimizeImageUrl(heroBg) || optimizeImageUrl(s?.logoUrl) || `${baseUrl}/images/default-gym-og.png`,
+    ...(s?.address && {
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": s.address
+      }
+    }),
+    ...(s?.phone && { "telephone": s.phone }),
+  };
+
   return (
-    <TenantThemeProvider settings={s}>
-      <div className="min-h-screen w-full overflow-x-hidden bg-background text-foreground" style={{ fontFamily: s?.fontFamily ? `'${s.fontFamily}', system-ui, sans-serif` : undefined }}>
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <TenantThemeProvider settings={s}>
+        <div className="min-h-screen w-full overflow-x-hidden bg-background text-foreground" style={{ fontFamily: s?.fontFamily ? `'${s.fontFamily}', system-ui, sans-serif` : undefined }}>
 
         {/* ── Nav ────────────────────────────────────────────────────────────── */}
         <nav
@@ -979,5 +1021,6 @@ export default async function GymPublicPage({
 
       </div>
     </TenantThemeProvider>
+    </>
   );
 }
