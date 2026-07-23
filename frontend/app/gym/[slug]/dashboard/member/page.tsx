@@ -78,7 +78,7 @@ export default async function MemberDashboardPage({
     orderBy: { price: "desc" },
   });
 
-  const isHighestPlan = activeSub && highestPlan && activeSub.plan.price >= highestPlan.price;
+  const isHighestPlan = activeSub && highestPlan && (activeSub.plan?.price ?? 0) >= highestPlan.price;
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
@@ -115,7 +115,7 @@ export default async function MemberDashboardPage({
           <div className="space-y-3">
             <div className="flex justify-between">
               <span className="text-muted-foreground">Plan</span>
-              <span className="font-medium text-foreground">{activeSub.plan.name}</span>
+              <span className="font-medium text-foreground">{activeSub.plan?.name || "Custom Plan"}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">Status</span>
