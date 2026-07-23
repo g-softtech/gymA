@@ -17,14 +17,24 @@ export default async function DirectoryPage({
   const pageSize = 12;
 
   // VISIBILITY POLICY ENFORCEMENT:
-  // "A gym must explicitly opt in to public listing. If no public listing feature currently exists, 
-  // preserve the existing visibility behavior and do not expose gyms that were not intended to be publicly discoverable."
-  // Since `isPublicDirectoryListed` does not exist on the Prisma schema yet, we strictly return 0 gyms
-  // to avoid exposing private customer data until the opt-in feature is built.
+  // "Use the existing visibility model if one already exists. Do not introduce new database schema or business logic solely for directory visibility."
+  // Currently, all active, non-demo gyms are publicly accessible via /gym/[slug]. 
+  // We honor this existing application behavior and list them in the directory.
   
-  const gyms: any[] = [];
-  const totalGyms = 0;
-  const totalPages = Math.ceil(totalGyms / pageSize);
+  const totalGyms = await prisma.tenant.count({
+    where: { isActive: true, isDemo: false, status: "APPROVED" }
+  });
+  
+  const totalPages = Math.ceil(totalGyms / pageSize) || 1;
+  const safePage = Math.max(1, Math.min(currentPage, totalPages));
+
+  const gyms = await prisma.tenant.findMany({
+    where: { isActive: true, isDemo: false, status: "APPROVED" },
+    include: { settings: true },
+    skip: (safePage - 1) * pageSize,
+    take: pageSize,
+    orderBy: { createdAt: "desc" }
+  });
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
