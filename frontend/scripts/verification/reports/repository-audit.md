@@ -1,6 +1,6 @@
 # Repository Audit Report
 
-Total Findings: 28
+Total Findings: 30
 Unauthorized Mutations: 0
 
 | File | Line | Pattern | Allowed | Reason |
@@ -15,6 +15,8 @@ Unauthorized Mutations: 0
 | scripts/billing-disaster-recovery.ts | 118 | `BillingEvent DB Mutation (delete)` | ✅ | Authorized lifecycle owner |
 | scripts/cleanup-tenants.ts | 56 | `Subscription DB Mutation (delete)` | ✅ | Authorized lifecycle owner |
 | scripts/cleanup-tenants.ts | 59 | `Transaction DB Mutation (delete)` | ✅ | Authorized lifecycle owner |
+| scripts/fill-sandboxes.ts | 96 | `Subscription DB Mutation (delete)` | ✅ | Authorized lifecycle owner |
+| scripts/fill-sandboxes.ts | 101 | `Subscription DB Mutation (create)` | ✅ | Authorized lifecycle owner |
 | scripts/phase15_audit.ts | 13 | `Transaction DB Mutation (delete)` | ✅ | Authorized lifecycle owner |
 | scripts/phase15_audit.ts | 16 | `Subscription DB Mutation (delete)` | ✅ | Authorized lifecycle owner |
 | scripts/phase15_audit.ts | 51 | `Transaction DB Mutation (create)` | ✅ | Authorized lifecycle owner |

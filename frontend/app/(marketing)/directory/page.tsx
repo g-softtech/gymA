@@ -33,7 +33,7 @@ export default async function DirectoryPage({
     include: { settings: true },
     skip: (safePage - 1) * pageSize,
     take: pageSize,
-    orderBy: { createdAt: "desc" }
+    orderBy: { id: "desc" }
   });
 
   return (

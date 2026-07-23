@@ -16,9 +16,9 @@
     "failures": 0
   },
   "repository": {
-    "executedAt": "2026-07-22T07:41:10.637Z",
+    "executedAt": "2026-07-23T18:26:34.869Z",
     "status": "PASS",
-    "findingCount": 28,
+    "findingCount": 30,
     "unauthorizedCount": 0
   },
   "email": {

@@ -8,6 +8,7 @@ import type { User, MemberProfile, Subscription, MembershipPlan } from "@prisma/
 import MembershipAnalyticsClient from "./MembershipAnalyticsClient";
 import UpgradeIntelligenceClient from "./UpgradeIntelligenceClient";
 import ImpersonateButton from "@/components/admin/ImpersonateButton";
+import MemberCsvImportModal from "@/components/admin/MemberCsvImportModal";
 
 type UserWithProfile = User & {
   memberProfile:
@@ -68,12 +69,15 @@ export default async function AdminMembersPage({
           <h1 className="text-2xl font-bold text-foreground">Members</h1>
           <p className="text-muted-foreground mt-1">{members.length} registered member{members.length !== 1 ? "s" : ""}</p>
         </div>
-        <Link 
-          href={`/gym/${slug}/dashboard/admin/members/health`}
-          className="bg-primary text-primary-foreground hover:bg-primary/90 px-4 py-2 rounded-md font-medium text-sm transition-colors"
-        >
-          View Subscription Health
-        </Link>
+        <div className="flex gap-3">
+          <MemberCsvImportModal />
+          <Link 
+            href={`/gym/${slug}/dashboard/admin/members/health`}
+            className="bg-primary text-primary-foreground hover:bg-primary/90 px-4 py-2 rounded-md font-medium text-sm transition-colors"
+          >
+            View Subscription Health
+          </Link>
+        </div>
       </div>
 
       <MembershipAnalyticsClient />

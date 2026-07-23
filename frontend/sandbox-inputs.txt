@@ -1,0 +1,4 @@
+yes
+Apollo Gym
+/logos/apollo.png
+#3b82f6

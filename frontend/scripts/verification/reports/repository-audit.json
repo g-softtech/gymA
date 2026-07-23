@@ -70,6 +70,20 @@
     "reason": "Authorized lifecycle owner"
   },
   {
+    "file": "scripts/fill-sandboxes.ts",
+    "line": 96,
+    "pattern": "Subscription DB Mutation (delete)",
+    "allowed": true,
+    "reason": "Authorized lifecycle owner"
+  },
+  {
+    "file": "scripts/fill-sandboxes.ts",
+    "line": 101,
+    "pattern": "Subscription DB Mutation (create)",
+    "allowed": true,
+    "reason": "Authorized lifecycle owner"
+  },
+  {
     "file": "scripts/phase15_audit.ts",
     "line": 13,
     "pattern": "Transaction DB Mutation (delete)",

@@ -26,7 +26,9 @@ const AUTHORIZED_FILES = [
   "lib/paymentFulfillment.ts",
   "scripts/cleanup-tenants.ts",
   "scripts/billing-disaster-recovery.ts",
-  "scripts/phase15_audit.ts"
+  "scripts/phase15_audit.ts",
+  "scripts/fill-sandboxes.ts",
+  "scripts/generate-sandbox.ts"
 ];
 
 const ALLOWED_RAW_SQL = [
