@@ -44,17 +44,17 @@ export default async function TrainerWorkoutsPage({
   // Deduplicate clients from bookings
   const clientMap = new Map<string, { id: string; name: string }>();
   trainerProfile.bookings.forEach((b: any) => {
-    if (!clientMap.has(b.memberId)) {
+    if (b?.memberId && !clientMap.has(b.memberId)) {
       clientMap.set(b.memberId, {
         id: b.memberId,
-        name: b.member.user.name ?? b.member.user.email ?? "Unknown",
+        name: b.member?.user?.name ?? b.member?.user?.email ?? "Unknown",
       });
     }
   });
   const clients = Array.from(clientMap.values());
 
   const filteredPlans = memberId
-    ? trainerProfile.workoutPlans.filter((w: WorkoutWithMember) => w.memberId === memberId)
+    ? trainerProfile.workoutPlans.filter((w: WorkoutWithMember) => w?.memberId === memberId)
     : trainerProfile.workoutPlans;
 
   return (
@@ -70,10 +70,10 @@ export default async function TrainerWorkoutsPage({
           id: w.id,
           title: w.title,
           memberId: w.memberId,
-          memberName: w.member.user.name ?? w.member.user.email ?? "Unknown",
+          memberName: w.member?.user?.name ?? w.member?.user?.email ?? "Unknown",
           routines: w.routines as any,
           isAiGenerated: w.isAiGenerated,
-          createdAt: w.createdAt.toISOString(),
+          createdAt: w.createdAt?.toISOString() ?? new Date().toISOString(),
         }))}
         filterMemberId={memberId}
       />

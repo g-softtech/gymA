@@ -263,13 +263,13 @@ export default function WorkoutPlanManager({ trainerId, clients, initialPlans, f
                 <button onClick={() => handleDelete(plan.id)} className="text-sm text-red-500 hover:underline">Delete</button>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                {plan.routines.map((r, i) => (
+                {(plan.routines || []).map((r, i) => (
                   <div key={i} className="bg-muted rounded-lg p-3">
-                    <p className="text-xs font-semibold text-indigo-600 mb-2">{r.day}</p>
+                    <p className="text-xs font-semibold text-indigo-600 mb-2">{r?.day || "Day"}</p>
                     <ul className="space-y-1">
-                      {r.exercises.map((ex, j) => (
+                      {(r?.exercises || []).map((ex, j) => (
                         <li key={j} className="text-xs text-muted-foreground">
-                          {ex.name} — {ex.sets}×{ex.reps} ({ex.rest} rest)
+                          {ex?.name} — {ex?.sets}×{ex?.reps} ({ex?.rest} rest)
                         </li>
                       ))}
                     </ul>
