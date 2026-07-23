@@ -138,10 +138,10 @@ export default async function SubscriptionHealthDashboard({
             tableData.map((sub) => (
               <tr key={sub.id} className="hover:bg-muted/50 transition-colors">
                 <td className="px-6 py-4">
-                  <span className="font-medium text-foreground">{sub.member.user.name || sub.member.user.email || "—"}</span>
+                  <span className="font-medium text-foreground">{sub.member?.user?.name || sub.member?.user?.email || "—"}</span>
                 </td>
                 <td className="px-6 py-4">
-                  <span className="text-sm">{sub.plan.name}</span>
+                  <span className="text-sm">{sub.plan?.name || "Custom Plan"}</span>
                 </td>
                 <td className="px-6 py-4">
                   <span
