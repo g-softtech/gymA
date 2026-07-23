@@ -36,9 +36,15 @@ export default function BookTrainerClient({ tenantId, memberId, trainers }: Prop
 
   // Derive time slots from the trainer's availability for the selected date
   const dayName = format(selectedDate, "EEEE");
-  const rawTimeSlots = selectedTrainer?.availability?.[dayName] || [];
+  const rawTimeSlots = selectedTrainer?.availability?.[dayName] 
+    || selectedTrainer?.availability?.[dayName.toLowerCase()] 
+    || [];
   
   const timeSlots = rawTimeSlots.map(time => {
+    // If it's a range like "06:00-10:00", just display it as is, or format the start time.
+    // For simplicity, if it contains a dash, we return it as is, because it's a custom block.
+    if (time.includes("-")) return time;
+
     const [h, m] = time.split(":");
     let hours = parseInt(h, 10);
     const ampm = hours >= 12 ? "PM" : "AM";
@@ -55,10 +61,18 @@ export default function BookTrainerClient({ tenantId, memberId, trainers }: Prop
     setSuccess(false);
 
     // Construct the requested date/time
-    const [time, ampm] = selectedTime.split(" ");
-    let [hours, minutes] = time.split(":").map(Number);
-    if (ampm === "PM" && hours !== 12) hours += 12;
-    if (ampm === "AM" && hours === 12) hours = 0;
+    let hours = 0, minutes = 0;
+    
+    if (selectedTime.includes("-")) {
+      // It's a range like "06:00-10:00", we just book the start time for now
+      const startTime = selectedTime.split("-")[0];
+      [hours, minutes] = startTime.split(":").map(Number);
+    } else {
+      const [time, ampm] = selectedTime.split(" ");
+      [hours, minutes] = time.split(":").map(Number);
+      if (ampm === "PM" && hours !== 12) hours += 12;
+      if (ampm === "AM" && hours === 12) hours = 0;
+    }
     
     const bookingDate = new Date(selectedDate);
     bookingDate.setHours(hours, minutes, 0, 0);
