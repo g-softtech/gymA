@@ -1,22 +1,9 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { Scanner as OriginalScanner, setZXingModuleOverrides } from '@yudiel/react-qr-scanner';
 import dynamic from 'next/dynamic';
 import { Html5Qrcode, Html5QrcodeScanner } from 'html5-qrcode';
-
-// Configure the scanner to use the self-hosted WebAssembly file
-// to prevent Content Security Policy blocks and CDN failures.
-if (typeof window !== 'undefined') {
-  setZXingModuleOverrides({
-    locateFile: (path, prefix) => {
-      if (path.endsWith('.wasm')) {
-        return '/zxing_reader.wasm';
-      }
-      return prefix + path;
-    },
-  });
-}
+import { JsqrScanner } from "./JsqrScanner";
 
 type MemberData = {
   id: string;
@@ -193,15 +180,8 @@ export function CheckInKiosk() {
           </div>
           <div className="p-4">
             <div className="w-full overflow-hidden rounded-lg border-2 border-dashed border-border bg-muted p-4">
-              <OriginalScanner 
-                constraints={{ facingMode: "environment" }}
-                onScan={(result) => {
-                  console.log("SCAN RESULT:", result);
-                  if (result && result.length > 0 && !loadingRef.current) {
-                     console.log("RAW VALUE:", result[0].rawValue);
-                     handleScan(result[0].rawValue);
-                  }
-                }}
+              <JsqrScanner 
+                onScan={handleScan}
                 onError={(error) => console.log(error?.message)}
               />
             </div>
