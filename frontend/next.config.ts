@@ -24,6 +24,7 @@ const nextConfig: NextConfig = {
               "font-src 'self' data: https: https://fonts.gstatic.com",
               "frame-src 'self' https://checkout.paystack.com https://maps.google.com https://www.google.com",
               "connect-src 'self' https://api.paystack.co https://checkout.paystack.com",
+              "media-src 'self' data: blob:",
             ].join("; "),
           },
           {

@@ -1,9 +1,22 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { Scanner as OriginalScanner } from '@yudiel/react-qr-scanner';
+import { Scanner as OriginalScanner, setZXingModuleOverrides } from '@yudiel/react-qr-scanner';
 import dynamic from 'next/dynamic';
 import { Html5Qrcode, Html5QrcodeScanner } from 'html5-qrcode';
+
+// Configure the scanner to use the self-hosted WebAssembly file
+// to prevent Content Security Policy blocks and CDN failures.
+if (typeof window !== 'undefined') {
+  setZXingModuleOverrides({
+    locateFile: (path, prefix) => {
+      if (path.endsWith('.wasm')) {
+        return '/zxing_reader.wasm';
+      }
+      return prefix + path;
+    },
+  });
+}
 
 type MemberData = {
   id: string;
