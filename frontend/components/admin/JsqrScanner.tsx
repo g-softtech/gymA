@@ -50,24 +50,33 @@ export function JsqrScanner({ onScan, onError }: JsqrScannerProps) {
     if (video && video.readyState >= 2 && video.videoWidth > 0 && canvas) {
       const ctx = canvas.getContext("2d", { willReadFrequently: true });
       if (ctx) {
-        if (canvas.width !== video.videoWidth || canvas.height !== video.videoHeight) {
-          canvas.width = video.videoWidth;
-          canvas.height = video.videoHeight;
+        // OPTIMIZATION: Scale down massive 4K/HD video feeds to max 600px wide
+        // This prevents jsQR from choking the CPU on high-end phones
+        const scale = Math.min(1, 600 / video.videoWidth);
+        const drawWidth = Math.floor(video.videoWidth * scale);
+        const drawHeight = Math.floor(video.videoHeight * scale);
+
+        if (canvas.width !== drawWidth || canvas.height !== drawHeight) {
+          canvas.width = drawWidth;
+          canvas.height = drawHeight;
         }
 
         if (now - lastScanTimeRef.current >= 150) {
           lastScanTimeRef.current = now;
           scanCountRef.current += 1;
 
-          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-          const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+          // Draw scaled video frame to hidden canvas
+          ctx.drawImage(video, 0, 0, drawWidth, drawHeight);
+          const imageData = ctx.getImageData(0, 0, drawWidth, drawHeight);
           
-          // Debug check: Are all pixels completely black/zero?
           const isBlank = imageData.data[0] === 0 && imageData.data[1] === 0 && imageData.data[2] === 0 && imageData.data[100] === 0;
           
-          setDebug(`Res:${canvas.width}x${canvas.height}|Scans:${scanCountRef.current}|Blank:${isBlank}`);
+          setDebug(`Res:${video.videoWidth}x${video.videoHeight} | Canvas:${drawWidth}x${drawHeight} | Scans:${scanCountRef.current}`);
 
-          const code = jsQR(imageData.data, imageData.width, imageData.height);
+          // Decode using pure math
+          const code = jsQR(imageData.data, imageData.width, imageData.height, {
+            inversionAttempts: "dontInvert" // Faster CPU execution
+          });
 
           if (code && code.data) {
             setDebug(`SUCCESS: ${code.data.substring(0, 10)}...`);
