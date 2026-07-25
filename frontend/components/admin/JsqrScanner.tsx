@@ -15,6 +15,9 @@ export function JsqrScanner({ onScan, onError }: JsqrScannerProps) {
   const [cameraError, setCameraError] = useState<string | null>(null);
   const [isScanning, setIsScanning] = useState(true);
 
+  const [debug, setDebug] = useState("Initializing...");
+  const scanCountRef = useRef(0);
+
   // Time tracking for 150ms throttling
   const lastScanTimeRef = useRef<number>(0);
 
@@ -42,33 +45,32 @@ export function JsqrScanner({ onScan, onError }: JsqrScannerProps) {
 
     const video = videoRef.current;
     const canvas = canvasRef.current;
-
-    // Output debug to console periodically
     const now = performance.now();
 
-    if (video && video.readyState === video.HAVE_ENOUGH_DATA && canvas) {
+    // Relaxed readyState check: >= 2 (HAVE_CURRENT_DATA)
+    if (video && video.readyState >= 2 && video.videoWidth > 0 && canvas) {
       const ctx = canvas.getContext("2d", { willReadFrequently: true });
       if (ctx) {
         if (canvas.width !== video.videoWidth || canvas.height !== video.videoHeight) {
           canvas.width = video.videoWidth;
           canvas.height = video.videoHeight;
-          console.log(`[jsQR] Canvas resized to ${canvas.width}x${canvas.height}`);
         }
 
-        // Throttle to roughly every 150ms (~6 fps) to save CPU
         if (now - lastScanTimeRef.current >= 150) {
           lastScanTimeRef.current = now;
+          scanCountRef.current += 1;
 
           ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
           const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
           
-          // Let jsQR try to invert if needed (slower but more robust)
+          setDebug(`Res: ${canvas.width}x${canvas.height} | Scans: ${scanCountRef.current}`);
+
           const code = jsQR(imageData.data, imageData.width, imageData.height, {
             inversionAttempts: "attemptBoth"
           });
 
           if (code && code.data) {
-            console.log("[jsQR] SUCCESSFUL SCAN:", code.data);
+            setDebug(`SUCCESS: ${code.data.substring(0, 10)}...`);
             setIsScanning(false);
             stopCamera();
             onScanRef.current(code.data);
@@ -76,6 +78,9 @@ export function JsqrScanner({ onScan, onError }: JsqrScannerProps) {
           }
         }
       }
+    } else if (video) {
+       // If video isn't ready yet, update debug
+       setDebug(`Waiting... ReadyState: ${video.readyState}, Width: ${video.videoWidth}`);
     }
 
     if (isScanning) {
@@ -88,17 +93,16 @@ export function JsqrScanner({ onScan, onError }: JsqrScannerProps) {
 
     async function startCamera() {
       try {
+        setDebug("Requesting camera...");
         const stream = await navigator.mediaDevices.getUserMedia({
-          video: { 
-            facingMode: { ideal: "environment" }
-          }
+          video: { facingMode: { ideal: "environment" } }
         });
 
         if (mounted && videoRef.current) {
+          setDebug("Camera granted. Starting...");
           videoRef.current.srcObject = stream;
           videoRef.current.setAttribute("playsinline", "true"); 
           await videoRef.current.play();
-          console.log("[jsQR] Camera started, starting tick loop");
           requestRef.current = requestAnimationFrame(tick);
         }
       } catch (err: any) {
@@ -117,7 +121,7 @@ export function JsqrScanner({ onScan, onError }: JsqrScannerProps) {
       stopCamera();
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isScanning]); // Only re-run if isScanning changes
+  }, [isScanning]); 
 
   if (cameraError) {
     return (
@@ -139,34 +143,33 @@ export function JsqrScanner({ onScan, onError }: JsqrScannerProps) {
         className="absolute inset-0 min-w-full min-h-full object-cover"
         muted
         playsInline
+        autoPlay
       />
 
       {/* Targeting Overlay Wrapper */}
       <div className="absolute inset-0 z-10 pointer-events-none">
-        {/* Semi-transparent mask surrounding the target box */}
         <div className="absolute inset-0 border-[60px] border-black/40 backdrop-blur-[1px]"></div>
         
-        {/* The Targeting Box */}
         <div className="absolute inset-0 m-[60px] border-2 border-indigo-500/80 shadow-[0_0_0_9999px_rgba(0,0,0,0.4)] sm:shadow-none">
-          
-          {/* Corner Brackets */}
           <div className="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-white -translate-x-[2px] -translate-y-[2px]"></div>
           <div className="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-white translate-x-[2px] -translate-y-[2px]"></div>
           <div className="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-white -translate-x-[2px] translate-y-[2px]"></div>
           <div className="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-white translate-x-[2px] translate-y-[2px]"></div>
           
-          {/* Scanning Animation Line */}
           {isScanning && (
             <div className="absolute top-0 left-0 w-full h-[2px] bg-indigo-500 shadow-[0_0_12px_4px_rgba(99,102,241,0.5)] animate-[scan_2s_ease-in-out_infinite]" />
           )}
 
-          {/* Centered Instruction Text */}
           <div className="absolute inset-0 flex items-center justify-center">
              <span className="bg-black/60 text-white px-3 py-1.5 rounded-full text-xs font-semibold tracking-wider uppercase backdrop-blur-md">
                 Align QR Code
              </span>
           </div>
+        </div>
 
+        {/* ON-SCREEN DEBUG INFO */}
+        <div className="absolute bottom-2 left-2 right-2 bg-black/80 text-green-400 text-[10px] font-mono p-1.5 rounded z-50 text-center">
+          {debug}
         </div>
       </div>
 
