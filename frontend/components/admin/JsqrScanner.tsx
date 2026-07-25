@@ -18,6 +18,12 @@ export function JsqrScanner({ onScan, onError }: JsqrScannerProps) {
   // Time tracking for 150ms throttling
   const lastScanTimeRef = useRef<number>(0);
 
+  // Use refs for stable callbacks and avoid re-triggering hooks
+  const onScanRef = useRef(onScan);
+  useEffect(() => {
+    onScanRef.current = onScan;
+  }, [onScan]);
+
   const stopCamera = useCallback(() => {
     if (videoRef.current && videoRef.current.srcObject) {
       const stream = videoRef.current.srcObject as MediaStream;
@@ -37,16 +43,18 @@ export function JsqrScanner({ onScan, onError }: JsqrScannerProps) {
     const video = videoRef.current;
     const canvas = canvasRef.current;
 
+    // Output debug to console periodically
+    const now = performance.now();
+
     if (video && video.readyState === video.HAVE_ENOUGH_DATA && canvas) {
       const ctx = canvas.getContext("2d", { willReadFrequently: true });
       if (ctx) {
-        // Set canvas dimensions to match video to extract full resolution data
-        if (canvas.width !== video.videoWidth) {
+        if (canvas.width !== video.videoWidth || canvas.height !== video.videoHeight) {
           canvas.width = video.videoWidth;
           canvas.height = video.videoHeight;
+          console.log(`[jsQR] Canvas resized to ${canvas.width}x${canvas.height}`);
         }
 
-        const now = performance.now();
         // Throttle to roughly every 150ms (~6 fps) to save CPU
         if (now - lastScanTimeRef.current >= 150) {
           lastScanTimeRef.current = now;
@@ -54,17 +62,17 @@ export function JsqrScanner({ onScan, onError }: JsqrScannerProps) {
           ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
           const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
           
-          // Pure math decode (no WASM!)
+          // Let jsQR try to invert if needed (slower but more robust)
           const code = jsQR(imageData.data, imageData.width, imageData.height, {
-            inversionAttempts: "dontInvert",
+            inversionAttempts: "attemptBoth"
           });
 
           if (code && code.data) {
-            // STOP SCANNING IMMEDIATELY to prevent duplicate hits
+            console.log("[jsQR] SUCCESSFUL SCAN:", code.data);
             setIsScanning(false);
             stopCamera();
-            onScan(code.data);
-            return; // Exit the loop completely
+            onScanRef.current(code.data);
+            return; 
           }
         }
       }
@@ -73,7 +81,7 @@ export function JsqrScanner({ onScan, onError }: JsqrScannerProps) {
     if (isScanning) {
       requestRef.current = requestAnimationFrame(tick);
     }
-  }, [isScanning, onScan, stopCamera]);
+  }, [isScanning, stopCamera]);
 
   useEffect(() => {
     let mounted = true;
@@ -82,18 +90,15 @@ export function JsqrScanner({ onScan, onError }: JsqrScannerProps) {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({
           video: { 
-            facingMode: { ideal: "environment" },
-            width: { ideal: 1280 },
-            height: { ideal: 720 }
+            facingMode: { ideal: "environment" }
           }
         });
 
         if (mounted && videoRef.current) {
           videoRef.current.srcObject = stream;
-          videoRef.current.setAttribute("playsinline", "true"); // required to tell iOS safari we don't want fullscreen
+          videoRef.current.setAttribute("playsinline", "true"); 
           await videoRef.current.play();
-          
-          // Kick off the throttled scan loop
+          console.log("[jsQR] Camera started, starting tick loop");
           requestRef.current = requestAnimationFrame(tick);
         }
       } catch (err: any) {
@@ -111,7 +116,8 @@ export function JsqrScanner({ onScan, onError }: JsqrScannerProps) {
       mounted = false;
       stopCamera();
     };
-  }, [isScanning, tick, stopCamera, onError]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isScanning]); // Only re-run if isScanning changes
 
   if (cameraError) {
     return (
