@@ -17,12 +17,22 @@ export function JsqrScanner({ onScan, onError }: JsqrScannerProps) {
 
   const [debug, setDebug] = useState("Initializing...");
   const scanCountRef = useRef(0);
+  const isProcessingRef = useRef(false);
+  const nativeDetectorRef = useRef<any>(null);
 
-  // Time tracking for 150ms throttling
+  useEffect(() => {
+    if (typeof window !== 'undefined' && 'BarcodeDetector' in window) {
+      try {
+        nativeDetectorRef.current = new (window as any).BarcodeDetector({ formats: ['qr_code'] });
+      } catch (e) {
+        console.warn("BarcodeDetector not fully supported", e);
+      }
+    }
+  }, []);
+
   const lastScanTimeRef = useRef<number>(0);
-
-  // Use refs for stable callbacks and avoid re-triggering hooks
   const onScanRef = useRef(onScan);
+
   useEffect(() => {
     onScanRef.current = onScan;
   }, [onScan]);
@@ -40,61 +50,97 @@ export function JsqrScanner({ onScan, onError }: JsqrScannerProps) {
     }
   }, []);
 
-  const tick = useCallback(() => {
+  const tick = useCallback(async () => {
     if (!isScanning) return;
 
     const video = videoRef.current;
     const canvas = canvasRef.current;
     const now = performance.now();
 
+    // If currently processing a scan, just loop and skip decoding
+    if (isProcessingRef.current) {
+      requestRef.current = requestAnimationFrame(tick);
+      return;
+    }
+
     if (video && video.readyState >= 2 && video.videoWidth > 0 && canvas) {
-      const ctx = canvas.getContext("2d", { willReadFrequently: true });
-      if (ctx) {
-        // OPTIMIZATION: Scale down massive 4K/HD video feeds to max 600px wide
-        // This prevents jsQR from choking the CPU on high-end phones
-        const scale = Math.min(1, 600 / video.videoWidth);
-        const drawWidth = Math.floor(video.videoWidth * scale);
-        const drawHeight = Math.floor(video.videoHeight * scale);
+      if (now - lastScanTimeRef.current >= 150) {
+        lastScanTimeRef.current = now;
+        scanCountRef.current += 1;
 
-        if (canvas.width !== drawWidth || canvas.height !== drawHeight) {
-          canvas.width = drawWidth;
-          canvas.height = drawHeight;
-        }
-
-        if (now - lastScanTimeRef.current >= 150) {
-          lastScanTimeRef.current = now;
-          scanCountRef.current += 1;
-
-          // Draw scaled video frame to hidden canvas
-          ctx.drawImage(video, 0, 0, drawWidth, drawHeight);
-          const imageData = ctx.getImageData(0, 0, drawWidth, drawHeight);
-          
-          const isBlank = imageData.data[0] === 0 && imageData.data[1] === 0 && imageData.data[2] === 0 && imageData.data[100] === 0;
-          
-          setDebug(`Res:${video.videoWidth}x${video.videoHeight} | Canvas:${drawWidth}x${drawHeight} | Scans:${scanCountRef.current}`);
-
-          // Decode using pure math
-          const code = jsQR(imageData.data, imageData.width, imageData.height, {
-            inversionAttempts: "dontInvert" // Faster CPU execution
-          });
-
-          if (code && code.data) {
-            setDebug(`SUCCESS: ${code.data.substring(0, 10)}...`);
-            setIsScanning(false);
-            stopCamera();
-            onScanRef.current(code.data);
-            return; 
+        try {
+          // 1. Try Native Hardware Scanner First (Lightning Fast)
+          if (nativeDetectorRef.current) {
+            const barcodes = await nativeDetectorRef.current.detect(video);
+            if (barcodes.length > 0) {
+              const code = barcodes[0].rawValue;
+              handleSuccess(code, "Native");
+              return;
+            }
           }
+
+          // 2. Fallback to JSQR (Software Decoder)
+          const ctx = canvas.getContext("2d", { willReadFrequently: true });
+          if (ctx) {
+            const scale = Math.min(1, 600 / video.videoWidth);
+            const drawWidth = Math.floor(video.videoWidth * scale);
+            const drawHeight = Math.floor(video.videoHeight * scale);
+
+            if (canvas.width !== drawWidth || canvas.height !== drawHeight) {
+              canvas.width = drawWidth;
+              canvas.height = drawHeight;
+            }
+
+            ctx.drawImage(video, 0, 0, drawWidth, drawHeight);
+            const imageData = ctx.getImageData(0, 0, drawWidth, drawHeight);
+            
+            const code = jsQR(imageData.data, imageData.width, imageData.height, {
+              inversionAttempts: "dontInvert" 
+            });
+
+            if (code && code.data) {
+              handleSuccess(code.data, "jsQR");
+              return;
+            } else {
+              setDebug(`Native:${!!nativeDetectorRef.current} | Scans:${scanCountRef.current}`);
+            }
+          }
+        } catch (err) {
+          console.error("Scan error:", err);
         }
       }
     } else if (video) {
-       setDebug(`Waiting... ReadyState: ${video.readyState}, Width: ${video.videoWidth}`);
+       setDebug(`Waiting for video...`);
     }
 
     if (isScanning) {
       requestRef.current = requestAnimationFrame(tick);
     }
-  }, [isScanning, stopCamera]);
+  }, [isScanning]);
+
+  const handleSuccess = (data: string, engine: string) => {
+    isProcessingRef.current = true; // Pause decoding
+    setDebug(`SUCCESS (${engine})`);
+    
+    // Call the parent API asynchronously without unmounting
+    (async () => {
+      try {
+        await Promise.resolve(onScanRef.current(data));
+      } catch (e) {
+        console.error(e);
+      } finally {
+        // Cooldown period before scanning again (prevents double scans)
+        setTimeout(() => {
+          isProcessingRef.current = false;
+        }, 1500);
+        
+        // Re-schedule tick if it dropped
+        if (!requestRef.current && isScanning) {
+          requestRef.current = requestAnimationFrame(tick);
+        }
+      }
+    })();
+  };
 
   useEffect(() => {
     let mounted = true;
