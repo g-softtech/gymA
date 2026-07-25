@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import dynamic from 'next/dynamic';
 import { Html5Qrcode, Html5QrcodeScanner } from 'html5-qrcode';
 import { JsqrScanner } from "./JsqrScanner";
+import { usePathname } from "next/navigation";
 
 type MemberData = {
   id: string;
@@ -21,6 +22,7 @@ type CheckInResponse = {
 };
 
 export function CheckInKiosk() {
+  const pathname = usePathname();
   const [scanResult, setScanResult] = useState<CheckInResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [facingMode, setFacingMode] = useState<"environment" | "user">("environment");
@@ -37,8 +39,15 @@ export function CheckInKiosk() {
     loadingRef.current = loading;
   }, [loading]);
 
-  // The @yudiel/react-qr-scanner component is native to React and handles its own lifecycle.
-  // We no longer need this html5-qrcode useEffect which breaks in React 18 Strict Mode.
+  // Helper to build headers that support Sandbox Guest mode
+  const getHeaders = () => {
+    const headers: Record<string, string> = { "Content-Type": "application/json" };
+    if (pathname && pathname.startsWith('/sandbox/')) {
+      const slug = pathname.split('/')[2];
+      if (slug) headers["x-guest-session-tenant-slug"] = slug;
+    }
+    return headers;
+  };
 
   const handleScan = async (token: string) => {
     if (!navigator.onLine) {
@@ -50,10 +59,12 @@ export function CheckInKiosk() {
     try {
       const res = await fetch("/api/admin/checkin", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: getHeaders(),
         body: JSON.stringify({ token, method: "QR" })
       });
       const data = await res.json();
+      
+      // If the API threw 401, data.error will be "Unauthorized"
       setScanResult(data);
       
       // Vibration feedback
@@ -81,7 +92,9 @@ export function CheckInKiosk() {
     
     setLoading(true);
     try {
-      const res = await fetch(`/api/admin/checkin/lookup?query=${encodeURIComponent(searchQuery)}`);
+      const res = await fetch(`/api/admin/checkin/lookup?query=${encodeURIComponent(searchQuery)}`, {
+        headers: getHeaders()
+      });
       const data = await res.json();
       setSearchResults(data.members || []);
       if (data.members && data.members.length === 0) {
@@ -102,7 +115,7 @@ export function CheckInKiosk() {
     try {
       const res = await fetch("/api/admin/checkin", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: getHeaders(),
         body: JSON.stringify({ memberId, method: "MANUAL" })
       });
       const data = await res.json();
@@ -126,7 +139,7 @@ export function CheckInKiosk() {
     try {
       const res = await fetch("/api/admin/checkin", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: getHeaders(),
         body: JSON.stringify({ 
           memberId: overrideTarget.memberId, 
           method: "MANUAL",
