@@ -33,35 +33,8 @@ export function CheckInKiosk() {
   
   const loadingRef = useRef(loading);
 
-  useEffect(() => {
-    loadingRef.current = loading;
-  }, [loading]);
-
-  useEffect(() => {
-    // Only initialize scanner on the client side
-    if (typeof window !== "undefined") {
-      const scanner = new Html5QrcodeScanner(
-        "html5qr-reader",
-        { fps: 10, qrbox: { width: 250, height: 250 } },
-        false
-      );
-
-      scanner.render(
-        (decodedText) => {
-          if (!loadingRef.current) {
-            handleScan(decodedText);
-          }
-        },
-        (error) => {
-          // ignore background errors to prevent spamming
-        }
-      );
-
-      return () => {
-        scanner.clear().catch(console.error);
-      };
-    }
-  }, []);
+  // The @yudiel/react-qr-scanner component is native to React and handles its own lifecycle.
+  // We no longer need this html5-qrcode useEffect which breaks in React 18 Strict Mode.
 
   const handleScan = async (token: string) => {
     if (!navigator.onLine) {
@@ -203,7 +176,14 @@ export function CheckInKiosk() {
           </div>
           <div className="p-4">
             <div className="w-full overflow-hidden rounded-lg border-2 border-dashed border-border bg-muted p-4">
-              <div id="html5qr-reader" className="w-full"></div>
+              <OriginalScanner 
+                onScan={(result) => {
+                  if (result && result.length > 0 && !loading) {
+                     handleScan(result[0].rawValue);
+                  }
+                }}
+                onError={(error) => console.log(error?.message)}
+              />
             </div>
             
             <div className="mt-4 border-t border-border pt-4 text-center">
