@@ -181,9 +181,11 @@ export function CheckInKiosk() {
           <div className="p-4">
             <div className="w-full overflow-hidden rounded-lg border-2 border-dashed border-border bg-muted p-4">
               <OriginalScanner 
-                formats={['qr_code']}
+                constraints={{ facingMode: "environment" }}
                 onScan={(result) => {
+                  console.log("SCAN RESULT:", result);
                   if (result && result.length > 0 && !loadingRef.current) {
+                     console.log("RAW VALUE:", result[0].rawValue);
                      handleScan(result[0].rawValue);
                   }
                 }}
