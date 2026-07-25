@@ -47,7 +47,6 @@ export function JsqrScanner({ onScan, onError }: JsqrScannerProps) {
     const canvas = canvasRef.current;
     const now = performance.now();
 
-    // Relaxed readyState check: >= 2 (HAVE_CURRENT_DATA)
     if (video && video.readyState >= 2 && video.videoWidth > 0 && canvas) {
       const ctx = canvas.getContext("2d", { willReadFrequently: true });
       if (ctx) {
@@ -63,11 +62,12 @@ export function JsqrScanner({ onScan, onError }: JsqrScannerProps) {
           ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
           const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
           
-          setDebug(`Res: ${canvas.width}x${canvas.height} | Scans: ${scanCountRef.current}`);
+          // Debug check: Are all pixels completely black/zero?
+          const isBlank = imageData.data[0] === 0 && imageData.data[1] === 0 && imageData.data[2] === 0 && imageData.data[100] === 0;
+          
+          setDebug(`Res:${canvas.width}x${canvas.height}|Scans:${scanCountRef.current}|Blank:${isBlank}`);
 
-          const code = jsQR(imageData.data, imageData.width, imageData.height, {
-            inversionAttempts: "attemptBoth"
-          });
+          const code = jsQR(imageData.data, imageData.width, imageData.height);
 
           if (code && code.data) {
             setDebug(`SUCCESS: ${code.data.substring(0, 10)}...`);
@@ -79,7 +79,6 @@ export function JsqrScanner({ onScan, onError }: JsqrScannerProps) {
         }
       }
     } else if (video) {
-       // If video isn't ready yet, update debug
        setDebug(`Waiting... ReadyState: ${video.readyState}, Width: ${video.videoWidth}`);
     }
 
@@ -95,7 +94,12 @@ export function JsqrScanner({ onScan, onError }: JsqrScannerProps) {
       try {
         setDebug("Requesting camera...");
         const stream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: { ideal: "environment" } }
+          video: { 
+            facingMode: { ideal: "environment" },
+            // Ask for HD resolution. If the phone is portrait, 1080 is the width!
+            width: { ideal: 1080 },
+            height: { ideal: 1920 }
+          }
         });
 
         if (mounted && videoRef.current) {
