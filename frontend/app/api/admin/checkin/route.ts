@@ -11,7 +11,9 @@ export async function POST(req: Request) {
   try {
     const session = await getAuthSession();
     if (!session?.user?.email || !["ADMIN", "SUPERADMIN"].includes(session.user.role)) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ 
+        error: `Unauthorized: Role=${session?.user?.role || 'NONE'}, Email=${!!session?.user?.email}` 
+      }, { status: 401 });
     }
 
     const tenantId = session.user.tenantId;
