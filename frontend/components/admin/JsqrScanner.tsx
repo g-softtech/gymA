@@ -82,7 +82,9 @@ export function JsqrScanner({ onScan, onError }: JsqrScannerProps) {
           // 2. Fallback to JSQR (Software Decoder)
           const ctx = canvas.getContext("2d", { willReadFrequently: true });
           if (ctx) {
-            const scale = Math.min(1, 600 / video.videoWidth);
+            // Laptops don't have BarcodeDetector, but they have strong CPUs. 
+            // Don't scale down aggressively. Allow up to 1280px to preserve QR details for blurry webcams.
+            const scale = Math.min(1, 1280 / video.videoWidth);
             const drawWidth = Math.floor(video.videoWidth * scale);
             const drawHeight = Math.floor(video.videoHeight * scale);
 
@@ -94,15 +96,17 @@ export function JsqrScanner({ onScan, onError }: JsqrScannerProps) {
             ctx.drawImage(video, 0, 0, drawWidth, drawHeight);
             const imageData = ctx.getImageData(0, 0, drawWidth, drawHeight);
             
+            // Laptops struggle with glare and bloom from phone screens. 
+            // attemptBoth is required for washed out contrast.
             const code = jsQR(imageData.data, imageData.width, imageData.height, {
-              inversionAttempts: "dontInvert" 
+              inversionAttempts: "attemptBoth" 
             });
 
             if (code && code.data) {
               handleSuccess(code.data, "jsQR");
               return;
             } else {
-              setDebug(`Native:${!!nativeDetectorRef.current} | Scans:${scanCountRef.current}`);
+              setDebug(`Native:False | Res:${drawWidth}x${drawHeight} | Scans:${scanCountRef.current}`);
             }
           }
         } catch (err) {
