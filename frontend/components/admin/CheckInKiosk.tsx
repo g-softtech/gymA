@@ -33,6 +33,10 @@ export function CheckInKiosk() {
   
   const loadingRef = useRef(loading);
 
+  useEffect(() => {
+    loadingRef.current = loading;
+  }, [loading]);
+
   // The @yudiel/react-qr-scanner component is native to React and handles its own lifecycle.
   // We no longer need this html5-qrcode useEffect which breaks in React 18 Strict Mode.
 
@@ -177,8 +181,9 @@ export function CheckInKiosk() {
           <div className="p-4">
             <div className="w-full overflow-hidden rounded-lg border-2 border-dashed border-border bg-muted p-4">
               <OriginalScanner 
+                formats={['qr_code']}
                 onScan={(result) => {
-                  if (result && result.length > 0 && !loading) {
+                  if (result && result.length > 0 && !loadingRef.current) {
                      handleScan(result[0].rawValue);
                   }
                 }}
