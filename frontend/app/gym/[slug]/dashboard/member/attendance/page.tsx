@@ -23,15 +23,16 @@ export default async function MemberAttendancePage({
   if (!memberProfile) return null;
 
   const records = memberProfile?.attendances ?? [];
+  const successfulRecords = records.filter(r => r.status === "PRESENT");
 
   // Stats
   const now = new Date();
-  const thisMonth = records.filter((r) => {
+  const thisMonth = successfulRecords.filter((r) => {
     const d = new Date(r.checkInTime);
     return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
   }).length;
 
-  const thisWeek = records.filter((r) => {
+  const thisWeek = successfulRecords.filter((r) => {
     const d = new Date(r.checkInTime);
     const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
     return d >= weekAgo;
@@ -41,7 +42,7 @@ export default async function MemberAttendancePage({
   let streak = 0;
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-  const uniqueDays = [...new Set(records.map((r) => {
+  const uniqueDays = [...new Set(successfulRecords.map((r) => {
     const d = new Date(r.checkInTime);
     d.setHours(0, 0, 0, 0);
     return d.getTime();
@@ -63,7 +64,7 @@ export default async function MemberAttendancePage({
       {/* Stats */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {[
-          { label: "Total Visits", value: records.length, icon: "📋", color: "bg-primary/10 text-primary" },
+          { label: "Total Visits", value: successfulRecords.length, icon: "📋", color: "bg-primary/10 text-primary" },
           { label: "This Month", value: thisMonth, icon: "📅", color: "bg-primary/10 text-primary" },
           { label: "This Week", value: thisWeek, icon: "📆", color: "bg-success/10 text-success" },
           { label: "Day Streak", value: streak, icon: "🔥", color: "bg-orange-50 text-orange-700" },
@@ -88,15 +89,24 @@ export default async function MemberAttendancePage({
             records.map((r) => (
               <div key={r.id} className="px-6 py-4 flex justify-between items-center">
                 <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 bg-success/10 text-success rounded-full flex items-center justify-center text-base">
-                    ✅
-                  </div>
+                  {r.status === "DENIED" ? (
+                    <div className="w-9 h-9 bg-red-100 text-red-600 rounded-full flex items-center justify-center text-base">
+                      ❌
+                    </div>
+                  ) : (
+                    <div className="w-9 h-9 bg-success/10 text-success rounded-full flex items-center justify-center text-base">
+                      ✅
+                    </div>
+                  )}
                   <div>
                     <p className="font-medium text-foreground">
                       {new Date(r.checkInTime).toLocaleDateString("en-NG", {
                         weekday: "long", year: "numeric", month: "long", day: "numeric",
                       })}
                     </p>
+                    {r.status === "DENIED" && (
+                      <p className="text-xs text-red-600 font-semibold">Access Denied (No Active Plan)</p>
+                    )}
                   </div>
                 </div>
                 <p className="text-sm text-muted-foreground">
