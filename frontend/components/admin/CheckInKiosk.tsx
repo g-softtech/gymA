@@ -221,8 +221,6 @@ export function CheckInKiosk() {
             </div>
           </div>
         </div>
-      </div>
-
       {/* RIGHT COL: Status & Manual Search */}
       <div className="space-y-6">
         {/* Check-In Status */}
