@@ -495,6 +495,16 @@ model TenantSettings {
   paystackCustomerCode     String?   @unique
   paystackEmailToken       String?
   paystackSubscriptionCode String?   @unique
+  
+  // Payout Configuration
+  paystackSubaccountCode     String?   @unique
+  paystackBankCode           String?
+  paystackBankName           String?
+  paystackAccountNumberLast4 String?
+  paystackAccountName        String?
+  paystackConnectedAt        DateTime?
+  paystackConnectionStatus   String?   @default("disconnected") // "connected", "disconnected", "failed"
+
   homepageLayout           Json?
   defaultCurrency          Currency  @default(NGN)
   gymType                  String?
@@ -819,8 +829,11 @@ enum CheckInMethod {
 
 enum AttendanceStatus {
   PRESENT
+  ABSENT
   LATE
+  EXCUSED
   NO_SHOW
+  DENIED
 }
 
 enum AttendanceType {

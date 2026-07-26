@@ -14,6 +14,7 @@ interface AttendanceRecord {
   memberName: string;
   checkInTime: string;
   notes: string;
+  status: string;
 }
 
 interface Props {
@@ -56,6 +57,7 @@ export default function AttendanceManager({ tenantId, members, initialRecords }:
           memberName,
           checkInTime: new Date().toISOString(),
           notes,
+          status: "PRESENT"
         };
         setRecords((prev) => [newRecord, ...prev]);
         setSelectedMember("");
@@ -133,7 +135,14 @@ export default function AttendanceManager({ tenantId, members, initialRecords }:
                     <div className="w-px h-full bg-muted my-1"></div>
                   </div>
                   <div className="pb-4">
-                    <p className="font-bold text-foreground">{r.memberName}</p>
+                    <div className="flex items-center gap-2">
+                      <p className="font-bold text-foreground">{r.memberName}</p>
+                      {r.status === "DENIED" ? (
+                        <span className="text-[10px] font-bold bg-red-100 text-red-700 px-2 py-0.5 rounded-full">DENIED</span>
+                      ) : (
+                        <span className="text-[10px] font-bold bg-green-100 text-green-700 px-2 py-0.5 rounded-full">PRESENT</span>
+                      )}
+                    </div>
                     <p className="text-sm text-muted-foreground">
                       {new Date(r.checkInTime).toLocaleTimeString("en-NG", { hour: "2-digit", minute: "2-digit" })}
                       {" "}·{" "}
@@ -159,6 +168,7 @@ export default function AttendanceManager({ tenantId, members, initialRecords }:
                 <th className="px-6 py-3 font-medium">Member</th>
                 <th className="px-6 py-3 font-medium">Date</th>
                 <th className="px-6 py-3 font-medium">Time</th>
+                <th className="px-6 py-3 font-medium">Status</th>
                 <th className="px-6 py-3 font-medium">Note</th>
               </tr>
             </thead>
@@ -187,6 +197,13 @@ export default function AttendanceManager({ tenantId, members, initialRecords }:
                       {new Date(r.checkInTime).toLocaleTimeString("en-NG", {
                         hour: "2-digit", minute: "2-digit",
                       })}
+                    </td>
+                    <td className="px-6 py-4">
+                      {r.status === "DENIED" ? (
+                        <span className="text-xs font-bold bg-red-100 text-red-700 px-2 py-1 rounded-full">DENIED</span>
+                      ) : (
+                        <span className="text-xs font-bold bg-green-100 text-green-700 px-2 py-1 rounded-full">PRESENT</span>
+                      )}
                     </td>
                     <td className="px-6 py-4 text-muted-foreground italic">
                       {r.notes || "—"}

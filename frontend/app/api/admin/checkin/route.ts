@@ -125,13 +125,22 @@ export async function POST(req: Request) {
 
     if (!activeSub && !overrideType) {
       // BLOCK check-in
-      // Log the denied event for security audit
-      await prisma.attendanceEvent.create({
+      // Create a DENIED attendance record so it reflects on the Attendance page
+      await prisma.attendance.create({
         data: {
           tenantId,
           memberId: targetMemberId,
-          eventType: "DENIED_EXPIRED",
-          notes: "Membership expired or inactive",
+          method: actualMethod as "QR" | "MANUAL" | "PIN",
+          type: "GENERAL",
+          status: "DENIED",
+          events: {
+            create: {
+              tenantId,
+              memberId: targetMemberId,
+              eventType: "DENIED_EXPIRED",
+              notes: "Membership expired or inactive",
+            }
+          }
         }
       });
 

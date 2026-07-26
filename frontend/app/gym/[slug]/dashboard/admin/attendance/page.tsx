@@ -102,6 +102,7 @@ export default async function AttendancePage({
           memberName: a.member.user.name ?? a.member.user.email ?? "Unknown",
           checkInTime: a.checkInTime.toISOString(),
           notes: a.events?.[0]?.notes ?? "",
+          status: a.status ?? "PRESENT",
         }))}
       />
     </div>
