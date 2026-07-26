@@ -191,8 +191,8 @@ export function CheckInKiosk() {
           <div className="p-4 border-b border-border bg-muted font-semibold text-foreground">
             QR Scanner
           </div>
-          <div className="p-4">
-            <div className="w-full overflow-hidden rounded-lg border-2 border-dashed border-border bg-muted p-4">
+          <div className="p-0 sm:p-4">
+            <div className="w-full overflow-hidden sm:rounded-lg border-y-2 sm:border-2 border-border bg-black">
               <JsqrScanner 
                 onScan={handleScan}
                 onError={(error) => console.log(error?.message)}

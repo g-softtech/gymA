@@ -196,7 +196,7 @@ export function JsqrScanner({ onScan, onError }: JsqrScannerProps) {
   }
 
   return (
-    <div className="relative w-full overflow-hidden rounded-xl bg-black aspect-[4/3] flex items-center justify-center">
+    <div className="relative w-full overflow-hidden bg-black aspect-square flex items-center justify-center">
       {/* Hidden canvas used solely for frame extraction */}
       <canvas ref={canvasRef} className="hidden" />
 
