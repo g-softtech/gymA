@@ -184,13 +184,12 @@ export function CheckInKiosk() {
   };
 
   return (
-    <div className="grid md:grid-cols-2 gap-8 items-start">
-      {/* LEFT COL: Scanner & Search */}
-      <div className="space-y-6">
-        <div className="bg-card text-card-foreground rounded-xl shadow-sm border border-border overflow-hidden">
-          <div className="p-4 border-b border-border bg-muted font-semibold text-foreground">
-            QR Scanner
-          </div>
+    <div className="grid lg:grid-cols-[1.5fr_1fr] gap-6 items-start">
+      {/* LEFT COL: MASSIVE Scanner */}
+      <div className="bg-card text-card-foreground rounded-xl shadow-sm border border-border overflow-hidden">
+        <div className="p-4 border-b border-border bg-muted font-semibold text-foreground">
+          Live QR Scanner
+        </div>
           <div className="p-0 sm:p-4">
             <div className="w-full overflow-hidden sm:rounded-lg border-y-2 sm:border-2 border-border bg-black">
               <JsqrScanner 
@@ -222,53 +221,12 @@ export function CheckInKiosk() {
             </div>
           </div>
         </div>
-
-        <div className="bg-card text-card-foreground rounded-xl shadow-sm border border-border">
-          <div className="p-4 border-b border-border bg-muted font-semibold text-foreground">
-            Manual Search
-          </div>
-          <div className="p-4">
-            <form onSubmit={handleManualSearch} className="flex gap-2">
-              <input 
-                type="text" 
-                placeholder="Name or Email..." 
-                className="flex-1 rounded-lg border border-border px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500"
-                value={searchQuery}
-                onChange={e => setSearchQuery(e.target.value)}
-              />
-              <button 
-                type="submit"
-                disabled={loading}
-                className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 disabled:opacity-50"
-              >
-                Search
-              </button>
-            </form>
-
-            {searchResults.length > 0 && (
-              <div className="mt-4 border border-border rounded-lg divide-y divide-border max-h-60 overflow-y-auto">
-                {searchResults.map(member => (
-                  <div key={member.id} className="flex justify-between items-center p-3 hover:bg-muted">
-                    <div>
-                      <p className="font-medium text-foreground text-sm">{member.user.name}</p>
-                      <p className="text-xs text-muted-foreground">{member.user.email}</p>
-                    </div>
-                    <button 
-                      onClick={() => handleManualCheckIn(member.id)}
-                      className="text-xs bg-muted hover:bg-muted text-foreground px-3 py-1.5 rounded-md font-medium"
-                    >
-                      Check In
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
       </div>
 
-      {/* RIGHT COL: Status Screen */}
-      <div className="bg-card text-card-foreground rounded-xl shadow-md border border-border min-h-[400px] flex flex-col relative overflow-hidden">
+      {/* RIGHT COL: Status & Manual Search */}
+      <div className="space-y-6">
+        {/* Check-In Status */}
+        <div className="bg-card text-card-foreground rounded-xl shadow-md border border-border min-h-[400px] flex flex-col relative overflow-hidden">
         <div className="p-4 border-b border-border bg-gray-900 text-white font-semibold flex justify-between items-center">
           <span>Check-In Status</span>
           {loading && <span className="animate-pulse text-xs bg-indigo-500 px-2 py-1 rounded">Processing...</span>}
@@ -344,6 +302,52 @@ export function CheckInKiosk() {
           )}
         </div>
       </div>
+
+      {/* Manual Search (Moved to right column) */}
+      <div className="bg-card text-card-foreground rounded-xl shadow-sm border border-border">
+        <div className="p-4 border-b border-border bg-muted font-semibold text-foreground">
+          Manual Search & Check-In
+        </div>
+        <div className="p-4">
+          <form onSubmit={handleManualSearch} className="flex gap-2">
+            <input 
+              type="text" 
+              placeholder="Type member name or email..." 
+              className="flex-1 rounded-lg border border-border px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500"
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+            />
+            <button 
+              type="submit"
+              disabled={loading}
+              className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 disabled:opacity-50"
+            >
+              Search
+            </button>
+          </form>
+
+          {searchResults.length > 0 && (
+            <div className="mt-4 border border-border rounded-lg divide-y divide-border max-h-60 overflow-y-auto">
+              {searchResults.map(member => (
+                <div key={member.id} className="flex justify-between items-center p-3 hover:bg-muted">
+                  <div>
+                    <p className="font-medium text-foreground text-sm">{member.user.name}</p>
+                    <p className="text-xs text-muted-foreground">{member.user.email}</p>
+                  </div>
+                  <button 
+                    onClick={() => handleManualCheckIn(member.id)}
+                    className="text-xs bg-muted hover:bg-muted text-foreground px-3 py-1.5 rounded-md font-medium"
+                  >
+                    Check In
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+      
+    </div>
 
       {/* Override Modal */}
       {showOverrideModal && (
