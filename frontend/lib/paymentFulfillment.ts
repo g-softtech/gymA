@@ -79,7 +79,7 @@ export async function fulfillPayment(reference: string, gatewayData: {
         }
 
       // b. Ensure member profile exists
-      let memberProfile = await tx.memberProfile.findUnique({
+      const memberProfile = await tx.memberProfile.findUnique({
         where: { id: transaction.memberId },
       });
 

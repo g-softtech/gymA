@@ -34,7 +34,7 @@ export default async function MemberBillingPage({ params }: { params: { slug: st
   
   // Calculate Stats
   let active = 0;
-  let trialing = 0;
+  const trialing = 0;
   let pastDue = 0;
   let suspended = 0;
   let expired = 0;

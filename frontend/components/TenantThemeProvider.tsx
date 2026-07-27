@@ -50,7 +50,7 @@ export function TenantThemeProvider({ settings, tenantName, children }: Props) {
     <BrandingContext.Provider value={brandingValue}>
       <div style={style} className="h-full flex flex-col">
         {fontHref && (
-          // eslint-disable-next-line @next/next/no-page-custom-font
+           
           <link rel="stylesheet" href={fontHref} />
         )}
         {children}

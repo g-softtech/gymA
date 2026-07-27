@@ -28,8 +28,8 @@ export async function GET(
 
     // 2. Resolve the experiment assignment at the time (Phase 9)
     // Note: The outcome links directly to the variant, but we can also fetch the strict assignment if it exists.
-    let experimentAssignment = null;
-    let variant = actionLog.experimentOutcomes[0]?.variant || "CONTROL";
+    const experimentAssignment = null;
+    const variant = actionLog.experimentOutcomes[0]?.variant || "CONTROL";
 
     // 3. Resolve the active intelligence registry version at the time of execution (Phase 10)
     // We look up the latest version that was activated *before* this action log was created.

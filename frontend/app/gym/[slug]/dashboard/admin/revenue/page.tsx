@@ -53,7 +53,7 @@ export default async function RevenuePage({
 
   // Aggregations
   let activeMembers = 0;
-  let trialMembers = 0;
+  const trialMembers = 0;
   let pendingPayment = 0;
   let suspended = 0;
   let cancelled = 0;

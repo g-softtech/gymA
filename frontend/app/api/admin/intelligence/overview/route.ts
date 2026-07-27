@@ -13,7 +13,7 @@ export async function GET(req: Request) {
     const tenantId = session.user.tenantId;
     
     // Attempt to load risk profiles from the Cron Job cache
-    let riskProfiles = analyticsCache.get<any[]>(`tenant:${tenantId}:intelligence:risks`);
+    const riskProfiles = analyticsCache.get<any[]>(`tenant:${tenantId}:intelligence:risks`);
     
     // If cron hasn't run yet, we return empty arrays with a warning to trigger the cron
     if (!riskProfiles) {

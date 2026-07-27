@@ -52,7 +52,7 @@ async function main() {
   }
 
   // --- 6. Slug Collision Handling ---
-  let baseSlug = gymName.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+  const baseSlug = gymName.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
   let slug = baseSlug;
   let isUnique = false;
   

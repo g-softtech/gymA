@@ -18,7 +18,7 @@ export default async function TrainerDashboardPage({
 
 
 
-  let trainerProfile = await prisma.trainerProfile.findUnique({
+  const trainerProfile = await prisma.trainerProfile.findUnique({
     where: { userId: session!.user.id },
     include: {
       bookings: {

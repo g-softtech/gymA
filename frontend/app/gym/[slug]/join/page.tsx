@@ -11,17 +11,8 @@ export default async function GymJoinPage({
   const { slug } = await params;
   const session = await getAuthSession();
 
-  const TRACE = `[FORENSIC:join-page][${Date.now()}]`;
-  console.log(`${TRACE} ┌─ ENTRY slug=${slug}`);
-  console.log(`${TRACE} │  session present  = ${!!session?.user}`);
-  console.log(`${TRACE} │  user.id          = ${session?.user?.id ?? "undefined"}`);
-  console.log(`${TRACE} │  user.email       = ${session?.user?.email ?? "undefined"}`);
-  console.log(`${TRACE} │  user.role        = ${(session?.user as any)?.role ?? "undefined"}`);
-  console.log(`${TRACE} │  user.tenantId    = ${(session?.user as any)?.tenantId ?? "undefined"}`);
-  console.log(`${TRACE} │  user.tenantSlug  = ${(session?.user as any)?.tenantSlug ?? "undefined"}`);
 
   if (!session?.user) {
-    console.log(`${TRACE} └─ BRANCH: no session → redirecting to signin`);
     redirect(`/api/auth/signin?callbackUrl=/gym/${slug}/join`);
   }
   const tenant = await prisma.tenant.findUnique({
@@ -31,18 +22,14 @@ export default async function GymJoinPage({
 
   if (!tenant) notFound();
 
-  console.log(`${TRACE} │  tenant.id        = ${tenant.id}`);
-  console.log(`${TRACE} │  tenant.slug      = ${tenant.slug}`);
 
   // If they already have a tenantId for THIS gym, redirect them to their dashboard
   if ((session.user as any).tenantId === tenant.id) {
-    console.log(`${TRACE} └─ BRANCH: already member of this gym → redirect /gym/${slug}/dashboard/member`);
     redirect(`/gym/${slug}/dashboard/member`);
   }
 
   // If they belong to ANOTHER gym, they cannot join this one with the same account.
   if ((session.user as any).tenantId && (session.user as any).tenantId !== tenant.id) {
-    console.log(`${TRACE} └─ BRANCH: user belongs to different gym (${(session.user as any).tenantId}) → show access denied`);
     return (
       <div className="flex min-h-screen bg-slate-50 items-center justify-center p-6 text-center">
         <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 max-w-md">

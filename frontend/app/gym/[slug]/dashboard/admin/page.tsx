@@ -36,6 +36,7 @@ export default async function AdminDashboardPage({
   const tenant = await prisma.tenant.findUnique({
     where: { slug },
     include: {
+      settings: true,
       membershipPlans: true,
       users: {
         include: {
@@ -89,6 +90,24 @@ export default async function AdminDashboardPage({
           + Manage Plans
         </Link>
       </div>
+
+      {(!tenant.settings?.paystackConnectionStatus || tenant.settings?.paystackConnectionStatus !== "connected") && (
+        <div className="bg-red-50 border border-red-200 text-red-800 p-4 rounded-xl flex justify-between items-center">
+          <div className="flex items-center gap-3">
+            <span className="text-xl">⚠️</span>
+            <div>
+              <p className="font-bold">Connect your bank account to begin accepting member payments.</p>
+              <p className="text-sm">Member checkouts are currently blocked until a settlement account is configured.</p>
+            </div>
+          </div>
+          <Link 
+            href={`${adminBase}/revenue/payout-settings`} 
+            className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition"
+          >
+            Connect Account
+          </Link>
+        </div>
+      )}
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {stats.map((s) => (

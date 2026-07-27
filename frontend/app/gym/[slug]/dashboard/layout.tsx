@@ -126,6 +126,7 @@ export default async function DashboardLayout({
     { href: `${adminBase}/checkin`, label: "Check-in Desk", icon: "📲" },
     { href: `${adminBase}/attendance`, label: "Attendance", icon: "✅" },
     { href: `${adminBase}/revenue`, label: "Revenue", icon: "💰" },
+    { href: `${adminBase}/revenue/payout-settings`, label: "Payout Settings", icon: "🏦" },
     { href: `${adminBase}/analytics`, label: "Analytics ⭐", icon: "📈" },
     { href: `${adminBase}/intelligence`, label: "Intelligence ⚡", icon: "🧠" },
     { href: `${adminBase}/ai-usage`, label: "AI Usage", icon: "🤖" },

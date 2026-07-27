@@ -7,7 +7,7 @@ async function verifyDashboard() {
   console.log("VERIFY DASHBOARD");
   console.log("==============================\n");
 
-  let overallStatus: any = "PENDING MANUAL VERIFICATION";
+  const overallStatus: any = "PENDING MANUAL VERIFICATION";
   let report = "# Dashboard Verification\n\n";
 
   // Check if Playwright is installed

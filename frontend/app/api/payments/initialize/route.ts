@@ -30,6 +30,10 @@ export async function POST(req: Request) {
       where: { tenantId }
     });
 
+    if (!tenantSettings?.paystackConnectionStatus || tenantSettings.paystackConnectionStatus !== "connected" || !tenantSettings.paystackSubaccountCode) {
+      return NextResponse.json({ error: "This gym has not connected a bank account to receive payments yet." }, { status: 400 });
+    }
+
     const memberProfile = await prisma.memberProfile.findUnique({
       where: { userId: session.user.id }
     });
@@ -138,7 +142,8 @@ export async function POST(req: Request) {
       email: safeEmail,
       reference: transaction.reference,
       currency,
-      callback_url
+      callback_url,
+      subaccount: tenantSettings.paystackSubaccountCode,
     });
 
     return NextResponse.json({
