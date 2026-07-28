@@ -24,8 +24,7 @@ export default function SignInPage() {
   const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
   const errorParam = searchParams.get("error");
 
-  const [tab, setTab] = useState<"signin" | "register">("signin");
-  const [form, setForm] = useState({ name: "", email: "", password: "", confirmPassword: "" });
+  const [form, setForm] = useState({ email: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
@@ -54,6 +53,7 @@ export default function SignInPage() {
     AccessDenied: "Access denied.",
     Verification: "Sign-in link is invalid or has expired.",
     CredentialsSignin: "Incorrect email or password.",
+    EmailSignin: "Failed to send magic link. Please try again.",
   };
 
   useEffect(() => {
@@ -131,49 +131,7 @@ export default function SignInPage() {
     }
   };
 
-  const handleRegister = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (form.password !== form.confirmPassword) {
-      setMessage({ type: "error", text: "Passwords do not match." });
-      return;
-    }
-    if (form.password.length < 8) {
-      setMessage({ type: "error", text: "Password must be at least 8 characters." });
-      return;
-    }
 
-    setLoading(true);
-    setMessage(null);
-
-    const res = await fetch("/api/auth/register", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name: form.name, email: form.email, password: form.password }),
-    });
-
-    const data = await res.json();
-
-    if (!res.ok) {
-      setMessage({ type: "error", text: data.error || "Registration failed." });
-      setLoading(false);
-      return;
-    }
-
-    // Auto sign in after successful registration
-    const result = await signIn("credentials", {
-      redirect: false,
-      email: form.email,
-      password: form.password,
-    });
-
-    if (result?.ok) {
-      router.push(callbackUrl);
-    } else {
-      setMessage({ type: "success", text: "Account created! Please sign in." });
-      setTab("signin");
-      setLoading(false);
-    }
-  };
 
   const inputClass =
     "w-full px-4 py-3 rounded-xl border border-border bg-background text-foreground placeholder-muted-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/60 transition";
@@ -206,23 +164,7 @@ export default function SignInPage() {
         {/* Card */}
         <div className="bg-card/50 backdrop-blur-xl border border-border rounded-3xl p-8 shadow-2xl">
 
-          {/* Tabs */}
-          <div className="flex bg-muted rounded-xl p-1 mb-6">
-            {(["signin", "register"] as const).map((t) => (
-              <button
-                key={t}
-                id={`tab-${t}`}
-                onClick={() => { setTab(t); setMessage(null); }}
-                className={`flex-1 py-2 text-sm font-semibold rounded-lg transition-all ${
-                  tab === t
-                    ? "bg-background text-foreground shadow-sm"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                {t === "signin" ? "Sign In" : "Create Account"}
-              </button>
-            ))}
-          </div>
+
 
           {/* Error / Success message */}
           {message && (
@@ -235,9 +177,6 @@ export default function SignInPage() {
             </div>
           )}
 
-          {tab === "signin" ? (
-            <>
-              {/* Google Sign In */}
               <button
                 id="google-signin-btn"
                 onClick={handleGoogleSignIn}
@@ -293,7 +232,7 @@ export default function SignInPage() {
                 </div>
                 <div className="flex items-center justify-between mt-2 mb-4">
                   <span className="text-xs text-muted-foreground invisible">Spacer</span>
-                  <button type="button" onClick={() => { setTab("signin"); setMessage({type:"success", text: "Click 'Send Magic Login Link' below to securely log in or set a new password."})}} className="text-xs text-primary font-medium hover:underline focus:outline-none">Forgot Password?</button>
+                  <button type="button" onClick={() => { setMessage({type:"success", text: "Click 'Send Magic Login Link' below to securely log in or set a new password."})}} className="text-xs text-primary font-medium hover:underline focus:outline-none">Forgot Password?</button>
                 </div>
                 <button
                   id="signin-submit-btn"
@@ -305,7 +244,6 @@ export default function SignInPage() {
                 </button>
               </form>
 
-              {/* Magic Link Divider */}
               <div className="flex items-center gap-3 my-4">
                 <div className="flex-1 h-px bg-border" />
                 <span className="text-muted-foreground text-xs">or</span>
@@ -324,80 +262,6 @@ export default function SignInPage() {
                 </svg>
                 {magicLinkLoading ? "Sending..." : "Send Magic Login Link"}
               </button>
-            </>
-          ) : (
-            <form onSubmit={handleRegister} className="space-y-3">
-              <input
-                id="register-name"
-                name="name"
-                type="text"
-                required
-                value={form.name}
-                onChange={handleChange}
-                placeholder="Full name"
-                className={inputClass}
-              />
-              <input
-                id="register-email"
-                name="email"
-                type="email"
-                required
-                value={form.email}
-                onChange={handleChange}
-                placeholder="Email address"
-                className={inputClass}
-              />
-              <div className="relative">
-                <input
-                  id="register-password"
-                  name="password"
-                  type={showPassword ? "text" : "password"}
-                  required
-                  minLength={8}
-                  value={form.password}
-                  onChange={handleChange}
-                  placeholder="Password (min 8 characters)"
-                  className={inputClass}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-muted-foreground hover:text-foreground"
-                >
-                  {showPassword ? <EyeSlashIcon className="w-5 h-5" /> : <EyeIcon className="w-5 h-5" />}
-                </button>
-              </div>
-              <div className="relative">
-                <input
-                  id="register-confirm-password"
-                  name="confirmPassword"
-                  type={showPassword ? "text" : "password"}
-                  required
-                  value={form.confirmPassword}
-                  onChange={handleChange}
-                  placeholder="Confirm password"
-                  className={inputClass}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-muted-foreground hover:text-foreground"
-                >
-                  {showPassword ? <EyeSlashIcon className="w-5 h-5" /> : <EyeIcon className="w-5 h-5" />}
-                </button>
-              </div>
-              <button
-                id="register-submit-btn"
-                type="submit"
-                disabled={loading}
-                className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-bold text-sm hover:opacity-90 hover:shadow-lg hover:shadow-primary/30 transition-all disabled:opacity-60"
-              >
-                {loading ? "Creating account…" : "Create Account →"}
-              </button>
-            </form>
-          )}
-
-          {/* Footer links */}
           <div className="mt-6 text-center">
             <Link href="/" className="text-xs text-muted-foreground hover:text-foreground transition">
               ← Back to home
