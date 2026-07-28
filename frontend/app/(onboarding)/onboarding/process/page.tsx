@@ -55,7 +55,7 @@ export default async function OnboardingProcessPage() {
         plan: "FREE",
         trialEndsAt,
         planStartedAt: new Date(),
-        status: "ACTIVE", // Start as active (trial)
+        status: "APPROVED", // Start as approved
       }
     });
 
