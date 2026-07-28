@@ -2,11 +2,9 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
 
 export default function CreatePasswordPage() {
   const router = useRouter();
-  const { data: session, update } = useSession();
   
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -43,16 +41,8 @@ export default function CreatePasswordPage() {
 
       setMessage({ type: "success", text: "Password saved successfully!" });
       
-      // Update the NextAuth session so it knows we have a password now
-      await update({ hasPassword: true });
-      
-      // Redirect to dashboard
-      const tenantSlug = session?.user?.tenantSlug;
-      if (tenantSlug) {
-        router.push(`/gym/${tenantSlug}/dashboard`);
-      } else {
-        router.push("/dashboard");
-      }
+      // Hard redirect to dashboard to refresh session automatically
+      window.location.href = "/dashboard";
     } catch (err) {
       setMessage({ type: "error", text: "An error occurred." });
       setLoading(false);
@@ -111,8 +101,7 @@ export default function CreatePasswordPage() {
           <button 
              type="button"
              onClick={() => {
-                const tenantSlug = session?.user?.tenantSlug;
-                router.push(tenantSlug ? `/gym/${tenantSlug}/dashboard` : "/dashboard");
+                window.location.href = "/dashboard";
              }}
              className="text-xs text-muted-foreground hover:text-foreground underline"
           >
