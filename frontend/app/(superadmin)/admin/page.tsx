@@ -194,7 +194,12 @@ export default async function SuperAdminOverviewPage() {
                   {t.name[0]}
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="text-sm font-medium text-foreground truncate">{t.name}</p>
+                  <div className="flex items-center gap-2">
+                    <p className="text-sm font-medium text-foreground truncate">{t.name}</p>
+                    {t.isDemo && (
+                      <span className="bg-orange-500/10 text-orange-400 border border-orange-500/20 text-[9px] font-bold px-1.5 py-0.5 rounded uppercase">Sandbox</span>
+                    )}
+                  </div>
                   <p className="text-xs text-muted-foreground">{t._count.users} users · /{t.slug}</p>
                 </div>
                 <span

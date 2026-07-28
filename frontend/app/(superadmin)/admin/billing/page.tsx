@@ -160,7 +160,12 @@ export default async function SuperAdminBillingPage() {
                         {tenant.name[0]}
                       </div>
                       <div>
-                        <p className="font-semibold text-foreground">{tenant.name}</p>
+                        <div className="flex items-center gap-2">
+                          <p className="font-semibold text-foreground">{tenant.name}</p>
+                          {tenant.isDemo && (
+                            <span className="bg-orange-500/10 text-orange-400 border border-orange-500/20 text-[9px] font-bold px-1.5 py-0.5 rounded uppercase">Sandbox</span>
+                          )}
+                        </div>
                         <p className="text-muted-foreground font-mono text-[10px]">/{tenant.slug}</p>
                       </div>
                     </div>

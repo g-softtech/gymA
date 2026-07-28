@@ -114,7 +114,12 @@ export default async function SuperAdminTenantsPage() {
                         )}
                       </div>
                       <div>
-                        <p className="font-semibold text-foreground">{tenant.name}</p>
+                        <div className="flex items-center gap-2">
+                          <p className="font-semibold text-foreground">{tenant.name}</p>
+                          {tenant.isDemo && (
+                            <span className="bg-orange-500/10 text-orange-400 border border-orange-500/20 text-[9px] font-bold px-1.5 py-0.5 rounded uppercase">Sandbox</span>
+                          )}
+                        </div>
                         {tenant.settings?.city && (
                           <p className="text-xs text-muted-foreground">
                             {tenant.settings.city}, {tenant.settings.country}
