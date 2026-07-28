@@ -5,25 +5,31 @@ import { redirect } from "next/navigation";
 export default async function SuperAdminUsersPage({
   searchParams,
 }: {
-  searchParams: Promise<{ tenantId?: string; role?: string; env?: string }>;
+  searchParams: Promise<{ tenantId?: string; role?: string; env?: string; page?: string }>;
 }) {
   const session = await getAuthSession();
 
   if (!session?.user) return null;
-  const { tenantId: filterTenantId, role: filterRole, env: filterEnv } = await searchParams;
+  const { tenantId: filterTenantId, role: filterRole, env: filterEnv, page: filterPage } = await searchParams;
 
-  const [users, tenants] = await Promise.all([
+  const PAGE_SIZE = 50;
+  const currentPage = Math.max(1, parseInt(filterPage || "1", 10));
+  const skip = (currentPage - 1) * PAGE_SIZE;
+
+  const whereClause = {
+    ...(filterTenantId ? { tenantId: filterTenantId } : {}),
+    ...(filterRole
+      ? {
+          role: filterRole as "SUPERADMIN" | "ADMIN" | "TRAINER" | "MEMBER",
+        }
+      : {}),
+    ...(filterEnv === "sandbox" ? { tenant: { isDemo: true } } : {}),
+    ...(filterEnv === "real" ? { tenant: { isDemo: false } } : {}),
+  };
+
+  const [users, totalUsersCount, tenants] = await Promise.all([
     prisma.user.findMany({
-      where: {
-        ...(filterTenantId ? { tenantId: filterTenantId } : {}),
-        ...(filterRole
-          ? {
-              role: filterRole as "SUPERADMIN" | "ADMIN" | "TRAINER" | "MEMBER",
-            }
-          : {}),
-        ...(filterEnv === "sandbox" ? { tenant: { isDemo: true } } : {}),
-        ...(filterEnv === "real" ? { tenant: { isDemo: false } } : {}),
-      },
+      where: whereClause,
       select: {
         id: true,
         name: true,
@@ -34,8 +40,10 @@ export default async function SuperAdminUsersPage({
         tenant: { select: { name: true, slug: true, isDemo: true } },
       },
       orderBy: { name: "asc" },
-      take: 250,
+      skip,
+      take: PAGE_SIZE,
     }),
+    prisma.user.count({ where: whereClause }),
     prisma.tenant.findMany({
       select: { id: true, name: true, slug: true },
       orderBy: { name: "asc" },
@@ -50,6 +58,17 @@ export default async function SuperAdminUsersPage({
   };
 
   const roles = ["SUPERADMIN", "ADMIN", "TRAINER", "MEMBER"];
+
+  const totalPages = Math.ceil(totalUsersCount / PAGE_SIZE);
+
+  const getPageLink = (p: number) => {
+    const query = new URLSearchParams();
+    if (filterTenantId) query.set("tenantId", filterTenantId);
+    if (filterRole) query.set("role", filterRole);
+    if (filterEnv) query.set("env", filterEnv);
+    query.set("page", p.toString());
+    return `/admin/users?${query.toString()}`;
+  };
 
   return (
     <div className="p-8">
@@ -209,6 +228,29 @@ export default async function SuperAdminUsersPage({
             <div className="text-center py-16 text-muted-foreground">
               <p className="text-4xl mb-3">👥</p>
               <p className="text-sm">No users match your filters.</p>
+            </div>
+          )}
+
+          {totalPages > 1 && (
+            <div className="flex items-center justify-between border-t border-white/5 bg-card/50 px-6 py-4">
+              <div className="text-sm text-muted-foreground">
+                Showing <span className="font-semibold text-slate-300">{users.length > 0 ? skip + 1 : 0}</span> to <span className="font-semibold text-slate-300">{skip + users.length}</span> of <span className="font-semibold text-slate-300">{totalUsersCount}</span> users
+              </div>
+              <div className="flex items-center gap-2">
+                <a
+                  href={currentPage > 1 ? getPageLink(currentPage - 1) : "#"}
+                  className={`px-3 py-1.5 text-sm rounded-md border ${currentPage > 1 ? "border-white/10 hover:bg-white/5 text-slate-300" : "border-white/5 text-slate-600 pointer-events-none"}`}
+                >
+                  Previous
+                </a>
+                <span className="text-sm text-slate-400 px-2">Page {currentPage} of {totalPages}</span>
+                <a
+                  href={currentPage < totalPages ? getPageLink(currentPage + 1) : "#"}
+                  className={`px-3 py-1.5 text-sm rounded-md border ${currentPage < totalPages ? "border-white/10 hover:bg-white/5 text-slate-300" : "border-white/5 text-slate-600 pointer-events-none"}`}
+                >
+                  Next
+                </a>
+              </div>
             </div>
           )}
         </div>
