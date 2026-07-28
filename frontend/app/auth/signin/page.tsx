@@ -102,7 +102,7 @@ export default function SignInPage() {
         redirect: false
       });
       if (result?.error) {
-        setMessage({ type: "error", text: result.error });
+        setMessage({ type: "error", text: authErrorMap[result.error] || result.error });
       } else {
         setMessage({ type: "success", text: "Check your email! A secure login link has been sent." });
       }
@@ -126,7 +126,7 @@ export default function SignInPage() {
     if (result?.ok) {
       router.push(callbackUrl);
     } else {
-      setMessage({ type: "error", text: result?.error || "Incorrect email or password." });
+      setMessage({ type: "error", text: (result?.error ? authErrorMap[result.error] : null) || result?.error || "Incorrect email or password." });
       setLoading(false);
     }
   };
