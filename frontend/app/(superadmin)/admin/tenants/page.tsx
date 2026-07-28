@@ -78,6 +78,9 @@ export default async function SuperAdminTenantsPage() {
                   Status
                 </th>
                 <th className="text-left px-6 py-3.5 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                  Trial / Billing
+                </th>
+                <th className="text-left px-6 py-3.5 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                   Actions
                 </th>
               </tr>
@@ -152,13 +155,27 @@ export default async function SuperAdminTenantsPage() {
                     <span className="text-muted-foreground">{tenant._count.membershipPlans}</span>
                   </td>
 
-                  {/* Status */}
+                  {/* Status badge */}
                   <td className="px-6 py-4">
                     <span
                       className={`text-[11px] font-bold px-2.5 py-1 rounded-full border ${statusColors[tenant.status] ?? "bg-slate-700 text-slate-300 border-slate-600"}`}
                     >
                       {tenant.status}
                     </span>
+                  </td>
+
+                  {/* Trial / Billing */}
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {tenant.trialEndsAt ? (
+                      <div>
+                        <span className={`text-xs font-semibold ${new Date() > tenant.trialEndsAt ? "text-red-400" : "text-emerald-400"}`}>
+                          Trial {new Date() > tenant.trialEndsAt ? "Ended" : "Ends"}:
+                        </span>
+                        <p className="text-xs text-muted-foreground mt-0.5">{tenant.trialEndsAt.toLocaleDateString()}</p>
+                      </div>
+                    ) : (
+                      <span className="text-xs text-muted-foreground">No Trial</span>
+                    )}
                   </td>
 
                   {/* Actions */}
