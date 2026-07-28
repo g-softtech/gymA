@@ -12,7 +12,7 @@ export default async function SuperAdminUsersPage({
   if (!session?.user) return null;
   const { tenantId: filterTenantId, role: filterRole, env: filterEnv, page: filterPage } = await searchParams;
 
-  const PAGE_SIZE = 50;
+  const PAGE_SIZE = 25;
   const currentPage = Math.max(1, parseInt(filterPage || "1", 10));
   const skip = (currentPage - 1) * PAGE_SIZE;
 
