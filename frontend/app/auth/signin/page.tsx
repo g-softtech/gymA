@@ -29,6 +29,7 @@ export default function SignInPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
+  const [magicLinkLoading, setMagicLinkLoading] = useState(false);
   const [message, setMessage] = useState<{ type: "error" | "success"; text: string } | null>(null);
   const [branding, setBranding] = useState<any>(null);
 
@@ -73,6 +74,42 @@ export default function SignInPage() {
     } catch {
       setGoogleLoading(false);
     }
+  };
+
+  const handleMagicLink = async () => {
+    if (!form.email) {
+       setMessage({ type: "error", text: "Please enter your email address above to receive a login link." });
+       return;
+    }
+    setMagicLinkLoading(true);
+    setMessage(null);
+    try {
+      const res = await fetch("/api/auth/magic-link/rate-limit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: form.email })
+      });
+      if (!res.ok) {
+         const data = await res.json();
+         setMessage({ type: "error", text: data.error || "Too many requests. Please try again later." });
+         setMagicLinkLoading(false);
+         return;
+      }
+      
+      const result = await signIn("email", {
+        email: form.email,
+        callbackUrl,
+        redirect: false
+      });
+      if (result?.error) {
+        setMessage({ type: "error", text: result.error });
+      } else {
+        setMessage({ type: "success", text: "Check your email! A secure login link has been sent." });
+      }
+    } catch (e) {
+      setMessage({ type: "error", text: "Failed to send link." });
+    }
+    setMagicLinkLoading(false);
   };
 
   const handleCredentialsSignIn = async (e: React.FormEvent) => {
@@ -254,15 +291,39 @@ export default function SignInPage() {
                     {showPassword ? <EyeSlashIcon className="w-5 h-5" /> : <EyeIcon className="w-5 h-5" />}
                   </button>
                 </div>
+                <div className="flex items-center justify-between mt-2 mb-4">
+                  <span className="text-xs text-muted-foreground invisible">Spacer</span>
+                  <button type="button" onClick={() => { setTab("signin"); setMessage({type:"success", text: "Click 'Send Magic Login Link' below to securely log in or set a new password."})}} className="text-xs text-primary font-medium hover:underline focus:outline-none">Forgot Password?</button>
+                </div>
                 <button
                   id="signin-submit-btn"
                   type="submit"
-                  disabled={loading}
+                  disabled={loading || magicLinkLoading}
                   className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-bold text-sm hover:opacity-90 hover:shadow-lg hover:shadow-primary/30 transition-all disabled:opacity-60"
                 >
                   {loading ? "Signing in…" : "Sign In →"}
                 </button>
               </form>
+
+              {/* Magic Link Divider */}
+              <div className="flex items-center gap-3 my-4">
+                <div className="flex-1 h-px bg-border" />
+                <span className="text-muted-foreground text-xs">or</span>
+                <div className="flex-1 h-px bg-border" />
+              </div>
+
+              {/* Magic Link Request */}
+              <button
+                type="button"
+                onClick={handleMagicLink}
+                disabled={magicLinkLoading || loading}
+                className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl bg-indigo-50 border border-indigo-100 text-indigo-700 dark:bg-indigo-950/30 dark:border-indigo-900/50 dark:text-indigo-400 font-semibold text-sm hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-all hover:shadow-lg disabled:opacity-60"
+              >
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 12a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0zm0 0c0 1.657 1.007 3 2.25 3S21 13.657 21 12a9 9 0 10-2.636 6.364M16.5 12V8.25" />
+                </svg>
+                {magicLinkLoading ? "Sending..." : "Send Magic Login Link"}
+              </button>
             </>
           ) : (
             <form onSubmit={handleRegister} className="space-y-3">

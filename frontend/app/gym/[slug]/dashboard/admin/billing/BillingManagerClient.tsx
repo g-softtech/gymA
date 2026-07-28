@@ -3,11 +3,11 @@
 import { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useBranding } from "@/components/TenantThemeProvider";
-import type { PlatformPlanConfig } from "@/lib/billing/pricingConfig";
+import type { PlatformPlanConfig } from "@/lib/billing/pricing.config";
 import { PricingCard } from "@/components/billing/PricingCard";
 
-// Type override for the mismatch between PricingCard's expected type and the actual data
-type AnyPlanConfig = any;
+// Use the actual interface from the new billing system
+type AnyPlanConfig = PlatformPlanConfig;
 
 type PlanInfo = {
   subscriptionPlan: string;
@@ -143,9 +143,12 @@ export default function BillingManagerClient() {
       {/* Plans Comparison */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 xl:gap-6 items-start">
         {plans.map((plan) => {
-          const isCurrent = status?.subscriptionPlan === plan.code;
-          const currentPlanConfig = plans.find(p => p.code === (status?.subscriptionPlan || "FREE")) || plans[0];
-          const isDowngrade = plan.amountNGN < currentPlanConfig.amountNGN;
+          const isCurrent = status?.subscriptionPlan === plan.code || (status?.subscriptionPlan === "FREE" && plan.code === "STARTER");
+          const currentPlanCode = status?.subscriptionPlan === "FREE" ? "STARTER" : (status?.subscriptionPlan || "STARTER");
+          const currentPlanConfig = plans.find(p => p.code === currentPlanCode) || plans[0];
+          const planAmount = plan.pricing?.[0]?.amountSubunits || 0;
+          const currentAmount = currentPlanConfig?.pricing?.[0]?.amountSubunits || 0;
+          const isDowngrade = planAmount < currentAmount;
 
           return (
             <PricingCard 
@@ -159,7 +162,7 @@ export default function BillingManagerClient() {
                       disabled={!!checkoutLoading}
                       className="w-full py-3 rounded-xl border-2 border-indigo-600 text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 font-bold text-sm transition-all"
                     >
-                      {checkoutLoading === p.code ? "Redirecting..." : `Renew ${p.name}`}
+                      {checkoutLoading === p.code ? "Redirecting..." : `Renew ${p.ui?.displayName || p.code}`}
                     </button>
                   );
                 }
@@ -179,7 +182,7 @@ export default function BillingManagerClient() {
                     className="w-full py-3 rounded-xl text-white font-bold text-sm hover:opacity-90 transition-all shadow-lg"
                     style={{ background: primaryColor || "linear-gradient(135deg, #6366F1, #8B5CF6)" }}
                   >
-                    {checkoutLoading === p.code ? "Redirecting..." : `Upgrade to ${p.name}`}
+                    {checkoutLoading === p.code ? "Redirecting..." : `Upgrade to ${p.ui?.displayName || p.code}`}
                   </button>
                 );
               }}

@@ -103,6 +103,16 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
+model AuthRateLimit {
+  id        String   @id @default(cuid())
+  email     String
+  ip        String?
+  createdAt DateTime @default(now())
+
+  @@index([email])
+  @@index([createdAt])
+}
+
 model MemberProfile {
   id                     String                  @id @default(cuid())
   userId                 String                  @unique

@@ -6,6 +6,7 @@ import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "./prisma";
 import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
+import EmailProvider from "next-auth/providers/email";
 import bcrypt from "bcryptjs";
 import { auditLogger, AuditEventType } from "./auditLogger";
 
@@ -96,6 +97,66 @@ export const authOptions: NextAuthOptions = {
         } as any;
       },
     }),
+
+    // ── Magic Link (Email) ────────────────────────────────────────────────────
+    EmailProvider({
+      server: "", // Custom sendVerificationRequest bypasses Nodemailer
+      from: "CortexFit <noreply@cortexfit.com>",
+      maxAge: 15 * 60, // 15 minutes expiration
+      async sendVerificationRequest({ identifier: email, url, provider }) {
+        const resendApiKey = process.env.RESEND_API_KEY;
+        if (!resendApiKey) {
+          console.error("RESEND_API_KEY is missing. Cannot send Magic Link.");
+          return;
+        }
+
+        // Extract tenant branding from the callback URL if available
+        const parsedUrl = new URL(url);
+        const callbackUrl = parsedUrl.searchParams.get("callbackUrl") || "";
+        const match = callbackUrl.match(/\/gym\/([^\/]+)/);
+        const tenantSlug = match ? match[1] : null;
+
+        let gymName = "CortexFit";
+        if (tenantSlug) {
+          const tenant = await prisma.tenant.findUnique({ where: { slug: tenantSlug }, select: { name: true }});
+          if (tenant) gymName = tenant.name;
+        }
+
+        const html = `
+          <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eaeaea; border-radius: 8px;">
+            <h2 style="color: #333;">Sign in to ${gymName}</h2>
+            <p style="color: #555; font-size: 16px;">Hello,</p>
+            <p style="color: #555; font-size: 16px;">Click the button below to securely sign in.</p>
+            <div style="margin: 30px 0;">
+              <a href="${url}" style="background-color: #4F46E5; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">
+                Sign In
+              </a>
+            </div>
+            <hr style="border: none; border-top: 1px solid #eaeaea; margin: 20px 0;" />
+            <p style="color: #888; font-size: 14px; margin: 0;">This link expires in 15 minutes.</p>
+            <p style="color: #888; font-size: 14px; margin: 5px 0 0 0;">If you didn't request this, simply ignore this email.</p>
+          </div>
+        `;
+
+        const res = await fetch("https://api.resend.com/emails", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${resendApiKey}`,
+          },
+          body: JSON.stringify({
+            from: provider.from,
+            to: email,
+            subject: `Sign in to ${gymName}`,
+            html: html,
+          }),
+        });
+
+        if (!res.ok) {
+          throw new Error("Resend API error: " + await res.text());
+        }
+      },
+    }),
   ],
 
   session: {
@@ -141,6 +202,7 @@ export const authOptions: NextAuthOptions = {
           role: true,
           tenantId: true,
           sessionVersion: true,
+          password: true,
           tenant: { select: { slug: true, status: true } },
         },
       });
@@ -173,6 +235,12 @@ export const authOptions: NextAuthOptions = {
       token.tenantSlug = dbUser.tenant?.slug ?? null;
       token.tenantStatus = dbUser.tenant?.status ?? null;
       token.sessionVersion = dbUser.sessionVersion;
+      token.hasPassword = !!dbUser.password;
+      
+      // If logging in right now, record the provider
+      if (account) {
+        token.provider = account.provider;
+      }
 
       console.log(`${TRACE} └─ FINAL TOKEN (after hydration):`);
       console.log(`${TRACE}    token.id        = ${token.id}`);
@@ -202,6 +270,8 @@ export const authOptions: NextAuthOptions = {
         session.user.tenantId = token.tenantId as string | undefined;
         session.user.tenantSlug = token.tenantSlug as string | null | undefined;
         session.user.tenantStatus = token.tenantStatus as string | null | undefined;
+        session.user.hasPassword = token.hasPassword as boolean;
+        session.user.provider = token.provider as string | undefined;
       }
 
       console.log(`${TRACE} └─ OUTGOING session.user:`);
