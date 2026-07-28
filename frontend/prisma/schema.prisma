@@ -1137,3 +1137,19 @@ model IntelligenceSafetyEvent {
   @@index([tenantId])
   @@index([action])
 }
+
+
+model PendingSignup {
+  id         String   @id @default(cuid())
+  email      String   @unique
+  ownerName  String
+  gymName    String
+  slug       String
+  status     String   @default("PENDING") // PENDING, COMPLETED, EXPIRED
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([email, status])
+}
+

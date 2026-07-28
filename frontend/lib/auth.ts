@@ -117,19 +117,34 @@ export const authOptions: NextAuthOptions = {
         const tenantSlug = match ? match[1] : null;
 
         let gymName = "CortexFit";
-        if (tenantSlug) {
+        let isCreationFlow = callbackUrl.includes("/onboarding/process");
+        let title = `Sign in to ${gymName}`;
+        let body = `<p style="color: #555; font-size: 16px;">Hello,</p><p style="color: #555; font-size: 16px;">Click the button below to securely sign in.</p>`;
+        let buttonText = "Sign In";
+
+        if (isCreationFlow) {
+          const pending = await prisma.pendingSignup.findFirst({ where: { email, status: "PENDING" } });
+          if (pending) {
+            gymName = pending.gymName;
+            title = `Create ${gymName}`;
+            body = `<p style="color: #555; font-size: 16px;">Welcome to CortexFit!</p><p style="color: #555; font-size: 16px;">We're almost ready. Click below to create <strong>${gymName}</strong>.</p>`;
+            buttonText = "Create My Gym";
+          }
+        } else if (tenantSlug) {
           const tenant = await prisma.tenant.findUnique({ where: { slug: tenantSlug }, select: { name: true }});
-          if (tenant) gymName = tenant.name;
+          if (tenant) {
+            gymName = tenant.name;
+            title = `Sign in to ${gymName}`;
+          }
         }
 
         const html = `
           <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eaeaea; border-radius: 8px;">
-            <h2 style="color: #333;">Sign in to ${gymName}</h2>
-            <p style="color: #555; font-size: 16px;">Hello,</p>
-            <p style="color: #555; font-size: 16px;">Click the button below to securely sign in.</p>
+            <h2 style="color: #333;">${title}</h2>
+            ${body}
             <div style="margin: 30px 0;">
               <a href="${url}" style="background-color: #4F46E5; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">
-                Sign In
+                ${buttonText}
               </a>
             </div>
             <hr style="border: none; border-top: 1px solid #eaeaea; margin: 20px 0;" />
@@ -147,7 +162,7 @@ export const authOptions: NextAuthOptions = {
           body: JSON.stringify({
             from: provider.from,
             to: email,
-            subject: `Sign in to ${gymName}`,
+            subject: title,
             html: html,
           }),
         });
