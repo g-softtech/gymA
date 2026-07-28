@@ -17,8 +17,8 @@ async function getPlatformStats() {
     totalSaaSRevenue,
     recentInvoices,
   ] = await Promise.all([
-    prisma.tenant.count(),
-    prisma.tenant.count({ where: { isActive: true } }),
+    prisma.tenant.count({ where: { isDemo: false } }),
+    prisma.tenant.count({ where: { isActive: true, isDemo: false } }),
     prisma.user.count(),
     prisma.user.count({ where: { role: "ADMIN" } }),
     prisma.user.count({ where: { role: "TRAINER" } }),
@@ -45,7 +45,7 @@ async function getPlatformStats() {
   const planBreakdown = await prisma.tenant.groupBy({
     by: ["plan"],
     _count: { _all: true },
-    where: { isActive: true }, // Only count active tenants for MRR
+    where: { isActive: true, isDemo: false }, // Only count active real tenants for MRR
   });
 
   let estimatedMRR = 0;

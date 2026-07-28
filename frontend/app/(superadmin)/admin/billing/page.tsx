@@ -32,22 +32,25 @@ export default async function SuperAdminBillingPage() {
     orderBy: { name: "asc" }
   });
 
-  const healthy = tenants.filter(t => t.billingStatus === "ACTIVE").length;
-  const trialing = tenants.filter(t => t.billingStatus === "TRIALING").length;
-  const pastDue = tenants.filter(t => t.billingStatus === "PAST_DUE").length;
-  const suspended = tenants.filter(t => t.billingStatus === "SUSPENDED").length;
-  const expired = tenants.filter(t => t.billingStatus === "EXPIRED").length;
+  const realTenants = tenants.filter(t => !t.isDemo);
+  const sandboxes = tenants.filter(t => t.isDemo).length;
+
+  const healthy = realTenants.filter(t => t.billingStatus === "ACTIVE").length;
+  const trialing = realTenants.filter(t => t.billingStatus === "TRIALING").length;
+  const pastDue = realTenants.filter(t => t.billingStatus === "PAST_DUE").length;
+  const suspended = realTenants.filter(t => t.billingStatus === "SUSPENDED").length;
+  const expired = realTenants.filter(t => t.billingStatus === "EXPIRED").length;
 
   const now = new Date();
   const in1Day = new Date(now.getTime() + 1 * 24 * 60 * 60 * 1000);
   const in3Days = new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000);
   const in7Days = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
 
-  const expiring1 = tenants.filter(t => t.billingEndsAt && t.billingEndsAt > now && t.billingEndsAt <= in1Day).length;
-  const expiring3 = tenants.filter(t => t.billingEndsAt && t.billingEndsAt > in1Day && t.billingEndsAt <= in3Days).length;
-  const expiring7 = tenants.filter(t => t.billingEndsAt && t.billingEndsAt > in3Days && t.billingEndsAt <= in7Days).length;
+  const expiring1 = realTenants.filter(t => t.billingEndsAt && t.billingEndsAt > now && t.billingEndsAt <= in1Day).length;
+  const expiring3 = realTenants.filter(t => t.billingEndsAt && t.billingEndsAt > in1Day && t.billingEndsAt <= in3Days).length;
+  const expiring7 = realTenants.filter(t => t.billingEndsAt && t.billingEndsAt > in3Days && t.billingEndsAt <= in7Days).length;
 
-  const churnRate = tenants.length > 0 ? Math.round(((expired + suspended) / tenants.length) * 100) : 0;
+  const churnRate = realTenants.length > 0 ? Math.round(((expired + suspended) / realTenants.length) * 100) : 0;
 
   const statusColors: Record<string, string> = {
     ACTIVE: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
@@ -70,7 +73,7 @@ export default async function SuperAdminBillingPage() {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-4">
+      <div className="grid grid-cols-2 md:grid-cols-6 gap-4 mb-4">
         <div className="bg-card text-card-foreground border border-border p-4 rounded-xl">
           <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Active / Healthy</p>
           <p className="text-2xl font-black mt-1 text-emerald-400">{healthy}</p>
@@ -90,6 +93,10 @@ export default async function SuperAdminBillingPage() {
         <div className="bg-card text-card-foreground border border-border p-4 rounded-xl">
           <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Expired</p>
           <p className="text-2xl font-black mt-1 text-red-400">{expired}</p>
+        </div>
+        <div className="bg-card text-card-foreground border border-border p-4 rounded-xl">
+          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Sandboxes</p>
+          <p className="text-2xl font-black mt-1 text-orange-400">{sandboxes}</p>
         </div>
       </div>
 
