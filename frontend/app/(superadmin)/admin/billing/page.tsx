@@ -21,6 +21,7 @@ export default async function SuperAdminBillingPage() {
       billingStatus: true,
       billingEndsAt: true,
       trialEndsAt: true,
+      isDemo: true,
       settings: {
         select: {
           logoUrl: true,
