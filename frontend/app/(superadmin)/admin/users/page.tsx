@@ -5,12 +5,12 @@ import { redirect } from "next/navigation";
 export default async function SuperAdminUsersPage({
   searchParams,
 }: {
-  searchParams: Promise<{ tenantId?: string; role?: string }>;
+  searchParams: Promise<{ tenantId?: string; role?: string; env?: string }>;
 }) {
   const session = await getAuthSession();
 
   if (!session?.user) return null;
-  const { tenantId: filterTenantId, role: filterRole } = await searchParams;
+  const { tenantId: filterTenantId, role: filterRole, env: filterEnv } = await searchParams;
 
   const [users, tenants] = await Promise.all([
     prisma.user.findMany({
@@ -21,6 +21,8 @@ export default async function SuperAdminUsersPage({
               role: filterRole as "SUPERADMIN" | "ADMIN" | "TRAINER" | "MEMBER",
             }
           : {}),
+        ...(filterEnv === "sandbox" ? { tenant: { isDemo: true } } : {}),
+        ...(filterEnv === "real" ? { tenant: { isDemo: false } } : {}),
       },
       select: {
         id: true,
@@ -29,7 +31,7 @@ export default async function SuperAdminUsersPage({
         role: true,
         image: true,
         tenantId: true,
-        tenant: { select: { name: true, slug: true } },
+        tenant: { select: { name: true, slug: true, isDemo: true } },
       },
       orderBy: { name: "asc" },
       take: 250,
@@ -91,6 +93,18 @@ export default async function SuperAdminUsersPage({
               {r}
             </option>
           ))}
+        </select>
+
+        {/* Environment filter */}
+        <select
+          name="env"
+          defaultValue={filterEnv ?? ""}
+          id="filter-env"
+          className="bg-card text-card-foreground/[0.05] border border-white/10 rounded-lg px-3 py-2 text-sm text-slate-300 focus:outline-none focus:ring-1 focus:ring-indigo-500 cursor-pointer"
+        >
+          <option value="">All Environments</option>
+          <option value="real">Real Gyms Only</option>
+          <option value="sandbox">Sandboxes Only</option>
         </select>
 
         <button
@@ -174,9 +188,14 @@ export default async function SuperAdminUsersPage({
                   {/* Gym */}
                   <td className="px-6 py-3.5">
                     {user.tenant ? (
-                      <span className="text-indigo-400 text-xs font-medium">
-                        {user.tenant.name}
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-indigo-400 text-xs font-medium">
+                          {user.tenant.name}
+                        </span>
+                        {user.tenant.isDemo && (
+                          <span className="bg-orange-500/10 text-orange-400 border border-orange-500/20 text-[9px] font-bold px-1.5 py-0.5 rounded uppercase">Sandbox</span>
+                        )}
+                      </div>
                     ) : (
                       <span className="text-slate-600 text-xs italic">No gym</span>
                     )}
