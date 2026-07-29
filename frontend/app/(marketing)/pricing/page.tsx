@@ -34,7 +34,7 @@ export default function PricingPage() {
                 plan={plan} 
                 renderAction={(p) => (
                   <Link 
-                    href={p.code === "APEX" ? "/contact" : `/onboarding?plan=${p.code.toLowerCase()}`} 
+                    href={p.code === "APEX" ? "/contact" : `/signup?plan=${p.code.toLowerCase()}`} 
                     className={`w-full font-bold px-6 py-3 rounded-xl transition text-center block ${
                       p.ui.isMostPopular 
                         ? "bg-indigo-600 text-white hover:bg-indigo-700 shadow-md shadow-indigo-200" 
@@ -80,7 +80,7 @@ export default function PricingPage() {
             <Link href="/contact" className="bg-white text-indigo-700 font-bold px-8 py-4 rounded-xl hover:bg-indigo-50 transition">
               Talk to Sales
             </Link>
-            <Link href="/onboarding" className="border-2 border-white/40 font-bold px-8 py-4 rounded-xl hover:bg-white/10 transition">
+            <Link href="/signup" className="border-2 border-white/40 font-bold px-8 py-4 rounded-xl hover:bg-white/10 transition">
               Start Free Trial
             </Link>
           </div>

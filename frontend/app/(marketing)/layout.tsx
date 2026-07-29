@@ -42,7 +42,7 @@ export default function MarketingLayout({ children }: { children: ReactNode }) {
               Sign In
             </Link>
             <Link
-              href="/onboarding"
+              href="/signup"
               className="bg-primary hover:opacity-90 text-primary-foreground text-sm font-semibold px-4 py-2 rounded-lg transition ml-2 shadow-sm"
             >
               Register Gym

@@ -231,7 +231,7 @@ export default function HomePage() {
                   Our AI coach generates personalised workout plans and Nigerian meal plans — featuring Jollof Rice, Egusi Soup, Suya, Moin Moin, and 60+ local foods with precise macro breakdowns.
                 </p>
                 <Link
-                  href="/onboarding"
+                  href="/signup"
                   className="inline-flex bg-white text-indigo-700 font-bold px-6 py-3 rounded-xl hover:bg-indigo-50 transition"
                 >
                   Try AI Coach →
@@ -335,7 +335,7 @@ export default function HomePage() {
                 plan={plan} 
                 renderAction={(p) => (
                   <Link 
-                    href={p.code === "APEX" ? "/contact" : `/onboarding?plan=${p.code.toLowerCase()}`} 
+                    href={p.code === "APEX" ? "/contact" : `/signup?plan=${p.code.toLowerCase()}`} 
                     className={`w-full font-bold px-6 py-3 rounded-xl transition text-center block ${
                       p.ui.isMostPopular 
                         ? "bg-indigo-600 text-white hover:bg-indigo-700 shadow-md shadow-indigo-200" 
@@ -364,7 +364,7 @@ export default function HomePage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
-              href="/onboarding"
+              href="/signup"
               className="bg-white text-indigo-700 font-bold px-8 py-4 rounded-xl hover:bg-indigo-50 transition"
             >
               Start Free Trial
