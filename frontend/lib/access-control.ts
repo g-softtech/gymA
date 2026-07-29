@@ -63,7 +63,7 @@ export function getUserAccessContext(session: Session | null): AccessContext {
       hasTenant: false,
       tenantId: null,
       tenantSlug: null,
-      defaultRedirect: "/onboarding",
+      defaultRedirect: "/signup",
     };
   }
 
@@ -88,7 +88,7 @@ export function getUserAccessContext(session: Session | null): AccessContext {
     hasTenant: false,
     tenantId: null,
     tenantSlug: null,
-    defaultRedirect: "/onboarding",
+    defaultRedirect: "/signup",
   };
   console.log(`${TRACE} └─ BRANCH: no tenant → redirect=${result.defaultRedirect}`);
   return result;
