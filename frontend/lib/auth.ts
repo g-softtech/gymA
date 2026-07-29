@@ -101,7 +101,7 @@ export const authOptions: NextAuthOptions = {
     // ── Magic Link (Email) ────────────────────────────────────────────────────
     EmailProvider({
       server: "", // Custom sendVerificationRequest bypasses Nodemailer
-      from: "CortexFit <noreply@cortexfit.com>",
+      from: process.env.EMAIL_FROM || "CortexFit <onboarding@resend.dev>",
       maxAge: 15 * 60, // 15 minutes expiration
       async sendVerificationRequest({ identifier: email, url, provider }) {
         const resendApiKey = process.env.RESEND_API_KEY;
