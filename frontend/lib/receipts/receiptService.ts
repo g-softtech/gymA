@@ -104,7 +104,7 @@ export async function processAndSendReceipt({
       recipient: memberEmail,
       subject: `Payment Receipt - ${receiptNumber}`,
       tenantId: receipt.tenantId,
-      userId: receipt.userId,
+      userId: (receipt as any).member?.userId, // Or simply omit if we don't strictly need it for the email
       payload: {
         memberName,
         receiptNumber,

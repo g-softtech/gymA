@@ -42,6 +42,7 @@ export async function enqueueEmail(entry: EmailQueueEntry): Promise<void> {
   try {
     await prisma.emailJob.create({
       data: {
+        eventId: entry.eventId,
         emailType: entry.emailType as any, // Prisma enum cast
         recipient: entry.recipient,
         subject: entry.subject,
@@ -67,42 +68,26 @@ export async function enqueueEmail(entry: EmailQueueEntry): Promise<void> {
  * Called by the email worker at /api/workers/email-worker/route.ts
  * Guarantees exactly-once delivery via idempotency check before sending.
  */
-export async function processEmailJob(jobId: string): Promise<void> {
-  const job = await prisma.emailJob.findUnique({ where: { id: jobId } });
-
-  if (!job) {
-    console.warn(`[EmailService] Job ${jobId} not found.`);
-    return;
-  }
-
-  if (job.status === "PROCESSING" || job.status === "SENT") {
-    console.warn(`[EmailService] Job ${jobId} is already ${job.status}. Skipping.`);
-    return;
-  }
-
-  // Mark as PROCESSING
-  await prisma.emailJob.update({
-    where: { id: jobId },
-    data: {
-      status: "PROCESSING",
-      lastAttemptAt: new Date(),
-      attempts: { increment: 1 },
-    },
-  });
+export async function processEmailJob(job: any): Promise<void> {
+  const jobId = job.id;
 
   // ── Idempotency Check ───────────────────────────────────────────────────────
-  // Check if we've already successfully delivered this exact email to this recipient
+  // Check if we've already successfully delivered this exact event
   const alreadySent = await prisma.emailLog.findFirst({
-    where: {
-      emailType: job.emailType,
-      recipient: job.recipient,
-      tenantId: job.tenantId,
-      status: "SENT",
-    },
+    where: job.eventId
+      ? { eventId: job.eventId, status: "SENT" }
+      : {
+          emailType: job.emailType,
+          recipient: job.recipient,
+          tenantId: job.tenantId,
+          status: "SENT",
+          // Only fall back to this loose check if eventId is missing, and scope it to recent
+          createdAt: { gte: new Date(Date.now() - 24 * 60 * 60 * 1000) },
+        },
   });
 
   if (alreadySent) {
-    console.log(`[EmailService] Idempotency: Email ${job.emailType} to ${job.recipient} already sent. Cleaning up job.`);
+    console.warn(`[EmailService] Idempotency check failed: Job ${jobId} (Event ${job.eventId}) already sent. Removing duplicate.`);
     await prisma.emailJob.delete({ where: { id: jobId } });
     return;
   }
@@ -141,6 +126,7 @@ export async function processEmailJob(jobId: string): Promise<void> {
     });
     await prisma.emailLog.create({
       data: {
+        eventId: job.eventId,
         emailType: job.emailType as any,
         recipient: job.recipient,
         subject: job.subject,
@@ -198,6 +184,7 @@ export async function processEmailJob(jobId: string): Promise<void> {
     await prisma.$transaction([
       prisma.emailLog.create({
         data: {
+          eventId: job.eventId,
           emailType: job.emailType as any,
           recipient: job.recipient,
           subject: job.subject,

@@ -25,15 +25,24 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    // ── Fetch pending jobs that are ready to be processed ────────────────────
-    const jobs = await prisma.emailJob.findMany({
-      where: {
-        status: { in: ["PENDING"] },
-        nextRetryAt: { lte: new Date() },
-      },
-      orderBy: { createdAt: "asc" },
-      take: BATCH_SIZE,
-    });
+    // ── Atomic Claim (FOR UPDATE SKIP LOCKED) ─────────────────────────────────
+    // This guarantees that if Vercel spins up two concurrent worker invocations,
+    // they will not claim the same jobs, preventing dual-sends.
+    const claimedJobs = await prisma.$queryRaw<any[]>`
+      UPDATE "EmailJob"
+      SET status = 'PROCESSING', "lastAttemptAt" = NOW()
+      WHERE id IN (
+        SELECT id FROM "EmailJob"
+        WHERE status = 'PENDING' AND ("nextRetryAt" IS NULL OR "nextRetryAt" <= NOW())
+        ORDER BY "createdAt" ASC
+        LIMIT ${BATCH_SIZE}
+        FOR UPDATE SKIP LOCKED
+      )
+      RETURNING *;
+    `;
+
+    // Map raw sql casing to JS objects if necessary, though raw usually returns matching names 
+    const jobs = claimedJobs;
 
     if (jobs.length === 0) {
       return NextResponse.json({ processed: 0, message: "No pending jobs." });
@@ -44,7 +53,7 @@ export async function GET(req: NextRequest) {
 
     for (const job of jobs) {
       try {
-        await processEmailJob(job.id);
+        await processEmailJob(job);
         results.push({ id: job.id, status: "processed" });
       } catch (err: any) {
         results.push({ id: job.id, status: "error", error: err.message });

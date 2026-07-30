@@ -1,5 +1,4 @@
 import { prisma } from "@/lib/prisma";
-import { sendEmail } from "@/lib/email/emailService";
 
 import { EXPIRY_WARNING_DAYS } from "@/lib/billing/pricingConfig";
 

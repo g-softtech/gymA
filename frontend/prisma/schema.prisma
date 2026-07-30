@@ -24,18 +24,18 @@ model Tenant {
   blogPosts              BlogPost[]
   classSessions          ClassSession[]
   entitlementLogs        EntitlementLog[]
-  intelligenceActionLogs IntelligenceActionLog[]
-  intelligenceOpsMetrics IntelligenceOpsMetrics[]
   membershipPlans        MembershipPlan[]
   messages               Message[]
   notifications          Notification[]
   receipts               Receipt[]
   saasInvoices           SaaSInvoice[]
   subscriptions          Subscription[]
-  intelligenceMetrics    TenantIntelligenceMetrics[]
   settings               TenantSettings?
   transactions           Transaction[]
   users                  User[]
+  intelligenceActionLogs IntelligenceActionLog[]
+  intelligenceMetrics    TenantIntelligenceMetrics[]
+  intelligenceOpsMetrics IntelligenceOpsMetrics[]
 
   @@index([billingStatus])
   @@index([billingEndsAt])
@@ -124,7 +124,6 @@ model MemberProfile {
   attendances            Attendance[]
   bookings               Booking[]
   foodLogs               FoodLog[]
-  intelligenceActionLogs IntelligenceActionLog[]
   mealPlans              MealPlan[]
   user                   User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
   progressRecords        ProgressRecord[]
@@ -132,6 +131,7 @@ model MemberProfile {
   subscriptions          Subscription[]
   transactions           Transaction[]
   workouts               WorkoutPlan[]
+  intelligenceActionLogs IntelligenceActionLog[]
 }
 
 model TrainerProfile {
@@ -454,72 +454,78 @@ model Notification {
 }
 
 model TenantSettings {
-  id                         String    @id @default(cuid())
-  tenantId                   String    @unique
-  logoUrl                    String?
-  faviconUrl                 String?
-  primaryColor               String?
-  secondaryColor             String?
-  accentColor                String?
-  fontFamily                 String?
-  darkMode                   Boolean   @default(false)
-  brandName                  String?
-  whiteLabelEnabled          Boolean   @default(false)
-  customDomain               String?   @unique
-  subdomain                  String?   @unique
-  domainVerified             Boolean   @default(false)
-  verificationToken          String?
-  dnsVerifiedAt              DateTime?
-  subscriptionPlan           String    @default("FREE")
-  subscriptionStatus         String    @default("inactive")
-  currentPeriodEnd           DateTime?
-  tagline                    String?
-  description                String?
-  phone                      String?
-  email                      String?
-  address                    String?
-  city                       String?
-  state                      String?
-  country                    String?   @default("Nigeria")
-  mapEmbedUrl                String?
-  instagramUrl               String?
-  facebookUrl                String?
-  twitterUrl                 String?
-  tiktokUrl                  String?
-  whatsappNumber             String?
-  youtubeUrl                 String?
-  heroData                   Json?
-  aboutData                  Json?
-  servicesData               Json?
-  galleryData                Json?
-  testimonialData            Json?
-  contactData                Json?
-  featuresData               Json?
-  statsData                  Json?
-  openingHours               Json?
-  metaTitle                  String?
-  metaDescription            String?
-  ogImageUrl                 String?
-  googleAnalyticsId          String?
-  updatedAt                  DateTime  @updatedAt
-  paystackCustomerCode       String?   @unique
-  paystackEmailToken         String?
-  paystackSubscriptionCode   String?   @unique
-  homepageLayout             Json?
-  defaultCurrency            Currency  @default(NGN)
-  gymType                    String?
-  attendanceBaselinePerWeek  Int       @default(2)
-  avgSessionDurationMinutes  Int       @default(60)
-  learningDecayLambda        Float     @default(0.04)
-  retentionCurveType         String    @default("standard")
-  paystackAccountName        String?
-  paystackAccountNumberLast4 String?
+  id                       String    @id @default(cuid())
+  tenantId                 String    @unique
+  logoUrl                  String?
+  faviconUrl               String?
+  primaryColor             String?
+  secondaryColor           String?
+  accentColor              String?
+  fontFamily               String?
+  darkMode                 Boolean   @default(false)
+  brandName                String?
+  whiteLabelEnabled        Boolean   @default(false)
+  customDomain             String?   @unique
+  subdomain                String?   @unique
+  domainVerified           Boolean   @default(false)
+  verificationToken        String?
+  dnsVerifiedAt            DateTime?
+  subscriptionPlan         String    @default("FREE")
+  subscriptionStatus       String    @default("inactive")
+  currentPeriodEnd         DateTime?
+  tagline                  String?
+  description              String?
+  phone                    String?
+  email                    String?
+  address                  String?
+  city                     String?
+  state                    String?
+  country                  String?   @default("Nigeria")
+  mapEmbedUrl              String?
+  instagramUrl             String?
+  facebookUrl              String?
+  twitterUrl               String?
+  tiktokUrl                String?
+  whatsappNumber           String?
+  youtubeUrl               String?
+  heroData                 Json?
+  aboutData                Json?
+  servicesData             Json?
+  galleryData              Json?
+  testimonialData          Json?
+  contactData              Json?
+  featuresData             Json?
+  statsData                Json?
+  openingHours             Json?
+  metaTitle                String?
+  metaDescription          String?
+  ogImageUrl               String?
+  googleAnalyticsId        String?
+  updatedAt                DateTime  @updatedAt
+  paystackCustomerCode     String?   @unique
+  paystackEmailToken       String?
+  paystackSubscriptionCode String?   @unique
+  
+  // Payout Configuration
+  paystackSubaccountCode     String?   @unique
   paystackBankCode           String?
   paystackBankName           String?
+  paystackAccountNumberLast4 String?
+  paystackAccountName        String?
   paystackConnectedAt        DateTime?
-  paystackConnectionStatus   String?   @default("disconnected")
-  paystackSubaccountCode     String?   @unique
-  tenant                     Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  paystackConnectionStatus   String?   @default("disconnected") // "connected", "disconnected", "failed"
+
+  homepageLayout           Json?
+  defaultCurrency          Currency  @default(NGN)
+  gymType                  String?
+
+  // Phase 7.1: Behavioral Fingerprinting
+  attendanceBaselinePerWeek Int    @default(2)
+  avgSessionDurationMinutes Int    @default(60)
+  retentionCurveType        String @default("standard") // "steep_dropoff", "gradual"
+  learningDecayLambda       Float  @default(0.04)
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 }
 
 model BlogPost {
@@ -720,198 +726,6 @@ model AuditLog {
   @@index([correlationId])
 }
 
-model IntelligenceActionLog {
-  id                 String                @id @default(cuid())
-  tenantId           String
-  recommendationId   String
-  actionType         String
-  targetMemberId     String
-  confidenceScore    Float
-  executionStatus    String                @default("EXECUTED")
-  executedAt         DateTime              @default(now())
-  outcomeStatus      String                @default("PENDING")
-  resolvedAt         DateTime?
-  mrrImpact          Decimal?              @db.Decimal(10, 2)
-  algorithmVersion   Int                   @default(1)
-  explorationVersion Int                   @default(1)
-  scoringSnapshot    Json?
-  explorationPolicy  ExplorationPolicyType @default(DETERMINISTIC_RANKING)
-  experimentOutcomes ExperimentOutcome[]
-  targetMember       MemberProfile         @relation(fields: [targetMemberId], references: [id], onDelete: Cascade)
-  tenant             Tenant                @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-
-  @@index([tenantId, actionType])
-  @@index([tenantId, targetMemberId])
-  @@index([outcomeStatus])
-}
-
-model IntelligenceOpsMetrics {
-  id                     String                @id @default(cuid())
-  tenantId               String
-  timestamp              DateTime              @default(now())
-  generatedCount         Int                   @default(0)
-  approvedCount          Int                   @default(0)
-  executedCount          Int                   @default(0)
-  successfulCount        Int                   @default(0)
-  partialSuccessCount    Int                   @default(0)
-  failureCount           Int                   @default(0)
-  ignoredCount           Int                   @default(0)
-  failedExecutionCount   Int                   @default(0)
-  retainedMRR            Float                 @default(0)
-  averageConfidence      Float                 @default(0)
-  averageExecutionTime   Float                 @default(0)
-  averageEvaluationDelay Float                 @default(0)
-  lastRollup             DateTime              @default(now())
-  rollupVersion          Int                   @default(1)
-  rollupDurationMs       Int                   @default(0)
-  lastRecommendation     DateTime?
-  algorithmVersion       Int
-  explorationVersion     Int
-  explorationPolicy      ExplorationPolicyType
-  rollupKey              String                @unique
-  tenant                 Tenant                @relation(fields: [tenantId], references: [id])
-
-  @@index([tenantId, timestamp])
-}
-
-model IntelligenceRollupJobLog {
-  id               String    @id @default(cuid())
-  startedAt        DateTime  @default(now())
-  finishedAt       DateTime?
-  status           String
-  errorMessage     String?
-  recordsProcessed Int       @default(0)
-  tenantId         String?
-
-  @@index([status])
-  @@index([startedAt])
-}
-
-model TenantIntelligenceMetrics {
-  id                 String              @id @default(cuid())
-  tenantId           String
-  actionType         String
-  successRate        Float               @default(0.1)
-  partialSuccessRate Float               @default(0.0)
-  failureRate        Float               @default(0.9)
-  totalSamples       Int                 @default(0)
-  lastComputedAt     DateTime            @default(now())
-  algorithmVersion   Int                 @default(1)
-  decayFactor        Float               @default(1.0)
-  metricType         String
-  segmentKey         IntelligenceSegment @default(ALL)
-  windowEnd          DateTime
-  windowStart        DateTime
-  tenant             Tenant              @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-
-  @@unique([tenantId, metricType, actionType, segmentKey, windowStart, windowEnd])
-}
-
-model IntelligenceExperiment {
-  id           String          @id @default(cuid())
-  name         String
-  type         ExperimentType
-  layer        ExperimentLayer
-  isActive     Boolean         @default(true)
-  startDate    DateTime
-  endDate      DateTime?
-  trafficSplit Json
-  createdAt    DateTime        @default(now())
-}
-
-model ExperimentAssignment {
-  id           String            @id @default(cuid())
-  tenantId     String
-  userId       String
-  experimentId String
-  variant      ExperimentVariant
-  assignedAt   DateTime          @default(now())
-
-  @@index([tenantId, experimentId])
-}
-
-model ExperimentOutcome {
-  id                    String                @id @default(cuid())
-  experimentId          String
-  variant               ExperimentVariant
-  actionLogId           String
-  success               Boolean
-  mrrImpact             Float
-  evaluationWindowStart DateTime
-  evaluationWindowEnd   DateTime
-  evaluatedAt           DateTime              @default(now())
-  actionLog             IntelligenceActionLog @relation(fields: [actionLogId], references: [id])
-
-  @@index([experimentId, evaluationWindowStart])
-}
-
-model ExperimentSnapshot {
-  id             String   @id @default(cuid())
-  experimentId   String
-  startWindow    DateTime
-  endWindow      DateTime
-  controlMetrics Json
-  variantMetrics Json
-  uplift         Float
-  significance   Float
-  createdAt      DateTime @default(now())
-
-  @@index([experimentId, startWindow])
-}
-
-model IntelligenceVersionRegistry {
-  id                String                        @id @default(cuid())
-  scoringVersion    Int                           @default(1)
-  policyVersion     Int                           @default(1)
-  experimentId      String?
-  promotedVariant   String?
-  status            String
-  activatedAt       DateTime                      @default(now())
-  deactivatedAt     DateTime?
-  previousVersionId String?
-  previousVersion   IntelligenceVersionRegistry?  @relation("VersionHistory", fields: [previousVersionId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  nextVersions      IntelligenceVersionRegistry[] @relation("VersionHistory")
-
-  @@index([status])
-}
-
-model IntelligencePromotionLog {
-  id           String   @id @default(cuid())
-  experimentId String
-  variantName  String
-  promotedBy   String
-  reason       String?
-  promotedAt   DateTime @default(now())
-
-  @@index([experimentId])
-}
-
-model IntelligenceSafetyEvent {
-  id          String   @id @default(cuid())
-  tenantId    String?
-  action      String
-  reason      String
-  triggeredBy String
-  triggeredAt DateTime @default(now())
-
-  @@index([tenantId])
-  @@index([action])
-}
-
-model PendingSignup {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  ownerName String
-  gymName   String
-  slug      String
-  status    String   @default("PENDING")
-  expiresAt DateTime
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([email, status])
-}
-
 enum Role {
   SUPERADMIN
   ADMIN
@@ -1028,10 +842,10 @@ enum CheckInMethod {
 
 enum AttendanceStatus {
   PRESENT
-  LATE
-  NO_SHOW
   ABSENT
+  LATE
   EXCUSED
+  NO_SHOW
   DENIED
 }
 
@@ -1095,9 +909,325 @@ enum ExperimentVariant {
   TOP_K
 }
 
+model IntelligenceActionLog {
+  id               String @id @default(cuid())
+  tenantId         String
+  recommendationId String
+  actionType       String
+  targetMemberId   String
+  confidenceScore  Float
+
+  // Scoring Context
+  algorithmVersion   Int                   @default(1)
+  explorationVersion Int                   @default(1)
+  explorationPolicy  ExplorationPolicyType @default(DETERMINISTIC_RANKING)
+  scoringSnapshot    Json?
+
+  // Execution State
+  executionStatus String   @default("EXECUTED") // EXECUTED
+  executedAt      DateTime @default(now())
+
+  // Outcome State
+  outcomeStatus String    @default("PENDING") // PENDING, SUCCESS, FAILED, EXPIRED
+  resolvedAt    DateTime?
+  mrrImpact     Decimal?  @db.Decimal(10, 2)
+
+  // Relations
+  tenant             Tenant              @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  targetMember       MemberProfile       @relation(fields: [targetMemberId], references: [id], onDelete: Cascade)
+  experimentOutcomes ExperimentOutcome[]
+
+  @@index([tenantId, actionType])
+  @@index([tenantId, targetMemberId])
+  @@index([outcomeStatus])
+}
+
+model IntelligenceOpsMetrics {
+  id        String   @id @default(cuid())
+  tenantId  String
+  tenant    Tenant   @relation(fields: [tenantId], references: [id])
+  timestamp DateTime @default(now())
+
+  // Pipeline Stats (Funnel)
+  generatedCount  Int @default(0)
+  approvedCount   Int @default(0)
+  executedCount   Int @default(0)
+  successfulCount Int @default(0)
+
+  // Additional Outcome Stats
+  partialSuccessCount  Int @default(0)
+  failureCount         Int @default(0)
+  ignoredCount         Int @default(0)
+  failedExecutionCount Int @default(0) // executionStatus = FAILED
+
+  retainedMRR Float @default(0)
+
+  // Averages
+  averageConfidence      Float @default(0)
+  averageExecutionTime   Float @default(0) // ms from generation to execution
+  averageEvaluationDelay Float @default(0) // ms from execution to outcome evaluation
+
+  // Metadata & Context
+  lastRollup         DateTime              @default(now())
+  rollupVersion      Int                   @default(1)
+  rollupDurationMs   Int                   @default(0)
+  rollupKey          String                @unique // tenantId + timestampBucket + rollupVersion
+  lastRecommendation DateTime?
+  algorithmVersion   Int
+  explorationVersion Int
+  explorationPolicy  ExplorationPolicyType
+
+  @@index([tenantId, timestamp])
+}
+
+model IntelligenceRollupJobLog {
+  id               String    @id @default(cuid())
+  startedAt        DateTime  @default(now())
+  finishedAt       DateTime?
+  status           String // SUCCESS or FAILED
+  errorMessage     String?   @db.Text
+  recordsProcessed Int       @default(0)
+  tenantId         String? // optional for batch mode
+
+  @@index([status])
+  @@index([startedAt])
+}
+
+model TenantIntelligenceMetrics {
+  id       String @id @default(cuid())
+  tenantId String
+
+  // Dimensionality
+  metricType String // e.g., "CHURN", "UPSELL", "RECOVERY"
+  actionType String // e.g., "DISCOUNT", "EMAIL"
+  segmentKey IntelligenceSegment @default(ALL)
+
+  // Time Windowing (Bounding the feedback loop)
+  windowStart DateTime
+  windowEnd   DateTime
+
+  successRate        Float @default(0.1)
+  partialSuccessRate Float @default(0.0)
+  failureRate        Float @default(0.9)
+  totalSamples       Int   @default(0)
+
+  // Exponential Decay tracking
+  decayFactor Float @default(1.0)
+
+  algorithmVersion Int      @default(1)
+  lastComputedAt   DateTime @default(now())
+  tenant           Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, metricType, actionType, segmentKey, windowStart, windowEnd])
+}
+
+// ── EXPERIMENTATION (PHASE 9) ─────────────────────────────────────────────
+
+model IntelligenceExperiment {
+  id       String          @id @default(cuid())
+  name     String
+  type     ExperimentType
+  layer    ExperimentLayer
+  isActive Boolean         @default(true)
+
+  startDate DateTime
+  endDate   DateTime?
+
+  trafficSplit Json // { control: 0.7, bayes: 0.15, ucb: 0.15 }
+
+  createdAt DateTime @default(now())
+}
+
+model ExperimentAssignment {
+  id       String @id @default(cuid())
+  tenantId String
+  userId   String
+
+  experimentId String
+  variant      ExperimentVariant
+
+  assignedAt DateTime @default(now())
+
+  @@index([tenantId, experimentId])
+}
+
+model ExperimentOutcome {
+  id           String            @id @default(cuid())
+  experimentId String
+  variant      ExperimentVariant
+
+  actionLogId String
+  actionLog   IntelligenceActionLog @relation(fields: [actionLogId], references: [id])
+
+  success   Boolean
+  mrrImpact Float
+
+  evaluationWindowStart DateTime
+  evaluationWindowEnd   DateTime
+  evaluatedAt           DateTime @default(now())
+
+  @@index([experimentId, evaluationWindowStart])
+}
+
+model ExperimentSnapshot {
+  id           String @id @default(cuid())
+  experimentId String
+
+  startWindow DateTime
+  endWindow   DateTime
+
+  controlMetrics Json
+  variantMetrics Json
+
+  uplift       Float
+  significance Float
+
+  createdAt DateTime @default(now())
+
+  @@index([experimentId, startWindow])
+}
+
+// ── GOVERNANCE (PHASE 10) ────────────────────────────────────────────────
+
+model IntelligenceVersionRegistry {
+  id String @id @default(cuid())
+
+  // Versions
+  scoringVersion Int @default(1)
+  policyVersion  Int @default(1)
+
+  // Promotion metadata
+  experimentId    String?
+  promotedVariant String?
+
+  status String // ACTIVE, DEPRECATED, ROLLED_BACK
+
+  // Time-based reproducibility
+  activatedAt   DateTime  @default(now())
+  deactivatedAt DateTime?
+
+  // Traceability
+  previousVersionId String?
+  previousVersion   IntelligenceVersionRegistry?  @relation("VersionHistory", fields: [previousVersionId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  nextVersions      IntelligenceVersionRegistry[] @relation("VersionHistory")
+
+  @@index([status])
+}
+
+model IntelligencePromotionLog {
+  id           String @id @default(cuid())
+  experimentId String
+  variantName  String
+
+  promotedBy String // Admin User ID
+  reason     String? @db.Text
+
+  promotedAt DateTime @default(now())
+
+  @@index([experimentId])
+}
+
+model IntelligenceSafetyEvent {
+  id       String  @id @default(cuid())
+  tenantId String? // Null means GLOBAL event
+
+  action      String // DISABLE, THROTTLE, ROLLBACK, ENABLE
+  reason      String @db.Text
+  triggeredBy String // Admin User ID
+
+  triggeredAt DateTime @default(now())
+
+  @@index([tenantId])
+  @@index([action])
+}
+
+
+model PendingSignup {
+  id         String   @id @default(cuid())
+  email      String   @unique
+  ownerName  String
+  gymName    String
+  slug       String
+  status     String   @default("PENDING") // PENDING, COMPLETED, EXPIRED
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([email, status])
+}
+
+// ── TRANSACTIONAL EMAIL SYSTEM ──────────────────────────────────────────
+
 enum EmailStatus {
   PENDING
   PROCESSING
   SENT
   FAILED
+  FAILED_RENDER
 }
+
+enum EmailType {
+  MAGIC_LINK
+  MEMBER_WELCOME
+  GYM_OWNER_WELCOME
+  PAYMENT_RECEIPT
+  BILLING_REMINDER
+  TRIAL_ENDING
+  SUBSCRIPTION_ACTIVATED
+  SUBSCRIPTION_SUSPENDED
+  BOOKING_CONFIRMATION
+  BOOKING_REMINDER
+  BOOKING_CANCELLED
+  MEMBERSHIP_EXPIRING
+  PAYMENT_FAILED
+  PASSWORD_CHANGED
+  TRAINER_INVITATION
+  STAFF_INVITATION
+  BANK_ACCOUNT_CONNECTED
+}
+
+model EmailJob {
+  id              String      @id @default(cuid())
+  eventId         String?     @unique
+  tenantId        String?
+  userId          String?
+  emailType       EmailType
+  recipient       String
+  subject         String
+  payload         Json
+  status          EmailStatus @default(PENDING)
+  attempts        Int         @default(0)
+  nextRetryAt     DateTime?
+  lastAttemptAt   DateTime?
+  errorMessage    String?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  @@index([status, nextRetryAt])
+  @@index([tenantId])
+}
+
+model EmailLog {
+  id                String      @id @default(cuid())
+  eventId           String?
+  tenantId          String?
+  userId            String?
+  emailType         EmailType
+  recipient         String
+  subject           String
+  templateVersion   String      @default("v1")
+  provider          String      @default("RESEND")
+  providerMessageId String?
+  status            EmailStatus
+  attempts          Int
+  errorMessage      String?
+  sentAt            DateTime?
+  createdAt         DateTime    @default(now())
+
+  @@index([eventId])
+  @@index([tenantId])
+  @@index([emailType])
+  @@index([recipient])
+  @@index([status])
+}
+

@@ -170,6 +170,7 @@ export interface EmailQueueEntry<T = Record<string, unknown>> {
   payload: T;
   tenantId?: string;
   userId?: string;
+  eventId?: string;
 }
 
 // ── Template Version (increment when making breaking visual changes) ───────────
