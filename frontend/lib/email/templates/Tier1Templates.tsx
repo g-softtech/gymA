@@ -150,7 +150,7 @@ export function GymOwnerWelcomeTemplate({
           <InfoCard label="Step 5" value="Invite your trainers and front desk staff" />
         </Section>
 
-        <Button href={payload.dashboardUrl} brand={brand}>
+        <Button href={payload.magicUrl ?? payload.dashboardUrl} brand={brand}>
           Go to My Dashboard →
         </Button>
 

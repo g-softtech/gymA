@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { TRIAL_DURATION_DAYS } from "@/lib/billing/pricingConfig";
 import { enqueueEmail } from "@/lib/email/emailQueue";
+import { createVerificationToken } from "@/lib/auth-tokens";
 
 export default async function OnboardingProcessPage() {
   const session = await getAuthSession();
@@ -93,7 +94,20 @@ export default async function OnboardingProcessPage() {
     return { tenant: newTenant };
   });
 
-  // 3. Enqueue the Gym Owner Welcome email (fire-and-forget — never blocks)
+  // 3. Enqueue the Gym Owner Welcome email with a fresh magic sign-in link
+  // so "Go to Dashboard" logs them in automatically in one click.
+  const dashboardUrl = `${process.env.NEXTAUTH_URL}/gym/${tenant.slug}/dashboard/admin`;
+  
+  // Generate a fresh NextAuth verification token so the button is a magic link
+  let magicUrl: string | undefined;
+  try {
+    const token = await createVerificationToken(session.user.email!, dashboardUrl);
+    magicUrl = `${process.env.NEXTAUTH_URL}/api/auth/callback/email?callbackUrl=${encodeURIComponent(dashboardUrl)}&token=${token}&email=${encodeURIComponent(session.user.email!)}`;
+  } catch {
+    // If token generation fails, fall back to plain dashboard URL
+    magicUrl = undefined;
+  }
+
   await enqueueEmail({
     emailType: "GYM_OWNER_WELCOME",
     recipient: session.user.email!,
@@ -104,7 +118,8 @@ export default async function OnboardingProcessPage() {
       ownerName: pendingSignup.ownerName,
       gymName: tenant.name,
       gymSlug: tenant.slug,
-      dashboardUrl: `${process.env.NEXTAUTH_URL}/gym/${tenant.slug}/dashboard/admin`,
+      dashboardUrl,
+      magicUrl,
     },
   });
 

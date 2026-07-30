@@ -84,6 +84,7 @@ export interface GymOwnerWelcomePayload {
   gymName: string;
   gymSlug: string;
   dashboardUrl: string;
+  magicUrl?: string;   // If provided, the "Go to Dashboard" button logs the user in automatically
 }
 
 export interface PaymentReceiptPayload {
