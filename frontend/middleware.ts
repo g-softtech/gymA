@@ -209,6 +209,8 @@ export default withAuth(
         if (pathname.startsWith("/api/sandbox/")) return true;
         if (pathname.startsWith("/api/payments/webhook")) return true;
         if (pathname.startsWith("/api/cron/")) return true;
+        if (pathname.startsWith("/api/signup/")) return true;
+        if (pathname.startsWith("/api/workers/")) return true;
         if (pathname.includes("/join")) return true;
         if (pathname.startsWith("/(marketing)")) return true;
         if (pathname.startsWith("/gym/") && !pathname.includes("/dashboard")) return true;

@@ -64,19 +64,19 @@ export default function SignupPage() {
 
   if (success) {
     return (
-      <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8 md:p-12 shadow-2xl max-w-lg mx-auto mt-24 text-center">
+      <div className="bg-card backdrop-blur-xl border border-border rounded-3xl p-8 md:p-12 shadow-2xl max-w-lg mx-auto mt-24 text-center">
         <div className="w-20 h-20 bg-gradient-to-br from-green-400 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg shadow-emerald-500/25">
           <span className="text-4xl text-white">✉️</span>
         </div>
-        <h1 className="text-3xl font-extrabold text-white tracking-tight mb-4">
+        <h1 className="text-3xl font-extrabold text-foreground tracking-tight mb-4">
           Check your email!
         </h1>
-        <p className="text-gray-300 mb-8 leading-relaxed">
-          We've sent a secure login link to <span className="font-semibold text-white">{email}</span>. 
+        <p className="text-muted-foreground mb-8 leading-relaxed">
+          We've sent a secure login link to <span className="font-semibold text-foreground">{email}</span>. 
           <br/><br/>
           Click the link in the email to instantly verify your account and finish setting up <strong>{gymName}</strong>!
         </p>
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-muted-foreground">
           Didn't receive it? <button onClick={() => setSuccess(false)} className="text-indigo-400 hover:underline">Try again</button>
         </p>
       </div>
