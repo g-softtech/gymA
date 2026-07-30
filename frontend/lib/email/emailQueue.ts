@@ -24,15 +24,12 @@ export async function enqueueEmail(entry: EmailQueueEntry): Promise<void> {
       },
     });
 
-    // Poke the worker to process immediately (improves UX for magic links)
-    // We catch and ignore errors because this is a best-effort async trigger.
-    // If it fails, the Vercel cron will pick it up on the next minute.
-    const vercelUrl = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null;
-    const appUrl = vercelUrl || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+    // Poke the worker to process immediately (improves UX for magic links).
+    // IMPORTANT: Use NEXTAUTH_URL (the canonical public domain, e.g. fit.thecortexsystems.com)
+    // NOT VERCEL_URL (which is the deployment-specific internal URL and may not resolve correctly).
+    const appUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
     fetch(`${appUrl}/api/workers/email-worker`, {
-      headers: {
-        "Authorization": `Bearer ${process.env.CRON_SECRET || ""}`
-      }
+      method: "GET",
     }).catch(() => {});
     
   } catch (err: any) {
