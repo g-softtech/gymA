@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import type { Session } from "next-auth";
 import { getAuthSession } from "./auth";
 import { prisma } from "./prisma";
-import { TENANT_PLAN_LIMITS, TenantLimits } from "./tenant-entitlements";
+import { resolveCapabilities } from "./capabilities";
 import { Permission, hasPermission } from "./permissions";
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -366,23 +366,34 @@ export async function verifyTenantEntitlement(
     return NextResponse.json({ error: "Tenant not found" }, { status: 404 });
   }
 
-  const limits = TENANT_PLAN_LIMITS[tenant.plan];
+  const capabilities = resolveCapabilities(tenant.plan, tenant.planVersion);
+  const limits = capabilities.getLimits();
 
   // Boolean Feature Check
-  if (typeof limits[feature] === "boolean") {
-    if (!limits[feature]) {
-      return NextResponse.json(
-        { error: `This feature is locked on the ${tenant.plan} plan. Please upgrade.` },
-        { status: 403 }
-      );
-    }
-    return null;
+  if (capabilities.has(feature as any)) {
+    return null; // They have it
+  }
+
+  // If it's a known boolean feature and they don't have it:
+  const booleanFeatures = [
+    "AI_ASSISTANT", "MULTI_BRANCH", "CUSTOM_DOMAIN", "WHITE_LABEL", 
+    "WEBSITE", "ONLINE_BOOKING", "CLASS_BOOKING", "NUTRITION", 
+    "PAYROLL", "ANALYTICS", "REPORTS", "PUBLIC_API", "FILE_STORAGE", 
+    "STAFF_ROLES", "ATTENDANCE", "SMS", "EMAIL", "QR_CHECKIN", "MOBILE_APP"
+  ];
+  if (booleanFeatures.includes(feature)) {
+    return NextResponse.json(
+      { error: `This feature is locked on the ${tenant.plan} plan. Please upgrade.` },
+      { status: 403 }
+    );
   }
 
   // Threshold / Numeric Check
-  if (typeof limits[feature] === "number") {
-    const limit = limits[feature] as number;
+  if (feature in limits) {
+    const limit = limits[feature as keyof typeof limits] as number;
     
+    if (limit === -1) return null; // Unlimited
+
     let currentCount = 0;
     if (feature === "maxMembers") {
       currentCount = await prisma.memberProfile.count({

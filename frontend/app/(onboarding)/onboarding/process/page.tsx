@@ -2,6 +2,7 @@ import { getAuthSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { TRIAL_DURATION_DAYS } from "@/lib/billing/pricingConfig";
+import { enqueueEmail } from "@/lib/email/emailService";
 
 export default async function OnboardingProcessPage() {
   const session = await getAuthSession();
@@ -92,6 +93,21 @@ export default async function OnboardingProcessPage() {
     return { tenant: newTenant };
   });
 
-  // 3. Send them to the Welcome Setup Wizard
+  // 3. Enqueue the Gym Owner Welcome email (fire-and-forget — never blocks)
+  await enqueueEmail({
+    emailType: "GYM_OWNER_WELCOME",
+    recipient: session.user.email!,
+    subject: `Welcome to CortexFit — ${tenant.name} is live!`,
+    tenantId: tenant.id,
+    userId: session.user.id,
+    payload: {
+      ownerName: pendingSignup.ownerName,
+      gymName: tenant.name,
+      gymSlug: tenant.slug,
+      dashboardUrl: `${process.env.NEXTAUTH_URL}/gym/${tenant.slug}/dashboard/admin`,
+    },
+  });
+
+  // 4. Send them to the Welcome Setup Wizard
   redirect(`/onboarding/welcome`);
 }

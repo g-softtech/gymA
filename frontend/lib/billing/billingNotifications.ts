@@ -20,7 +20,7 @@
 import { subscriptionEventBus } from "@/lib/events/subscriptionEventBus";
 
 import { prisma } from "@/lib/prisma";
-import { sendEmail } from "@/lib/email/emailService";
+import { enqueueEmail } from "@/lib/email/emailService";
 import { logger } from "@/lib/logger";
 
 async function logNotification(tenantId: string, type: any, message: string) {
@@ -35,14 +35,43 @@ async function logNotification(tenantId: string, type: any, message: string) {
   try {
     const adminUsers = await prisma.user.findMany({ where: { tenantId, role: "ADMIN" } });
     const settings = await prisma.tenantSettings.findUnique({ where: { tenantId } });
+    const tenant = await prisma.tenant.findUnique({ where: { id: tenantId } });
+    const tenantName = tenant?.name;
     const recipientEmail = settings?.email || adminUsers[0]?.email;
     const adminUserId = adminUsers[0]?.id;
 
     if (recipientEmail) {
-      await sendEmail({
-        to: recipientEmail,
+      const emailTypeMap: Record<string, string> = {
+        "TRIAL_ENDING": "TRIAL_ENDING",
+        "PAST_DUE": "BILLING_REMINDER",
+        "SUSPENDED": "SUBSCRIPTION_SUSPENDED",
+        "EXPIRED": "MEMBERSHIP_EXPIRING",
+        "REACTIVATED": "SUBSCRIPTION_ACTIVATED",
+      };
+
+      const emailType = emailTypeMap[type] || "BILLING_REMINDER";
+
+      await enqueueEmail({
+        emailType: emailType as any,
+        recipient: recipientEmail,
         subject: `[CortexFit Billing] ${type.replace("_", " ")}`,
-        html: `<p>${message}</p>`,
+        tenantId,
+        userId: adminUserId || undefined,
+        payload: {
+          ownerName: adminUsers[0]?.name || "Gym Owner",
+          gymName: tenantName || "Gym",
+          // Fallback fields for the generic billing reminder templates
+          amountDue: "See Dashboard",
+          dueDate: "Immediately",
+          paymentUrl: `${process.env.NEXTAUTH_URL}/gym/dashboard/admin/revenue`,
+          trialEndsAt: "Soon",
+          daysRemaining: 3,
+          upgradeUrl: `${process.env.NEXTAUTH_URL}/gym/dashboard/admin/revenue`,
+          planName: "Your Subscription",
+          amountPaid: "Paid",
+          billingPeriodEnd: "Next Cycle",
+          dashboardUrl: `${process.env.NEXTAUTH_URL}/gym/dashboard/admin/revenue`,
+        },
       });
     } else {
       logger.warn(`No admin email found for tenant ${tenantId} to send billing notification.`);

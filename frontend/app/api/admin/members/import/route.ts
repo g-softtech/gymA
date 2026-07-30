@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { getAuthSession } from "@/lib/auth";
 import { getTenantContextFromSession, requireAdmin, noTenantContext } from "@/lib/tenant";
 import { auditLogger, AuditEventType } from "@/lib/auditLogger";
+import { enqueueEmail } from "@/lib/email/emailService";
 import Papa from "papaparse";
 
 const MAX_ROWS = 1000;
@@ -39,6 +40,16 @@ export async function POST(req: NextRequest) {
     const text = await file.text();
     if (!text.trim()) {
       return NextResponse.json({ error: "File is empty." }, { status: 400 });
+    }
+
+    // Fetch tenant details for the email templates
+    const tenant = await prisma.tenant.findUnique({
+      where: { id: tenantId },
+      select: { name: true, slug: true },
+    });
+
+    if (!tenant) {
+      return NextResponse.json({ error: "Tenant not found" }, { status: 404 });
     }
 
     // ── 3. Parse CSV (Using papaparse as requested for robustness) ────────────
@@ -128,6 +139,22 @@ export async function POST(req: NextRequest) {
           await tx.memberProfile.create({
             data: {
               userId: user.id,
+            },
+          });
+
+          // Enqueue the Welcome Email
+          await enqueueEmail({
+            emailType: "MEMBER_WELCOME",
+            recipient: user.email!,
+            subject: `Welcome to ${tenant.name} — your member portal is ready!`,
+            tenantId: tenantId,
+            userId: user.id,
+            payload: {
+              memberId: user.id,
+              memberName: user.name || "Member",
+              gymName: tenant.name,
+              gymSlug: tenant.slug,
+              magicUrl: `${process.env.NEXTAUTH_URL}/auth/signin?callbackUrl=/dashboard`,
             },
           });
         });

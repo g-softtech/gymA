@@ -1,14 +1,46 @@
-export type PlatformPlanCode = "FREE" | "PRO" | "ENTERPRISE";
+export type PlatformPlanCode = "FREE" | "STARTER" | "PROFESSIONAL" | "SCALEUP" | "APEX";
+
+export type FeatureKey =
+  | "AI_ASSISTANT"
+  | "MEMBER_LIMIT"
+  | "TRAINER_LIMIT"
+  | "MULTI_BRANCH"
+  | "CUSTOM_DOMAIN"
+  | "WHITE_LABEL"
+  | "WEBSITE"
+  | "ONLINE_BOOKING"
+  | "CLASS_BOOKING"
+  | "NUTRITION"
+  | "PAYROLL"
+  | "ANALYTICS"
+  | "REPORTS"
+  | "PUBLIC_API"
+  | "FILE_STORAGE"
+  | "STAFF_ROLES"
+  | "ATTENDANCE"
+  | "SMS"
+  | "EMAIL"
+  | "QR_CHECKIN"
+  | "MOBILE_APP";
 
 export interface PlatformPlanConfig {
   code: PlatformPlanCode;
-  name: string;
-  amountNGN: number;
-  description: string;
-  features: string[];
-  interval: "month" | "year";
+  displayName: string;
+  yearlyPrice: number;
+  marketingDescription: string;
   isTrial: boolean;
-  maxMembers: number; // -1 for unlimited
+  recommended?: boolean;
+  limits: {
+    maxMembers: number; // -1 for unlimited
+    maxTrainers: number; // -1 for unlimited
+    maxBranches: number;
+  };
+  capabilities: FeatureKey[];
+  comparisonFeatures: {
+    name: string;
+    included: boolean;
+    text?: string; // e.g. "Up to 50", "Unlimited"
+  }[];
 }
 
 // Global configuration for billing policies
@@ -20,32 +52,123 @@ export const TRIAL_DURATION_DAYS = 14;
 export const PLATFORM_PLANS: Record<PlatformPlanCode, PlatformPlanConfig> = {
   FREE: {
     code: "FREE",
-    name: "Starter",
-    amountNGN: 0,
-    description: "Basic gym management for small gyms",
-    features: ["Up to 50 members", "1 trainer account", "Member management", "Basic attendance tracking"],
-    interval: "month",
+    displayName: "Free Trial",
+    yearlyPrice: 0,
+    marketingDescription: "14-day free trial of Professional features",
     isTrial: true,
-    maxMembers: 50,
+    limits: {
+      maxMembers: 50,
+      maxTrainers: 1,
+      maxBranches: 1,
+    },
+    capabilities: [
+      "MEMBER_LIMIT", "TRAINER_LIMIT", "ATTENDANCE", "REPORTS"
+    ],
+    comparisonFeatures: []
   },
-  PRO: {
-    code: "PRO",
-    name: "Professional",
-    amountNGN: 49000, // ₦49,000
-    description: "For growing gyms that need more power",
-    features: ["Custom Domain", "Up to 500 members", "AI Fitness Coach", "Advanced analytics"],
-    interval: "month",
+  STARTER: {
+    code: "STARTER",
+    displayName: "Starter Plan",
+    yearlyPrice: 100000,
+    marketingDescription: "Perfect for small, independent gyms just getting started with digital management.",
     isTrial: false,
-    maxMembers: 500,
+    limits: {
+      maxMembers: 100,
+      maxTrainers: 2,
+      maxBranches: 1,
+    },
+    capabilities: [
+      "MEMBER_LIMIT", "TRAINER_LIMIT", "ATTENDANCE", "REPORTS", "EMAIL", "ONLINE_BOOKING", "CLASS_BOOKING"
+    ],
+    comparisonFeatures: [
+      { name: "Members", included: true, text: "Up to 100" },
+      { name: "Trainers", included: true, text: "Up to 2" },
+      { name: "Locations", included: true, text: "1 Branch" },
+      { name: "Basic Analytics", included: true },
+      { name: "AI Coach", included: false },
+      { name: "Custom Domain", included: false },
+      { name: "White Label", included: false },
+    ]
   },
-  ENTERPRISE: {
-    code: "ENTERPRISE",
-    name: "Enterprise",
-    amountNGN: 199000, // ₦199,000
-    description: "Full white-label SaaS experience",
-    features: ["White-Label Mode", "Unlimited members", "Multiple gym locations", "API access"],
-    interval: "month",
+  PROFESSIONAL: {
+    code: "PROFESSIONAL",
+    displayName: "Professional Plan",
+    yearlyPrice: 200000,
+    marketingDescription: "Designed for growing gyms that need more power. Includes our signature AI Coach.",
     isTrial: false,
-    maxMembers: -1,
+    recommended: true,
+    limits: {
+      maxMembers: 500,
+      maxTrainers: 10,
+      maxBranches: 1,
+    },
+    capabilities: [
+      "MEMBER_LIMIT", "TRAINER_LIMIT", "ATTENDANCE", "REPORTS", "EMAIL", "ONLINE_BOOKING", "CLASS_BOOKING",
+      "AI_ASSISTANT", "WEBSITE", "SMS", "QR_CHECKIN", "NUTRITION", "ANALYTICS"
+    ],
+    comparisonFeatures: [
+      { name: "Members", included: true, text: "Up to 500" },
+      { name: "Trainers", included: true, text: "Up to 10" },
+      { name: "Locations", included: true, text: "1 Branch" },
+      { name: "Advanced Analytics", included: true },
+      { name: "AI Coach", included: true },
+      { name: "Website Builder", included: true },
+      { name: "Custom Domain", included: false },
+      { name: "White Label", included: false },
+    ]
+  },
+  SCALEUP: {
+    code: "SCALEUP",
+    displayName: "Scale-Up Plan",
+    yearlyPrice: 300000,
+    marketingDescription: "For elite gyms rapidly scaling their operations. Includes advanced revenue insights.",
+    isTrial: false,
+    limits: {
+      maxMembers: 2000,
+      maxTrainers: 30,
+      maxBranches: 3,
+    },
+    capabilities: [
+      "MEMBER_LIMIT", "TRAINER_LIMIT", "ATTENDANCE", "REPORTS", "EMAIL", "ONLINE_BOOKING", "CLASS_BOOKING",
+      "AI_ASSISTANT", "WEBSITE", "SMS", "QR_CHECKIN", "NUTRITION", "ANALYTICS", "PAYROLL", "CUSTOM_DOMAIN"
+    ],
+    comparisonFeatures: [
+      { name: "Members", included: true, text: "Up to 2,000" },
+      { name: "Trainers", included: true, text: "Up to 30" },
+      { name: "Locations", included: true, text: "Up to 3 Branches" },
+      { name: "Advanced Analytics", included: true },
+      { name: "AI Coach", included: true },
+      { name: "Website Builder", included: true },
+      { name: "Custom Domain", included: true },
+      { name: "White Label", included: false },
+    ]
+  },
+  APEX: {
+    code: "APEX",
+    displayName: "Apex Network Plan",
+    yearlyPrice: 400000,
+    marketingDescription: "The ultimate enterprise solution for gym franchises and multi-location businesses.",
+    isTrial: false,
+    limits: {
+      maxMembers: -1,
+      maxTrainers: -1,
+      maxBranches: -1,
+    },
+    capabilities: [
+      "MEMBER_LIMIT", "TRAINER_LIMIT", "ATTENDANCE", "REPORTS", "EMAIL", "ONLINE_BOOKING", "CLASS_BOOKING",
+      "AI_ASSISTANT", "WEBSITE", "SMS", "QR_CHECKIN", "NUTRITION", "ANALYTICS", "PAYROLL", "CUSTOM_DOMAIN",
+      "MULTI_BRANCH", "WHITE_LABEL", "PUBLIC_API", "FILE_STORAGE", "STAFF_ROLES", "MOBILE_APP"
+    ],
+    comparisonFeatures: [
+      { name: "Members", included: true, text: "Unlimited" },
+      { name: "Trainers", included: true, text: "Unlimited" },
+      { name: "Locations", included: true, text: "Unlimited Branches" },
+      { name: "Advanced Analytics", included: true },
+      { name: "AI Coach", included: true },
+      { name: "Website Builder", included: true },
+      { name: "Custom Domain", included: true },
+      { name: "White Label", included: true },
+    ]
   },
 };
+

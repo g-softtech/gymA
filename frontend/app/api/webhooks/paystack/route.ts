@@ -39,7 +39,7 @@ export async function POST(req: Request) {
 
     // 2. Transaction processing
     if (eventType === "charge.success" && reference) {
-      await processChargeSuccess(reference);
+      await processChargeSuccess(reference, payload);
     } else if (eventType === "refund.processed" && reference) {
       await processRefund(reference, payload.amount);
     }
@@ -57,8 +57,81 @@ export async function POST(req: Request) {
   }
 }
 
-async function processChargeSuccess(reference: string) {
+async function processChargeSuccess(reference: string, payload: any) {
   await prisma.$transaction(async (tx) => {
+    // 1. SaaS Platform Subscription Fulfillment
+    if (reference.startsWith("PLATFORM_")) {
+      const invoice = await tx.saaSInvoice.findUnique({ where: { reference } });
+      if (!invoice || invoice.status === "paid") return;
+
+      const metadata = payload.metadata || {};
+      const expectedAmountKobo = Math.round(Number(invoice.amount) * 100);
+
+      // Webhook Hardening: Verify amount matches exactly
+      if (payload.amount !== expectedAmountKobo) {
+        throw new Error(`Amount mismatch. Expected ${expectedAmountKobo}, got ${payload.amount}`);
+      }
+      
+      const nextYear = new Date();
+      nextYear.setFullYear(nextYear.getFullYear() + 1);
+
+      // Generate Sequential Invoice Number
+      const year = new Date().getFullYear();
+      const lastInvoice = await tx.saaSInvoice.findFirst({
+        where: { invoiceNumber: { startsWith: `CF-${year}-` } },
+        orderBy: { invoiceNumber: 'desc' }
+      });
+      let nextSeq = 1;
+      if (lastInvoice && lastInvoice.invoiceNumber) {
+        const parts = lastInvoice.invoiceNumber.split('-');
+        nextSeq = parseInt(parts[2], 10) + 1;
+      }
+      const invoiceNumber = `CF-${year}-${nextSeq.toString().padStart(6, '0')}`;
+
+      // Atomic Upgrade
+      await tx.tenant.update({
+        where: { id: invoice.tenantId },
+        data: {
+          plan: metadata.planCode,
+          planVersion: "v1",
+          planStartedAt: new Date(),
+          billingEndsAt: nextYear
+        }
+      });
+
+      // Immutable Invoice Update
+      await tx.saaSInvoice.update({
+        where: { id: invoice.id },
+        data: { status: "paid", invoiceNumber }
+      });
+
+      // Permanent Subscription Record
+      await tx.tenantSubscription.create({
+        data: {
+          tenantId: invoice.tenantId,
+          plan: metadata.planCode,
+          planVersion: "v1",
+          pricePaid: invoice.amount,
+          currency: invoice.currency,
+          billingCycle: invoice.billingPeriod || "YEARLY",
+          startedAt: new Date(),
+          expiresAt: nextYear
+        }
+      });
+
+      // Emit Domain Event (could be abstracted to an event bus)
+      await tx.billingEvent.create({
+        data: {
+          tenantId: invoice.tenantId,
+          eventId: `sub_activated_${reference}`,
+          eventType: "SUBSCRIPTION_ACTIVATED",
+          payload: { plan: metadata.planCode, amount: invoice.amount }
+        }
+      });
+      return;
+    }
+
+    // 2. Gym Member Transaction Fulfillment
     const transaction = await tx.transaction.findUnique({
       where: { reference },
       include: { tenant: true, member: true }

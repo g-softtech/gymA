@@ -9,6 +9,8 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import EmailProvider from "next-auth/providers/email";
 import bcrypt from "bcryptjs";
 import { auditLogger, AuditEventType } from "./auditLogger";
+import { renderEmail } from "./email/emailRenderer";
+import { CORTEXFIT_BRAND } from "./email/types";
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma) as any,
@@ -139,20 +141,16 @@ export const authOptions: NextAuthOptions = {
           }
         }
 
-        const html = `
-          <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eaeaea; border-radius: 8px;">
-            <h2 style="color: #333;">${title}</h2>
-            ${body}
-            <div style="margin: 30px 0;">
-              <a href="${url}" style="background-color: #4F46E5; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">
-                ${buttonText}
-              </a>
-            </div>
-            <hr style="border: none; border-top: 1px solid #eaeaea; margin: 20px 0;" />
-            <p style="color: #888; font-size: 14px; margin: 0;">This link expires in 15 minutes.</p>
-            <p style="color: #888; font-size: 14px; margin: 5px 0 0 0;">If you didn't request this, simply ignore this email.</p>
-          </div>
-        `;
+        const html = renderEmail(
+          "MAGIC_LINK",
+          {
+            recipientName: "",
+            magicUrl: url,
+            gymName: gymName !== "CortexFit" ? gymName : undefined,
+            isNewSignup: isCreationFlow,
+          },
+          CORTEXFIT_BRAND
+        );
 
         const res = await fetch("https://api.resend.com/emails", {
           method: "POST",
@@ -164,7 +162,7 @@ export const authOptions: NextAuthOptions = {
             from: provider.from,
             to: email,
             subject: title,
-            html: html,
+            html,
           }),
         });
 

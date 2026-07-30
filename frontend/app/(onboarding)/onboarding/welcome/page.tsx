@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { getSession } from "next-auth/react";
+import PayoutSettingsClient from "@/app/gym/[slug]/dashboard/admin/revenue/payout-settings/PayoutSettingsClient";
 
 export default function WelcomeWizard() {
   const router = useRouter();
@@ -89,19 +90,8 @@ export default function WelcomeWizard() {
             <h2 className="text-2xl font-bold mb-2">Connect Bank Account</h2>
             <p className="text-gray-400 mb-8">Connect Paystack to start receiving member subscriptions immediately.</p>
             
-            <div className="bg-white/5 border border-white/10 rounded-2xl p-6 mb-8 flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-blue-500/20 text-blue-400 rounded-xl flex items-center justify-center font-bold text-xl">
-                  P
-                </div>
-                <div>
-                  <h3 className="font-bold text-lg">Paystack Integration</h3>
-                  <p className="text-sm text-gray-400">Accept Cards, Bank Transfers, and USSD.</p>
-                </div>
-              </div>
-              <button className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg text-sm font-bold transition">
-                Connect
-              </button>
+            <div className="bg-white/5 border border-white/10 rounded-2xl p-6 mb-8 text-left">
+              <PayoutSettingsClient settings={null} />
             </div>
 
             <div className="flex justify-between items-center">

@@ -1,6 +1,5 @@
 import { generateReceiptNumber } from "./receiptNumber";
-import { generateReceiptHtml } from "./receiptTemplate";
-import { sendEmail } from "@/lib/email/emailService";
+import { enqueueEmail } from "@/lib/email/emailService";
 import { prisma } from "@/lib/prisma";
 
 export async function processAndSendReceipt({
@@ -99,37 +98,32 @@ export async function processAndSendReceipt({
         year: "numeric",
       });
 
-    // 3. Generate HTML
-    const html = generateReceiptHtml({
-      gymName: tenantName || "CortexFit Gym",
-      receiptNumber,
-      transactionReference,
-      memberName,
-      memberEmail,
-      planName,
-      amountFormatted,
-      paymentDate: formatDate(paymentDate),
-      subscriptionStart: formatDate(subscriptionStart),
-      subscriptionEnd: formatDate(subscriptionEnd),
-      tenantEmail: tenantEmail || "support@cortexfit.com",
+    // 3. Enqueue Email
+    await enqueueEmail({
+      emailType: "PAYMENT_RECEIPT",
+      recipient: memberEmail,
+      subject: `Payment Receipt - ${receiptNumber}`,
+      tenantId: receipt.tenantId,
+      userId: receipt.userId,
+      payload: {
+        memberName,
+        receiptNumber,
+        transactionReference,
+        planName,
+        amountFormatted,
+        paymentDate: formatDate(paymentDate),
+        subscriptionStart: formatDate(subscriptionStart),
+        subscriptionEnd: formatDate(subscriptionEnd),
+        gymName: tenantName || "CortexFit Gym",
+        gymSupportEmail: tenantEmail || undefined,
+      },
     });
 
-    // 4. Send Email
-    const subject = `Payment Receipt - ${receiptNumber}`;
-    const emailResult = await sendEmail({
-      to: memberEmail,
-      subject,
-      html,
-      replyTo: tenantEmail || undefined,
-    });
-
-    // 6. Update to SENT or FAILED
+    // 4. Update to QUEUED (handled async by worker)
     await prisma.receipt.update({
       where: { id: receipt!.id },
       data: {
-        sentAt: emailResult.success ? new Date() : null,
-        status: emailResult.success ? "SENT" : "FAILED",
-        metadata: { emailError: emailResult.error },
+        status: "QUEUED",
       },
     });
 

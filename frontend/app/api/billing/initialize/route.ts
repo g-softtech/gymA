@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Invalid plan selected" }, { status: 400 });
     }
 
-    if (platformPlan.amountNGN <= 0) {
+    if (platformPlan.yearlyPrice <= 0) {
       return NextResponse.json({ error: "Free plans do not require payment" }, { status: 400 });
     }
 
@@ -42,7 +42,9 @@ export async function POST(req: NextRequest) {
     await prisma.saaSInvoice.create({
       data: {
         tenantId,
-        amount: platformPlan.amountNGN,
+        amount: platformPlan.yearlyPrice,
+        planName: platformPlan.displayName,
+        billingPeriod: "YEARLY",
         status: "pending",
         reference,
       }
@@ -57,7 +59,7 @@ export async function POST(req: NextRequest) {
       },
       body: JSON.stringify({
         email: session.user.email,
-        amount: platformPlan.amountNGN * 100, // strictly enforce config price (in kobo)
+        amount: platformPlan.yearlyPrice * 100, // strictly enforce config price (in kobo)
         currency: "NGN",
         reference,
         // Metadata is no longer relied upon for routing or security
