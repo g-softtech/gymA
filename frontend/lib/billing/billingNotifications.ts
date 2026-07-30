@@ -20,7 +20,7 @@
 import { subscriptionEventBus } from "@/lib/events/subscriptionEventBus";
 
 import { prisma } from "@/lib/prisma";
-import { enqueueEmail } from "@/lib/email/emailService";
+import { enqueueEmail } from "@/lib/email/emailQueue";
 import { logger } from "@/lib/logger";
 
 async function logNotification(tenantId: string, type: any, message: string) {

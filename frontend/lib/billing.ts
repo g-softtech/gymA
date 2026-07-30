@@ -59,15 +59,38 @@ export const SAAS_PLANS: Record<TenantPlan, SaaSPlanDetails> = {
     maxTrainers: 1000000,
     maxAiRequests: 1000000,
     features: [
-      "Unlimited members",
-      "Unlimited trainers",
+      "Unlimited members & trainers",
       "Unlimited AI requests",
-      "Full AI Suite + Chat",
-      "Advanced website builder",
-      "Custom domains",
-      "Multi-branch support",
+      "Custom domain & website builder",
+      "Custom CSS branding",
+      "Priority Support",
+      "Advanced Reports",
     ],
   },
+  PROFESSIONAL: {
+    name: "Professional",
+    price: 50000,
+    maxMembers: 1000,
+    maxTrainers: 10,
+    maxAiRequests: 1000,
+    features: [],
+  },
+  SCALEUP: {
+    name: "ScaleUp",
+    price: 100000,
+    maxMembers: 5000,
+    maxTrainers: 50,
+    maxAiRequests: 5000,
+    features: [],
+  },
+  APEX: {
+    name: "Apex",
+    price: 200000,
+    maxMembers: 1000000,
+    maxTrainers: 1000000,
+    maxAiRequests: 1000000,
+    features: [],
+  }
 };
 
 export function getTenantLimits(plan: TenantPlan): SaaSPlanDetails {

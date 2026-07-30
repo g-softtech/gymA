@@ -355,7 +355,7 @@ export async function getTenantSettings(tenantId: string) {
  */
 export async function verifyTenantEntitlement(
   tenantId: string,
-  feature: keyof TenantLimits
+  feature: string
 ): Promise<NextResponse | null> {
   const tenant = await prisma.tenant.findUnique({
     where: { id: tenantId },
@@ -366,7 +366,7 @@ export async function verifyTenantEntitlement(
     return NextResponse.json({ error: "Tenant not found" }, { status: 404 });
   }
 
-  const capabilities = resolveCapabilities(tenant.plan, tenant.planVersion);
+  const capabilities = resolveCapabilities(tenant.plan);
   const limits = capabilities.getLimits();
 
   // Boolean Feature Check

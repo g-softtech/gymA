@@ -32,8 +32,8 @@ export class TenantCapabilityService {
       addOns: [],
     };
 
-    const basePlan = planCatalogService.getPlan(state.planCode as any, state.planVersion);
-    const effective = resolveEffectiveEntitlements(basePlan.entitlements, state.addOns, state.overrides);
+    const basePlan = planCatalogService.getPlan(state.planCode as any);
+    const effective = resolveEffectiveEntitlements({ features: basePlan.capabilities, limits: basePlan.limits } as any, state.addOns, state.overrides);
     
     this.requestCache.set(tenantId, effective);
     return effective;

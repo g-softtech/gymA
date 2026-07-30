@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { getAuthSession } from "@/lib/auth";
 import { getTenantContextFromSession, requireAdmin, noTenantContext } from "@/lib/tenant";
 import { auditLogger, AuditEventType } from "@/lib/auditLogger";
-import { enqueueEmail } from "@/lib/email/emailService";
+import { enqueueEmail } from "@/lib/email/emailQueue";
 import Papa from "papaparse";
 
 const MAX_ROWS = 1000;

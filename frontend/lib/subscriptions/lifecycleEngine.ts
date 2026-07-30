@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { enqueueEmail } from "@/lib/email/emailQueue";
 
 import { EXPIRY_WARNING_DAYS } from "@/lib/billing/pricingConfig";
 
@@ -50,33 +51,27 @@ export async function processExpiringSubscriptions() {
       continue;
     }
 
-    const html = `
-      <div style="font-family: sans-serif; padding: 20px;">
-        <h2>Membership Expiring Soon</h2>
-        <p>Hi ${user.name},</p>
-        <p>Your <strong>${sub.plan.name}</strong> membership at ${sub.tenant.name} is expiring on ${sub.endDate.toLocaleDateString()}.</p>
-        <p>Please log in to renew your membership and continue enjoying your access.</p>
-      </div>
-    `;
-
-    const emailSent = await sendEmail({
-      to: user.email,
+    await enqueueEmail({
+      emailType: "MEMBERSHIP_EXPIRING",
+      recipient: user.email,
       subject: `Your Membership is Expiring Soon`,
-      html,
-      replyTo: (sub.tenant as any).email || undefined,
+      tenantId: sub.tenantId,
+      payload: {
+        memberName: user.name || "Member",
+        daysLeft: Math.ceil((sub.endDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)),
+        gymName: sub.tenant.name,
+      }
     });
 
-    if (emailSent.success) {
-      await prisma.notification.create({
-        data: {
-          tenantId: sub.tenantId,
-          userId: user.id,
-          type: "SUBSCRIPTION_EXPIRY",
-          title: "Expiring Soon: Membership",
-          message: `Your ${sub.plan.name} membership expires on ${sub.endDate.toLocaleDateString()}.`,
-        },
-      });
-    }
+    await prisma.notification.create({
+      data: {
+        tenantId: sub.tenantId,
+        userId: user.id,
+        type: "SUBSCRIPTION_EXPIRY",
+        title: "Expiring Soon: Membership",
+        message: `Your ${sub.plan.name} membership expires on ${sub.endDate.toLocaleDateString()}.`,
+      },
+    });
   }
 
   // Find subscriptions that have expired (endDate < now) but are still marked ACTIVE
@@ -120,33 +115,27 @@ export async function processExpiringSubscriptions() {
       continue; // They already renewed, ignore the old expired one
     }
 
-    const html = `
-      <div style="font-family: sans-serif; padding: 20px;">
-        <h2>Membership Expired</h2>
-        <p>Hi ${user.name},</p>
-        <p>Your <strong>${sub.plan.name}</strong> membership at ${sub.tenant.name} expired on ${sub.endDate.toLocaleDateString()}.</p>
-        <p>We'd love to see you back! Please log in to renew your membership.</p>
-      </div>
-    `;
-
-    const emailSent = await sendEmail({
-      to: user.email,
+    await enqueueEmail({
+      emailType: "MEMBERSHIP_EXPIRING", // or EXPIRED if we create one, but for now reuse or rely on existing templates
+      recipient: user.email,
       subject: `Your Membership has Expired`,
-      html,
-      replyTo: (sub.tenant as any).email || undefined,
+      tenantId: sub.tenantId,
+      payload: {
+        memberName: user.name || "Member",
+        daysLeft: 0,
+        gymName: sub.tenant.name,
+      }
     });
 
-    if (emailSent.success) {
-      await prisma.notification.create({
-        data: {
-          tenantId: sub.tenantId,
-          userId: user.id,
-          type: "SUBSCRIPTION_EXPIRY",
-          title: "Expired: Membership",
-          message: `Your ${sub.plan.name} membership has expired. Log in to renew!`,
-        },
-      });
-    }
+    await prisma.notification.create({
+      data: {
+        tenantId: sub.tenantId,
+        userId: user.id,
+        type: "SUBSCRIPTION_EXPIRY",
+        title: "Expired: Membership",
+        message: `Your ${sub.plan.name} membership expired on ${sub.endDate.toLocaleDateString()}.`,
+      },
+    });
   }
 
   return {

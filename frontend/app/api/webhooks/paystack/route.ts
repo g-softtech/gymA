@@ -75,25 +75,11 @@ async function processChargeSuccess(reference: string, payload: any) {
       const nextYear = new Date();
       nextYear.setFullYear(nextYear.getFullYear() + 1);
 
-      // Generate Sequential Invoice Number
-      const year = new Date().getFullYear();
-      const lastInvoice = await tx.saaSInvoice.findFirst({
-        where: { invoiceNumber: { startsWith: `CF-${year}-` } },
-        orderBy: { invoiceNumber: 'desc' }
-      });
-      let nextSeq = 1;
-      if (lastInvoice && lastInvoice.invoiceNumber) {
-        const parts = lastInvoice.invoiceNumber.split('-');
-        nextSeq = parseInt(parts[2], 10) + 1;
-      }
-      const invoiceNumber = `CF-${year}-${nextSeq.toString().padStart(6, '0')}`;
-
       // Atomic Upgrade
       await tx.tenant.update({
         where: { id: invoice.tenantId },
         data: {
           plan: metadata.planCode,
-          planVersion: "v1",
           planStartedAt: new Date(),
           billingEndsAt: nextYear
         }
@@ -102,21 +88,7 @@ async function processChargeSuccess(reference: string, payload: any) {
       // Immutable Invoice Update
       await tx.saaSInvoice.update({
         where: { id: invoice.id },
-        data: { status: "paid", invoiceNumber }
-      });
-
-      // Permanent Subscription Record
-      await tx.tenantSubscription.create({
-        data: {
-          tenantId: invoice.tenantId,
-          plan: metadata.planCode,
-          planVersion: "v1",
-          pricePaid: invoice.amount,
-          currency: invoice.currency,
-          billingCycle: invoice.billingPeriod || "YEARLY",
-          startedAt: new Date(),
-          expiresAt: nextYear
-        }
+        data: { status: "paid" }
       });
 
       // Emit Domain Event (could be abstracted to an event bus)

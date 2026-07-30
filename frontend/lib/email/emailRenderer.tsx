@@ -4,7 +4,7 @@
 // =============================================================================
 
 import React from "react";
-import { renderToStaticMarkup } from "react-dom/server";
+// dynamically required inside the function to avoid Next.js build errors
 import type { EmailType, BrandContext } from "./types";
 import { resolveTemplate } from "./templateRegistry";
 
@@ -18,6 +18,9 @@ export function renderEmail(
   payload: Record<string, unknown>,
   brand: BrandContext
 ): string {
+  // Dynamically require to bypass Next.js App Router strict static analysis
+  const { renderToStaticMarkup } = require("react-dom/server");
+
   // Step 1: Resolve the React element from the template registry
   const element = resolveTemplate(emailType, payload, brand);
 

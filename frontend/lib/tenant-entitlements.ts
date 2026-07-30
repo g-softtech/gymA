@@ -48,5 +48,32 @@ export const TENANT_PLAN_LIMITS: Record<TenantPlan, TenantLimits> = {
     hasWebsiteBuilder: true,
     hasBlogModule: true,
     hasCustomBranding: true,
+  },
+  PROFESSIONAL: {
+    maxMembers: 1000,
+    maxTrainers: 10, 
+    hasAiCoach: true,
+    hasCustomDomain: true,
+    hasWebsiteBuilder: true,
+    hasBlogModule: true,
+    hasCustomBranding: true,
+  },
+  SCALEUP: {
+    maxMembers: 5000,
+    maxTrainers: 50, 
+    hasAiCoach: true,
+    hasCustomDomain: true,
+    hasWebsiteBuilder: true,
+    hasBlogModule: true,
+    hasCustomBranding: true,
+  },
+  APEX: {
+    maxMembers: 999999,
+    maxTrainers: 999999, 
+    hasAiCoach: true,
+    hasCustomDomain: true,
+    hasWebsiteBuilder: true,
+    hasBlogModule: true,
+    hasCustomBranding: true,
   }
 };

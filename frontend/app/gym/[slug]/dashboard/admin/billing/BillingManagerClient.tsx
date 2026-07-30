@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useBranding } from "@/components/TenantThemeProvider";
-import type { PlatformPlanConfig } from "@/lib/billing/pricing.config";
+import type { PlatformPlanConfig } from "@/lib/billing/pricingConfig";
 import { PricingCard } from "@/components/billing/PricingCard";
 
 // Use the actual interface from the new billing system
@@ -146,8 +146,8 @@ export default function BillingManagerClient() {
           const isCurrent = status?.subscriptionPlan === plan.code || (status?.subscriptionPlan === "FREE" && plan.code === "STARTER");
           const currentPlanCode = status?.subscriptionPlan === "FREE" ? "STARTER" : (status?.subscriptionPlan || "STARTER");
           const currentPlanConfig = plans.find(p => p.code === currentPlanCode) || plans[0];
-          const planAmount = plan.pricing?.[0]?.amountSubunits || 0;
-          const currentAmount = currentPlanConfig?.pricing?.[0]?.amountSubunits || 0;
+          const planAmount = plan.yearlyPrice || 0;
+          const currentAmount = currentPlanConfig?.yearlyPrice || 0;
           const isDowngrade = planAmount < currentAmount;
 
           return (
@@ -162,7 +162,7 @@ export default function BillingManagerClient() {
                       disabled={!!checkoutLoading}
                       className="w-full py-3 rounded-xl border-2 border-indigo-600 text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 font-bold text-sm transition-all"
                     >
-                      {checkoutLoading === p.code ? "Redirecting..." : `Renew ${p.ui?.displayName || p.code}`}
+                      {checkoutLoading === p.code ? "Redirecting..." : `Renew ${p.displayName || p.code}`}
                     </button>
                   );
                 }

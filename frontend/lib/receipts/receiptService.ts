@@ -1,5 +1,5 @@
 import { generateReceiptNumber } from "./receiptNumber";
-import { enqueueEmail } from "@/lib/email/emailService";
+import { enqueueEmail } from "@/lib/email/emailQueue";
 import { prisma } from "@/lib/prisma";
 
 export async function processAndSendReceipt({

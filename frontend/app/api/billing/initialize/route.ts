@@ -43,8 +43,6 @@ export async function POST(req: NextRequest) {
       data: {
         tenantId,
         amount: platformPlan.yearlyPrice,
-        planName: platformPlan.displayName,
-        billingPeriod: "YEARLY",
         status: "pending",
         reference,
       }

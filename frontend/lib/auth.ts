@@ -9,7 +9,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import EmailProvider from "next-auth/providers/email";
 import bcrypt from "bcryptjs";
 import { auditLogger, AuditEventType } from "./auditLogger";
-import { renderEmail } from "./email/emailRenderer";
+import { enqueueEmail } from "./email/emailQueue";
 import { CORTEXFIT_BRAND } from "./email/types";
 
 export const authOptions: NextAuthOptions = {
@@ -107,12 +107,6 @@ export const authOptions: NextAuthOptions = {
       from: process.env.EMAIL_FROM || "CortexFit <noreply@thecortexsystems.com>",
       maxAge: 15 * 60, // 15 minutes expiration
       async sendVerificationRequest({ identifier: email, url, provider }) {
-        const resendApiKey = process.env.RESEND_API_KEY;
-        if (!resendApiKey) {
-          console.error("RESEND_API_KEY is missing. Cannot send Magic Link.");
-          return;
-        }
-
         // Extract tenant branding from the callback URL if available
         const parsedUrl = new URL(url);
         const callbackUrl = parsedUrl.searchParams.get("callbackUrl") || "";
@@ -122,16 +116,12 @@ export const authOptions: NextAuthOptions = {
         let gymName = "CortexFit";
         let isCreationFlow = callbackUrl.includes("/onboarding/process");
         let title = `Sign in to ${gymName}`;
-        let body = `<p style="color: #555; font-size: 16px;">Hello,</p><p style="color: #555; font-size: 16px;">Click the button below to securely sign in.</p>`;
-        let buttonText = "Sign In";
 
         if (isCreationFlow) {
           const pending = await prisma.pendingSignup.findFirst({ where: { email, status: "PENDING" } });
           if (pending) {
             gymName = pending.gymName;
             title = `Create ${gymName}`;
-            body = `<p style="color: #555; font-size: 16px;">Welcome to CortexFit!</p><p style="color: #555; font-size: 16px;">We're almost ready. Click below to create <strong>${gymName}</strong>.</p>`;
-            buttonText = "Create My Gym";
           }
         } else if (tenantSlug) {
           const tenant = await prisma.tenant.findUnique({ where: { slug: tenantSlug }, select: { name: true }});
@@ -141,33 +131,22 @@ export const authOptions: NextAuthOptions = {
           }
         }
 
-        const html = renderEmail(
-          "MAGIC_LINK",
-          {
-            recipientName: "",
-            magicUrl: url,
-            gymName: gymName !== "CortexFit" ? gymName : undefined,
-            isNewSignup: isCreationFlow,
-          },
-          CORTEXFIT_BRAND
-        );
-
-        const res = await fetch("https://api.resend.com/emails", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${resendApiKey}`,
-          },
-          body: JSON.stringify({
-            from: provider.from,
-            to: email,
+        try {
+          await enqueueEmail({
+            emailType: "MAGIC_LINK",
+            recipient: email,
             subject: title,
-            html,
-          }),
-        });
-
-        if (!res.ok) {
-          throw new Error("Resend API error: " + await res.text());
+            tenantId: tenantSlug || undefined,
+            payload: {
+              recipientName: "",
+              magicUrl: url,
+              gymName: gymName !== "CortexFit" ? gymName : undefined,
+              isNewSignup: isCreationFlow,
+            }
+          });
+        } catch (error) {
+          console.error("Error enqueuing magic link email:", error);
+          throw new Error("Failed to send verification email");
         }
       },
     }),

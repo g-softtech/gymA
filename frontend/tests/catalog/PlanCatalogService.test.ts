@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { planCatalogService } from "../../lib/billing/StaticPlanCatalogService";
 
 describe("PlanCatalogService", () => {

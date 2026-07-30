@@ -2,7 +2,7 @@ import { getAuthSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { TRIAL_DURATION_DAYS } from "@/lib/billing/pricingConfig";
-import { enqueueEmail } from "@/lib/email/emailService";
+import { enqueueEmail } from "@/lib/email/emailQueue";
 
 export default async function OnboardingProcessPage() {
   const session = await getAuthSession();

@@ -10,7 +10,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { processEmailJob } from "@/lib/email/emailService";
+import { processEmailJob } from "@/lib/email/emailProcessor";
 
 const BATCH_SIZE = 10; // Max jobs to process per invocation
 
