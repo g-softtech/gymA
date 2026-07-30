@@ -17,9 +17,10 @@ const BATCH_SIZE = 10; // Max jobs to process per invocation
 export async function GET(req: NextRequest) {
   // ── Security Check ──────────────────────────────────────────────────────────
   const authHeader = req.headers.get("authorization");
+  const expectedSecret = process.env.CRON_SECRET || "";
   if (
     process.env.NODE_ENV === "production" &&
-    authHeader !== `Bearer ${process.env.CRON_SECRET}`
+    authHeader !== `Bearer ${expectedSecret}`
   ) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
