@@ -23,6 +23,17 @@ export async function enqueueEmail(entry: EmailQueueEntry): Promise<void> {
         nextRetryAt: new Date(), // Ready to process immediately
       },
     });
+
+    // Poke the worker to process immediately (improves UX for magic links)
+    // We catch and ignore errors because this is a best-effort async trigger.
+    // If it fails, the Vercel cron will pick it up on the next minute.
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+    fetch(`${appUrl}/api/workers/email-worker`, {
+      headers: {
+        "Authorization": `Bearer ${process.env.CRON_SECRET || ""}`
+      }
+    }).catch(() => {});
+    
   } catch (err: any) {
     // Log but never throw — email queuing must never break business logic
     console.error("[EmailQueue] Failed to enqueue email:", err.message);
