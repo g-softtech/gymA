@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { getAuthSession } from "@/lib/auth";
 import { getTenantContextFromSession, requireAdmin, noTenantContext } from "@/lib/tenant";
 import { listBanks, resolveAccountNumber, createPaystackSubaccount } from "@/lib/paystack";
+import { requireRecentAuth, StepUpRequiredError } from "@/lib/auth/requireRecentAuth";
 
 export async function GET(req: NextRequest) {
   try {
@@ -33,6 +34,21 @@ export async function POST(req: NextRequest) {
     if (!bankCode || !bankName || !accountNumber) {
       return NextResponse.json({ error: "Missing bank details" }, { status: 400 });
     }
+
+    // --- STEP UP AUTHENTICATION ---
+    try {
+      if (!session) throw new Error("Unauthorized");
+      await requireRecentAuth(session, 15);
+    } catch (e) {
+      if (e instanceof StepUpRequiredError) {
+        return NextResponse.json({ 
+          error: "STEP_UP_REQUIRED", 
+          reason: e.reason 
+        }, { status: 403 });
+      }
+      throw e;
+    }
+    // ------------------------------
 
     // 1. Resolve Account Name with Paystack
     let accountName = "";

@@ -15,7 +15,7 @@ import { CORTEXFIT_BRAND } from "./email/types";
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma) as any,
   session: {
-    strategy: "database",
+    strategy: "jwt",
     maxAge: 30 * 24 * 60 * 60, // 30 days
     updateAge: 24 * 60 * 60, // 24 hours (sliding expiration)
   },
@@ -157,11 +157,6 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
 
-  session: {
-    strategy: "jwt",
-    maxAge: 24 * 60 * 60,
-  },
-
   pages: {
     signIn: "/auth/signin",  // custom sign-in page (created below)
     error: "/auth/error",
@@ -235,9 +230,10 @@ export const authOptions: NextAuthOptions = {
       token.sessionVersion = dbUser.sessionVersion;
       token.hasPassword = !!dbUser.password;
       
-      // If logging in right now, record the provider
+      // If logging in right now (interactive login), record the provider and timestamp
       if (account) {
         token.provider = account.provider;
+        token.authenticatedAt = Date.now();
       }
 
       console.log(`${TRACE} └─ FINAL TOKEN (after hydration):`);
@@ -270,6 +266,7 @@ export const authOptions: NextAuthOptions = {
         session.user.tenantStatus = token.tenantStatus as string | null | undefined;
         session.user.hasPassword = token.hasPassword as boolean;
         session.user.provider = token.provider as string | undefined;
+        session.user.authenticatedAt = token.authenticatedAt as number | undefined;
       }
 
       console.log(`${TRACE} └─ OUTGOING session.user:`);

@@ -103,6 +103,20 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
+model StepUpChallenge {
+  id          String   @id @default(cuid())
+  userId      String
+  action      String
+  returnUrl   String
+  expiresAt   DateTime
+  completedAt DateTime?
+  createdAt   DateTime @default(now())
+
+  // Note: No foreign key constraint to User intentionally to keep auth loosely coupled,
+  // but it conceptually belongs to a User.
+  @@index([userId, action])
+}
+
 model AuthRateLimit {
   id        String   @id @default(cuid())
   email     String

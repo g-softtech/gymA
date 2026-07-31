@@ -11,6 +11,7 @@ declare module "next-auth" {
       tenantStatus?: string | null;
       hasPassword?: boolean;
       provider?: string;
+      authenticatedAt?: number;
     } & DefaultSession["user"];
   }
 
@@ -34,5 +35,6 @@ declare module "next-auth/jwt" {
     sessionVersion?: number;
     hasPassword?: boolean;
     provider?: string;
+    authenticatedAt?: number;
   }
 }

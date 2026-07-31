@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { CheckCircle, AlertCircle, Building, Loader2, Landmark } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { StepUpModal } from "@/components/security/StepUpModal";
 
 interface Bank {
   name: string;
@@ -32,6 +33,9 @@ export default function PayoutSettingsClient({ settings }: { settings: PayoutSet
   
   const isConnected = settings?.paystackConnectionStatus === "connected";
   const [isEditing, setIsEditing] = useState(!isConnected);
+  
+  // Step-Up Auth State
+  const [isStepUpModalOpen, setIsStepUpModalOpen] = useState(false);
 
   useEffect(() => {
     fetch("/api/admin/revenue/payouts")
@@ -65,7 +69,14 @@ export default function PayoutSettingsClient({ settings }: { settings: PayoutSet
       });
       
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to connect account");
+      
+      if (!res.ok) {
+        if (data.error === "STEP_UP_REQUIRED") {
+          setIsStepUpModalOpen(true);
+          return;
+        }
+        throw new Error(data.error || "Failed to connect account");
+      }
       
       setSuccess("Bank account connected successfully!");
       setIsEditing(false);
@@ -79,6 +90,12 @@ export default function PayoutSettingsClient({ settings }: { settings: PayoutSet
 
   return (
     <div className="space-y-6">
+      <StepUpModal 
+        isOpen={isStepUpModalOpen} 
+        onOpenChange={setIsStepUpModalOpen} 
+        actionName="connect_payout_account" 
+        returnUrl={typeof window !== "undefined" ? window.location.href : ""} 
+      />
       {/* Status Card */}
       <div className={`p-6 rounded-xl border ${isConnected ? 'bg-green-50/50 border-green-200' : 'bg-amber-50/50 border-amber-200'}`}>
         <div className="flex items-start gap-4">
