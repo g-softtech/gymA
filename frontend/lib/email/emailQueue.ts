@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { waitUntil } from "@vercel/functions";
 import type { EmailQueueEntry } from "./types";
 
 /**
@@ -25,12 +26,16 @@ export async function enqueueEmail(entry: EmailQueueEntry): Promise<void> {
     });
 
     // Poke the worker to process immediately (improves UX for magic links).
-    // IMPORTANT: Use NEXTAUTH_URL (the canonical public domain, e.g. fit.thecortexsystems.com)
-    // NOT VERCEL_URL (which is the deployment-specific internal URL and may not resolve correctly).
+    // Uses waitUntil to guarantee execution completes without blocking the response.
     const appUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
-    fetch(`${appUrl}/api/workers/email-worker`, {
-      method: "GET",
-    }).catch(() => {});
+    waitUntil(
+      fetch(`${appUrl}/api/workers/email-worker`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${process.env.CRON_SECRET}`,
+        },
+      }).catch(() => {})
+    );
     
   } catch (err: any) {
     // Log but never throw — email queuing must never break business logic

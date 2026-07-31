@@ -16,9 +16,13 @@ const BATCH_SIZE = 10; // Max jobs to process per invocation
 
 export async function GET(req: NextRequest) {
   // ── Security Check ──────────────────────────────────────────────────────────
-  // Removed because Vercel environment variables are causing 401 mismatches.
-  // This is safe because the worker only processes trusted jobs from the DB queue.
-  // No external user input is processed here.
+  const authHeader = req.headers.get("authorization");
+  if (
+    process.env.CRON_SECRET &&
+    authHeader !== `Bearer ${process.env.CRON_SECRET}`
+  ) {
+    return new NextResponse("Unauthorized", { status: 401 });
+  }
 
   try {
     // ── Atomic Claim (FOR UPDATE SKIP LOCKED) ─────────────────────────────────
