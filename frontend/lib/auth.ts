@@ -14,6 +14,11 @@ import { CORTEXFIT_BRAND } from "./email/types";
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma) as any,
+  session: {
+    strategy: "database",
+    maxAge: 30 * 24 * 60 * 60, // 30 days
+    updateAge: 24 * 60 * 60, // 24 hours (sliding expiration)
+  },
   providers: [
     // ── Google OAuth ──────────────────────────────────────────────────────────
     // Works in production. Requires valid GOOGLE_CLIENT_ID + GOOGLE_CLIENT_SECRET
