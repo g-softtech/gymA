@@ -11,19 +11,18 @@ export default function WelcomeWizard() {
   const [slug, setSlug] = useState<string | null>(null);
 
   useEffect(() => {
-    // Fetch the user's tenant slug so we know where to redirect them at the end
+    // 1. Check if slug was passed directly from the provisioning step
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlSlug = urlParams.get("slug");
+    if (urlSlug) {
+      setSlug(urlSlug);
+      return;
+    }
+
+    // 2. Fallback: Fetch the user's tenant slug from NextAuth session
     getSession().then((session) => {
       if (session?.user?.tenantSlug) {
         setSlug(session.user.tenantSlug);
-      } else {
-        // Fallback: If tenantSlug is not in the JWT yet, we fetch it from the API
-        fetch("/api/tenant/me")
-          .then(res => res.json())
-          .then(data => {
-            if (data.tenant?.slug) {
-              setSlug(data.tenant.slug);
-            }
-          });
       }
     });
   }, []);

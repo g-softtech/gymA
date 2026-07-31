@@ -113,7 +113,7 @@ export async function provisionGymAction() {
       },
     });
 
-    return { success: true, alreadyProvisioned: false };
+    return { success: true, alreadyProvisioned: false, slug: tenant.slug };
   } catch (err: any) {
     console.error("Failed to provision gym:", err);
     return { error: "Internal server error", redirect: "/auth/signin" };

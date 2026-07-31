@@ -23,7 +23,7 @@ export default function OnboardingProcessPage() {
       } else if (res.alreadyProvisioned) {
         router.push(`/gym/${res.slug}/dashboard/admin`);
       } else {
-        router.push(`/onboarding/welcome`);
+        router.push(`/onboarding/welcome?slug=${res.slug}`);
       }
     });
 
