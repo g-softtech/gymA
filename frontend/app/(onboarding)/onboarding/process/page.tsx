@@ -80,8 +80,7 @@ export default async function OnboardingProcessPage() {
       data: {
         name: pendingSignup.ownerName, // Set their name from the form
         tenantId: newTenant.id,
-        role: "ADMIN",
-        sessionVersion: { increment: 1 }
+        role: "ADMIN"
       }
     });
 
