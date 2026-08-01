@@ -76,6 +76,9 @@ export default function SignInPage() {
     }
   };
 
+  // Extract tenant slug from the callbackUrl (used for both magic link and credentials pre-flights)
+  const tenantSlug = callbackUrl.match(/\/gym\/([^\/]+)/)?.[1] ?? null;
+
   const handleMagicLink = async () => {
     if (!form.email) {
        setMessage({ type: "error", text: "Please enter your email address above to receive a login link." });
@@ -84,10 +87,11 @@ export default function SignInPage() {
     setMagicLinkLoading(true);
     setMessage(null);
     try {
+      // Pre-flight: validate tenant membership and rate-limit BEFORE generating any token
       const res = await fetch("/api/auth/magic-link/rate-limit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: form.email })
+        body: JSON.stringify({ email: form.email, tenantSlug }),
       });
       if (!res.ok) {
          const data = await res.json();
@@ -95,11 +99,11 @@ export default function SignInPage() {
          setMagicLinkLoading(false);
          return;
       }
-      
+
       const result = await signIn("email", {
         email: form.email,
         callbackUrl,
-        redirect: false
+        redirect: false,
       });
       if (result?.error) {
         setMessage({ type: "error", text: authErrorMap[result.error] || result.error });
@@ -117,10 +121,31 @@ export default function SignInPage() {
     setLoading(true);
     setMessage(null);
 
+    // Pre-flight: validate tenant membership before invoking NextAuth.
+    // Use checkOnly=true so this call doesn't record a rate-limit hit.
+    try {
+      const preflightRes = await fetch("/api/auth/magic-link/rate-limit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: form.email, tenantSlug, checkOnly: true }),
+      });
+      if (!preflightRes.ok) {
+        const data = await preflightRes.json();
+        setMessage({ type: "error", text: data.error || "Unable to sign in. Please try again." });
+        setLoading(false);
+        return;
+      }
+    } catch {
+      setMessage({ type: "error", text: "Unable to verify your account. Please try again." });
+      setLoading(false);
+      return;
+    }
+
     const result = await signIn("credentials", {
       redirect: false,
       email: form.email,
       password: form.password,
+      tenantSlug: tenantSlug ?? "",
     });
 
     if (result?.ok) {

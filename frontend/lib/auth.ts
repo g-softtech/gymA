@@ -43,6 +43,8 @@ export const authOptions: NextAuthOptions = {
       credentials: {
         email: { label: "Email", type: "email", placeholder: "you@example.com" },
         password: { label: "Password", type: "password" },
+        // Tenant context forwarded from the sign-in page to enforce cross-site isolation.
+        tenantSlug: { label: "Tenant Slug", type: "text" },
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
@@ -51,8 +53,11 @@ export const authOptions: NextAuthOptions = {
         }
 
         const email = credentials.email.toLowerCase().trim();
+        const tenantSlug = (credentials.tenantSlug as string) || null;
+
         const user = await prisma.user.findUnique({
           where: { email },
+          include: { tenant: { select: { slug: true, name: true } } },
         });
 
         console.log("[AUTH TRACE] User Found", {
@@ -84,6 +89,26 @@ export const authOptions: NextAuthOptions = {
           console.log("[AUTH TRACE] Rejecting: Password mismatch");
           auditLogger.log(AuditEventType.USER_FAILED_LOGIN, user.tenantId, { email, reason: "Password mismatch" }, user.id);
           throw new Error("Invalid email or password.");
+        }
+
+        // ── Safety net: cross-tenant isolation ────────────────────────────────
+        // The pre-flight in the UI catches this first; this guard blocks any
+        // direct API call that bypasses the frontend.
+        //   • tenantSlug present  → user must belong to that exact tenant
+        //   • tenantSlug absent   → user must not be a gym member (SUPERADMIN/platform only)
+        if (user.role !== "SUPERADMIN") {
+          if (tenantSlug) {
+            if (user.tenant?.slug !== tenantSlug) {
+              console.log("[AUTH TRACE] Rejecting: User does not belong to tenant", tenantSlug);
+              auditLogger.log(AuditEventType.USER_FAILED_LOGIN, user.tenantId, { email, reason: `Cross-tenant credentials attempt for ${tenantSlug}` }, user.id);
+              throw new Error("Invalid email or password.");
+            }
+          } else if (user.tenantId) {
+            // Gym member trying to log in on the main site — block them
+            console.log("[AUTH TRACE] Rejecting: Gym member attempting main-site login");
+            auditLogger.log(AuditEventType.USER_FAILED_LOGIN, user.tenantId, { email, reason: "Main-site login blocked for gym member" }, user.id);
+            throw new Error("Invalid email or password.");
+          }
         }
 
         console.log("[AUTH TRACE] Returning User", {
@@ -133,6 +158,34 @@ export const authOptions: NextAuthOptions = {
           if (tenant) {
             gymName = tenant.name;
             title = `Sign in to ${gymName}`;
+          }
+        }
+
+        // ── Safety net: tenant membership validation ──────────────────────────
+        // The rate-limit pre-flight is the primary guard. This block prevents
+        // any direct POST to /api/auth/signin/email from bypassing tenant checks.
+        if (!isCreationFlow) {
+          const requestingUser = await prisma.user.findUnique({
+            where: { email },
+            select: {
+              tenantId: true,
+              role: true,
+              tenant: { select: { slug: true } },
+            },
+          });
+
+          if (tenantSlug) {
+            // Tenant-scoped: the requesting email must belong to this exact tenant
+            if (!requestingUser || requestingUser.tenant?.slug !== tenantSlug) {
+              console.error(`[AUTH] Magic link blocked: ${email} is not a member of tenant ${tenantSlug}`);
+              throw new Error("Tenant membership validation failed.");
+            }
+          } else {
+            // Main-site: only tenant-free accounts (no gym membership) may use magic link
+            if (requestingUser?.tenantId && requestingUser.role !== "SUPERADMIN") {
+              console.error(`[AUTH] Magic link blocked: gym member ${email} attempted main-site sign-in`);
+              throw new Error("Tenant membership validation failed.");
+            }
           }
         }
 
