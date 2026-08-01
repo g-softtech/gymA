@@ -1,10 +1,10 @@
-import { PLATFORM_PLANS, PlatformPlanConfig, PlatformPlanCode } from "./pricingConfig";
+import { STATIC_PLATFORM_PLANS, PlatformPlanConfig, PlatformPlanCode } from "./pricing.config";
 
 export class StaticPlanCatalogService {
   private cache: PlatformPlanConfig[] = [];
 
   constructor() {
-    this.cache = Object.values(PLATFORM_PLANS);
+    this.cache = STATIC_PLATFORM_PLANS;
   }
 
   getPlans(): PlatformPlanConfig[] {

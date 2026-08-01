@@ -36,7 +36,7 @@ export default function PricingPage() {
                   <Link 
                     href={p.code === "APEX" ? "/contact" : `/signup?plan=${p.code.toLowerCase()}`} 
                     className={`w-full font-bold px-6 py-3 rounded-xl transition text-center block ${
-                      p.recommended 
+                      p.ui?.isMostPopular 
                         ? "bg-indigo-600 text-white hover:bg-indigo-700 shadow-md shadow-indigo-200" 
                         : p.code === "APEX" 
                           ? "bg-gray-900 text-white hover:bg-gray-800" 
