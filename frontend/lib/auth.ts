@@ -278,6 +278,15 @@ export const authOptions: NextAuthOptions = {
 
       return session;
     },
+
+    async redirect({ url, baseUrl }) {
+      // Allow absolute URLs on the same origin (e.g. full magic-link callbackUrl)
+      if (url.startsWith(baseUrl)) return url;
+      // Allow relative paths (e.g. /gym/sinfit/dashboard/admin) — prepend origin
+      if (url.startsWith("/")) return `${baseUrl}${url}`;
+      // Fallback: send to root
+      return baseUrl;
+    },
   },
 };
 
