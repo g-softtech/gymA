@@ -54,11 +54,9 @@ export default function HomePage() {
             Now with AI Fitness Coaching powered by Google Gemini
           </div>
           <h1 className="text-5xl sm:text-6xl font-extrabold leading-tight mb-6">
-            The Complete Gym
+            The Operating System
             <br />
-            <span className="text-indigo-300">Management Platform</span>
-            <br />
-            for Africa
+            <span className="text-indigo-300">for Modern African Gyms</span>
           </h1>
           <p className="text-xl text-indigo-200 max-w-2xl mx-auto mb-10 leading-relaxed">
             Automate member check-ins, eliminate payment leaks, and retain members—all in one powerful operating system built for African gyms.
