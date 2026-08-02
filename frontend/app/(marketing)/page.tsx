@@ -61,7 +61,7 @@ export default function HomePage() {
             for Africa
           </h1>
           <p className="text-xl text-indigo-200 max-w-2xl mx-auto mb-10 leading-relaxed">
-            Manage members, trainers, payments, nutrition, and community — all in one powerful SaaS platform built for Nigerian and African gyms.
+            Automate member check-ins, eliminate payment leaks, and retain members—all in one powerful operating system built for African gyms.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
