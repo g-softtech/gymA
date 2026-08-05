@@ -17,7 +17,7 @@ export async function provisionGymAction() {
     const pendingSignup = await prisma.pendingSignup.findFirst({
       where: { 
         email: session.user.email,
-        status: "PENDING"
+        status: { in: ["NEW", "MAGIC_LINK_SENT", "EMAIL_VERIFIED"] }
       }
     });
 
@@ -81,7 +81,10 @@ export async function provisionGymAction() {
 
       await tx.pendingSignup.update({
         where: { id: pendingSignup.id },
-        data: { status: "COMPLETED" }
+        data: { 
+          status: "ONBOARDED",
+          lastActivityAt: new Date()
+        }
       });
 
       return { tenant: newTenant };

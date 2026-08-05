@@ -148,7 +148,7 @@ export const authOptions: NextAuthOptions = {
         let title = `Sign in to ${gymName}`;
 
         if (isCreationFlow) {
-          const pending = await prisma.pendingSignup.findFirst({ where: { email, status: "PENDING" } });
+          const pending = await prisma.pendingSignup.findFirst({ where: { email, status: { in: ["NEW", "MAGIC_LINK_SENT"] } } });
           if (pending) {
             gymName = pending.gymName;
             title = `Create ${gymName}`;

@@ -1156,16 +1156,48 @@ model IntelligenceSafetyEvent {
 }
 
 
+enum LeadSource {
+  WEBSITE
+  LIVE_DEMO
+  TIKTOK
+  INSTAGRAM
+  FACEBOOK
+  YOUTUBE
+  LINKEDIN
+  DIRECT
+  REFERRAL
+}
+
+enum DemoPersona {
+  GYM_OWNER
+  TRAINER
+  MEMBER
+}
+
+enum PendingSignupStatus {
+  NEW
+  MAGIC_LINK_SENT
+  EMAIL_VERIFIED
+  ONBOARDED
+  ABANDONED
+}
+
 model PendingSignup {
-  id         String   @id @default(cuid())
-  email      String   @unique
-  ownerName  String
-  gymName    String
-  slug       String
-  status     String   @default("PENDING") // PENDING, COMPLETED, EXPIRED
-  expiresAt  DateTime
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id             String              @id @default(cuid())
+  email          String              @unique
+  ownerName      String
+  gymName        String
+  slug           String
+  phone          String?
+  status         PendingSignupStatus @default(NEW)
+  leadSource     LeadSource          @default(WEBSITE)
+  demoPersona    DemoPersona?
+  attribution    Json?
+  expiresAt      DateTime
+  firstSeenAt    DateTime?
+  lastActivityAt DateTime?
+  createdAt      DateTime            @default(now())
+  updatedAt      DateTime            @updatedAt
 
   @@index([email, status])
 }

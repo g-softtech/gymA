@@ -416,3 +416,18 @@ export async function verifyTenantEntitlement(
 
   return null;
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Demo Environment Helpers
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Checks if a tenant is considered a "Demo" tenant.
+ * Centralized here to avoid scattering `tenant.isDemo` checks throughout the UI.
+ */
+export function isDemoTenant(tenant?: { isDemo?: boolean, slug?: string } | null): boolean {
+  if (!tenant) return false;
+  if (tenant.isDemo) return true;
+  if (tenant.slug?.startsWith('demo-') || tenant.slug === 'cortexfit-demo') return true;
+  return false;
+}

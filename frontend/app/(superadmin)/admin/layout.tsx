@@ -24,6 +24,7 @@ export default async function SuperAdminLayout({
 
   const navItems = [
     { href: "/admin", label: "Overview", icon: "⚡" },
+    { href: "/admin/growth", label: "Growth", icon: "🌱" },
     { href: "/admin/tenants", label: "Gyms", icon: "🏢" },
     { href: "/admin/users", label: "All Users", icon: "👥" },
     { href: "/admin/billing", label: "Billing", icon: "💰" },
