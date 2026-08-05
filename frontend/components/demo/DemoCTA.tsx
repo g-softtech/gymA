@@ -42,11 +42,11 @@ export function DemoCTA() {
   return (
     <>
       <div 
-        className={`fixed bottom-6 right-6 z-50 transition-all duration-700 ease-out transform ${
-          showButton ? "translate-y-0 opacity-100 scale-100" : "translate-y-12 opacity-0 scale-95 pointer-events-none"
+        className={`fixed top-4 left-4 right-4 md:top-auto md:left-auto md:bottom-6 md:right-6 z-50 transition-all duration-700 ease-out transform ${
+          showButton ? "translate-y-0 opacity-100 scale-100" : "-translate-y-12 md:translate-y-12 opacity-0 scale-95 pointer-events-none"
         }`}
       >
-        <div className="bg-card border border-border shadow-2xl rounded-2xl p-5 w-[320px] flex flex-col gap-3 relative overflow-hidden group">
+        <div className="bg-card border border-border shadow-2xl rounded-2xl p-5 md:w-[320px] flex flex-col gap-3 relative overflow-hidden group">
           <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none transition-transform group-hover:scale-125"></div>
           
           <div className="flex items-center gap-3 relative z-10">
