@@ -1,12 +1,14 @@
 import { prisma } from "@/lib/prisma";
 import { formatDistanceToNow, format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
+import { DemoResetButton } from "./DemoResetButton";
 
 export const dynamic = "force-dynamic";
 
 export default async function GrowthDashboard() {
   const signups = await prisma.pendingSignup.findMany({
-    orderBy: { createdAt: "desc" }
+    orderBy: { createdAt: "desc" },
+    take: 1000
   });
 
   // Basic KPI calculations
@@ -17,11 +19,14 @@ export default async function GrowthDashboard() {
 
   return (
     <div className="space-y-8 max-w-7xl mx-auto pb-12">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight text-foreground">Growth Funnel</h1>
-        <p className="text-muted-foreground mt-2">
-          Monitor your customer acquisition pipeline, lead attribution, and conversion metrics.
-        </p>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight text-foreground">Growth Funnel</h1>
+          <p className="text-muted-foreground mt-2">
+            Monitor your customer acquisition pipeline, lead attribution, and conversion metrics.
+          </p>
+        </div>
+        <DemoResetButton />
       </div>
 
       {/* KPI Ribbon */}

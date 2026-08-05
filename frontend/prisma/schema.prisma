@@ -1196,10 +1196,13 @@ model PendingSignup {
   expiresAt      DateTime
   firstSeenAt    DateTime?
   lastActivityAt DateTime?
+  followUpSentAt DateTime?
   createdAt      DateTime            @default(now())
   updatedAt      DateTime            @updatedAt
 
   @@index([email, status])
+  @@index([status, createdAt])
+  @@index([leadSource])
 }
 
 // ── TRANSACTIONAL EMAIL SYSTEM ──────────────────────────────────────────

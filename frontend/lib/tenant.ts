@@ -3,7 +3,7 @@ import type { Session } from "next-auth";
 import { getAuthSession } from "./auth";
 import { prisma } from "./prisma";
 import { resolveCapabilities } from "./capabilities";
-import { Permission, hasPermission } from "./permissions";
+import { Permission, hasPermission, DEMO_RESTRICTED_PERMISSIONS } from "./permissions";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -14,6 +14,7 @@ export interface TenantContext {
   userId: string;
   role: string;
   tenantStatus?: string;
+  isDemo?: boolean;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -30,21 +31,22 @@ export async function getTenantContext(): Promise<TenantContext | null> {
   const session = await getAuthSession();
   if (!session?.user?.id) return null;
 
-  const { id: userId, role, tenantId, tenantStatus } = session.user as {
+  const { id: userId, role, tenantId, tenantStatus, isDemo } = session.user as {
     id: string;
     role: string;
     tenantId?: string;
     tenantStatus?: string;
+    isDemo?: boolean;
   };
 
   // SUPERADMIN may operate without a tenantId
   if (role === "SUPERADMIN") {
-    return { tenantId: tenantId ?? "", userId, role, tenantStatus };
+    return { tenantId: tenantId ?? "", userId, role, tenantStatus, isDemo };
   }
 
   if (!tenantId) return null;
 
-  return { tenantId, userId, role, tenantStatus };
+  return { tenantId, userId, role, tenantStatus, isDemo };
 }
 
 /**
@@ -97,6 +99,15 @@ export function authorize(
   if (!hasPermission(ctx.role, permission)) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
+
+  // Global Demo Protection
+  if (ctx.isDemo && DEMO_RESTRICTED_PERMISSIONS.includes(permission)) {
+    return NextResponse.json(
+      { error: "This action is restricted in the Live Demo environment." }, 
+      { status: 403 }
+    );
+  }
+
   return null;
 }
 

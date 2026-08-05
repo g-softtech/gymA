@@ -18,6 +18,7 @@ export async function GET(req: Request) {
     const abandonedLeads = await prisma.pendingSignup.findMany({
       where: {
         status: { in: ["NEW", "MAGIC_LINK_SENT"] },
+        followUpSentAt: null,
         createdAt: {
           lt: twentyFourHoursAgo,
           gte: fortyEightHoursAgo
@@ -42,7 +43,8 @@ export async function GET(req: Request) {
         where: { id: lead.id },
         data: { 
           status: "MAGIC_LINK_SENT",
-          lastActivityAt: new Date()
+          lastActivityAt: new Date(),
+          followUpSentAt: new Date()
         }
       });
 

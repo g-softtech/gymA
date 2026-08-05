@@ -280,6 +280,7 @@ export const authOptions: NextAuthOptions = {
       token.tenantId = dbUser.tenantId ?? undefined;
       token.tenantSlug = dbUser.tenant?.slug ?? null;
       token.tenantStatus = dbUser.tenant?.status ?? null;
+      token.isDemo = dbUser.tenant?.isDemo ?? false;
       token.sessionVersion = dbUser.sessionVersion;
       token.hasPassword = !!dbUser.password;
       
@@ -317,6 +318,7 @@ export const authOptions: NextAuthOptions = {
         session.user.tenantId = token.tenantId as string | undefined;
         session.user.tenantSlug = token.tenantSlug as string | null | undefined;
         session.user.tenantStatus = token.tenantStatus as string | null | undefined;
+        session.user.isDemo = token.isDemo as boolean | undefined;
         session.user.hasPassword = token.hasPassword as boolean;
         session.user.provider = token.provider as string | undefined;
         session.user.authenticatedAt = token.authenticatedAt as number | undefined;

@@ -151,7 +151,7 @@ export default function CommunityFeed({
   return (
     <div className="space-y-4">
       {/* Post composer */}
-      <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4">
+      <div className="bg-card text-card-foreground rounded-xl border border-border shadow-sm p-4">
         <div className="flex gap-3">
           <div className="w-9 h-9 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold uppercase text-sm shrink-0">
             {currentUserName[0]}
@@ -161,8 +161,7 @@ export default function CommunityFeed({
               rows={3}
               placeholder="Share your fitness journey, tips, or motivation..."
               value={newContent}
-              onChange={(e) => setNewContent(e.target.value)}
-              className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full bg-background text-foreground border border-border rounded-xl px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-muted-foreground"
             />
             <div className="flex justify-end mt-2">
               <button
@@ -179,14 +178,14 @@ export default function CommunityFeed({
 
       {/* Posts */}
       {posts.length === 0 ? (
-        <div className="bg-white rounded-xl border border-gray-100 p-12 text-center text-gray-400">
+        <div className="bg-card text-card-foreground rounded-xl border border-border p-12 text-center text-muted-foreground">
           <p className="text-4xl mb-3">💬</p>
-          <p className="font-medium text-gray-600">No posts yet</p>
+          <p className="font-medium text-muted-foreground">No posts yet</p>
           <p className="text-sm mt-1">Be the first to share something with the community!</p>
         </div>
       ) : (
         posts.map((post) => (
-          <div key={post.id} className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+          <div key={post.id} className="bg-card text-card-foreground rounded-xl border border-border shadow-sm overflow-hidden">
             {/* Post header */}
             <div className="px-5 py-4">
               <div className="flex justify-between items-start mb-3">
@@ -195,14 +194,14 @@ export default function CommunityFeed({
                     {post.authorName[0]}
                   </div>
                   <div>
-                    <p className="font-semibold text-gray-900 text-sm">{post.authorName}</p>
-                    <p className="text-xs text-gray-400">{timeAgo(post.createdAt)}</p>
+                    <p className="font-semibold text-foreground text-sm">{post.authorName}</p>
+                    <p className="text-xs text-muted-foreground">{timeAgo(post.createdAt)}</p>
                   </div>
                 </div>
                 {post.authorId === currentUserId && (
                   <button
                     onClick={() => handleDelete(post.id)}
-                    className="text-xs text-gray-400 hover:text-red-500 transition"
+                    className="text-xs text-muted-foreground hover:text-red-500 transition"
                   >
                     Delete
                   </button>
@@ -223,11 +222,11 @@ export default function CommunityFeed({
             </div>
 
             {/* Actions */}
-            <div className="px-5 pb-3 flex items-center gap-4 border-t border-gray-50 pt-3">
+            <div className="px-5 pb-3 flex items-center gap-4 border-t border-border pt-3">
               <button
                 onClick={() => handleLike(post.id)}
                 className={`flex items-center gap-1.5 text-sm font-medium transition ${
-                  post.likedByMe ? "text-indigo-600" : "text-gray-400 hover:text-indigo-500"
+                  post.likedByMe ? "text-indigo-600" : "text-muted-foreground hover:text-indigo-500"
                 }`}
               >
                 <span>{post.likedByMe ? "❤️" : "🤍"}</span>
@@ -237,7 +236,7 @@ export default function CommunityFeed({
 
               <button
                 onClick={() => toggleComments(post.id)}
-                className="flex items-center gap-1.5 text-sm font-medium text-gray-400 hover:text-indigo-500 transition"
+                className="flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-indigo-500 transition"
               >
                 <span>💬</span>
                 {post.comments.length > 0 && <span>{post.comments.length}</span>}
@@ -247,15 +246,15 @@ export default function CommunityFeed({
 
             {/* Comments */}
             {expandedComments.has(post.id) && (
-              <div className="border-t border-gray-50 px-5 py-3 bg-gray-50 space-y-3">
+              <div className="border-t border-border px-5 py-3 bg-muted/50 space-y-3">
                 {post.comments.map((c) => (
                   <div key={c.id} className="flex gap-2">
-                    <div className="w-7 h-7 rounded-full bg-gray-200 text-gray-600 flex items-center justify-center text-xs font-bold uppercase shrink-0">
+                    <div className="w-7 h-7 rounded-full bg-gray-200 text-muted-foreground flex items-center justify-center text-xs font-bold uppercase shrink-0">
                       {c.authorName[0]}
                     </div>
-                    <div className="flex-1 bg-white rounded-xl px-3 py-2">
+                    <div className="flex-1 bg-card text-card-foreground rounded-xl px-3 py-2">
                       <p className="text-xs font-semibold text-gray-700">{c.authorName}</p>
-                      <p className="text-sm text-gray-600 mt-0.5">{c.content}</p>
+                      <p className="text-sm text-muted-foreground mt-0.5">{c.content}</p>
                     </div>
                   </div>
                 ))}
@@ -276,7 +275,7 @@ export default function CommunityFeed({
                       onKeyDown={(e) => {
                         if (e.key === "Enter") handleComment(post.id);
                       }}
-                      className="flex-1 border border-gray-200 rounded-xl px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      className="flex-1 bg-background text-foreground border border-border rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-muted-foreground"
                     />
                     <button
                       onClick={() => handleComment(post.id)}

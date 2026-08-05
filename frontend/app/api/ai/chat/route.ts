@@ -23,6 +23,13 @@ export async function POST(req: NextRequest) {
     const ctx = getTenantContextFromSession(session);
     if (!ctx?.tenantId) return noTenantContext();
 
+    if (session.user?.isDemo) {
+      // ✅ Demo AI Mocking: Do not consume real AI API credits in demo mode.
+      return NextResponse.json({
+        reply: "Hello! This is a simulated response for the CortexFit Live Demo. In a real environment, I am powered by Gemini 2.5 Flash and have full access to your gym's data to answer questions and generate insights!"
+      });
+    }
+
     // ✅ Phase 9B.4: SaaS AI Quota Enforcement
     const quota = await checkAiQuota(ctx.tenantId);
     if (!quota.allowed) {

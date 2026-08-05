@@ -20,6 +20,21 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Content is required" }, { status: 400 });
     }
 
+    if (session.user?.isDemo) {
+      return NextResponse.json({
+        id: `mock_post_${Date.now()}`,
+        tenantId: ctx.tenantId,
+        authorId: session.user.id,
+        content: content.trim(),
+        imageUrl: imageUrl ?? null,
+        createdAt: new Date().toISOString(),
+        author: { id: session.user.id, name: session.user.name || "Demo User" },
+        likes: [],
+        comments: [],
+        _count: { likes: 0, comments: 0 }
+      });
+    }
+
     const post = await prisma.post.create({
       data: {
         tenantId: ctx.tenantId, // ✅ from session

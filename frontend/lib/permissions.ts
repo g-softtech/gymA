@@ -55,3 +55,19 @@ export function hasPermission(role: string, permission: Permission): boolean {
   
   return permissions.includes(permission);
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Demo Environment Restrictions
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Destructive capabilities that should be blocked when operating in a Demo Tenant.
+ * We block by business capability rather than HTTP method so harmless actions 
+ * (like booking a class or generating AI meal plans) still work in the demo.
+ */
+export const DEMO_RESTRICTED_PERMISSIONS = [
+  Permission.DELETE_MEMBERS,
+  Permission.EDIT_BILLING,
+  Permission.EDIT_SETTINGS,
+  Permission.SYSTEM_ADMIN,
+];

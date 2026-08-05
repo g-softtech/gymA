@@ -23,6 +23,20 @@ export async function POST(req: NextRequest) {
     const ctx = getTenantContextFromSession(session);
     if (!ctx?.tenantId) return noTenantContext();
 
+    if (session.user?.isDemo) {
+      return NextResponse.json({
+        plan: {
+          title: "Demo 3-Day Strength Foundation",
+          routines: {
+            day1: "Squats (3x10), Bench Press (3x10), Rows (3x10)",
+            day2: "Deadlifts (3x8), Overhead Press (3x10), Pullups (3xAMRAP)",
+            day3: "Lunges (3x12), Dips (3x10), Core Circuit (15 mins)"
+          },
+          explanation: "This is a simulated AI workout plan for the CortexFit Live Demo. In a production environment, this is generated dynamically by Google Gemini based on the member's specific biometric data, available equipment, and fitness goals."
+        }
+      });
+    }
+
     // ✅ Phase 9B.4: SaaS AI Quota Enforcement
     const quota = await checkAiQuota(ctx.tenantId);
     if (!quota.allowed) {

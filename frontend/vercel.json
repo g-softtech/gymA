@@ -7,6 +7,14 @@
     {
       "path": "/api/workers/email-worker",
       "schedule": "0 0 * * *"
+    },
+    {
+      "path": "/api/cron/reset-demo",
+      "schedule": "0 3 * * *"
+    },
+    {
+      "path": "/api/cron/abandoned-leads",
+      "schedule": "0 10 * * *"
     }
   ]
 }

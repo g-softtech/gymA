@@ -23,6 +23,26 @@ export async function POST(req: NextRequest) {
     const ctx = getTenantContextFromSession(session);
     if (!ctx?.tenantId) return noTenantContext();
 
+    if (session.user?.isDemo) {
+      return NextResponse.json({
+        plan: {
+          title: "Demo 7-Day Performance Plan",
+          goal: "MAINTAIN",
+          totalCalories: 2200,
+          protein: 160,
+          carbs: 200,
+          fats: 70,
+          meals: {
+            breakfast: "Oatmeal with whey protein and berries.",
+            lunch: "Grilled chicken breast, quinoa, and roasted vegetables.",
+            dinner: "Baked salmon with sweet potato and asparagus.",
+            snacks: "Greek yogurt, handful of almonds, apple."
+          },
+          explanation: "This is a simulated AI meal plan for the CortexFit Live Demo. In a production environment, this is generated dynamically by Google Gemini based on the member's specific biometric data and fitness goals."
+        }
+      });
+    }
+
     // ✅ Phase 9B.4: SaaS AI Quota Enforcement
     const quota = await checkAiQuota(ctx.tenantId);
     if (!quota.allowed) {
