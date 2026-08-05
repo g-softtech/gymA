@@ -83,7 +83,7 @@ export default function MembershipAnalyticsClient() {
                   ))}
                 </Pie>
                 <Tooltip
-                  contentStyle={{ borderRadius: "12px", border: "1px solid var(--border)", backgroundColor: "var(--card)", color: "var(--foreground)", fontSize: "12px" }}
+                  contentStyle={{ borderRadius: "12px", border: "1px solid hsl(var(--border))", backgroundColor: "hsl(var(--card))", color: "hsl(var(--foreground))", fontSize: "12px" }}
                 />
                 <Legend />
               </PieChart>
