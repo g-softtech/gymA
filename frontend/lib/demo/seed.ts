@@ -132,6 +132,11 @@ async function seedLiveDemoTransaction(tx: Prisma.TransactionClient) {
             hourlyRate: isDaniel ? 15000 : 8000,
             showOnWebsite: true,
             yearsOfExperience: isDaniel ? 10 : 3,
+            availability: {
+              monday: ["08:00", "09:00", "10:00", "16:00", "17:00"],
+              wednesday: ["08:00", "09:00", "10:00", "16:00", "17:00"],
+              friday: ["08:00", "09:00", "10:00"]
+            },
           }
         }
       },

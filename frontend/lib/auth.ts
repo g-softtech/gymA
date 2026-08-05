@@ -249,7 +249,7 @@ export const authOptions: NextAuthOptions = {
           tenantId: true,
           sessionVersion: true,
           password: true,
-          tenant: { select: { slug: true, status: true } },
+          tenant: { select: { slug: true, status: true, isDemo: true } },
         },
       });
 
