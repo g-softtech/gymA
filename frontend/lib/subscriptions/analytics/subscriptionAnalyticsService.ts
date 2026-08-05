@@ -16,6 +16,9 @@ export class SubscriptionAnalyticsService {
     granularity: TrendGranularity,
     recoveryWindowDays: number = 14
   ): Promise<SubscriptionAnalyticsDTO> {
+    const diffTime = Math.abs(to.getTime() - from.getTime());
+    const diffDays = Math.max(1, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
+
     // 1. Fetch raw metrics concurrently
     const [
       renewalStats,
@@ -30,8 +33,8 @@ export class SubscriptionAnalyticsService {
       this.repository.getRetentionStats(tenantId, from, to),
       this.repository.getRecoveryStats(tenantId, from, to, recoveryWindowDays),
       this.repository.getExpiringTrend(tenantId, from, to, granularity),
-      this.repository.getAverageLifetimeMonths(tenantId),
-      this.repository.getUpcomingRevenueAtRisk(tenantId, 30),
+      this.repository.getAverageLifetimeMonths(tenantId, from, to),
+      this.repository.getUpcomingRevenueAtRisk(tenantId, diffDays),
       this.repository.getSubscriptionDistribution(tenantId),
     ]);
 

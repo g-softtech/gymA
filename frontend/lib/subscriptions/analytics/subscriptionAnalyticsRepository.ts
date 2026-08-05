@@ -148,10 +148,9 @@ export class SubscriptionAnalyticsRepository {
     }));
   }
 
-  async getAverageLifetimeMonths(tenantId: string) {
+  async getAverageLifetimeMonths(tenantId: string, from: Date, to: Date) {
     // Average continuous duration: average of (endDate - startDate) across all subscriptions
-    // In our domain, we define this as the difference between the earliest startDate and the latest endDate
-    // for each member.
+    // Filter to members who had an active subscription in the selected period.
     const result = await prisma.$queryRaw<{ avg_months: number }[]>`
       WITH MemberDurations AS (
         SELECT 
@@ -162,11 +161,20 @@ export class SubscriptionAnalyticsRepository {
         WHERE "tenantId" = ${tenantId}
           AND "status" != 'PENDING_PAYMENT'
         GROUP BY "memberId"
+      ),
+      ActiveMembersInPeriod AS (
+        SELECT DISTINCT "memberId"
+        FROM "Subscription"
+        WHERE "tenantId" = ${tenantId}
+          AND "startDate" <= ${to}
+          AND "endDate" >= ${from}
+          AND "status" != 'PENDING_PAYMENT'
       )
       SELECT 
-        AVG(EXTRACT(EPOCH FROM (last_end - first_start)) / (30 * 24 * 60 * 60))::float as avg_months
-      FROM MemberDurations
-      WHERE last_end > first_start
+        AVG(EXTRACT(EPOCH FROM (md.last_end - md.first_start)) / (30 * 24 * 60 * 60))::float as avg_months
+      FROM MemberDurations md
+      JOIN ActiveMembersInPeriod am ON md."memberId" = am."memberId"
+      WHERE md.last_end > md.first_start
     `;
 
     return result[0]?.avg_months || 0;
