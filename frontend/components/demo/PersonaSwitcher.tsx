@@ -54,7 +54,7 @@ export default function PersonaSwitcher({ tenantId, tenantName, currentRole, isD
 
   return (
     <>
-      <div className="fixed bottom-24 right-6 md:bottom-6 md:right-6 z-[60]">
+      <div className="fixed bottom-24 left-1/2 -translate-x-1/2 md:bottom-6 z-[60]">
         <button
           onClick={() => setIsOpen(!isOpen)}
           className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-full shadow-2xl p-3 md:px-5 md:py-3 flex items-center gap-3 transition-all hover:scale-105 border-4 border-background"
@@ -73,7 +73,7 @@ export default function PersonaSwitcher({ tenantId, tenantName, currentRole, isD
       </div>
 
       {isOpen && (
-        <div className="fixed bottom-40 right-6 md:bottom-24 md:right-6 z-[60] w-72 bg-card text-card-foreground shadow-2xl rounded-2xl border border-border overflow-hidden animate-in fade-in slide-in-from-bottom-4">
+        <div className="fixed bottom-40 left-1/2 -translate-x-1/2 md:bottom-24 z-[60] w-72 bg-card text-card-foreground shadow-2xl rounded-2xl border border-border overflow-hidden animate-in fade-in slide-in-from-bottom-4">
           <div className="bg-indigo-900/10 border-b border-indigo-900/10 p-4">
             <div className="flex justify-between items-start">
               <div>
