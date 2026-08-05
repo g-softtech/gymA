@@ -15,6 +15,22 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
+    if (process.env.DEMO_MODE === "true") {
+      const { prisma } = await import("@/lib/prisma");
+      const transaction = await prisma.transaction.findUnique({
+        where: { reference },
+        include: { tenant: true }
+      });
+      if (transaction && (process.env.DEMO_MODE === "true" || transaction.tenant?.isDemo)) {
+        const fulfillResult = await fulfillPayment(reference, {
+          amountKobo: Number(transaction.amount) * 100,
+          currency: transaction.currency,
+          rawResponse: { status: "success", simulated: true, message: "Demo Mode: Payment simulation completed successfully." },
+        });
+        return NextResponse.json({ ...fulfillResult, demoSimulated: true, message: "Demo Mode: Payment simulation completed successfully." });
+      }
+    }
+
     // Call Paystack REST API to verify payment (Authoritative check for client route)
     const paystackRes = await fetch(
       `https://api.paystack.co/transaction/verify/${encodeURIComponent(reference)}`,

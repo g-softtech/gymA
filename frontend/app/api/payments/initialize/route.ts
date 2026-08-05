@@ -133,6 +133,14 @@ export async function POST(req: Request) {
     const paystackAmount = Math.round(amountFloat * 100);
     const callback_url = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/gym/${tenant?.slug}/dashboard/member?payment=verify`;
 
+    if (process.env.DEMO_MODE === "true" || tenant?.isDemo) {
+      return NextResponse.json({
+        checkoutUrl: `${callback_url}&reference=${transaction.reference}&demo=true`,
+        accessCode: "demo_access_code",
+        reference: transaction.reference
+      });
+    }
+
     const safeEmail = (session.user.email && session.user.email.includes("@") && !session.user.email.endsWith(".local")) 
       ? session.user.email.trim() 
       : `guest_${session.user.id.substring(0, 8)}@example.com`;

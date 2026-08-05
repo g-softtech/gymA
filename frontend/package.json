@@ -10,7 +10,8 @@
     "test": "dotenv -e .env.test -- vitest run",
     "postinstall": "prisma generate && prisma db push --accept-data-loss",
     "audit:billing": "npx tsx scripts/verification/verify-repository.ts",
-    "generate-sandbox": "npx tsx scripts/generate-sandbox.ts"
+    "generate-sandbox": "npx tsx scripts/generate-sandbox.ts",
+    "seed:live-demo": "npx tsx scripts/seed-live-demo.ts"
   },
   "dependencies": {
     "@ai-sdk/google": "^3.0.83",

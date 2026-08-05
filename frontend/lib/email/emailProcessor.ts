@@ -107,34 +107,40 @@ export async function processEmailJob(job: any): Promise<void> {
   // ── Send via Resend ─────────────────────────────────────────────────────────
   let providerMessageId: string | undefined;
   let sendError: string | undefined;
+  const isDemoMode = process.env.DEMO_MODE === "true" || (job.tenantId && await prisma.tenant.findUnique({ where: { id: job.tenantId } }).then(t => t?.isDemo));
 
   try {
-    if (!process.env.RESEND_API_KEY) {
-      throw new Error("RESEND_API_KEY is not configured.");
+    if (isDemoMode) {
+      console.log(`[EmailService] DEMO MODE: Suppressing email to ${job.recipient}`);
+      providerMessageId = `demo_suppressed_${Date.now()}`;
+    } else {
+      if (!process.env.RESEND_API_KEY) {
+        throw new Error("RESEND_API_KEY is not configured.");
+      }
+
+      const res = await fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
+        },
+        body: JSON.stringify({
+          from: `${brand.brandName} <info@thecortexsystems.com>`,
+          to: job.recipient,
+          subject: job.subject,
+          html,
+          reply_to: brand.replyTo,
+        }),
+      });
+
+      const responseData = await res.json();
+
+      if (!res.ok) {
+        throw new Error(JSON.stringify(responseData));
+      }
+
+      providerMessageId = responseData.id;
     }
-
-    const res = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
-      },
-      body: JSON.stringify({
-        from: `${brand.brandName} <info@thecortexsystems.com>`,
-        to: job.recipient,
-        subject: job.subject,
-        html,
-        reply_to: brand.replyTo,
-      }),
-    });
-
-    const responseData = await res.json();
-
-    if (!res.ok) {
-      throw new Error(JSON.stringify(responseData));
-    }
-
-    providerMessageId = responseData.id;
   } catch (sendErr: any) {
     sendError = sendErr.message;
   }
