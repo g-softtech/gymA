@@ -266,7 +266,7 @@ async function main() {
     const lastPossibleAttendance = isChurnRisk ? subDays(now, 46) : now;
     const numAttendances = randomInt(5, 30);
     
-    const attendances = [];
+    const attendances: any[] = [];
     for (let a = 0; a < numAttendances; a++) {
       const attDate = randomDate(joinDate, lastPossibleAttendance);
       attendances.push({
@@ -301,7 +301,7 @@ async function main() {
   });
 
   // Add 28 bookings to make it a 93% filled "Popular Class"
-  const classBookings = [];
+  const classBookings: any[] = [];
   for (let b = 0; b < 28; b++) {
     classBookings.push({
       classSessionId: strengthClass.id,
@@ -315,7 +315,7 @@ async function main() {
   if (classBookings.length > 0) await prisma.booking.createMany({ data: classBookings });
 
   // Add Daniel Okoro's PT sessions (Scenario: High Performer - 120 completed)
-  const ptBookings = [];
+  const ptBookings: any[] = [];
   for (let pt = 0; pt < 120; pt++) {
     const ptDate = subDays(now, randomInt(1, 90));
     ptBookings.push({
