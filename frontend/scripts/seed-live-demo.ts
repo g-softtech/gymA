@@ -67,6 +67,7 @@ async function main() {
       name: "CortexFit Elite Performance Center",
       slug: "demo-elite",
       isDemo: true,
+      status: "APPROVED" as any,
       plan: "ENTERPRISE",
       isActive: true,
       settings: {
