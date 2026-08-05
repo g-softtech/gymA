@@ -52,7 +52,8 @@ async function main() {
     process.exit(1);
   }
 
-  // --- 6. Slug Collision Handling ---
+  // --- 6. Sandbox Generation ---
+  try {
     const result = await generateSandbox({
       gymName,
       logoUrl: logoUrl || undefined,
