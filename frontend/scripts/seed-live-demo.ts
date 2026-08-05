@@ -400,6 +400,23 @@ async function main() {
     });
   }
 
+  console.log("🤖 Generating AI Usage Logs...");
+  const aiLogs = [];
+  const features = ["CHAT", "NUTRITION", "WORKOUT", "PROGRESS"];
+  for (let i = 0; i < 45; i++) {
+    aiLogs.push({
+      tenantId: tenant.id,
+      userId: randomItem(members).id,
+      feature: randomItem(features) as any,
+      model: "gemini-2.5-flash",
+      inputTokens: randomInt(200, 1000),
+      outputTokens: randomInt(300, 1500),
+      success: true,
+      createdAt: randomDate(subDays(now, 30), now),
+    });
+  }
+  await prisma.aiLog.createMany({ data: aiLogs });
+
   console.log("✅ LIVE DEMO SEED COMPLETE!");
 }
 
