@@ -130,7 +130,11 @@ async function main() {
         trainerProfile: {
           create: {
             specialties: isDaniel ? ["Strength Training", "Powerlifting"] : ["General Fitness", "Cardio"],
-            availability: {},
+            availability: {
+              monday: ["08:00", "09:00", "10:00", "16:00", "17:00"],
+              wednesday: ["08:00", "09:00", "10:00", "16:00", "17:00"],
+              friday: ["08:00", "09:00", "10:00"]
+            },
             bio: isDaniel ? "Elite strength coach with 10 years experience." : "Certified fitness professional.",
             hourlyRate: isDaniel ? 15000 : 8000,
             showOnWebsite: true,
@@ -198,10 +202,25 @@ async function main() {
     const memberTransactions: any[] = [];
 
     // Fast forward subscription cycles to present
-    while (endDate < subDays(now, 14)) {
+    while (endDate < subDays(now, 2)) {
       if (Math.random() > 0.95) { subStatus = "CANCELLED"; break; } // 5% churn
       
       // Add transaction for past renewal
+      if (Math.random() > 0.9) {
+        // Seed a failed transaction before the successful one to simulate recovery
+        memberTransactions.push({
+           tenantId: tenant.id,
+           memberId: user.memberProfile!.id,
+           itemName: plan.name,
+           itemType: "MEMBERSHIP" as any,
+           amount: plan.price,
+           currency: "NGN",
+           status: "FAILED" as any,
+           reference: `TRX_FAIL_${i}_${endDate.getTime()}`,
+           createdAt: subDays(joinDate, 1),
+        });
+      }
+
       memberTransactions.push({
            tenantId: tenant.id,
            memberId: user.memberProfile!.id,
@@ -315,18 +334,23 @@ async function main() {
   }
   if (classBookings.length > 0) await prisma.booking.createMany({ data: classBookings });
 
-  // Add Daniel Okoro's PT sessions (Scenario: High Performer - 120 completed)
+  // Add PT sessions for all trainers
   const ptBookings: any[] = [];
-  for (let pt = 0; pt < 120; pt++) {
-    const ptDate = subDays(now, randomInt(1, 90));
-    ptBookings.push({
-      trainerId: danielOkoro.trainerProfile!.id,
-      memberId: randomItem(members).memberProfile!.id,
-      tenantId: tenant.id,
-      date: ptDate,
-      status: "COMPLETED" as any,
-      sessionType: "PHYSICAL" as any
-    });
+  for (const trainer of trainers) {
+    const isDaniel = trainer.id === danielOkoro.id;
+    const numBookings = isDaniel ? 120 : randomInt(15, 60); // distribute bookings among all
+    
+    for (let pt = 0; pt < numBookings; pt++) {
+      const ptDate = subDays(now, randomInt(1, 90));
+      ptBookings.push({
+        trainerId: trainer.trainerProfile!.id,
+        memberId: randomItem(members).memberProfile!.id,
+        tenantId: tenant.id,
+        date: ptDate,
+        status: "COMPLETED" as any,
+        sessionType: "PHYSICAL" as any
+      });
+    }
   }
   if (ptBookings.length > 0) await prisma.booking.createMany({ data: ptBookings });
 
@@ -347,6 +371,34 @@ async function main() {
       content: "My legs are dead but totally worth it!",
     }
   });
+
+  console.log("📝 Creating Meal & Workout Plans...");
+  for (let i = 0; i < 5; i++) {
+    await prisma.mealPlan.create({
+      data: {
+        memberId: members[i].memberProfile!.id,
+        tenantId: tenant.id,
+        title: "Fat Loss Kickstart",
+        goal: "WEIGHT_LOSS",
+        totalCalories: 1800,
+        protein: 140,
+        carbs: 150,
+        fats: 60,
+        meals: { breakfast: "Oats", lunch: "Chicken Salad", dinner: "Salmon & Greens" },
+        isAiGenerated: true
+      }
+    });
+
+    await prisma.workoutPlan.create({
+      data: {
+        memberId: members[i].memberProfile!.id,
+        tenantId: tenant.id,
+        title: "Full Body Foundation",
+        routines: { day1: "Squats, Pushups", day2: "Deadlifts, Pullups" },
+        isAiGenerated: true
+      }
+    });
+  }
 
   console.log("✅ LIVE DEMO SEED COMPLETE!");
 }
