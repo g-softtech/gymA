@@ -7,7 +7,7 @@ export default function DemoLandingPage() {
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
       {/* 1. HERO SECTION */}
-      <section className="bg-gradient-to-br from-indigo-900 via-indigo-800 to-purple-900 text-white py-24 px-6 relative overflow-hidden">
+      <section className="shrink-0 bg-gradient-to-br from-indigo-900 via-indigo-800 to-purple-900 text-white py-24 px-6 relative overflow-hidden">
         <div className="absolute inset-0 opacity-10 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-white via-transparent to-transparent"></div>
         <div className="max-w-5xl mx-auto text-center relative z-10">
           <div className="mb-6 inline-block">
@@ -39,7 +39,7 @@ export default function DemoLandingPage() {
       </section>
 
       {/* 2. ECOSYSTEM / FEATURE SECTIONS */}
-      <section className="py-20 px-6 max-w-6xl mx-auto">
+      <section className="shrink-0 py-20 px-6 max-w-6xl mx-auto">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">One Connected Ecosystem</h2>
           <p className="text-lg text-slate-600 max-w-2xl mx-auto">See how CortexFit seamlessly connects owners, trainers, and members into a unified operating system.</p>
@@ -95,7 +95,7 @@ export default function DemoLandingPage() {
       </section>
 
       {/* 3. DEMO SELECTOR */}
-      <section id="demo-selector" className="bg-indigo-50 py-24 px-6 border-t border-indigo-100/50">
+      <section id="demo-selector" className="shrink-0 bg-indigo-50 py-24 px-6 border-t border-indigo-100/50">
         <div className="max-w-5xl mx-auto text-center">
           <h2 className="text-3xl md:text-5xl font-extrabold text-slate-900 mb-6">Choose Your Experience</h2>
           <p className="text-lg text-slate-600 mb-12 max-w-2xl mx-auto">
