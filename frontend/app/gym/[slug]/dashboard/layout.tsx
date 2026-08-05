@@ -237,11 +237,12 @@ export default async function DashboardLayout({
         primaryColor={primaryColor}
       />
       
-      <PersonaSwitcher
-        tenantId={tenant.id}
-        tenantName={tenant.name}
-        currentRole={role}
+      <PersonaSwitcher 
+        tenantId={tenant.id} 
+        tenantName={tenant.name} 
+        currentRole={role} 
         isDemo={tenant.isDemo}
+        environmentType={slug === 'demo-elite' ? 'LIVE DEMO' : 'SANDBOX'}
       />
     </>
   );

@@ -44,6 +44,10 @@ export async function resetSandboxAction(tenantId: string) {
     throw new Error("Cannot reset a non-sandbox tenant");
   }
 
+  if (tenant.slug === "demo-elite") {
+    throw new Error("Cannot reset the public Live Demo. It is protected.");
+  }
+
   // 1. Delete all non-superadmin data for this tenant
   await prisma.$transaction([
     prisma.post.deleteMany({ where: { tenantId } }),
@@ -79,6 +83,10 @@ export async function deleteSandboxAction(tenantId: string) {
   const tenant = await prisma.tenant.findUnique({ where: { id: tenantId } });
   if (!tenant || !tenant.isDemo) {
     throw new Error("Cannot delete a non-sandbox tenant");
+  }
+
+  if (tenant.slug === "demo-elite") {
+    throw new Error("Cannot delete the public Live Demo. It is protected.");
   }
 
   // Transactionally delete everything related to this tenant
