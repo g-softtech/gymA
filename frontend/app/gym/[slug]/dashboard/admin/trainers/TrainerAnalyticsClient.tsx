@@ -2,15 +2,15 @@
 
 import { useState, useEffect } from "react";
 import {
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, LabelList
 } from "recharts";
 
 interface TrainerStat {
   trainerId: string;
   trainerName: string | null;
-  totalSessions: number;
+  sessionsBooked: number;
   activeClients: number;
-  utilizationPct: number;
+  utilizationPercent: number;
 }
 
 const COLORS = ["#6366F1", "#8B5CF6", "#10B981", "#F59E0B", "#EF4444", "#EC4899"];
@@ -18,7 +18,7 @@ const COLORS = ["#6366F1", "#8B5CF6", "#10B981", "#F59E0B", "#EF4444", "#EC4899"
 export default function TrainerAnalyticsClient() {
   const [data, setData] = useState<{
     trainers: TrainerStat[];
-    totalSessions: number;
+    totalSessionsBooked: number;
     totalActiveClients: number;
   } | null>(null);
   const [loading, setLoading] = useState(true);
@@ -48,7 +48,7 @@ export default function TrainerAnalyticsClient() {
         <div className="bg-card text-card-foreground p-6 rounded-xl border border-border shadow-sm flex items-center justify-between">
           <div>
             <p className="text-sm font-medium text-muted-foreground">Total Sessions Booked</p>
-            <h3 className="text-3xl font-bold text-foreground mt-1">{data.totalSessions}</h3>
+            <h3 className="text-3xl font-bold text-foreground mt-1">{data.totalSessionsBooked}</h3>
           </div>
           <div className="p-3 bg-primary/10 text-primary rounded-lg text-2xl">🏋️</div>
         </div>
@@ -69,7 +69,7 @@ export default function TrainerAnalyticsClient() {
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
               data={data.trainers}
-              margin={{ top: 5, right: 10, left: 0, bottom: 5 }}
+              margin={{ top: 20, right: 10, left: 0, bottom: 5 }}
             >
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
               <XAxis
@@ -87,11 +87,12 @@ export default function TrainerAnalyticsClient() {
               <Tooltip
                 formatter={(val: any, name: any) => [
                   val,
-                  name === "totalSessions" ? "Sessions" : "Active Clients",
+                  name === "sessionsBooked" ? "Sessions" : "Active Clients",
                 ]}
                 contentStyle={{ borderRadius: "12px", border: "1px solid hsl(var(--border))", backgroundColor: "hsl(var(--card))", color: "hsl(var(--foreground))", fontSize: "12px" }}
               />
-              <Bar dataKey="totalSessions" name="Sessions" radius={[6, 6, 0, 0]}>
+              <Bar dataKey="sessionsBooked" name="Sessions" radius={[6, 6, 0, 0]}>
+                <LabelList dataKey="sessionsBooked" position="top" fill="hsl(var(--foreground))" fontSize={11} fontWeight="bold" />
                 {data.trainers.map((_: any, index: number) => (
                   <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                 ))}
@@ -120,17 +121,17 @@ export default function TrainerAnalyticsClient() {
               {data.trainers.map((t: TrainerStat) => (
                 <tr key={t.trainerId} className="hover:bg-muted transition-colors">
                   <td className="px-6 py-4 font-medium text-foreground">{t.trainerName || "Unknown"}</td>
-                  <td className="px-6 py-4 text-foreground">{t.totalSessions}</td>
+                  <td className="px-6 py-4 text-foreground">{t.sessionsBooked}</td>
                   <td className="px-6 py-4 text-foreground">{t.activeClients}</td>
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
                       <div className="flex-1 bg-muted rounded-full h-2 max-w-[120px]">
                         <div
                           className="bg-indigo-500 h-2 rounded-full transition-all"
-                          style={{ width: `${Math.min(t.utilizationPct, 100)}%` }}
+                          style={{ width: `${Math.min(t.utilizationPercent, 100)}%` }}
                         />
                       </div>
-                      <span className="text-sm font-semibold text-foreground">{t.utilizationPct}%</span>
+                      <span className="text-sm font-semibold text-foreground">{t.utilizationPercent}%</span>
                     </div>
                   </td>
                 </tr>
