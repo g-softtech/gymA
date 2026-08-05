@@ -10,6 +10,7 @@ import PendingApprovalScreen from "@/components/admin/PendingApprovalScreen";
 import { MobileNav } from "@/components/MobileNav";
 import { SidebarNav } from "@/components/SidebarNav";
 import ImpersonateBanner from "@/components/admin/ImpersonateBanner";
+import PersonaSwitcher from "@/components/demo/PersonaSwitcher";
 
 export default async function DashboardLayout({
   children,
@@ -234,6 +235,13 @@ export default async function DashboardLayout({
         trainerLinks={trainerLinks}
         memberLinks={memberLinks}
         primaryColor={primaryColor}
+      />
+      
+      <PersonaSwitcher
+        tenantId={tenant.id}
+        tenantName={tenant.name}
+        currentRole={role}
+        isDemo={tenant.isDemo}
       />
     </>
   );

@@ -3,7 +3,10 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-export default function TenantActionButtons({ tenantId, currentStatus }: { tenantId: string, currentStatus: string }) {
+import { resetSandboxAction, deleteSandboxAction } from "../../actions/sandbox";
+import { Loader2, RefreshCcw, Trash2 } from "lucide-react";
+
+export default function TenantActionButtons({ tenantId, currentStatus, isDemo }: { tenantId: string, currentStatus: string, isDemo?: boolean }) {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
@@ -26,6 +29,23 @@ export default function TenantActionButtons({ tenantId, currentStatus }: { tenan
       router.refresh();
     } catch (err: any) {
       alert(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleSandboxAction(action: "reset" | "delete") {
+    if (!confirm(`Are you sure you want to ${action} this sandbox? This cannot be undone.`)) return;
+    
+    setLoading(true);
+    try {
+      if (action === "reset") {
+        await resetSandboxAction(tenantId);
+      } else {
+        await deleteSandboxAction(tenantId);
+      }
+    } catch (err: any) {
+      alert(err.message || `Failed to ${action} sandbox`);
     } finally {
       setLoading(false);
     }
@@ -71,6 +91,27 @@ export default function TenantActionButtons({ tenantId, currentStatus }: { tenan
         >
           Restore
         </button>
+      )}
+
+      {isDemo && (
+        <div className="flex items-center gap-1 border-l border-border pl-2 ml-1">
+          <button
+            onClick={() => handleSandboxAction("reset")}
+            disabled={loading}
+            title="Reset Sandbox Data"
+            className="p-1.5 rounded-md text-amber-500 hover:bg-amber-500/10 transition-colors disabled:opacity-50"
+          >
+            <RefreshCcw className="w-4 h-4" />
+          </button>
+          <button
+            onClick={() => handleSandboxAction("delete")}
+            disabled={loading}
+            title="Delete Sandbox"
+            className="p-1.5 rounded-md text-red-500 hover:bg-red-500/10 transition-colors disabled:opacity-50"
+          >
+            <Trash2 className="w-4 h-4" />
+          </button>
+        </div>
       )}
     </div>
   );

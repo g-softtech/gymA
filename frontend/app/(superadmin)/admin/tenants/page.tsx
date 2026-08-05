@@ -3,6 +3,7 @@ import { getAuthSession } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import TenantActionButtons from "./components/TenantActionButtons";
+import GenerateSandboxButton from "./components/GenerateSandboxButton";
 
 export default async function SuperAdminTenantsPage() {
   const session = await getAuthSession();
@@ -51,6 +52,7 @@ export default async function SuperAdminTenantsPage() {
             {tenants.length} gym{tenants.length !== 1 ? "s" : ""} on the platform
           </p>
         </div>
+        <GenerateSandboxButton />
       </div>
 
       {/* Table */}
@@ -186,7 +188,7 @@ export default async function SuperAdminTenantsPage() {
                   {/* Actions */}
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-4">
-                      <TenantActionButtons tenantId={tenant.id} currentStatus={tenant.status} />
+                      <TenantActionButtons tenantId={tenant.id} currentStatus={tenant.status} isDemo={tenant.isDemo} />
                       <Link
                       href={`/gym/${tenant.slug}/dashboard/admin`}
                       target="_blank"
