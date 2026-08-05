@@ -71,16 +71,16 @@ export default function TrainerAnalyticsClient() {
               data={data.trainers}
               margin={{ top: 20, right: 10, left: 0, bottom: 5 }}
             >
-              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
               <XAxis
                 dataKey="trainerName"
-                tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }}
+                tick={{ fontSize: 11, fill: "var(--muted-foreground)" }}
                 axisLine={false}
                 tickLine={false}
               />
               <YAxis
                 allowDecimals={false}
-                tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }}
+                tick={{ fontSize: 11, fill: "var(--muted-foreground)" }}
                 axisLine={false}
                 tickLine={false}
               />
@@ -89,10 +89,10 @@ export default function TrainerAnalyticsClient() {
                   val,
                   name === "sessionsBooked" ? "Sessions" : "Active Clients",
                 ]}
-                contentStyle={{ borderRadius: "12px", border: "1px solid hsl(var(--border))", backgroundColor: "hsl(var(--card))", color: "hsl(var(--foreground))", fontSize: "12px" }}
+                contentStyle={{ borderRadius: "12px", border: "1px solid var(--border)", backgroundColor: "var(--card)", color: "var(--foreground)", fontSize: "12px" }}
               />
               <Bar dataKey="sessionsBooked" name="Sessions" radius={[6, 6, 0, 0]}>
-                <LabelList dataKey="sessionsBooked" position="top" fill="hsl(var(--foreground))" fontSize={11} fontWeight="bold" />
+                <LabelList dataKey="sessionsBooked" position="top" fill="var(--foreground)" fontSize={11} fontWeight="bold" />
                 {data.trainers.map((_: any, index: number) => (
                   <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                 ))}

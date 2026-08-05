@@ -69,15 +69,15 @@ export default function EntitlementAnalyticsClient() {
               layout="vertical"
               margin={{ top: 5, right: 30, left: 40, bottom: 5 }}
             >
-              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" horizontal={false} />
-              <XAxis type="number" tickFormatter={(val) => `${val}%`} domain={[0, 100]} tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} />
-              <YAxis dataKey="feature" type="category" tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} width={100} />
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" horizontal={false} />
+              <XAxis type="number" tickFormatter={(val) => `${val}%`} domain={[0, 100]} tick={{ fontSize: 11, fill: "var(--muted-foreground)" }} axisLine={false} tickLine={false} />
+              <YAxis dataKey="feature" type="category" tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} axisLine={false} tickLine={false} width={100} />
               <Tooltip
                 formatter={(val: any, name: any) => [
                   name === "adoptionPercent" ? `${val}%` : val,
                   name === "adoptionPercent" ? "Adoption" : "Distinct Users",
                 ]}
-                contentStyle={{ borderRadius: "12px", border: "1px solid hsl(var(--border))", backgroundColor: "hsl(var(--card))", color: "hsl(var(--foreground))", fontSize: "12px" }}
+                contentStyle={{ borderRadius: "12px", border: "1px solid var(--border)", backgroundColor: "var(--card)", color: "var(--foreground)", fontSize: "12px" }}
               />
               <Bar dataKey="adoptionPercent" name="Adoption" fill="#8B5CF6" radius={[0, 6, 6, 0]} barSize={24} />
             </BarChart>
