@@ -194,7 +194,7 @@ async function main() {
     let subStatus: "ACTIVE" | "EXPIRED" | "CANCELLED" = "ACTIVE";
     let endDate = addDays(joinDate, plan.durationDays);
     
-    const memberTransactions = [];
+    const memberTransactions: any[] = [];
 
     // Fast forward subscription cycles to present
     while (endDate < subDays(now, 14)) {
