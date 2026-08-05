@@ -37,6 +37,9 @@ async function clearExistingDemoData() {
     await prisma.post.deleteMany({ where: { tenantId: oldTenant.id } });
     await prisma.classSession.deleteMany({ where: { tenantId: oldTenant.id } });
     await prisma.membershipPlan.deleteMany({ where: { tenantId: oldTenant.id } });
+    await prisma.aiLog.deleteMany({ where: { tenantId: oldTenant.id } });
+    await prisma.mealPlan.deleteMany({ where: { tenantId: oldTenant.id } });
+    await prisma.workoutPlan.deleteMany({ where: { tenantId: oldTenant.id } });
 
     // Clear demo users
     await prisma.user.deleteMany({
@@ -50,9 +53,29 @@ async function clearExistingDemoData() {
   }
   
   // Extra safeguard for orphaned users
-  await prisma.user.deleteMany({
-    where: { email: { endsWith: DEMO_DOMAIN } }
+  const orphans = await prisma.user.findMany({
+    where: { email: { endsWith: DEMO_DOMAIN } },
+    include: { memberProfile: true }
   });
+
+  if (orphans.length > 0) {
+    const memberIds = orphans.map(u => u.memberProfile?.id).filter(Boolean) as string[];
+    const userIds = orphans.map(u => u.id);
+    
+    if (memberIds.length > 0) {
+      await prisma.transaction.deleteMany({ where: { memberId: { in: memberIds } } });
+      await prisma.subscription.deleteMany({ where: { memberId: { in: memberIds } } });
+      await prisma.attendance.deleteMany({ where: { memberId: { in: memberIds } } });
+      await prisma.booking.deleteMany({ where: { memberId: { in: memberIds } } });
+      await prisma.mealPlan.deleteMany({ where: { memberId: { in: memberIds } } });
+      await prisma.workoutPlan.deleteMany({ where: { memberId: { in: memberIds } } });
+    }
+    await prisma.aiLog.deleteMany({ where: { userId: { in: userIds } } });
+    
+    await prisma.user.deleteMany({
+      where: { id: { in: userIds } }
+    });
+  }
   console.log("✅ Cleared old demo data.");
 }
 
