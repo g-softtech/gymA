@@ -9,6 +9,7 @@ interface PersonaSwitcherProps {
   tenantName: string;
   currentRole: string;
   isDemo: boolean;
+  environmentType: "SANDBOX" | "LIVE DEMO";
 }
 
 const ROLES = [
@@ -17,7 +18,7 @@ const ROLES = [
   { id: "MEMBER", label: "Member", icon: "👥" },
 ];
 
-export default function PersonaSwitcher({ tenantId, tenantName, currentRole, isDemo }: PersonaSwitcherProps) {
+export default function PersonaSwitcher({ tenantId, tenantName, currentRole, isDemo, environmentType }: PersonaSwitcherProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [loadingRole, setLoadingRole] = useState<string | null>(null);
   const router = useRouter();
@@ -77,7 +78,7 @@ export default function PersonaSwitcher({ tenantId, tenantName, currentRole, isD
           <div className="bg-indigo-900/10 border-b border-indigo-900/10 p-4">
             <div className="flex justify-between items-start">
               <div>
-                <p className="text-[10px] font-bold text-indigo-500 uppercase tracking-wider">Sandbox</p>
+                <p className="text-[10px] font-bold text-indigo-500 uppercase tracking-wider">{environmentType}</p>
                 <h3 className="font-bold text-base">{tenantName}</h3>
               </div>
               <button onClick={() => setIsOpen(false)} className="text-muted-foreground hover:text-foreground">

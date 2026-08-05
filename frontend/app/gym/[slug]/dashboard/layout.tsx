@@ -242,7 +242,7 @@ export default async function DashboardLayout({
         tenantName={tenant.name} 
         currentRole={role} 
         isDemo={tenant.isDemo}
-        environmentType={slug === 'demo-elite' ? 'LIVE DEMO' : 'SANDBOX'}
+        environmentType={slug === 'demo-elite' ? ('LIVE DEMO' as const) : ('SANDBOX' as const)}
       />
     </>
   );

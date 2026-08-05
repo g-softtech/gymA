@@ -147,10 +147,10 @@ export function SidebarNav({
       </nav>
 
       {/* ROLE SWITCHER */}
-      {(_isSandbox || role === "TRAINER" || role === "ADMIN" || role === "SUPERADMIN") && (
+      {!_isSandbox && (role === "TRAINER" || role === "ADMIN" || role === "SUPERADMIN") && (
         <div className="px-3 py-2 border-t border-border space-y-1">
-          {/* If ADMIN/SUPERADMIN OR Sandbox, they can switch between Admin, Trainer, and Member */}
-          {(_isSandbox || role === "ADMIN" || role === "SUPERADMIN") && (
+          {/* If ADMIN/SUPERADMIN, they can switch between Admin, Trainer, and Member */}
+          {(role === "ADMIN" || role === "SUPERADMIN") && (
             <>
               {currentContext !== "ADMIN" && (
                 <button
@@ -188,8 +188,8 @@ export function SidebarNav({
             </>
           )}
 
-          {/* If strictly TRAINER (and not Sandbox), they can only switch between Trainer and Member */}
-          {!_isSandbox && role === "TRAINER" && (
+          {/* If strictly TRAINER, they can only switch between Trainer and Member */}
+          {role === "TRAINER" && (
             <>
               {currentContext !== "TRAINER" && (
                 <Link
