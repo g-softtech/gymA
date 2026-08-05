@@ -32,6 +32,7 @@ export default function AnalyticsDashboardClient({
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isNavigating, setIsNavigating] = useState(false);
+  const [activePreset, setActivePreset] = useState<string>("30d");
 
   // Generate dynamic insights
   const insights = generateSubscriptionInsights(initialMetrics);
@@ -78,11 +79,11 @@ export default function AnalyticsDashboardClient({
       
       {/* TIME CONTROLS */}
       <div className="flex flex-wrap gap-2">
-        <button onClick={() => handleDatePreset("7d")} className="px-4 py-2 text-sm font-medium rounded-full bg-muted text-muted-foreground hover:bg-primary/10 hover:text-primary transition-colors">Last 7 Days</button>
-        <button onClick={() => handleDatePreset("30d")} className="px-4 py-2 text-sm font-medium rounded-full bg-primary text-primary-foreground shadow-sm">Last 30 Days</button>
-        <button onClick={() => handleDatePreset("90d")} className="px-4 py-2 text-sm font-medium rounded-full bg-muted text-muted-foreground hover:bg-primary/10 hover:text-primary transition-colors">Last 90 Days</button>
-        <button onClick={() => handleDatePreset("month")} className="px-4 py-2 text-sm font-medium rounded-full bg-muted text-muted-foreground hover:bg-primary/10 hover:text-primary transition-colors">This Month</button>
-        <button onClick={() => handleDatePreset("year")} className="px-4 py-2 text-sm font-medium rounded-full bg-muted text-muted-foreground hover:bg-primary/10 hover:text-primary transition-colors">This Year</button>
+        <button onClick={() => { setActivePreset("7d"); handleDatePreset("7d"); }} className={`px-4 py-2 text-sm font-medium rounded-full transition-colors ${activePreset === "7d" ? "bg-primary text-primary-foreground shadow-sm" : "bg-muted text-muted-foreground hover:bg-primary/10 hover:text-primary"}`}>Last 7 Days</button>
+        <button onClick={() => { setActivePreset("30d"); handleDatePreset("30d"); }} className={`px-4 py-2 text-sm font-medium rounded-full transition-colors ${activePreset === "30d" ? "bg-primary text-primary-foreground shadow-sm" : "bg-muted text-muted-foreground hover:bg-primary/10 hover:text-primary"}`}>Last 30 Days</button>
+        <button onClick={() => { setActivePreset("90d"); handleDatePreset("90d"); }} className={`px-4 py-2 text-sm font-medium rounded-full transition-colors ${activePreset === "90d" ? "bg-primary text-primary-foreground shadow-sm" : "bg-muted text-muted-foreground hover:bg-primary/10 hover:text-primary"}`}>Last 90 Days</button>
+        <button onClick={() => { setActivePreset("month"); handleDatePreset("month"); }} className={`px-4 py-2 text-sm font-medium rounded-full transition-colors ${activePreset === "month" ? "bg-primary text-primary-foreground shadow-sm" : "bg-muted text-muted-foreground hover:bg-primary/10 hover:text-primary"}`}>This Month</button>
+        <button onClick={() => { setActivePreset("year"); handleDatePreset("year"); }} className={`px-4 py-2 text-sm font-medium rounded-full transition-colors ${activePreset === "year" ? "bg-primary text-primary-foreground shadow-sm" : "bg-muted text-muted-foreground hover:bg-primary/10 hover:text-primary"}`}>This Year</button>
       </div>
 
       {/* INSIGHT LAYER */}
