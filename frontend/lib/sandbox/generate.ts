@@ -104,7 +104,19 @@ export async function generateSandbox({
       },
     });
 
-    await tx.membershipPlan.create({
+    const premiumPlan = await tx.membershipPlan.create({
+      data: {
+        tenantId: tenantRecord.id,
+        name: "Premium Quarterly",
+        price: 70000,
+        currency: "NGN",
+        durationDays: 90,
+        isActive: true,
+        features: ["All classes included", "1 PT Session/mo"],
+      },
+    });
+
+    const annualPlan = await tx.membershipPlan.create({
       data: {
         tenantId: tenantRecord.id,
         name: "Annual VIP",
@@ -116,6 +128,8 @@ export async function generateSandbox({
       },
     });
 
+    const plans = [standardPlan, premiumPlan, annualPlan];
+
     // Class Sessions
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
@@ -125,29 +139,33 @@ export async function generateSandbox({
     nextWeek.setDate(nextWeek.getDate() + 7);
     nextWeek.setHours(18, 0, 0, 0);
 
-    await tx.classSession.createMany({
-      data: [
-        {
-          tenantId: tenantRecord.id,
-          title: "Morning HIIT",
-          instructorId: trainer.id,
-          startTime: tomorrow,
-          durationMins: 45,
-          capacity: 20,
-        },
-        {
-          tenantId: tenantRecord.id,
-          title: "Evening Strength",
-          instructorId: trainer.id,
-          startTime: nextWeek,
-          durationMins: 60,
-          capacity: 15,
-        },
-      ],
+    const hiitClass = await tx.classSession.create({
+      data: {
+        tenantId: tenantRecord.id,
+        title: "Morning HIIT",
+        instructorId: trainer.id,
+        startTime: tomorrow,
+        durationMins: 45,
+        capacity: 20,
+      }
     });
 
+    const strengthClass = await tx.classSession.create({
+      data: {
+        tenantId: tenantRecord.id,
+        title: "Evening Strength",
+        instructorId: trainer.id,
+        startTime: nextWeek,
+        durationMins: 60,
+        capacity: 15,
+      }
+    });
+
+    // Generate Members
+    const allMembers: { user: any, profile: any }[] = [];
+
     // Single specific member for impersonation
-    const memberUser = await tx.user.create({
+    const mainMemberUser = await tx.user.create({
       data: {
         name: `${gymName} Member`,
         email: memberEmail,
@@ -156,26 +174,11 @@ export async function generateSandbox({
         tenantId: tenantRecord.id,
       },
     });
+    const mainProfile = await tx.memberProfile.create({ data: { userId: mainMemberUser.id, weightKg: 75, heightCm: 180 } });
+    allMembers.push({ user: mainMemberUser, profile: mainProfile });
 
-    const profile = await tx.memberProfile.create({
-      data: {
-        userId: memberUser.id,
-      },
-    });
-
-    await tx.subscription.create({
-      data: {
-        memberId: profile.id,
-        planId: standardPlan.id,
-        tenantId: tenantRecord.id,
-        status: "ACTIVE",
-        startDate: new Date(),
-        endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-      },
-    });
-    
-    // Additional generic dummy members
-    for (let i = 2; i <= 5; i++) {
+    // Additional generic dummy members (19 more to make 20 total)
+    for (let i = 2; i <= 20; i++) {
       const dummyUser = await tx.user.create({
         data: {
           name: `Test Member ${i}`,
@@ -186,18 +189,116 @@ export async function generateSandbox({
         }
       });
       const dummyProfile = await tx.memberProfile.create({
-        data: { userId: dummyUser.id }
+        data: { userId: dummyUser.id, weightKg: 65 + (i % 20), heightCm: 160 + (i % 30) }
       });
+      allMembers.push({ user: dummyUser, profile: dummyProfile });
+    }
+
+    // Distribute Subscriptions and Generate Data
+    for (let i = 0; i < allMembers.length; i++) {
+      const { profile } = allMembers[i];
+      const plan = plans[i % plans.length]; // Distribute evenly
+      
+      // Subscription
       await tx.subscription.create({
         data: {
-          memberId: dummyProfile.id,
-          planId: standardPlan.id,
+          memberId: profile.id,
+          planId: plan.id,
           tenantId: tenantRecord.id,
           status: "ACTIVE",
-          startDate: new Date(),
-          endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+          startDate: new Date(Date.now() - (i * 24 * 60 * 60 * 1000)), // staggered starts
+          endDate: new Date(Date.now() + plan.durationDays * 24 * 60 * 60 * 1000),
+        },
+      });
+
+      // Progress Record
+      await tx.progressRecord.create({
+        data: {
+          memberId: profile.id,
+          tenantId: tenantRecord.id,
+          recordedBy: profile.id,
+          weightKg: profile.weightKg! - (i % 5),
+          bodyFatPct: 15 + (i % 10),
+          notes: "Initial reading",
         }
       });
+
+      // Food Log
+      await tx.foodLog.create({
+        data: {
+          memberId: profile.id,
+          tenantId: tenantRecord.id,
+          mealType: "Breakfast",
+          foodName: "Oatmeal and Eggs",
+          calories: 450,
+          protein: 25,
+          carbs: 50,
+          fats: 15,
+        }
+      });
+
+      // Workout Plan
+      await tx.workoutPlan.create({
+        data: {
+          memberId: profile.id,
+          trainerId: trainer.id,
+          tenantId: tenantRecord.id,
+          title: "Full Body Foundation",
+          routines: [
+            { day: "Monday", exercises: ["Squats 3x10", "Bench Press 3x10"] },
+            { day: "Wednesday", exercises: ["Deadlifts 3x8", "Pullups 3x8"] },
+          ]
+        }
+      });
+
+      // Bookings & Attendances
+      if (i % 2 === 0) {
+        // Book a class
+        await tx.booking.create({
+          data: {
+            memberId: profile.id,
+            tenantId: tenantRecord.id,
+            classSessionId: hiitClass.id,
+            date: hiitClass.startTime,
+            status: "CONFIRMED",
+          }
+        });
+        
+        // Past attendance for past sessions (mocking past attendance for metrics)
+        const pastDate = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000);
+        await tx.attendance.create({
+          data: {
+            memberId: profile.id,
+            tenantId: tenantRecord.id,
+            checkInTime: pastDate,
+            method: "QR",
+            status: "PRESENT",
+            type: "GENERAL"
+          }
+        });
+      } else {
+        // Book a class
+        await tx.booking.create({
+          data: {
+            memberId: profile.id,
+            tenantId: tenantRecord.id,
+            classSessionId: strengthClass.id,
+            date: strengthClass.startTime,
+            status: "CONFIRMED",
+          }
+        });
+        // Book a PT Session
+        await tx.booking.create({
+          data: {
+            memberId: profile.id,
+            tenantId: tenantRecord.id,
+            trainerId: trainer.id,
+            date: tomorrow,
+            sessionType: "PHYSICAL",
+            status: "CONFIRMED",
+          }
+        });
+      }
     }
 
     return tenantRecord;
