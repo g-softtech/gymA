@@ -51,10 +51,18 @@ export async function GET(req: NextRequest) {
       const day = log.createdAt.toISOString().slice(0, 10);
       dailyMap[day] = (dailyMap[day] ?? 0) + 1;
     }
-    const dailyBreakdown = Object.entries(dailyMap).map(([date, count]) => ({
-      date,
-      count,
-    }));
+    
+    // Pad all dates in range with 0 if no logs exist
+    const dailyBreakdown: { date: string; count: number }[] = [];
+    for (let i = days - 1; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      const dateStr = d.toISOString().slice(0, 10);
+      dailyBreakdown.push({
+        date: dateStr,
+        count: dailyMap[dateStr] ?? 0,
+      });
+    }
 
     // ── Top users by AI call count ─────────────────────────────────────────────
     const byUser = await prisma.aiLog.groupBy({
