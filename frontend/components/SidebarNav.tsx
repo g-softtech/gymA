@@ -147,70 +147,7 @@ export function SidebarNav({
       </nav>
 
       {/* ROLE SWITCHER */}
-      {!_isSandbox && (role === "TRAINER" || role === "ADMIN" || role === "SUPERADMIN") && (
-        <div className="px-3 py-2 border-t border-border space-y-1">
-          {/* If ADMIN/SUPERADMIN, they can switch between Admin, Trainer, and Member */}
-          {(role === "ADMIN" || role === "SUPERADMIN") && (
-            <>
-              {currentContext !== "ADMIN" && (
-                <button
-                  onClick={async () => {
-                    if (_isSandbox) await fetch("/api/sandbox/impersonate", { method: "POST", body: JSON.stringify({ action: "revert" }) }).catch(() => {});
-                    window.location.href = _isSandbox ? `/sandbox/${slug}` : `/gym/${slug}/dashboard/admin`;
-                  }}
-                  className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold transition-colors w-full bg-accent hover:bg-accent/80 text-foreground"
-                >
-                  <span>👑</span> Switch to Admin View
-                </button>
-              )}
-              {currentContext !== "TRAINER" && (
-                <button
-                  onClick={async () => {
-                    if (_isSandbox) await fetch("/api/sandbox/impersonate", { method: "POST", body: JSON.stringify({ action: "revert" }) }).catch(() => {});
-                    window.location.href = _isSandbox ? `/sandbox/${slug}/trainer` : `/gym/${slug}/dashboard/trainer`;
-                  }}
-                  className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold transition-colors w-full bg-accent hover:bg-accent/80 text-foreground"
-                >
-                  <span>🏋️</span> Switch to Trainer View
-                </button>
-              )}
-              {currentContext !== "MEMBER" && (
-                <button
-                  onClick={async () => {
-                    if (_isSandbox) await fetch("/api/sandbox/impersonate", { method: "POST", body: JSON.stringify({ action: "revert" }) }).catch(() => {});
-                    window.location.href = _isSandbox ? `/sandbox/${slug}/member` : `/gym/${slug}/dashboard/member`;
-                  }}
-                  className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold transition-colors w-full bg-accent hover:bg-accent/80 text-foreground"
-                >
-                  <span>👤</span> Switch to Member View
-                </button>
-              )}
-            </>
-          )}
 
-          {/* If strictly TRAINER, they can only switch between Trainer and Member */}
-          {role === "TRAINER" && (
-            <>
-              {currentContext !== "TRAINER" && (
-                <Link
-                  href={`/gym/${slug}/dashboard/trainer`}
-                  className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold transition-colors w-full bg-accent hover:bg-accent/80 text-foreground"
-                >
-                  <span>🏋️</span> Switch to Trainer View
-                </Link>
-              )}
-              {currentContext !== "MEMBER" && (
-                <Link
-                  href={`/gym/${slug}/dashboard/member`}
-                  className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold transition-colors w-full bg-accent hover:bg-accent/80 text-foreground"
-                >
-                  <span>👤</span> Switch to Member View
-                </Link>
-              )}
-            </>
-          )}
-        </div>
-      )}
 
       <div className="px-4 py-4 border-t border-border">
         <div className="flex items-center gap-2">
