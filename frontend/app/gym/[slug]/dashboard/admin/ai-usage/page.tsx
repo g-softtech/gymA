@@ -230,7 +230,7 @@ export default function AiUsagePage() {
                   return (
                     <div
                       key={d.date}
-                      className="flex-1 group relative"
+                      className="flex-1 group relative h-full flex flex-col justify-end"
                       title={`${d.date}: ${d.count} calls`}
                     >
                       <div
