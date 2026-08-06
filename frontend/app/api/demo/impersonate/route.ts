@@ -38,7 +38,7 @@ export async function POST(req: Request) {
     } else if (targetUser.role === "TRAINER") {
       redirectPath = `/gym/${targetUser.tenant.slug}/dashboard/trainer`;
     } else if (targetUser.role === "MEMBER") {
-      redirectPath = `/gym/${targetUser.tenant.slug}/dashboard`;
+      redirectPath = `/gym/${targetUser.tenant.slug}/dashboard/member`;
     }
 
     return NextResponse.redirect(new URL(redirectPath, req.url), 302);
