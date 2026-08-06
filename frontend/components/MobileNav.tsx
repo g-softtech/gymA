@@ -154,7 +154,7 @@ export function MobileNav({ slug, role, adminLinks, trainerLinks, memberLinks, p
 
       {/* More Drawer */}
       {moreOpen && (
-        <div className="md:hidden fixed inset-0 z-40 bg-black/50" onClick={() => setMoreOpen(false)}>
+        <div className="md:hidden fixed inset-0 z-[70] bg-black/50" onClick={() => setMoreOpen(false)}>
           <div 
             className="absolute bottom-16 left-0 right-0 bg-card border-t border-border rounded-t-2xl shadow-2xl p-4 max-h-[70vh] overflow-y-auto"
             onClick={e => e.stopPropagation()}
@@ -173,78 +173,6 @@ export function MobileNav({ slug, role, adminLinks, trainerLinks, memberLinks, p
                 </Link>
               ))}
 
-              {/* ROLE SWITCHER */}
-              {(_isSandbox || role === "TRAINER" || role === "ADMIN" || role === "SUPERADMIN") && (
-                <>
-                  <div className="my-2 border-t border-border" />
-                  
-                  {(_isSandbox || role === "ADMIN" || role === "SUPERADMIN") && (
-                    <>
-                      {currentContext !== "ADMIN" && (
-                        <button
-                          onClick={async () => {
-                            if (_isSandbox) await fetch("/api/sandbox/impersonate", { method: "POST", body: JSON.stringify({ action: "revert" }) }).catch(() => {});
-                            window.location.href = _isSandbox ? `/sandbox/${slug}` : `/gym/${slug}/dashboard/admin`;
-                          }}
-                          className="flex items-center gap-4 px-4 py-3 rounded-xl bg-primary/10 text-primary hover:bg-primary/20 transition w-full text-left"
-                        >
-                          <span className="text-2xl">👑</span>
-                          <span className="font-semibold">Switch to Admin View</span>
-                        </button>
-                      )}
-                      {currentContext !== "TRAINER" && (
-                        <button
-                          onClick={async () => {
-                            if (_isSandbox) await fetch("/api/sandbox/impersonate", { method: "POST", body: JSON.stringify({ action: "revert" }) }).catch(() => {});
-                            window.location.href = _isSandbox ? `/sandbox/${slug}/trainer` : `/gym/${slug}/dashboard/trainer`;
-                          }}
-                          className="flex items-center gap-4 px-4 py-3 rounded-xl bg-primary/10 text-primary hover:bg-primary/20 transition w-full text-left"
-                        >
-                          <span className="text-2xl">🏋️</span>
-                          <span className="font-semibold">Switch to Trainer View</span>
-                        </button>
-                      )}
-                      {currentContext !== "MEMBER" && (
-                        <button
-                          onClick={async () => {
-                            if (_isSandbox) await fetch("/api/sandbox/impersonate", { method: "POST", body: JSON.stringify({ action: "revert" }) }).catch(() => {});
-                            window.location.href = _isSandbox ? `/sandbox/${slug}/member` : `/gym/${slug}/dashboard/member`;
-                          }}
-                          className="flex items-center gap-4 px-4 py-3 rounded-xl bg-primary/10 text-primary hover:bg-primary/20 transition w-full text-left"
-                        >
-                          <span className="text-2xl">👤</span>
-                          <span className="font-semibold">Switch to Member View</span>
-                        </button>
-                      )}
-                    </>
-                  )}
-
-                  {!_isSandbox && role === "TRAINER" && (
-                    <>
-                      {currentContext !== "TRAINER" && (
-                        <Link
-                          href={`/gym/${slug}/dashboard/trainer`}
-                          onClick={() => setMoreOpen(false)}
-                          className="flex items-center gap-4 px-4 py-3 rounded-xl bg-primary/10 text-primary hover:bg-primary/20 transition"
-                        >
-                          <span className="text-2xl">🏋️</span>
-                          <span className="font-semibold">Switch to Trainer View</span>
-                        </Link>
-                      )}
-                      {currentContext !== "MEMBER" && (
-                        <Link
-                          href={`/gym/${slug}/dashboard/member`}
-                          onClick={() => setMoreOpen(false)}
-                          className="flex items-center gap-4 px-4 py-3 rounded-xl bg-primary/10 text-primary hover:bg-primary/20 transition"
-                        >
-                          <span className="text-2xl">👤</span>
-                          <span className="font-semibold">Switch to Member View</span>
-                        </Link>
-                      )}
-                    </>
-                  )}
-                </>
-              )}
             </div>
             <div className="mt-4 pt-4 border-t border-border flex items-center justify-between px-4">
               <button
