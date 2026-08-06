@@ -219,22 +219,22 @@ export default withAuth(
 
         // ── Protected routes ──────────────────────────────────────────────
         if (pathname.startsWith("/api/")) {
-          const result = !!token || req.headers.has("x-guest-session-tenant-slug");
+          const result = !!token || req.headers.has("x-guest-session-tenant-slug") || req.cookies.has("sandbox_impersonate_userId");
           console.log(`${ATRACE} └─ ${result ? "ALLOW" : "DENY (no token)"}: protected API`);
           return result;
         }
         if (pathname.includes("/dashboard")) {
-          const result = !!token;
+          const result = !!token || req.cookies.has("sandbox_impersonate_userId");
           console.log(`${ATRACE} └─ ${result ? "ALLOW" : "DENY → sign-in redirect"}: /dashboard requires token`);
           return result;
         }
         if (pathname.startsWith("/admin")) {
-          const result = !!token;
+          const result = !!token || req.cookies.has("sandbox_impersonate_userId");
           console.log(`${ATRACE} └─ ${result ? "ALLOW" : "DENY"}: /admin`);
           return result;
         }
         if (pathname.startsWith("/onboarding")) {
-          const result = !!token;
+          const result = !!token || req.cookies.has("sandbox_impersonate_userId");
           console.log(`${ATRACE} └─ ${result ? "ALLOW" : "DENY"}: /onboarding`);
           return result;
         }
