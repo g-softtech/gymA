@@ -1020,6 +1020,5 @@ export default async function GymPublicPage({
 
       </div>
     </TenantThemeProvider>
-    </>
   );
 }
