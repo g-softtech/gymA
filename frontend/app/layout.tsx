@@ -3,6 +3,8 @@ import { ThemeProvider } from "@/components/ThemeProvider";
 import QueryProvider from "@/components/QueryProvider";
 import { DemoSandboxProvider } from "@/components/sandbox/DemoSandboxProvider";
 import { GoogleAnalytics } from "@next/third-parties/google";
+import { UtmTracker } from "@/lib/analytics/UtmTracker";
+import { Suspense } from "react";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -51,6 +53,9 @@ export default function RootLayout({
         {process.env.NEXT_PUBLIC_GA_ID && (
           <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />
         )}
+        <Suspense fallback={null}>
+          <UtmTracker />
+        </Suspense>
       </body>
     </html>
   );
