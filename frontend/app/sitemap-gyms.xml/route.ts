@@ -1,4 +1,4 @@
-import { NextResponse } from "next";
+import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { tenantUrl } from "@/lib/tenant/url";
 

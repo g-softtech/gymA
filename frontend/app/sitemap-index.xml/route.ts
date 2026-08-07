@@ -1,4 +1,4 @@
-import { NextResponse } from "next";
+import { NextResponse } from "next/server";
 
 export async function GET() {
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://fit.thecortexsystems.com";
