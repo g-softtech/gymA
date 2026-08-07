@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import type { Metadata } from "next";
+import { tenantUrl } from "@/lib/tenant/url";
 import { TenantThemeProvider } from "@/components/TenantThemeProvider";
 import ContactForm from "@/components/ContactForm";
 import { getEntitlementFeatures } from "@/lib/entitlements/registry";
@@ -61,7 +62,7 @@ export async function generateMetadata({
     `Join ${tenant.name} and start your fitness journey today.`;
 
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://cortexfit.vercel.app";
-  const canonicalUrl = `${baseUrl}/gym/${slug}`;
+  const canonicalUrl = tenantUrl(slug);
 
   // Safe image fallbacks
   const ogImageUrl = s?.ogImageUrl || s?.logoUrl || hero?.bgImageUrl || `${baseUrl}/images/default-gym-og.png`;
@@ -170,7 +171,7 @@ export default async function GymPublicPage({
   const gradientSoft = `linear-gradient(135deg, ${primary}15, ${secondary}20)`;
 
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://cortexfit.vercel.app";
-  const canonicalUrl = `${baseUrl}/gym/${slug}`;
+  const canonicalUrl = tenantUrl(slug);
 
   const jsonLd = {
     "@context": "https://schema.org",

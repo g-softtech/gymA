@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { RESERVED_SLUGS } from "@/lib/tenant/reservedSlugs";
 
 export async function POST(req: Request) {
   try {
@@ -10,9 +11,20 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
+    // Normalize slug: lowercase, trim, replace spaces/invalid chars with hyphens
+    const normalizedSlug = slug
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "");
+
+    if (RESERVED_SLUGS.includes(normalizedSlug)) {
+      return NextResponse.json({ error: "This workspace URL is reserved by the platform. Please choose another gym name." }, { status: 400 });
+    }
+
     // 1. Check if a real Tenant already has this slug
     const existingTenant = await prisma.tenant.findUnique({
-      where: { slug }
+      where: { slug: normalizedSlug }
     });
 
     if (existingTenant) {
@@ -37,7 +49,7 @@ export async function POST(req: Request) {
       update: {
         ownerName,
         gymName,
-        slug,
+        slug: normalizedSlug,
         phone,
         leadSource: leadSource || "WEBSITE",
         demoPersona,
@@ -50,7 +62,7 @@ export async function POST(req: Request) {
         email,
         ownerName,
         gymName,
-        slug,
+        slug: normalizedSlug,
         phone,
         leadSource: leadSource || "WEBSITE",
         demoPersona,

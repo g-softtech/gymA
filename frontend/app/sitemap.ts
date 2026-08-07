@@ -1,5 +1,6 @@
 import { MetadataRoute } from "next";
 import { prisma } from "@/lib/prisma";
+import { tenantUrl } from "@/lib/tenant/url";
 
 export const dynamic = "force-dynamic";
 
@@ -64,7 +65,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   for (const tenant of tenants) {
     sitemapEntries.push({
-      url: `${baseUrl}/gym/${tenant.slug}`,
+      url: tenantUrl(tenant.slug),
       lastModified: tenant.settings?.updatedAt || new Date(),
       changeFrequency: "weekly",
       priority: 0.7,

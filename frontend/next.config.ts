@@ -5,6 +5,39 @@ const nextConfig: NextConfig = {
     root: __dirname,
   },
 
+  // ── SEO & Vanity URLs ───────────────────────────────────────────────────
+  async redirects() {
+    return [
+      {
+        source: '/gym/:slug',
+        destination: '/:slug',
+        permanent: true,
+      },
+      {
+        source: '/gym/:slug/:path*',
+        destination: '/:slug/:path*',
+        permanent: true,
+      },
+    ];
+  },
+
+  async rewrites() {
+    return {
+      beforeFiles: [],
+      afterFiles: [],
+      fallback: [
+        {
+          source: "/:slug",
+          destination: "/gym/:slug",
+        },
+        {
+          source: "/:slug/:path*",
+          destination: "/gym/:slug/:path*",
+        },
+      ],
+    };
+  },
+
   // ── Multi-domain support ─────────────────────────────────────────────────
   // Allows the Next.js dev server to accept requests from subdomains and
   // custom domains when tested locally (e.g. powergymlago.localhost:3000).

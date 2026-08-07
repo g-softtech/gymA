@@ -4,6 +4,7 @@
 
 import React from "react";
 import type { BrandContext, MagicLinkPayload, MemberWelcomePayload, GymOwnerWelcomePayload, PaymentReceiptPayload, BillingReminderPayload, TrialEndingPayload, SubscriptionActivatedPayload, BankAccountConnectedPayload } from "../types";
+import { tenantUrl } from "@/lib/tenant/url";
 import {
   EmailLayout, Header, Body, Footer,
   H1, Text, Button, InfoCard, Section, Divider, Spacer, WarningBox, SuccessBox,
@@ -128,10 +129,10 @@ export function GymOwnerWelcomeTemplate({
         <SuccessBox>
           🔗 Your workspace URL:{" "}
           <a
-            href={`${brand.website}/gym/${payload.gymSlug}/dashboard/admin`}
+            href={tenantUrl(payload.gymSlug, "/dashboard/admin")}
             style={{ color: "#065F46", fontWeight: 600 }}
           >
-            {brand.website}/gym/{payload.gymSlug}
+            {tenantUrl(payload.gymSlug)}
           </a>
         </SuccessBox>
 
