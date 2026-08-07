@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
+import { trackEvent } from "@/lib/analytics/google";
+import { ANALYTICS_EVENTS } from "@/lib/analytics/events";
 
 export default function SignupPage() {
   const [ownerName, setOwnerName] = useState("");
@@ -41,6 +43,11 @@ export default function SignupPage() {
       if (!res.ok) {
         throw new Error(data.error || "Failed to initiate signup.");
       }
+
+      // Track the signup initiation
+      trackEvent(ANALYTICS_EVENTS.SIGNUP_INITIATED, {
+        gymName,
+      });
 
       // 2. Trigger NextAuth Magic Link via EmailProvider
       // We set the callbackUrl to /onboarding/process so we can provision the gym AFTER they verify their email
