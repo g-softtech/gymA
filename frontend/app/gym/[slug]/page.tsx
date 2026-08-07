@@ -8,6 +8,7 @@ import ContactForm from "@/components/ContactForm";
 import { getEntitlementFeatures } from "@/lib/entitlements/registry";
 import AnimatedStats, { AnimatedNumber } from "@/components/ui/AnimatedStats";
 import { TenantMobileNav } from "@/components/ui/TenantMobileNav";
+import { buildHealthClubSchema } from "@/lib/seo/jsonld";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types mirroring TenantSettings JSON blobs
@@ -173,30 +174,27 @@ export default async function GymPublicPage({
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://cortexfit.vercel.app";
   const canonicalUrl = tenantUrl(slug);
 
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "HealthAndBeautyBusiness",
-    "name": s?.brandName || tenant.name,
-    "description": heroSub,
-    "url": canonicalUrl,
-    "image": optimizeImageUrl(heroBg) || optimizeImageUrl(s?.logoUrl) || `${baseUrl}/images/default-gym-og.png`,
-    ...(s?.address && {
-      "address": {
-        "@type": "PostalAddress",
-        "streetAddress": s.address
-      }
-    }),
-    ...(s?.phone && { "telephone": s.phone }),
-  };
+  // The jsonLd schema is built using the new helper below
+  const brandName = s?.brandName || tenant.name;
+
+  const overrideClasses = "";
+
+  const jsonLdSchema = buildHealthClubSchema({
+    name: brandName,
+    url: canonicalUrl,
+    logo: s?.logoUrl || `${baseUrl}/images/default-gym-logo.png`,
+    description: s?.tagline || `Welcome to ${brandName}`,
+    address: s?.address || "Location not set",
+  });
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-      <TenantThemeProvider settings={s}>
-        <div className="min-h-screen w-full overflow-x-hidden bg-background text-foreground" style={{ fontFamily: s?.fontFamily ? `'${s.fontFamily}', system-ui, sans-serif` : undefined }}>
+    <TenantThemeProvider settings={s}>
+      <div className={`min-h-screen w-full overflow-x-hidden bg-background text-foreground ${overrideClasses}`} style={{ fontFamily: s?.fontFamily ? `'${s.fontFamily}', system-ui, sans-serif` : undefined }}>
+        {/* JSON-LD Structured Data for Local SEO */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdSchema) }}
+        />
 
         {/* ── Nav ────────────────────────────────────────────────────────────── */}
         <nav

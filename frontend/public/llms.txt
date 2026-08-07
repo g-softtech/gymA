@@ -1,0 +1,31 @@
+# CortexFit - Intelligent Gym Management Software
+
+CortexFit is a multi-tenant B2B2C SaaS platform designed for modern fitness businesses in Africa and globally.
+
+## Core Capabilities
+- Member Management and Access Control
+- Subscription Billing and Payment Processing
+- Custom Branded Gym Websites (Programmatic SEO)
+- Trainer and Class Scheduling
+- Automated Transactional Emails
+
+## Target Audience
+- Independent Gym Owners
+- Health Clubs
+- Fitness Franchises
+- Boutique Studios
+
+## Technical Architecture
+- Built on Next.js App Router
+- Multi-tenant PostgreSQL database
+- Stripe for payments
+- Magic Link authentication
+
+## API and Integration
+Currently, CortexFit operates as a closed ecosystem. Public API access for third-party integrations is on our long-term roadmap.
+
+## Pricing
+Pricing is capability-based, offering flexible tiers designed to scale with gym revenue.
+
+## Support
+For technical support, gym owners can contact support@cortexsystems.com.

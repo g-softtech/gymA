@@ -82,6 +82,15 @@ export default async function WebsiteHubPage({
         : "bg-slate-100 text-slate-500",
       id: "website-domains-link",
     },
+    {
+      href: `${adminBase}/website/seo`,
+      icon: "📈",
+      title: "SEO & Visibility",
+      desc: "Search ranking, Google Business, and AI recommendations",
+      badge: "New",
+      badgeColor: "bg-indigo-100 text-indigo-700",
+      id: "website-seo-link",
+    },
   ];
 
   return (

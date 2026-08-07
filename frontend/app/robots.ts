@@ -6,12 +6,21 @@ export default function robots(): MetadataRoute.Robots {
   return {
     rules: {
       userAgent: "*",
-      allow: "/",
+      allow: [
+        "/",
+        "/pricing",
+        "/features",
+        "/blog",
+        "/gym/*"
+      ],
       disallow: [
         "/api/",
-        "/auth/",
         "/dashboard/",
-        "/superadmin/",
+        "/admin/",
+        "/auth/",
+        "/onboarding/",
+        "/billing/",
+        "/settings/",
         "/sandbox/",
       ],
     },
