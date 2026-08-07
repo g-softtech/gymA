@@ -24,6 +24,6 @@ export default function robots(): MetadataRoute.Robots {
         "/sandbox/",
       ],
     },
-    sitemap: `${baseUrl}/sitemap.xml`,
+    sitemap: `${baseUrl}/sitemap-index.xml`,
   };
 }
