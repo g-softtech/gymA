@@ -76,7 +76,7 @@ export default function MarketingLayout({ children }: { children: ReactNode }) {
                 links: [
                   { label: "Features", href: "/#features" },
                   { label: "Pricing", href: "/pricing" },
-                  { label: "Demo", href: "/gym/cortexfit" },
+                  { label: "Demo", href: "/demo" },
                   { label: "AI Coach", href: "/#ai" },
                 ],
               },

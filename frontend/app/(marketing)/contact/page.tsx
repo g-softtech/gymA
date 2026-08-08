@@ -52,7 +52,7 @@ export default function ContactPage() {
                 Try our demo gym with full access to all features — no credit card required.
               </p>
               <a
-                href="/gym/cortexfit"
+                href="/demo"
                 className="inline-block bg-white text-indigo-700 font-bold text-sm px-5 py-2.5 rounded-lg hover:bg-indigo-50 transition"
               >
                 Try Demo Free →

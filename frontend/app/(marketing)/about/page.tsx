@@ -107,7 +107,7 @@ export default function AboutPage() {
           <h2 className="text-3xl font-extrabold mb-4">Join the CortexFit family</h2>
           <p className="text-indigo-200 mb-8">Start your free trial today — no credit card required.</p>
           <Link
-            href="/gym/cortexfit"
+            href="/demo"
             className="inline-block bg-white text-indigo-700 font-bold px-8 py-4 rounded-xl hover:bg-indigo-50 transition"
           >
             Start Free Trial
