@@ -9,8 +9,8 @@ export default function MarketingLayout({ children }: { children: ReactNode }) {
       <header className="sticky top-0 z-50 bg-background border-b border-border shadow-sm">
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
-            <div className="h-10 w-10 overflow-hidden flex items-start justify-center">
-              <img src="/logo.png" alt="CortexFit Logo" className="w-full h-auto object-cover object-top drop-shadow-md scale-[1.2] origin-top" />
+            <div className="h-16 w-16 overflow-hidden flex items-start justify-center -ml-2">
+              <img src="/logo.png" alt="CortexFit Logo" className="w-full h-auto object-cover object-top drop-shadow-md scale-[1.3] origin-top mt-1" />
             </div>
             <span className="font-bold text-foreground text-lg">CortexFit</span>
           </Link>
@@ -60,8 +60,8 @@ export default function MarketingLayout({ children }: { children: ReactNode }) {
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-10 mb-12">
             <div className="col-span-2 sm:col-span-1">
               <div className="flex items-center gap-2 mb-4">
-                <div className="h-10 w-10 overflow-hidden flex items-start justify-center">
-                  <img src="/logo.png" alt="CortexFit Logo" className="w-full h-auto object-cover object-top drop-shadow-md scale-[1.2] origin-top" />
+                <div className="h-16 w-16 overflow-hidden flex items-start justify-center -ml-2">
+                  <img src="/logo.png" alt="CortexFit Logo" className="w-full h-auto object-cover object-top drop-shadow-md scale-[1.3] origin-top mt-1" />
                 </div>
                 <span className="font-bold text-white text-lg">CortexFit</span>
               </div>

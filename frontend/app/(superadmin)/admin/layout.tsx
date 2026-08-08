@@ -38,8 +38,8 @@ export default async function SuperAdminLayout({
         {/* Brand */}
         <div className="px-6 py-5 border-b border-border">
           <div className="flex items-center gap-3">
-            <div className="h-8 w-8 overflow-hidden flex items-start justify-center">
-              <img src="/logo.png" alt="CortexFit Logo" className="w-full h-auto object-cover object-top drop-shadow-md scale-[1.2] origin-top" />
+            <div className="h-12 w-12 overflow-hidden flex items-start justify-center -ml-1">
+              <img src="/logo.png" alt="CortexFit Logo" className="w-full h-auto object-cover object-top drop-shadow-md scale-[1.3] origin-top mt-1" />
             </div>
             <div>
               <p className="text-sm font-bold text-foreground">CortexFit</p>
