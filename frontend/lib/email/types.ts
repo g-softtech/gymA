@@ -27,14 +27,14 @@ export interface BrandContext {
 
 export const CORTEXFIT_BRAND: BrandContext = {
   brandName: "CortexFit",
-  logo: "https://cortexfit.vercel.app/logo.png",
+  logo: `${process.env.NEXT_PUBLIC_APP_URL || "https://fit.thecortexsystems.com"}/logo.png`,
   primaryColor: "#6366F1",
   secondaryColor: "#8B5CF6",
   supportEmail: "support@thecortexsystems.com",
-  website: "https://cortexfit.vercel.app",
+  website: process.env.NEXT_PUBLIC_APP_URL || "https://fit.thecortexsystems.com",
   replyTo: "support@thecortexsystems.com",
-  privacyUrl: "https://cortexfit.vercel.app/privacy",
-  termsUrl: "https://cortexfit.vercel.app/terms",
+  privacyUrl: `${process.env.NEXT_PUBLIC_APP_URL || "https://fit.thecortexsystems.com"}/privacy`,
+  termsUrl: `${process.env.NEXT_PUBLIC_APP_URL || "https://fit.thecortexsystems.com"}/terms`,
   footerText: "© 2025 CortexFit. All rights reserved.",
 };
 
