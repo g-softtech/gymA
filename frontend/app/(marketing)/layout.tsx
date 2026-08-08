@@ -9,9 +9,7 @@ export default function MarketingLayout({ children }: { children: ReactNode }) {
       <header className="sticky top-0 z-50 bg-background border-b border-border shadow-sm">
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
-              <span className="text-white text-sm font-bold">SG</span>
-            </div>
+            <img src="/logo.png" alt="CortexFit Logo" className="w-8 h-8 object-contain" />
             <span className="font-bold text-foreground text-lg">CortexFit</span>
           </Link>
 
@@ -60,9 +58,7 @@ export default function MarketingLayout({ children }: { children: ReactNode }) {
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-10 mb-12">
             <div className="col-span-2 sm:col-span-1">
               <div className="flex items-center gap-2 mb-4">
-                <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
-                  <span className="text-white text-sm font-bold">SG</span>
-                </div>
+                <img src="/logo.png" alt="CortexFit Logo" className="w-8 h-8 object-contain" />
                 <span className="font-bold text-white text-lg">CortexFit</span>
               </div>
               <p className="text-sm text-gray-400 leading-relaxed">
