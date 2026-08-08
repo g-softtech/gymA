@@ -43,7 +43,6 @@ export default async function SuperAdminLayout({
                 src="/logo.png" 
                 alt="CortexFit Logo" 
                 className="h-12 w-auto object-contain drop-shadow-md" 
-                style={{ clipPath: "inset(0 0 35% 0)" }}
               />
             </div>
             <div>

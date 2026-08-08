@@ -14,7 +14,6 @@ export default function MarketingLayout({ children }: { children: ReactNode }) {
                 src="/logo.png" 
                 alt="CortexFit Logo" 
                 className="h-[4.5rem] w-auto object-contain drop-shadow-md" 
-                style={{ clipPath: "inset(0 0 35% 0)" }}
               />
             </div>
             <span className="font-bold text-foreground text-lg">CortexFit</span>
@@ -70,7 +69,6 @@ export default function MarketingLayout({ children }: { children: ReactNode }) {
                     src="/logo.png" 
                     alt="CortexFit Logo" 
                     className="h-[4.5rem] w-auto object-contain drop-shadow-md" 
-                    style={{ clipPath: "inset(0 0 35% 0)" }}
                   />
                 </div>
                 <span className="font-bold text-white text-lg">CortexFit</span>
