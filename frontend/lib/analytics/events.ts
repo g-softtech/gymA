@@ -16,8 +16,12 @@ export const ANALYTICS_EVENTS = {
   MAGIC_LINK_SENT: "magic_link_sent",
   MAGIC_LINK_VERIFIED: "magic_link_verified",
   GYM_CREATED: "gym_created",
-  ONBOARDING_STARTED: "onboarding_started",
-  ONBOARDING_COMPLETED: "onboarding_completed",
+  GYM_JOIN_INITIATED: "gym_join_initiated",
+  GYM_JOINED: "gym_joined",
+  
+  // Marketing & Content
+  NEWSLETTER_SUBSCRIBED: "newsletter_subscribed",
+  BLOG_ARTICLE_VIEWED: "blog_article_viewed",
 
   // Activation
   FIRST_MEMBER_ADDED: "first_member_added",

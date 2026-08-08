@@ -1,12 +1,13 @@
 import { NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
 
 export async function GET() {
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://fit.thecortexsystems.com";
   
-  // In a real implementation, you would fetch blog posts from the DB/CMS here.
-  const posts = [
-    { slug: "introducing-cortexfit", updatedAt: new Date().toISOString() },
-  ];
+  const posts = await prisma.marketingBlog.findMany({
+    where: { published: true },
+    select: { slug: true, updatedAt: true },
+  });
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">

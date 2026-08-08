@@ -58,7 +58,8 @@ export type EmailType =
   | "PASSWORD_CHANGED"
   | "TRAINER_INVITATION"
   | "STAFF_INVITATION"
-  | "BANK_ACCOUNT_CONNECTED";
+  | "BANK_ACCOUNT_CONNECTED"
+  | "NEWSLETTER_WELCOME";
 
 // ── Typed Payload Interfaces ──────────────────────────────────────────────────
 // Every EmailJob's `payload` field must conform to one of these interfaces.
@@ -160,6 +161,11 @@ export interface StaffInvitationPayload {
   role: string;
   inviteUrl: string;
   expiresAt: string;
+}
+
+export interface NewsletterWelcomePayload {
+  subscriberEmail: string;
+  unsubscribeUrl?: string; // For future implementation
 }
 
 // ── Generic Email Queue Entry ─────────────────────────────────────────────────

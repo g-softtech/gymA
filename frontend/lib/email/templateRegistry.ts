@@ -18,6 +18,8 @@ import {
   BankAccountConnectedTemplate,
 } from "./templates/Tier1Templates";
 
+import { NewsletterWelcomeTemplate } from "./templates/NewsletterWelcome";
+
 // ── Registry Type ─────────────────────────────────────────────────────────────
 
 type TemplateRenderer = (payload: Record<string, unknown>, brand: BrandContext) => React.ReactElement;
@@ -46,6 +48,9 @@ const EMAIL_TEMPLATES: Partial<Record<EmailType, TemplateRenderer>> = {
 
   BANK_ACCOUNT_CONNECTED: (payload, brand) =>
     React.createElement(BankAccountConnectedTemplate, { payload: payload as any, brand }),
+
+  NEWSLETTER_WELCOME: (payload, brand) =>
+    React.createElement(NewsletterWelcomeTemplate, { payload: payload as any, brand }),
 
   // Phase 2 — placeholder until templates are built
   BOOKING_CONFIRMATION: (payload, brand) =>

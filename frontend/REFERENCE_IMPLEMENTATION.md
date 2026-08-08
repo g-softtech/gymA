@@ -102,7 +102,17 @@ CortexFit employs an aggressive **Programmatic SEO** engine.
 
 ---
 
-## 9. Background Worker Architecture
+## 9. Marketing CMS Architecture
+
+The platform marketing blog uses a custom built-in Markdown CMS to avoid third-party dependencies and external API calls.
+- **Database Segregation**: The `MarketingBlog` model is completely decoupled from the tenant `BlogPost` model to ensure strict data isolation.
+- **Super Admin CMS**: The CMS UI (`/admin/blog`) and API (`/api/superadmin/blog`) are gated by the core RBAC `requireSuperAdmin` middleware.
+- **Content Rendering**: Posts are written in Markdown and rendered on the public `/blog/[slug]` route using `react-markdown` to ensure XSS safety and zero raw HTML injection.
+- **SEO & Sitemaps**: Dynamic SEO metadata, JSON-LD article schemas, and the `/sitemap-blog.xml` feed are fully integrated with the publishing lifecycle (Draft vs. Published state).
+
+---
+
+## 10. Background Worker Architecture
 
 Heavy operations are offloaded to background queues or serverless cron jobs:
 - Email dispatching
@@ -126,6 +136,7 @@ All major architectural decisions are documented in `docs/architecture/`.
 - `ADR-013`: Analytics Taxonomy
 - `ADR-014`: UTM Attribution Strategy
 - `ADR-015`: Launch Readiness Guidelines
+- `ADR-016`: Marketing CMS & Newsletter Architecture
 
 ---
 
