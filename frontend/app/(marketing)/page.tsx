@@ -47,7 +47,7 @@ export default function HomePage() {
   return (
     <div>
       {/* Hero */}
-      <section className="bg-gradient-to-br from-indigo-900 via-indigo-800 to-purple-900 text-white py-24 px-6">
+      <section className="bg-gradient-to-b from-background via-indigo-900 to-indigo-900 dark:to-purple-950 text-white py-24 px-6">
         <div className="max-w-5xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-4 py-1.5 text-sm font-medium mb-8">
             <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
