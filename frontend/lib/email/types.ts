@@ -59,7 +59,9 @@ export type EmailType =
   | "TRAINER_INVITATION"
   | "STAFF_INVITATION"
   | "BANK_ACCOUNT_CONNECTED"
-  | "NEWSLETTER_WELCOME";
+  | "NEWSLETTER_WELCOME"
+  | "PLATFORM_CONTACT"
+  | "TENANT_CONTACT";
 
 // ── Typed Payload Interfaces ──────────────────────────────────────────────────
 // Every EmailJob's `payload` field must conform to one of these interfaces.
@@ -166,6 +168,25 @@ export interface StaffInvitationPayload {
 export interface NewsletterWelcomePayload {
   subscriberEmail: string;
   unsubscribeUrl?: string; // For future implementation
+}
+
+export interface PlatformContactPayload {
+  name: string;
+  email: string;
+  phone?: string;
+  gymName?: string;
+  subject: string;
+  message: string;
+  submittedAt: string;
+}
+
+export interface TenantContactPayload {
+  name: string;
+  email: string;
+  phone?: string;
+  subject: string;
+  message: string;
+  tenantName: string;
 }
 
 // ── Generic Email Queue Entry ─────────────────────────────────────────────────

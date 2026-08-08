@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { trackEvent } from "@/lib/analytics/index";
 
 interface ContactFormProps {
   slug: string;
@@ -8,6 +9,7 @@ interface ContactFormProps {
 }
 
 export default function ContactForm({ slug, primaryColor }: ContactFormProps) {
+  const [submissionId, setSubmissionId] = useState("");
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -17,6 +19,15 @@ export default function ContactForm({ slug, primaryColor }: ContactFormProps) {
   });
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState("");
+
+  useEffect(() => {
+    // Generate idempotency ID once on mount
+    if (typeof crypto !== "undefined" && crypto.randomUUID) {
+      setSubmissionId(crypto.randomUUID());
+    } else {
+      setSubmissionId(Date.now().toString() + Math.random().toString());
+    }
+  }, []);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -33,11 +44,18 @@ export default function ContactForm({ slug, primaryColor }: ContactFormProps) {
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, slug }),
+        body: JSON.stringify({ ...form, slug, submissionId }),
       });
 
       if (res.ok) {
         setStatus("sent");
+        trackEvent("contact_form_submitted", { form_type: "tenant" });
+        // Generate a new submission ID so they can send another one if they want
+        if (typeof crypto !== "undefined" && crypto.randomUUID) {
+          setSubmissionId(crypto.randomUUID());
+        } else {
+          setSubmissionId(Date.now().toString() + Math.random().toString());
+        }
         setForm({ name: "", email: "", phone: "", subject: "", message: "" });
       } else {
         const data = await res.json();
@@ -76,10 +94,16 @@ export default function ContactForm({ slug, primaryColor }: ContactFormProps) {
     "w-full px-4 py-3 rounded-xl border border-border text-sm text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 transition-shadow bg-background";
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <form onSubmit={handleSubmit} className="space-y-5" aria-label="Gym Contact Form">
+      {status === "error" && (
+        <div className="text-sm text-destructive-foreground bg-destructive/10 border border-destructive/20 px-4 py-3 rounded-xl" role="alert">
+          {errorMessage}
+        </div>
+      )}
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
         <div>
-          <label className="block text-xs font-semibold text-muted-foreground mb-1.5">
+          <label htmlFor="contact-name" className="block text-sm font-medium text-muted-foreground mb-1.5">
             Full Name <span className="text-destructive">*</span>
           </label>
           <input
@@ -89,13 +113,13 @@ export default function ContactForm({ slug, primaryColor }: ContactFormProps) {
             required
             value={form.name}
             onChange={handleChange}
-            placeholder="Your name"
+            placeholder="Jane Doe"
             className={inputClass}
             style={{ "--tw-ring-color": primaryColor } as React.CSSProperties}
           />
         </div>
         <div>
-          <label className="block text-xs font-semibold text-muted-foreground mb-1.5">
+          <label htmlFor="contact-email" className="block text-sm font-medium text-muted-foreground mb-1.5">
             Email Address <span className="text-destructive">*</span>
           </label>
           <input
@@ -105,15 +129,16 @@ export default function ContactForm({ slug, primaryColor }: ContactFormProps) {
             required
             value={form.email}
             onChange={handleChange}
-            placeholder="you@example.com"
+            placeholder="jane@example.com"
             className={inputClass}
+            style={{ "--tw-ring-color": primaryColor } as React.CSSProperties}
           />
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
         <div>
-          <label className="block text-xs font-semibold text-muted-foreground mb-1.5">
+          <label htmlFor="contact-phone" className="block text-sm font-medium text-muted-foreground mb-1.5">
             Phone (optional)
           </label>
           <input
@@ -122,12 +147,13 @@ export default function ContactForm({ slug, primaryColor }: ContactFormProps) {
             type="tel"
             value={form.phone}
             onChange={handleChange}
-            placeholder="+234 800 000 0000"
+            placeholder="+1 (555) 000-0000"
             className={inputClass}
+            style={{ "--tw-ring-color": primaryColor } as React.CSSProperties}
           />
         </div>
         <div>
-          <label className="block text-xs font-semibold text-muted-foreground mb-1.5">
+          <label htmlFor="contact-subject" className="block text-sm font-medium text-muted-foreground mb-1.5">
             Subject
           </label>
           <input
@@ -138,40 +164,47 @@ export default function ContactForm({ slug, primaryColor }: ContactFormProps) {
             onChange={handleChange}
             placeholder="e.g. Membership enquiry"
             className={inputClass}
+            style={{ "--tw-ring-color": primaryColor } as React.CSSProperties}
           />
         </div>
       </div>
 
       <div>
-        <label className="block text-xs font-semibold text-muted-foreground mb-1.5">
+        <label htmlFor="contact-message" className="block text-sm font-medium text-muted-foreground mb-1.5">
           Message <span className="text-destructive">*</span>
         </label>
         <textarea
           id="contact-message"
           name="message"
           required
-          rows={4}
+          rows={5}
           value={form.message}
           onChange={handleChange}
           placeholder="How can we help you?"
           className={`${inputClass} resize-none`}
+          style={{ "--tw-ring-color": primaryColor } as React.CSSProperties}
         />
       </div>
-
-      {status === "error" && (
-        <p className="text-sm text-destructive-foreground bg-destructive px-4 py-2 rounded-lg">
-          {errorMessage}
-        </p>
-      )}
 
       <button
         id="contact-submit-btn"
         type="submit"
         disabled={status === "sending"}
-        className="w-full py-3.5 px-6 rounded-xl font-bold text-white text-sm transition-all hover:opacity-90 hover:shadow-md disabled:opacity-60 disabled:cursor-not-allowed"
+        aria-busy={status === "sending"}
+        className="w-full py-3.5 px-6 rounded-xl font-bold text-white text-sm transition-all hover:opacity-90 hover:shadow-md disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
         style={{ background: primaryColor }}
       >
-        {status === "sending" ? "Sending…" : "Send Message →"}
+        {status === "sending" ? (
+          <>
+            <svg className="animate-spin w-5 h-5 text-white/70" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+            </svg>
+            Sending Message...
+          </>
+        ) : (
+          "Send Message →"
+        )}
       </button>
     </form>
   );

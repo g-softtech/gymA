@@ -22,6 +22,7 @@ export const ANALYTICS_EVENTS = {
   // Marketing & Content
   NEWSLETTER_SUBSCRIBED: "newsletter_subscribed",
   BLOG_ARTICLE_VIEWED: "blog_article_viewed",
+  CONTACT_FORM_SUBMITTED: "contact_form_submitted",
 
   // Activation
   FIRST_MEMBER_ADDED: "first_member_added",

@@ -19,6 +19,8 @@ import {
 } from "./templates/Tier1Templates";
 
 import { NewsletterWelcomeTemplate } from "./templates/NewsletterWelcome";
+import { PlatformContactTemplate } from "./templates/PlatformContact";
+import { TenantContactTemplate } from "./templates/TenantContact";
 
 // ── Registry Type ─────────────────────────────────────────────────────────────
 
@@ -51,6 +53,10 @@ const EMAIL_TEMPLATES: Partial<Record<EmailType, TemplateRenderer>> = {
 
   NEWSLETTER_WELCOME: (payload, brand) =>
     React.createElement(NewsletterWelcomeTemplate, { payload: payload as any, brand }),
+  PLATFORM_CONTACT: (payload, brand) =>
+    React.createElement(PlatformContactTemplate, { payload: payload as any, brand }),
+  TENANT_CONTACT: (payload, brand) =>
+    React.createElement(TenantContactTemplate, { payload: payload as any, brand }),
 
   // Phase 2 — placeholder until templates are built
   BOOKING_CONFIRMATION: (payload, brand) =>
