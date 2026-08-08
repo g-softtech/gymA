@@ -9,8 +9,13 @@ export default function MarketingLayout({ children }: { children: ReactNode }) {
       <header className="sticky top-0 z-50 bg-background border-b border-border shadow-sm">
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
-            <div className="h-20 w-20 overflow-hidden flex items-start justify-center -ml-4">
-              <img src="/logo.png" alt="CortexFit Logo" className="w-full h-auto object-cover object-top drop-shadow-md scale-[2.0] origin-top mt-2" />
+            <div className="h-14 flex items-center justify-center -ml-2">
+              <img 
+                src="/logo.png" 
+                alt="CortexFit Logo" 
+                className="h-[4.5rem] w-auto object-contain drop-shadow-md" 
+                style={{ clipPath: "inset(0 0 35% 0)" }}
+              />
             </div>
             <span className="font-bold text-foreground text-lg">CortexFit</span>
           </Link>
@@ -60,8 +65,13 @@ export default function MarketingLayout({ children }: { children: ReactNode }) {
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-10 mb-12">
             <div className="col-span-2 sm:col-span-1">
               <div className="flex items-center gap-2 mb-4">
-                <div className="h-20 w-20 overflow-hidden flex items-start justify-center -ml-4">
-                  <img src="/logo.png" alt="CortexFit Logo" className="w-full h-auto object-cover object-top drop-shadow-md scale-[2.0] origin-top mt-2" />
+                <div className="h-14 flex items-center justify-center -ml-2">
+                  <img 
+                    src="/logo.png" 
+                    alt="CortexFit Logo" 
+                    className="h-[4.5rem] w-auto object-contain drop-shadow-md" 
+                    style={{ clipPath: "inset(0 0 35% 0)" }}
+                  />
                 </div>
                 <span className="font-bold text-white text-lg">CortexFit</span>
               </div>
