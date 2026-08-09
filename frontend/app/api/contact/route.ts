@@ -32,20 +32,43 @@ export async function POST(req: NextRequest) {
     const { slug, name, email, phone, message, subject, submissionId } = body;
 
     // ── Validation ────────────────────────────────────────────────────────────
+    if (!submissionId || typeof submissionId !== "string" || submissionId.length > 64) {
+      return NextResponse.json({ error: "Invalid submission ID" }, { status: 400 });
+    }
+
     if (!slug || typeof slug !== "string") {
       return NextResponse.json({ error: "Gym slug is required" }, { status: 400 });
     }
+
     if (!name?.trim() || !email?.trim() || !message?.trim()) {
       return NextResponse.json(
         { error: "Name, email, and message are required" },
         { status: 400 }
       );
     }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      return NextResponse.json({ error: "Invalid email address" }, { status: 400 });
+
+    if (name.trim().length > 100) {
+      return NextResponse.json({ error: "Name is too long" }, { status: 400 });
     }
+
+    if (subject && subject.trim().length > 150) {
+      return NextResponse.json({ error: "Subject is too long" }, { status: 400 });
+    }
+
+    if (phone && phone.trim().length > 30) {
+      return NextResponse.json({ error: "Phone number is too long" }, { status: 400 });
+    }
+
     if (message.trim().length < 10) {
       return NextResponse.json({ error: "Message is too short" }, { status: 400 });
+    }
+
+    if (message.trim().length > 5000) {
+      return NextResponse.json({ error: "Message is too long" }, { status: 400 });
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      return NextResponse.json({ error: "Invalid email address" }, { status: 400 });
     }
 
     // ── Resolve tenant ────────────────────────────────────────────────────────
@@ -59,35 +82,43 @@ export async function POST(req: NextRequest) {
     }
 
     // ── Create internal notification for the gym admin(s) ─────────────────────
-    // userId is null — meaning all admins of this tenant will see it in their
-    // notification center (the admin notification feed queries WHERE userId IS
-    // NULL OR userId = adminId, so broadcast-style nulls work fine).
-    await prisma.notification.create({
-      data: {
+    const notificationTitle = `📩 Contact Form: ${subject?.trim() || "New Enquiry"} from ${name.trim()}`;
+    const notificationMessage = [
+      `Name: ${name.trim()}`,
+      `Email: ${email.trim()}`,
+      phone ? `Phone: ${phone.trim()}` : null,
+      ``,
+      message.trim(),
+    ].filter((l) => l !== null).join("\n");
+
+    // Deduplicate the notification: Check if this exact notification was created in the last 5 mins
+    const recentNotification = await prisma.notification.findFirst({
+      where: {
         tenantId: tenant.id,
-        userId: null, // broadcast to all admins of this tenant
-        type: "GENERAL",
-        title: `📩 Contact Form: ${subject?.trim() || "New Enquiry"} from ${name.trim()}`,
-        message: [
-          `Name: ${name.trim()}`,
-          `Email: ${email.trim()}`,
-          phone ? `Phone: ${phone.trim()}` : null,
-          ``,
-          message.trim(),
-        ]
-          .filter((l) => l !== null)
-          .join("\n"),
+        title: notificationTitle,
+        message: notificationMessage,
+        createdAt: { gte: new Date(Date.now() - 5 * 60 * 1000) }
       },
     });
+
+    if (!recentNotification) {
+      await prisma.notification.create({
+        data: {
+          tenantId: tenant.id,
+          userId: null, // broadcast to all admins of this tenant
+          type: "GENERAL",
+          title: notificationTitle,
+          message: notificationMessage,
+        },
+      });
+    }
 
     // ── Send Email to Gym Owner ───────────────────────────────────────────────
     // If the gym has configured a contact email in their settings, enqueue an email!
     const gymEmail = (tenant.settings as any)?.email;
     if (gymEmail && typeof gymEmail === "string") {
-      // Use client submissionId for idempotency if provided, otherwise generate a fallback.
-      // This ensures if the queue retries, we don't spam the gym owner.
-      const actualSubmissionId = submissionId?.trim() || crypto.randomUUID();
-      const eventId = `contact:tenant:${tenant.id}:${actualSubmissionId}`;
+      // Use client submissionId for idempotency, now strictly required
+      const eventId = `contact:tenant:${tenant.id}:${submissionId.trim()}`;
 
       await enqueueEmail({
         eventId,
