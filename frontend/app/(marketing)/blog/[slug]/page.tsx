@@ -13,12 +13,13 @@ import { BlogArticleTracker } from "@/components/marketing/BlogArticleTracker";
 export const revalidate = 3600; // Cache for 1 hour
 
 interface PageProps {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }
 
 export async function generateMetadata({ params }: PageProps) {
+  const resolvedParams = await params;
   const post = await prisma.marketingBlog.findUnique({
-    where: { slug: params.slug },
+    where: { slug: resolvedParams.slug },
   });
 
   if (!post || !post.published) {
@@ -34,8 +35,9 @@ export async function generateMetadata({ params }: PageProps) {
 }
 
 export default async function BlogPostPage({ params }: PageProps) {
+  const resolvedParams = await params;
   const post = await prisma.marketingBlog.findUnique({
-    where: { slug: params.slug },
+    where: { slug: resolvedParams.slug },
   });
 
   if (!post || !post.published) {
