@@ -9,12 +9,8 @@ export default function MarketingLayout({ children }: { children: ReactNode }) {
       <header className="sticky top-0 z-50 bg-background border-b border-border shadow-sm">
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-1">
-            <div className="h-9 w-9 flex items-center justify-center overflow-visible">
-              <img 
-                src="/logo.png" 
-                alt="CortexFit Logo" 
-                className="h-[150%] w-[150%] max-w-none object-contain drop-shadow-md" 
-              />
+            <div className="h-9 w-9 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center shadow-md">
+              <span className="text-white font-bold text-lg">C</span>
             </div>
             <span className="font-bold text-foreground text-xl tracking-tight ml-2">CortexFit</span>
           </Link>
@@ -64,12 +60,8 @@ export default function MarketingLayout({ children }: { children: ReactNode }) {
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-10 mb-12">
             <div className="col-span-2 sm:col-span-1">
               <div className="flex items-center gap-1 mb-4">
-                <div className="h-9 w-9 flex items-center justify-center overflow-visible">
-                  <img 
-                    src="/logo.png" 
-                    alt="CortexFit Logo" 
-                    className="h-[150%] w-[150%] max-w-none object-contain drop-shadow-md" 
-                  />
+                <div className="h-9 w-9 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center shadow-md">
+                  <span className="text-white font-bold text-lg">C</span>
                 </div>
                 <span className="font-bold text-white text-xl tracking-tight ml-2">CortexFit</span>
               </div>
