@@ -113,7 +113,6 @@ export default async function AdminDashboardPage({
         {stats.map((s) => (
           <div 
             key={s.label} 
-            id={s.label.includes("Revenue") ? "tour-revenue-stats" : undefined}
             className={`rounded-xl p-5 ${s.color}`}
           >
             <div className="text-2xl mb-2">{s.icon}</div>

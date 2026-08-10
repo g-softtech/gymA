@@ -131,8 +131,9 @@ export function SidebarNav({
         {activeLinks.map((link) => {
           const isActive = pathname === link.href || pathname.startsWith(`${link.href}/`);
           let tourId = undefined;
-          if (link.href.endsWith("/members")) tourId = "tour-members";
           if (link.href.endsWith("/checkin")) tourId = "tour-checkin-desk";
+          if (link.href.endsWith("/revenue")) tourId = "tour-revenue";
+          if (link.href.endsWith("/website")) tourId = "tour-website";
           return (
             <Link
               key={link.href}

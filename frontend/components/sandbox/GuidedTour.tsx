@@ -51,15 +51,6 @@ export default function GuidedTour({ isSandbox, role, tenantSlug }: GuidedTourPr
             },
           },
           {
-            element: "#tour-members",
-            popover: {
-              title: "Lightning-Fast Onboarding",
-              description: "Add a new member and get them on a plan in under 10 seconds. You can manage everything about them here.",
-              side: "right",
-              align: "start",
-            },
-          },
-          {
             element: "#tour-checkin-desk",
             popover: {
               title: "Modern Access Control",
@@ -69,12 +60,21 @@ export default function GuidedTour({ isSandbox, role, tenantSlug }: GuidedTourPr
             },
           },
           {
-            element: "#tour-revenue-stats",
+            element: "#tour-revenue",
             popover: {
               title: "Automated Payment Recovery",
               description: "CortexFit automatically chases down failed payments for you. Monitor your real-time revenue and active subscriptions here.",
-              side: "bottom",
-              align: "center",
+              side: "right",
+              align: "start",
+            },
+          },
+          {
+            element: "#tour-website",
+            popover: {
+              title: "Your Digital Storefront",
+              description: "Manage your fully integrated, SEO-optimized gym website. Update branding, content, and hero images instantly.",
+              side: "right",
+              align: "start",
             },
           }
         ] as DriveStep[]).filter(step => {
@@ -96,9 +96,9 @@ export default function GuidedTour({ isSandbox, role, tenantSlug }: GuidedTourPr
     // Wait until the DOM targets exist (or timeout after 5 seconds)
     const checkTargets = setInterval(() => {
       const allTargetsExist = !!(
-        document.querySelector("#tour-members") &&
         document.querySelector("#tour-checkin-desk") &&
-        document.querySelector("#tour-revenue-stats")
+        document.querySelector("#tour-revenue") &&
+        document.querySelector("#tour-website")
       );
 
       if (allTargetsExist) {
