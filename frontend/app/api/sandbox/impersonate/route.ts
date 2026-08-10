@@ -31,9 +31,10 @@ export async function POST(req: Request) {
     }
 
     // Verify the actor has permission. 
-    // They must either be SUPERADMIN, or they must already be impersonating a user in the same sandbox.
+    // They must be a SUPERADMIN, an ADMIN of this sandbox, or already impersonating a user in the same sandbox.
     const session = await getAuthSession();
     const isSuperAdmin = session?.user?.role === "SUPERADMIN";
+    const isSandboxAdmin = session?.user?.tenantId === targetUser.tenantId && session?.user?.role === "ADMIN";
     
     const cookieStore = await cookies();
     const existingImpersonationId = cookieStore.get("sandbox_impersonate_userId")?.value;
@@ -46,7 +47,7 @@ export async function POST(req: Request) {
       }
     }
 
-    if (!isSuperAdmin && !isAlreadyInSandbox) {
+    if (!isSuperAdmin && !isSandboxAdmin && !isAlreadyInSandbox) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
