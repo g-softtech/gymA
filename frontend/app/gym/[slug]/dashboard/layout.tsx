@@ -11,6 +11,7 @@ import { MobileNav } from "@/components/MobileNav";
 import { SidebarNav } from "@/components/SidebarNav";
 import ImpersonateBanner from "@/components/admin/ImpersonateBanner";
 import PersonaSwitcher from "@/components/demo/PersonaSwitcher";
+import GuidedTour from "@/components/sandbox/GuidedTour";
 
 export default async function DashboardLayout({
   children,
@@ -243,6 +244,11 @@ export default async function DashboardLayout({
         currentRole={role} 
         isDemo={tenant.isDemo}
         environmentType={slug === 'demo-elite' ? ('LIVE DEMO' as const) : ('SANDBOX' as const)}
+      />
+      <GuidedTour 
+        isSandbox={isSandbox} 
+        role={role as string} 
+        tenantSlug={slug} 
       />
     </>
   );

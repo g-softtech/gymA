@@ -130,10 +130,14 @@ export function SidebarNav({
       <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
         {activeLinks.map((link) => {
           const isActive = pathname === link.href || pathname.startsWith(`${link.href}/`);
+          let tourId = undefined;
+          if (link.href.endsWith("/members")) tourId = "tour-members";
+          if (link.href.endsWith("/checkin")) tourId = "tour-checkin-desk";
           return (
             <Link
               key={link.href}
               href={link.href}
+              id={tourId}
               className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${isActive ? "bg-primary/10" : "hover:bg-accent"}`}
               style={{
                 color: isActive ? branding.primaryColor : undefined,
@@ -148,8 +152,19 @@ export function SidebarNav({
 
       {/* ROLE SWITCHER */}
 
-
-      <div className="px-4 py-4 border-t border-border">
+      {currentContext === "ADMIN" && _isSandbox && (
+        <div className="px-4 py-3">
+          <button
+            onClick={() => {
+              window.dispatchEvent(new CustomEvent('cortexfit:start-tour'));
+            }}
+            className="flex items-center gap-2 w-full px-3 py-2 text-xs font-semibold rounded-lg bg-indigo-500/10 text-indigo-600 hover:bg-indigo-500/20 transition-colors"
+          >
+            <span>🧭</span>
+            Take Product Tour
+          </button>
+        </div>
+      )}      <div className="px-4 py-4 border-t border-border">
         <div className="flex items-center gap-2">
           <div
             className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold uppercase text-white shrink-0"
