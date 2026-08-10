@@ -134,6 +134,9 @@ export function SidebarNav({
           if (link.href.endsWith("/checkin")) tourId = "tour-checkin-desk";
           if (link.href.endsWith("/revenue")) tourId = "tour-revenue";
           if (link.href.endsWith("/website")) tourId = "tour-website";
+          if (link.href.endsWith("/intelligence")) tourId = "tour-intelligence";
+          if (link.href.endsWith("/trainers")) tourId = "tour-trainers";
+          if (link.href.endsWith("/analytics")) tourId = "tour-analytics";
           return (
             <Link
               key={link.href}

@@ -45,7 +45,7 @@ export default function GuidedTour({ isSandbox, role, tenantSlug }: GuidedTourPr
           {
             popover: {
               title: "Welcome to CortexFit",
-              description: "Let's take a quick 3-step tour of the most powerful tools in your dashboard.",
+              description: "Let's take a quick 6-step tour of the most powerful tools in your dashboard.",
               side: "over",
               align: "center",
             },
@@ -76,6 +76,33 @@ export default function GuidedTour({ isSandbox, role, tenantSlug }: GuidedTourPr
               side: "right",
               align: "start",
             },
+          },
+          {
+            element: "#tour-intelligence",
+            popover: {
+              title: "AI Member Retention",
+              description: "Our proprietary AI engine analyzes attendance to predict and alert you about members at risk of churning before they cancel.",
+              side: "right",
+              align: "start",
+            },
+          },
+          {
+            element: "#tour-trainers",
+            popover: {
+              title: "Staff & Trainer Management",
+              description: "Manage your entire staff and personal trainers. They get their own dedicated app portal for bookings and client progress.",
+              side: "right",
+              align: "start",
+            },
+          },
+          {
+            element: "#tour-analytics",
+            popover: {
+              title: "Enterprise-Grade Analytics",
+              description: "Visualize your success with beautiful heatmaps of your busiest hours and deep retention data.",
+              side: "right",
+              align: "start",
+            },
           }
         ] as DriveStep[]).filter(step => {
           // Graceful degradation: skip steps if the DOM element doesn't exist yet
@@ -98,7 +125,10 @@ export default function GuidedTour({ isSandbox, role, tenantSlug }: GuidedTourPr
       const allTargetsExist = !!(
         document.querySelector("#tour-checkin-desk") &&
         document.querySelector("#tour-revenue") &&
-        document.querySelector("#tour-website")
+        document.querySelector("#tour-website") &&
+        document.querySelector("#tour-intelligence") &&
+        document.querySelector("#tour-trainers") &&
+        document.querySelector("#tour-analytics")
       );
 
       if (allTargetsExist) {
