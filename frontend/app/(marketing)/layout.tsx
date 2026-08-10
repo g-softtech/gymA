@@ -9,14 +9,14 @@ export default function MarketingLayout({ children }: { children: ReactNode }) {
       <header className="sticky top-0 z-50 bg-background border-b border-border shadow-sm">
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-1">
-            <div className="h-10 w-12 flex items-center justify-center overflow-hidden rounded-md">
+            <div className="h-9 w-9 flex items-center justify-center overflow-visible">
               <img 
                 src="/logo.png" 
                 alt="CortexFit Logo" 
-                className="h-full w-full object-cover scale-[1.6] drop-shadow-md" 
+                className="h-[150%] w-[150%] max-w-none object-contain drop-shadow-md" 
               />
             </div>
-            <span className="font-bold text-foreground text-xl tracking-tight ml-1">CortexFit</span>
+            <span className="font-bold text-foreground text-xl tracking-tight ml-2">CortexFit</span>
           </Link>
 
           <nav className="hidden md:flex items-center gap-8">
@@ -64,14 +64,14 @@ export default function MarketingLayout({ children }: { children: ReactNode }) {
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-10 mb-12">
             <div className="col-span-2 sm:col-span-1">
               <div className="flex items-center gap-1 mb-4">
-                <div className="h-10 w-12 flex items-center justify-center overflow-hidden rounded-md">
+                <div className="h-9 w-9 flex items-center justify-center overflow-visible">
                   <img 
                     src="/logo.png" 
                     alt="CortexFit Logo" 
-                    className="h-full w-full object-cover scale-[1.6] drop-shadow-md" 
+                    className="h-[150%] w-[150%] max-w-none object-contain drop-shadow-md" 
                   />
                 </div>
-                <span className="font-bold text-white text-xl tracking-tight ml-1">CortexFit</span>
+                <span className="font-bold text-white text-xl tracking-tight ml-2">CortexFit</span>
               </div>
               <p className="text-sm text-gray-400 leading-relaxed">
                 The complete SaaS platform for modern gyms across Africa. Manage members, trainers, and growth — all in one place.
