@@ -56,33 +56,35 @@ export function DemoCTA() {
   return (
     <>
       <div 
-        className={`fixed z-50 transition-all duration-500 ease-out transform
+        className={`fixed z-[60] transition-all duration-500 ease-out transform
           /* Desktop behavior */
           md:top-auto md:left-auto md:bottom-6 md:right-6 
           ${showButton ? "md:translate-y-0 md:opacity-100 md:scale-100" : "md:translate-y-12 md:opacity-0 md:scale-95 md:pointer-events-none"}
           
-          /* Mobile behavior (sits above persona switcher) */
-          top-auto left-4 right-4 bottom-24
-          ${isAtBottom ? "translate-y-0 opacity-100 scale-100" : "translate-y-12 opacity-0 scale-95 pointer-events-none"}
+          /* Mobile behavior: Drop from top of screen to avoid bottom nav/persona overlap */
+          top-4 left-4 right-4 md:bottom-auto
+          ${isAtBottom ? "translate-y-0 opacity-100 scale-100" : "-translate-y-24 opacity-0 scale-95 pointer-events-none"}
         `}
       >
-        <div className="bg-card border border-border shadow-2xl rounded-2xl p-4 md:p-5 w-full md:w-[320px] flex flex-col gap-2 md:gap-3 relative overflow-hidden group">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none transition-transform group-hover:scale-125"></div>
+        <div className="bg-card border border-border shadow-xl md:shadow-2xl rounded-xl md:rounded-2xl p-2.5 md:p-5 w-full md:w-[320px] flex flex-row md:flex-col items-center md:items-stretch justify-between gap-3 relative overflow-hidden group">
+          <div className="hidden md:block absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none transition-transform group-hover:scale-125"></div>
           
-          <div className="flex items-center gap-2 md:gap-3 relative z-10">
-            <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-gradient-to-br from-primary to-indigo-600 flex items-center justify-center text-white shadow-lg shrink-0 text-sm md:text-base">
+          <div className="flex items-center gap-2 md:gap-3 relative z-10 flex-1 min-w-0">
+            <div className="w-7 h-7 md:w-10 md:h-10 rounded-full bg-gradient-to-br from-primary to-indigo-600 flex items-center justify-center text-white shadow-lg shrink-0 text-xs md:text-base">
               🚀
             </div>
-            <div>
-              <h4 className="font-bold text-foreground text-xs md:text-sm leading-tight">Ready to run your gym with CortexFit?</h4>
+            <div className="min-w-0 flex-1">
+              <h4 className="font-bold text-foreground text-[13px] md:text-sm leading-tight truncate md:whitespace-normal">
+                Ready to run your gym?
+              </h4>
             </div>
           </div>
           
           <button 
             onClick={() => setModalOpen(true)}
-            className="w-full bg-primary text-primary-foreground font-semibold py-2 md:py-2.5 px-4 rounded-xl text-xs md:text-sm shadow-md hover:bg-primary/90 hover:shadow-lg transition-all relative z-10 mt-1"
+            className="shrink-0 bg-primary text-primary-foreground font-semibold py-1.5 md:py-2.5 px-3 md:px-4 rounded-lg md:rounded-xl text-[12px] md:text-sm shadow-md hover:bg-primary/90 hover:shadow-lg transition-all relative z-10 md:mt-1 whitespace-nowrap"
           >
-            Start My Free Trial
+            Start Free Trial
           </button>
         </div>
       </div>
