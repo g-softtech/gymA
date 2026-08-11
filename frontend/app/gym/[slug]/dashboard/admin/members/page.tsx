@@ -20,12 +20,14 @@ type UserWithProfile = User & {
 
 export default async function AdminMembersPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
   const { slug } = await params;
+  const sp = await searchParams;
   const session = await getAuthSession();
-
 
   if (!session?.user) return null;
   if (session.user.role !== "ADMIN" && session.user.role !== "SUPERADMIN") {
@@ -38,36 +40,45 @@ export default async function AdminMembersPage({
 
   const tenant = await prisma.tenant.findUnique({
     where: { slug },
+  });
+  
+  if (!tenant) return <p>Gym not found.</p>;
+
+  const page = parseInt((sp.page as string) || "1", 10);
+  const pageSize = 20;
+  const skip = (page - 1) * pageSize;
+
+  const totalMembers = await prisma.user.count({
+    where: { tenantId: tenant.id, role: { notIn: ["SUPERADMIN"] } },
+  });
+  const totalPages = Math.ceil(totalMembers / pageSize);
+
+  const fetchedMembers = await prisma.user.findMany({
+    where: { tenantId: tenant.id, role: { notIn: ["SUPERADMIN"] } },
+    skip,
+    take: pageSize,
+    orderBy: { name: "asc" },
     include: {
-      users: {
-        where: { role: { notIn: ["SUPERADMIN"] } },
+      memberProfile: {
         include: {
-          memberProfile: {
-            include: {
-              subscriptions: {
-                include: { plan: true },
-                orderBy: { startDate: "desc" },
-                take: 1,
-              },
-            },
+          subscriptions: {
+            include: { plan: true },
+            orderBy: { startDate: "desc" },
+            take: 1,
           },
         },
-        orderBy: { name: "asc" },
       },
     },
   });
-  if (!tenant) return null;
 
-  if (!tenant) return <p>Gym not found.</p>;
-
-  const members = tenant.users as UserWithProfile[];
+  const members = fetchedMembers as UserWithProfile[];
 
   return (
     <div className="max-w-6xl mx-auto space-y-6">
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold text-foreground">Members</h1>
-          <p className="text-muted-foreground mt-1">{members.length} registered member{members.length !== 1 ? "s" : ""}</p>
+          <p className="text-muted-foreground mt-1">{totalMembers} registered member{totalMembers !== 1 ? "s" : ""}</p>
         </div>
         <div className="flex gap-3">
           <MemberCsvImportModal />
@@ -166,6 +177,28 @@ export default async function AdminMembersPage({
             </tbody>
           </table>
         </div>
+        
+        {/* Pagination Controls */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-between p-4 border-t border-border bg-muted/20">
+            <div className="text-sm text-muted-foreground">
+              Showing <span className="font-medium text-foreground">{skip + 1}</span> to <span className="font-medium text-foreground">{Math.min(skip + pageSize, totalMembers)}</span> of <span className="font-medium text-foreground">{totalMembers}</span> members
+            </div>
+            <div className="flex gap-2">
+              {page > 1 ? (
+                <Link href={`/gym/${slug}/dashboard/admin/members?page=${page - 1}`} className="px-3 py-1.5 border border-border bg-card rounded-md text-sm hover:bg-muted transition-colors font-medium">Previous</Link>
+              ) : (
+                <button disabled className="px-3 py-1.5 border border-border bg-card rounded-md text-sm opacity-50 cursor-not-allowed font-medium">Previous</button>
+              )}
+              
+              {page < totalPages ? (
+                <Link href={`/gym/${slug}/dashboard/admin/members?page=${page + 1}`} className="px-3 py-1.5 border border-border bg-card rounded-md text-sm hover:bg-muted transition-colors font-medium">Next</Link>
+              ) : (
+                <button disabled className="px-3 py-1.5 border border-border bg-card rounded-md text-sm opacity-50 cursor-not-allowed font-medium">Next</button>
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

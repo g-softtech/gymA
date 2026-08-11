@@ -51,7 +51,7 @@ export default function GuidedTour({ isSandbox, role, tenantSlug }: GuidedTourPr
             },
           },
           {
-            element: window.innerWidth < 768 ? "#tour-mobile-checkin-desk" : "#tour-desktop-checkin-desk",
+            element: window.innerWidth < 768 ? undefined : "#tour-desktop-checkin-desk",
             popover: {
               title: "Modern Access Control",
               description: "Use the Check-in Desk to scan member QR codes, instantly verify active subscriptions, and log their attendance.",
@@ -60,7 +60,7 @@ export default function GuidedTour({ isSandbox, role, tenantSlug }: GuidedTourPr
             },
           },
           {
-            element: window.innerWidth < 768 ? "#tour-mobile-revenue" : "#tour-desktop-revenue",
+            element: window.innerWidth < 768 ? undefined : "#tour-desktop-revenue",
             popover: {
               title: "Automated Payment Recovery",
               description: "CortexFit automatically chases down failed payments for you. Monitor your real-time revenue and active subscriptions here.",
@@ -69,7 +69,7 @@ export default function GuidedTour({ isSandbox, role, tenantSlug }: GuidedTourPr
             },
           },
           {
-            element: window.innerWidth < 768 ? "#tour-mobile-website" : "#tour-desktop-website",
+            element: window.innerWidth < 768 ? undefined : "#tour-desktop-website",
             popover: {
               title: "Your Digital Storefront",
               description: "Manage your fully integrated, SEO-optimized gym website. Update branding, content, and hero images instantly.",
@@ -78,7 +78,7 @@ export default function GuidedTour({ isSandbox, role, tenantSlug }: GuidedTourPr
             },
           },
           {
-            element: window.innerWidth < 768 ? "#tour-mobile-intelligence" : "#tour-desktop-intelligence",
+            element: window.innerWidth < 768 ? undefined : "#tour-desktop-intelligence",
             popover: {
               title: "AI Member Retention",
               description: "Our proprietary AI engine analyzes attendance to predict and alert you about members at risk of churning before they cancel.",
@@ -87,7 +87,7 @@ export default function GuidedTour({ isSandbox, role, tenantSlug }: GuidedTourPr
             },
           },
           {
-            element: window.innerWidth < 768 ? "#tour-mobile-trainers" : "#tour-desktop-trainers",
+            element: window.innerWidth < 768 ? undefined : "#tour-desktop-trainers",
             popover: {
               title: "Staff & Trainer Management",
               description: "Manage your entire staff and personal trainers. They get their own dedicated app portal for bookings and client progress.",
@@ -96,7 +96,7 @@ export default function GuidedTour({ isSandbox, role, tenantSlug }: GuidedTourPr
             },
           },
           {
-            element: window.innerWidth < 768 ? "#tour-mobile-analytics" : "#tour-desktop-analytics",
+            element: window.innerWidth < 768 ? undefined : "#tour-desktop-analytics",
             popover: {
               title: "Enterprise-Grade Analytics",
               description: "Visualize your success with beautiful heatmaps of your busiest hours and deep retention data.",
