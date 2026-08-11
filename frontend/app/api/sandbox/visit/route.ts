@@ -24,8 +24,8 @@ export async function GET(req: Request) {
     const ip = req.headers.get("x-forwarded-for") ?? "Unknown IP";
     const userAgent = req.headers.get("user-agent") ?? "Unknown Device";
 
-    // Create an audit trail using ActionRegistry to track the click
-    await prisma.actionRegistry.create({
+    // Create an audit trail using ActionRegistry to track the click (fire-and-forget)
+    prisma.actionRegistry.create({
       data: {
         tenantId: tenant.id,
         actionType: "SANDBOX_PORTAL_VISIT",
@@ -39,7 +39,7 @@ export async function GET(req: Request) {
         status: "COMPLETED",
         executedAt: new Date()
       }
-    });
+    }).catch(err => console.error("[SANDBOX_VISIT_TRACK_ERROR]", err));
 
     // Finally, redirect them to their magical sandbox environment!
     return NextResponse.redirect(new URL(`/sandbox/${slug}`, req.url));

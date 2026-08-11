@@ -22,7 +22,9 @@ export default async function DashboardLayout({
 }) {
   const { slug } = await params;
   const session = await getAuthSession();
-  if (!session?.user) return null;
+  if (!session?.user) {
+    redirect(`/gym/${slug}/join`);
+  }
 
   // If user used Magic Link and has no password, force them to set one.
   if (session.user.provider === "email" && !session.user.hasPassword) {
