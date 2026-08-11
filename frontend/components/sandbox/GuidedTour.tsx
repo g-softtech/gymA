@@ -53,8 +53,8 @@ export default function GuidedTour({ isSandbox, role, tenantSlug }: GuidedTourPr
           {
             element: window.innerWidth < 768 ? undefined : "#tour-desktop-checkin-desk",
             popover: {
-              title: "Modern Access Control",
-              description: "Use the Check-in Desk to scan member QR codes, instantly verify active subscriptions, and log their attendance.",
+              title: "Access Control",
+              description: "Use the Check-in Desk to scan member QR codes, verify active subscriptions, and log attendance.",
               side: window.innerWidth < 768 ? "top" : "right",
               align: "start",
             },
@@ -62,8 +62,8 @@ export default function GuidedTour({ isSandbox, role, tenantSlug }: GuidedTourPr
           {
             element: window.innerWidth < 768 ? undefined : "#tour-desktop-revenue",
             popover: {
-              title: "Automated Payment Recovery",
-              description: "CortexFit automatically chases down failed payments for you. Monitor your real-time revenue and active subscriptions here.",
+              title: "Revenue Dashboard",
+              description: "Track real-time revenue, active subscriptions, and automatically recover failed member payments.",
               side: window.innerWidth < 768 ? "top" : "right",
               align: "start",
             },
@@ -71,8 +71,8 @@ export default function GuidedTour({ isSandbox, role, tenantSlug }: GuidedTourPr
           {
             element: window.innerWidth < 768 ? undefined : "#tour-desktop-website",
             popover: {
-              title: "Your Digital Storefront",
-              description: "Manage your fully integrated, SEO-optimized gym website. Update branding, content, and hero images instantly.",
+              title: "Website Manager",
+              description: "Update your gym's public website, customize your branding colors, and edit content instantly.",
               side: window.innerWidth < 768 ? "top" : "right",
               align: "start",
             },
@@ -80,8 +80,8 @@ export default function GuidedTour({ isSandbox, role, tenantSlug }: GuidedTourPr
           {
             element: window.innerWidth < 768 ? undefined : "#tour-desktop-intelligence",
             popover: {
-              title: "AI Member Retention",
-              description: "Our proprietary AI engine analyzes attendance to predict and alert you about members at risk of churning before they cancel.",
+              title: "AI Retention Engine",
+              description: "Predict member churn and get actionable AI alerts to retain at-risk members before they cancel.",
               side: window.innerWidth < 768 ? "top" : "right",
               align: "start",
             },
@@ -89,8 +89,8 @@ export default function GuidedTour({ isSandbox, role, tenantSlug }: GuidedTourPr
           {
             element: window.innerWidth < 768 ? undefined : "#tour-desktop-trainers",
             popover: {
-              title: "Staff & Trainer Management",
-              description: "Manage your entire staff and personal trainers. They get their own dedicated app portal for bookings and client progress.",
+              title: "Trainer Management",
+              description: "Manage your staff. Trainers get a dedicated portal for scheduling bookings and tracking clients.",
               side: window.innerWidth < 768 ? "top" : "right",
               align: "start",
             },
@@ -98,8 +98,8 @@ export default function GuidedTour({ isSandbox, role, tenantSlug }: GuidedTourPr
           {
             element: window.innerWidth < 768 ? undefined : "#tour-desktop-analytics",
             popover: {
-              title: "Enterprise-Grade Analytics",
-              description: "Visualize your success with beautiful heatmaps of your busiest hours and deep retention data.",
+              title: "Deep Analytics",
+              description: "Visualize attendance heatmaps, track your busiest hours, and monitor retention metrics.",
               side: window.innerWidth < 768 ? "top" : "right",
               align: "start",
             },
