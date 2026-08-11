@@ -121,6 +121,7 @@ export default async function DashboardLayout({
   const isImpersonating = !!cookieStore.get("sandbox_impersonate_userId")?.value;
 
   const isSandbox = isSandboxContext || session.user.email === "guest@sandbox.local" || session.user.id.startsWith("guest-admin-");
+  const isTourEnabled = isSandbox || tenant.isDemo;
 
   const adminBase = isSandbox ? `/sandbox/${slug}` : `/gym/${slug}/dashboard/admin`;
   const trainerBase = isSandbox ? `/sandbox/${slug}/trainer` : `/gym/${slug}/dashboard/trainer`;
@@ -231,7 +232,7 @@ export default async function DashboardLayout({
       <MobileNav
         slug={slug}
         role={role as "SUPERADMIN" | "ADMIN" | "TRAINER" | "MEMBER"}
-        isSandbox={isSandbox}
+        isSandbox={isTourEnabled}
         adminLinks={adminLinks}
         trainerLinks={trainerLinks}
         memberLinks={memberLinks}
@@ -246,7 +247,7 @@ export default async function DashboardLayout({
         environmentType={slug === 'demo-elite' ? ('LIVE DEMO' as const) : ('SANDBOX' as const)}
       />
       <GuidedTour 
-        isSandbox={isSandbox} 
+        isSandbox={isTourEnabled} 
         role={role as string} 
         tenantSlug={slug} 
       />
