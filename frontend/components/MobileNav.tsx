@@ -124,10 +124,19 @@ export function MobileNav({ slug, role, adminLinks, trainerLinks, memberLinks, p
         <div className="flex justify-around items-center h-16 px-2">
           {bottomLinks.map((link) => {
             const isActive = pathname === link.href;
+            let tourId = undefined;
+            if (link.href.endsWith("/checkin")) tourId = "tour-mobile-checkin-desk";
+            if (link.href.endsWith("/revenue")) tourId = "tour-mobile-revenue";
+            if (link.href.endsWith("/website")) tourId = "tour-mobile-website";
+            if (link.href.endsWith("/intelligence")) tourId = "tour-mobile-intelligence";
+            if (link.href.endsWith("/trainers")) tourId = "tour-mobile-trainers";
+            if (link.href.endsWith("/analytics")) tourId = "tour-mobile-analytics";
+            
             return (
               <Link
                 key={link.href}
                 href={link.href}
+                id={tourId}
                 className={`flex flex-col items-center justify-center w-full h-full space-y-1 transition-colors ${
                   isActive ? "font-bold" : "text-muted-foreground font-medium hover:text-foreground"
                 }`}
@@ -161,17 +170,40 @@ export function MobileNav({ slug, role, adminLinks, trainerLinks, memberLinks, p
           >
             <div className="w-12 h-1 bg-muted rounded-full mx-auto mb-4" />
             <div className="space-y-2">
-              {moreLinks.map(link => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  onClick={() => setMoreOpen(false)}
-                  className="flex items-center gap-4 px-4 py-3 rounded-xl hover:bg-accent transition"
+              {isAdminContext && _isSandbox && (
+                <button
+                  onClick={() => {
+                    setMoreOpen(false);
+                    setTimeout(() => window.dispatchEvent(new CustomEvent('cortexfit:start-tour')), 300);
+                  }}
+                  className="flex items-center gap-4 px-4 py-3 rounded-xl bg-indigo-500/10 text-indigo-600 hover:bg-indigo-500/20 transition w-full text-left"
                 >
-                  <span className="text-2xl">{link.icon}</span>
-                  <span className="font-semibold text-foreground">{link.label}</span>
-                </Link>
-              ))}
+                  <span className="text-2xl">🧭</span>
+                  <span className="font-semibold">Take Product Tour</span>
+                </button>
+              )}
+              {moreLinks.map(link => {
+                let tourId = undefined;
+                if (link.href.endsWith("/checkin")) tourId = "tour-mobile-checkin-desk";
+                if (link.href.endsWith("/revenue")) tourId = "tour-mobile-revenue";
+                if (link.href.endsWith("/website")) tourId = "tour-mobile-website";
+                if (link.href.endsWith("/intelligence")) tourId = "tour-mobile-intelligence";
+                if (link.href.endsWith("/trainers")) tourId = "tour-mobile-trainers";
+                if (link.href.endsWith("/analytics")) tourId = "tour-mobile-analytics";
+                
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    id={tourId}
+                    onClick={() => setMoreOpen(false)}
+                    className="flex items-center gap-4 px-4 py-3 rounded-xl hover:bg-accent transition"
+                  >
+                    <span className="text-2xl">{link.icon}</span>
+                    <span className="font-semibold text-foreground">{link.label}</span>
+                  </Link>
+                );
+              })}
 
             </div>
             <div className="mt-4 pt-4 border-t border-border flex items-center justify-between px-4">

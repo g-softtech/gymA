@@ -121,7 +121,18 @@ export function OnboardingModal({ isOpen, onClose }: OnboardingModalProps) {
               </p>
             </div>
             <button
-              onClick={onClose}
+              onClick={async () => {
+                try {
+                  await fetch("/api/sandbox/session", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ slug: liveSlug, email })
+                  });
+                  window.location.href = `/sandbox/${liveSlug}/member?welcome=1`;
+                } catch (e) {
+                  onClose();
+                }
+              }}
               className="w-full bg-secondary text-secondary-foreground font-semibold py-3 px-4 rounded-xl hover:bg-secondary/80 transition"
             >
               Continue Exploring

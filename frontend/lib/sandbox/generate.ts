@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { TenantPlan } from "@prisma/client";
 import crypto from "crypto";
 import bcrypt from "bcryptjs";
 
@@ -38,6 +39,10 @@ export async function generateSandbox({
   const tempPassword = crypto.randomBytes(16).toString("hex");
   const hashedPassword = await bcrypt.hash(tempPassword, 10);
 
+  // Randomly distribute SaaS plans for diverse analytics
+  const availablePlans: TenantPlan[] = ["FREE", "STARTER", "PROFESSIONAL", "ENTERPRISE"];
+  const randomPlan = availablePlans[Math.floor(Math.random() * availablePlans.length)];
+
   const tenant = await prisma.$transaction(async (tx) => {
     const tenantRecord = await tx.tenant.create({
       data: {
@@ -45,6 +50,7 @@ export async function generateSandbox({
         slug,
         isDemo: true, // Marks this as a Sandbox
         status: "APPROVED",
+        plan: randomPlan,
         settings: {
           create: {
             logoUrl: logoUrl || "/sandbox-logos/default.png",

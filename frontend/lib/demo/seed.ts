@@ -65,6 +65,10 @@ async function seedLiveDemoTransaction(tx: Prisma.TransactionClient) {
   console.log("🌱 Starting LIVE DEMO database seed...");
   await clearExistingDemoData(tx);
 
+  // Randomly distribute SaaS plans for diverse analytics
+  const availablePlans = ["FREE", "STARTER", "PROFESSIONAL", "ENTERPRISE"];
+  const randomPlan = availablePlans[Math.floor(Math.random() * availablePlans.length)] as any;
+
   // 1. Create Demo Tenant
   const tenant = await tx.tenant.create({
     data: {
@@ -72,7 +76,7 @@ async function seedLiveDemoTransaction(tx: Prisma.TransactionClient) {
       slug: "demo-elite",
       isDemo: true,
       status: "APPROVED" as any,
-      plan: "ENTERPRISE",
+      plan: randomPlan,
       isActive: true,
       settings: {
         create: {

@@ -51,56 +51,56 @@ export default function GuidedTour({ isSandbox, role, tenantSlug }: GuidedTourPr
             },
           },
           {
-            element: "#tour-checkin-desk",
+            element: window.innerWidth < 768 ? "#tour-mobile-checkin-desk" : "#tour-desktop-checkin-desk",
             popover: {
               title: "Modern Access Control",
               description: "Use the Check-in Desk to scan member QR codes, instantly verify active subscriptions, and log their attendance.",
-              side: "right",
+              side: window.innerWidth < 768 ? "top" : "right",
               align: "start",
             },
           },
           {
-            element: "#tour-revenue",
+            element: window.innerWidth < 768 ? "#tour-mobile-revenue" : "#tour-desktop-revenue",
             popover: {
               title: "Automated Payment Recovery",
               description: "CortexFit automatically chases down failed payments for you. Monitor your real-time revenue and active subscriptions here.",
-              side: "right",
+              side: window.innerWidth < 768 ? "top" : "right",
               align: "start",
             },
           },
           {
-            element: "#tour-website",
+            element: window.innerWidth < 768 ? "#tour-mobile-website" : "#tour-desktop-website",
             popover: {
               title: "Your Digital Storefront",
               description: "Manage your fully integrated, SEO-optimized gym website. Update branding, content, and hero images instantly.",
-              side: "right",
+              side: window.innerWidth < 768 ? "top" : "right",
               align: "start",
             },
           },
           {
-            element: "#tour-intelligence",
+            element: window.innerWidth < 768 ? "#tour-mobile-intelligence" : "#tour-desktop-intelligence",
             popover: {
               title: "AI Member Retention",
               description: "Our proprietary AI engine analyzes attendance to predict and alert you about members at risk of churning before they cancel.",
-              side: "right",
+              side: window.innerWidth < 768 ? "top" : "right",
               align: "start",
             },
           },
           {
-            element: "#tour-trainers",
+            element: window.innerWidth < 768 ? "#tour-mobile-trainers" : "#tour-desktop-trainers",
             popover: {
               title: "Staff & Trainer Management",
               description: "Manage your entire staff and personal trainers. They get their own dedicated app portal for bookings and client progress.",
-              side: "right",
+              side: window.innerWidth < 768 ? "top" : "right",
               align: "start",
             },
           },
           {
-            element: "#tour-analytics",
+            element: window.innerWidth < 768 ? "#tour-mobile-analytics" : "#tour-desktop-analytics",
             popover: {
               title: "Enterprise-Grade Analytics",
               description: "Visualize your success with beautiful heatmaps of your busiest hours and deep retention data.",
-              side: "right",
+              side: window.innerWidth < 768 ? "top" : "right",
               align: "start",
             },
           }
@@ -122,13 +122,13 @@ export default function GuidedTour({ isSandbox, role, tenantSlug }: GuidedTourPr
 
     // Wait until the DOM targets exist (or timeout after 5 seconds)
     const checkTargets = setInterval(() => {
-      const allTargetsExist = !!(
-        document.querySelector("#tour-checkin-desk") &&
-        document.querySelector("#tour-revenue") &&
-        document.querySelector("#tour-website") &&
-        document.querySelector("#tour-intelligence") &&
-        document.querySelector("#tour-trainers") &&
-        document.querySelector("#tour-analytics")
+      const allTargetsExist = window.innerWidth < 768 ? true : !!(
+        document.querySelector("#tour-desktop-checkin-desk") &&
+        document.querySelector("#tour-desktop-revenue") &&
+        document.querySelector("#tour-desktop-website") &&
+        document.querySelector("#tour-desktop-intelligence") &&
+        document.querySelector("#tour-desktop-trainers") &&
+        document.querySelector("#tour-desktop-analytics")
       );
 
       if (allTargetsExist) {

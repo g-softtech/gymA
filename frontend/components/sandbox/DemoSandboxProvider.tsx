@@ -2,6 +2,8 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { SandboxHeartbeat } from "./SandboxHeartbeat";
 
 interface DemoSandboxContextType {
   isDemoModalOpen: boolean;
@@ -13,6 +15,7 @@ const DemoSandboxContext = createContext<DemoSandboxContextType | undefined>(und
 
 export function DemoSandboxProvider({ children }: { children: ReactNode }) {
   const [isDemoModalOpen, setIsDemoModalOpen] = useState(false);
+  const pathname = usePathname();
 
   const triggerDemoModal = () => setIsDemoModalOpen(true);
   const closeDemoModal = () => setIsDemoModalOpen(false);
@@ -62,6 +65,7 @@ export function DemoSandboxProvider({ children }: { children: ReactNode }) {
     <DemoSandboxContext.Provider value={{ isDemoModalOpen, triggerDemoModal, closeDemoModal }}>
       {children}
       {isDemoModalOpen && <DemoUpgradeModal onClose={closeDemoModal} />}
+      {pathname?.startsWith("/sandbox/") && <SandboxHeartbeat />}
     </DemoSandboxContext.Provider>
   );
 }

@@ -131,12 +131,12 @@ export function SidebarNav({
         {activeLinks.map((link) => {
           const isActive = pathname === link.href || pathname.startsWith(`${link.href}/`);
           let tourId = undefined;
-          if (link.href.endsWith("/checkin")) tourId = "tour-checkin-desk";
-          if (link.href.endsWith("/revenue")) tourId = "tour-revenue";
-          if (link.href.endsWith("/website")) tourId = "tour-website";
-          if (link.href.endsWith("/intelligence")) tourId = "tour-intelligence";
-          if (link.href.endsWith("/trainers")) tourId = "tour-trainers";
-          if (link.href.endsWith("/analytics")) tourId = "tour-analytics";
+          if (link.href.endsWith("/checkin")) tourId = "tour-desktop-checkin-desk";
+          if (link.href.endsWith("/revenue")) tourId = "tour-desktop-revenue";
+          if (link.href.endsWith("/website")) tourId = "tour-desktop-website";
+          if (link.href.endsWith("/intelligence")) tourId = "tour-desktop-intelligence";
+          if (link.href.endsWith("/trainers")) tourId = "tour-desktop-trainers";
+          if (link.href.endsWith("/analytics")) tourId = "tour-desktop-analytics";
           return (
             <Link
               key={link.href}
