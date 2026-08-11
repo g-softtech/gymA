@@ -156,7 +156,10 @@ async function seedLiveDemoTransaction(tx: Prisma.TransactionClient) {
   
   for (let i = 1; i <= 50; i++) { // Reduced to 50 for faster automated resets
     const joinDate = subDays(now, randomInt(5, 60));
-    const plan = plans.professional;
+    
+    // Randomize member plan distribution
+    const planOptions = [plans.starter, plans.professional, plans.premium, plans.corporate];
+    const plan = planOptions[Math.floor(Math.random() * planOptions.length)];
 
     const user = await tx.user.create({
       data: {
