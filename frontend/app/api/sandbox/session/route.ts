@@ -46,7 +46,8 @@ export async function POST(req: Request) {
     });
 
     // Set secure HTTP-only cookie
-    cookies().set("cortexfit_sandbox_session", sessionId, {
+    const cookieStore = await cookies();
+    cookieStore.set("cortexfit_sandbox_session", sessionId, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
