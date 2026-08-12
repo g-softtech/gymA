@@ -55,6 +55,39 @@ export default function SuperadminMobileNav() {
           >
             <div className="w-12 h-1 bg-card text-card-foreground/20 rounded-full mx-auto mb-4" />
             <div className="space-y-2">
+              <Link
+                href="/admin/growth"
+                onClick={() => setMoreOpen(false)}
+                className="flex items-center gap-4 px-4 py-3 rounded-xl hover:bg-white/5 transition"
+              >
+                <span className="text-2xl">🌱</span>
+                <span className="font-semibold text-slate-200">Growth</span>
+              </Link>
+              <Link
+                href="/admin/billing"
+                onClick={() => setMoreOpen(false)}
+                className="flex items-center gap-4 px-4 py-3 rounded-xl hover:bg-white/5 transition"
+              >
+                <span className="text-2xl">💰</span>
+                <span className="font-semibold text-slate-200">Billing</span>
+              </Link>
+              <Link
+                href="/admin/blog"
+                onClick={() => setMoreOpen(false)}
+                className="flex items-center gap-4 px-4 py-3 rounded-xl hover:bg-white/5 transition"
+              >
+                <span className="text-2xl">📝</span>
+                <span className="font-semibold text-slate-200">Marketing Blog</span>
+              </Link>
+              <Link
+                href="/admin/subscribers"
+                onClick={() => setMoreOpen(false)}
+                className="flex items-center gap-4 px-4 py-3 rounded-xl hover:bg-white/5 transition"
+              >
+                <span className="text-2xl">📬</span>
+                <span className="font-semibold text-slate-200">Subscribers</span>
+              </Link>
+              <div className="my-2 border-t border-white/10" />
               <a
                 href="/api/auth/signout"
                 className="flex items-center gap-4 px-4 py-3 rounded-xl hover:bg-red-500/10 text-red-400 transition"
