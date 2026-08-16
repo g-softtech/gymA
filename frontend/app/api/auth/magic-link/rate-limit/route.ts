@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 
 export async function POST(req: NextRequest) {
   try {
-    const { email, tenantSlug, checkOnly } = await req.json();
+    const { email, tenantSlug, checkOnly, isJoinFlow } = await req.json();
     if (!email) return NextResponse.json({ error: "Email required" }, { status: 400 });
 
     // ── Tenant membership pre-flight ──────────────────────────────────────────
@@ -22,33 +22,46 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    if (tenantSlug) {
-      // Tenant-scoped sign-in: the requesting email must belong to this tenant.
-      // Unified message prevents account enumeration while still being actionable.
-      if (!user || user.tenant?.slug !== tenantSlug) {
-        return NextResponse.json(
-          {
-            error:
-              "You are not registered with this gym. Please check the sign-in link or contact your gym administrator.",
-          },
-          { status: 403 }
-        );
+    if (isJoinFlow) {
+      // It's a join flow.
+      // If they already belong to a DIFFERENT gym, they can't join this one with the same account.
+      if (user?.tenantId && tenantSlug && user.tenant?.slug !== tenantSlug) {
+         return NextResponse.json(
+           {
+             error: `This email is already registered with ${user.tenant?.name}. Please use a different email to join this gym.`,
+           },
+           { status: 403 }
+         );
       }
     } else {
-      // Main-site sign-in: only platform-level (tenantless) accounts allowed.
-      // SUPERADMINs have no tenantId so they pass automatically.
-      if (user?.tenantId) {
-        const gymName = user.tenant?.name ?? "your gym";
-        const gymSlug = user.tenant?.slug;
-        const portalHint = gymSlug
-          ? ` Please sign in at your gym's portal: /gym/${gymSlug}`
-          : "";
-        return NextResponse.json(
-          {
-            error: `This account is registered under ${gymName}.${portalHint}`,
-          },
-          { status: 403 }
-        );
+      if (tenantSlug) {
+        // Tenant-scoped sign-in: the requesting email must belong to this tenant.
+        // Unified message prevents account enumeration while still being actionable.
+        if (!user || user.tenant?.slug !== tenantSlug) {
+          return NextResponse.json(
+            {
+              error:
+                "You are not registered with this gym. Please check the sign-in link or contact your gym administrator.",
+            },
+            { status: 403 }
+          );
+        }
+      } else {
+        // Main-site sign-in: only platform-level (tenantless) accounts allowed.
+        // SUPERADMINs have no tenantId so they pass automatically.
+        if (user?.tenantId) {
+          const gymName = user.tenant?.name ?? "your gym";
+          const gymSlug = user.tenant?.slug;
+          const portalHint = gymSlug
+            ? ` Please sign in at your gym's portal: /gym/${gymSlug}`
+            : "";
+          return NextResponse.json(
+            {
+              error: `This account is registered under ${gymName}.${portalHint}`,
+            },
+            { status: 403 }
+          );
+        }
       }
     }
 

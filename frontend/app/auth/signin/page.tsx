@@ -78,12 +78,14 @@ export default function SignInPage() {
 
   // Extract tenant slug from the callbackUrl (used for both magic link and credentials pre-flights)
   const tenantSlug = callbackUrl.match(/\/gym\/([^\/]+)/)?.[1] ?? null;
+  const isJoinFlow = callbackUrl.includes("/join");
 
   const handleMagicLink = async () => {
     if (!form.email) {
        setMessage({ type: "error", text: "Please enter your email address above to receive a login link." });
        return;
     }
+
     setMagicLinkLoading(true);
     setMessage(null);
     try {
@@ -91,7 +93,7 @@ export default function SignInPage() {
       const res = await fetch("/api/auth/magic-link/rate-limit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: form.email, tenantSlug }),
+        body: JSON.stringify({ email: form.email, tenantSlug, isJoinFlow }),
       });
       if (!res.ok) {
          const data = await res.json();
@@ -127,7 +129,7 @@ export default function SignInPage() {
       const preflightRes = await fetch("/api/auth/magic-link/rate-limit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: form.email, tenantSlug, checkOnly: true }),
+        body: JSON.stringify({ email: form.email, tenantSlug, checkOnly: true, isJoinFlow }),
       });
       if (!preflightRes.ok) {
         const data = await preflightRes.json();
@@ -146,6 +148,7 @@ export default function SignInPage() {
       email: form.email,
       password: form.password,
       tenantSlug: tenantSlug ?? "",
+      isJoinFlow: isJoinFlow ? "true" : "false",
     });
 
     if (result?.ok) {

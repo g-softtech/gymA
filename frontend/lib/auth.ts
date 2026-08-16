@@ -45,6 +45,7 @@ export const authOptions: NextAuthOptions = {
         password: { label: "Password", type: "password" },
         // Tenant context forwarded from the sign-in page to enforce cross-site isolation.
         tenantSlug: { label: "Tenant Slug", type: "text" },
+        isJoinFlow: { label: "Is Join Flow", type: "text" },
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
@@ -97,17 +98,26 @@ export const authOptions: NextAuthOptions = {
         //   • tenantSlug present  → user must belong to that exact tenant
         //   • tenantSlug absent   → user must not be a gym member (SUPERADMIN/platform only)
         if (user.role !== "SUPERADMIN") {
-          if (tenantSlug) {
-            if (user.tenant?.slug !== tenantSlug) {
-              console.log("[AUTH TRACE] Rejecting: User does not belong to tenant", tenantSlug);
-              auditLogger.log(AuditEventType.USER_FAILED_LOGIN, user.tenantId, { email, reason: `Cross-tenant credentials attempt for ${tenantSlug}` }, user.id);
+          const isJoinFlow = credentials.isJoinFlow === "true";
+          if (isJoinFlow) {
+            if (user.tenantId && tenantSlug && user.tenant?.slug !== tenantSlug) {
+              console.log("[AUTH TRACE] Rejecting: User already belongs to another gym");
+              auditLogger.log(AuditEventType.USER_FAILED_LOGIN, user.tenantId, { email, reason: "Cannot join a different gym with existing gym account" }, user.id);
+              throw new Error("This email is already registered with another gym.");
+            }
+          } else {
+            if (tenantSlug) {
+              if (user.tenant?.slug !== tenantSlug) {
+                console.log("[AUTH TRACE] Rejecting: User does not belong to tenant", tenantSlug);
+                auditLogger.log(AuditEventType.USER_FAILED_LOGIN, user.tenantId, { email, reason: `Cross-tenant credentials attempt for ${tenantSlug}` }, user.id);
+                throw new Error("Invalid email or password.");
+              }
+            } else if (user.tenantId) {
+              // Gym member trying to log in on the main site — block them
+              console.log("[AUTH TRACE] Rejecting: Gym member attempting main-site login");
+              auditLogger.log(AuditEventType.USER_FAILED_LOGIN, user.tenantId, { email, reason: "Main-site login blocked for gym member" }, user.id);
               throw new Error("Invalid email or password.");
             }
-          } else if (user.tenantId) {
-            // Gym member trying to log in on the main site — block them
-            console.log("[AUTH TRACE] Rejecting: Gym member attempting main-site login");
-            auditLogger.log(AuditEventType.USER_FAILED_LOGIN, user.tenantId, { email, reason: "Main-site login blocked for gym member" }, user.id);
-            throw new Error("Invalid email or password.");
           }
         }
 
@@ -144,7 +154,7 @@ export const authOptions: NextAuthOptions = {
         const tenantSlug = match ? match[1] : null;
 
         let gymName = "CortexFit";
-        let isCreationFlow = callbackUrl.includes("/onboarding/process");
+        let isCreationFlow = callbackUrl.includes("/onboarding/process") || callbackUrl.includes("/join");
         let title = `Sign in to ${gymName}`;
 
         if (isCreationFlow) {
